@@ -9,38 +9,159 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as RekisteroidyRouteImport } from './routes/rekisteroidy'
+import { Route as LoginRouteImport } from './routes/login'
+import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AuthenticatedVuosikelloRouteImport } from './routes/_authenticated/vuosikello'
+import { Route as AuthenticatedTalonTiedotRouteImport } from './routes/_authenticated/talon-tiedot'
+import { Route as AuthenticatedKulutRouteImport } from './routes/_authenticated/kulut'
+import { Route as AuthenticatedHuoltohistoriaRouteImport } from './routes/_authenticated/huoltohistoria'
+import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 
+const RekisteroidyRoute = RekisteroidyRouteImport.update({
+  id: '/rekisteroidy',
+  path: '/rekisteroidy',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedRoute = AuthenticatedRouteImport.update({
+  id: '/_authenticated',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedVuosikelloRoute = AuthenticatedVuosikelloRouteImport.update({
+  id: '/vuosikello',
+  path: '/vuosikello',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedTalonTiedotRoute =
+  AuthenticatedTalonTiedotRouteImport.update({
+    id: '/talon-tiedot',
+    path: '/talon-tiedot',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedKulutRoute = AuthenticatedKulutRouteImport.update({
+  id: '/kulut',
+  path: '/kulut',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedHuoltohistoriaRoute =
+  AuthenticatedHuoltohistoriaRouteImport.update({
+    id: '/huoltohistoria',
+    path: '/huoltohistoria',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/login': typeof LoginRoute
+  '/rekisteroidy': typeof RekisteroidyRoute
+  '/dashboard': typeof AuthenticatedDashboardRoute
+  '/huoltohistoria': typeof AuthenticatedHuoltohistoriaRoute
+  '/kulut': typeof AuthenticatedKulutRoute
+  '/talon-tiedot': typeof AuthenticatedTalonTiedotRoute
+  '/vuosikello': typeof AuthenticatedVuosikelloRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/login': typeof LoginRoute
+  '/rekisteroidy': typeof RekisteroidyRoute
+  '/dashboard': typeof AuthenticatedDashboardRoute
+  '/huoltohistoria': typeof AuthenticatedHuoltohistoriaRoute
+  '/kulut': typeof AuthenticatedKulutRoute
+  '/talon-tiedot': typeof AuthenticatedTalonTiedotRoute
+  '/vuosikello': typeof AuthenticatedVuosikelloRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/_authenticated': typeof AuthenticatedRouteWithChildren
+  '/login': typeof LoginRoute
+  '/rekisteroidy': typeof RekisteroidyRoute
+  '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
+  '/_authenticated/huoltohistoria': typeof AuthenticatedHuoltohistoriaRoute
+  '/_authenticated/kulut': typeof AuthenticatedKulutRoute
+  '/_authenticated/talon-tiedot': typeof AuthenticatedTalonTiedotRoute
+  '/_authenticated/vuosikello': typeof AuthenticatedVuosikelloRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/login'
+    | '/rekisteroidy'
+    | '/dashboard'
+    | '/huoltohistoria'
+    | '/kulut'
+    | '/talon-tiedot'
+    | '/vuosikello'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/login'
+    | '/rekisteroidy'
+    | '/dashboard'
+    | '/huoltohistoria'
+    | '/kulut'
+    | '/talon-tiedot'
+    | '/vuosikello'
+  id:
+    | '__root__'
+    | '/'
+    | '/_authenticated'
+    | '/login'
+    | '/rekisteroidy'
+    | '/_authenticated/dashboard'
+    | '/_authenticated/huoltohistoria'
+    | '/_authenticated/kulut'
+    | '/_authenticated/talon-tiedot'
+    | '/_authenticated/vuosikello'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
+  LoginRoute: typeof LoginRoute
+  RekisteroidyRoute: typeof RekisteroidyRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/rekisteroidy': {
+      id: '/rekisteroidy'
+      path: '/rekisteroidy'
+      fullPath: '/rekisteroidy'
+      preLoaderRoute: typeof RekisteroidyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated': {
+      id: '/_authenticated'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AuthenticatedRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -48,22 +169,70 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/vuosikello': {
+      id: '/_authenticated/vuosikello'
+      path: '/vuosikello'
+      fullPath: '/vuosikello'
+      preLoaderRoute: typeof AuthenticatedVuosikelloRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/talon-tiedot': {
+      id: '/_authenticated/talon-tiedot'
+      path: '/talon-tiedot'
+      fullPath: '/talon-tiedot'
+      preLoaderRoute: typeof AuthenticatedTalonTiedotRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/kulut': {
+      id: '/_authenticated/kulut'
+      path: '/kulut'
+      fullPath: '/kulut'
+      preLoaderRoute: typeof AuthenticatedKulutRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/huoltohistoria': {
+      id: '/_authenticated/huoltohistoria'
+      path: '/huoltohistoria'
+      fullPath: '/huoltohistoria'
+      preLoaderRoute: typeof AuthenticatedHuoltohistoriaRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/dashboard': {
+      id: '/_authenticated/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof AuthenticatedDashboardRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
   }
 }
 
+interface AuthenticatedRouteChildren {
+  AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
+  AuthenticatedHuoltohistoriaRoute: typeof AuthenticatedHuoltohistoriaRoute
+  AuthenticatedKulutRoute: typeof AuthenticatedKulutRoute
+  AuthenticatedTalonTiedotRoute: typeof AuthenticatedTalonTiedotRoute
+  AuthenticatedVuosikelloRoute: typeof AuthenticatedVuosikelloRoute
+}
+
+const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
+  AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
+  AuthenticatedHuoltohistoriaRoute: AuthenticatedHuoltohistoriaRoute,
+  AuthenticatedKulutRoute: AuthenticatedKulutRoute,
+  AuthenticatedTalonTiedotRoute: AuthenticatedTalonTiedotRoute,
+  AuthenticatedVuosikelloRoute: AuthenticatedVuosikelloRoute,
+}
+
+const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
+  AuthenticatedRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AuthenticatedRoute: AuthenticatedRouteWithChildren,
+  LoginRoute: LoginRoute,
+  RekisteroidyRoute: RekisteroidyRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
