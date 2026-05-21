@@ -48,5 +48,7 @@ export async function getReadySession(): Promise<Session | null> {
 export function subscribeToSession(listener: (session: Session | null) => void) {
   startListener();
   listeners.add(listener);
-  return () => listeners.delete(listener);
+  return () => {
+    listeners.delete(listener);
+  };
 }
