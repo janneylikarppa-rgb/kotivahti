@@ -41,7 +41,7 @@ const LAMMITYS = [
   { key: "sahkolammitys", nimi: "Sähkölämmitys" },
   { key: "muu", nimi: "Muu" },
 ];
-const LAITTEET: Record<string, { tyyppi: string; merkit: string[] }> = {
+const MERKIT: Record<string, { tyyppi: string; merkit: string[] }> = {
   maalampo: { tyyppi: "Maalämpöpumppu", merkit: ["Nibe", "IVT", "Thermia", "Bosch", "Gebwell", "Mitsubishi", "Stiebel Eltron", "Oilon", "Muu"] },
   ilmavesilampo: { tyyppi: "Ilma-vesilämpöpumppu", merkit: ["Nibe", "Mitsubishi", "Daikin", "Panasonic", "Bosch", "Thermia", "Toshiba", "LG", "Muu"] },
   ilmalampopumppu: { tyyppi: "Ilmalämpöpumppu", merkit: ["Mitsubishi", "Daikin", "Panasonic", "Toshiba", "Fujitsu", "LG", "Samsung", "Sharp", "Muu"] },
