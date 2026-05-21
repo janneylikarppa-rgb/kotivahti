@@ -29,6 +29,7 @@ function KulutPage() {
   const saveAsFn = useServerFn(saveAsetukset);
   const qc = useQueryClient();
   const { data, isLoading } = useQuery({ queryKey: ["kulut"], queryFn: () => fetchFn() });
+  const [vuosi, setVuosi] = useState<number>(new Date().getFullYear());
 
   const addM = useMutation({
     mutationFn: (v: any) => addFn({ data: v }),
@@ -48,8 +49,7 @@ function KulutPage() {
   const kulut = data?.kulut ?? [];
   const asetukset = data?.asetukset;
   const nykyinen = new Date().getFullYear();
-  const vuodetSaatavilla = Array.from(new Set([nykyinen, ...kulut.map((k: any) => new Date(k.pvm).getFullYear())])).sort((a, b) => b - a);
-  const [vuosi, setVuosi] = useStateClient(nykyinen);
+  const vuodetSaatavilla = Array.from(new Set<number>([nykyinen, ...kulut.map((k: any) => new Date(k.pvm).getFullYear())])).sort((a, b) => b - a);
   const tamaVuosi = kulut.filter((k: any) => new Date(k.pvm).getFullYear() === vuosi);
   const summa = tamaVuosi.reduce((s: number, k: any) => s + Number(k.summa || 0), 0);
 
