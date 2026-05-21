@@ -46,7 +46,10 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
         <p className="mt-2 text-sm text-muted-foreground">{error.message}</p>
         <div className="mt-6 flex justify-center gap-2">
           <button
-            onClick={() => { router.invalidate(); reset(); }}
+            onClick={() => {
+              router.invalidate();
+              reset();
+            }}
             className="rounded-md bg-primary px-4 py-2 text-sm font-semibold uppercase tracking-wider text-primary-foreground hover:bg-[color:var(--gold-2)]"
           >
             Yritä uudelleen
@@ -63,7 +66,10 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
       { title: "Kotivahti – Huoltokirja omakotitaloasujille" },
-      { name: "description", content: "Pidä talosi huoltohistoria, kulut ja vuosikello järjestyksessä yhdessä paikassa." },
+      {
+        name: "description",
+        content: "Pidä talosi huoltohistoria, kulut ja vuosikello järjestyksessä yhdessä paikassa.",
+      },
       { property: "og:title", content: "Kotivahti" },
       { property: "og:description", content: "Huoltokirja omakotitaloasujille." },
       { property: "og:type", content: "website" },

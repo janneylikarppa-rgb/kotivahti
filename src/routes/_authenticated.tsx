@@ -24,7 +24,12 @@ function AuthenticatedLayout() {
     getReadySession().then((nextSession) => {
       setSession(nextSession);
       if (!nextSession) {
-        navigate({ to: "/login", search: { redirect: `${window.location.pathname}${window.location.search}${window.location.hash}` } });
+        navigate({
+          to: "/login",
+          search: {
+            redirect: `${window.location.pathname}${window.location.search}${window.location.hash}`,
+          },
+        });
       }
     });
     return unsubscribe;
