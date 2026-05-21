@@ -88,7 +88,7 @@ function TaloTiedotPage() {
       return saveFn({ data: {
         kiinteisto: {
           nimi: k.nimi, osoite: k.osoite, postinumero: k.postinumero, kaupunki: k.kaupunki,
-          rakennusvuosi: num(k.rakennusvuosi),
+          rakennusvuosi: num(k.rakennusvuosi), tyyppi: str(k.tyyppi),
         },
         talo: {
           pinta_ala: num(t.pinta_ala), tilavuus: num(t.tilavuus),
@@ -100,6 +100,8 @@ function TaloTiedotPage() {
           raystaat_kunnostettu_vuosi: num(t.raystaat_kunnostettu_vuosi),
           lammitysmuoto: str(t.lammitysmuoto), lammitys_asennettu_vuosi: num(t.lammitys_asennettu_vuosi),
           lammitys_lisatieto: lammitysLisa,
+          ilp_merkki: str(t.ilp_merkki), ilp_malli: str(t.ilp_malli),
+          ilp_asennettu_vuosi: num(t.ilp_asennettu_vuosi),
           ilmanvaihto: str(t.ilmanvaihto), ilmanvaihto_vuosi: num(t.ilmanvaihto_vuosi),
           putket_uusittu_vuosi: num(t.putket_uusittu_vuosi),
           putkimateriaali: str(t.putkimateriaali),
