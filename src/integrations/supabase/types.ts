@@ -23,7 +23,7 @@ export type Database = {
           kohde: string | null
           kustannus: number | null
           kuvaus: string | null
-          pts_siirto: boolean | null
+          pts_siirto: number | null
           pvm: string
           takuu_vuotta: number | null
           tekija: string | null
@@ -38,7 +38,7 @@ export type Database = {
           kohde?: string | null
           kustannus?: number | null
           kuvaus?: string | null
-          pts_siirto?: boolean | null
+          pts_siirto?: number | null
           pvm: string
           takuu_vuotta?: number | null
           tekija?: string | null
@@ -53,7 +53,7 @@ export type Database = {
           kohde?: string | null
           kustannus?: number | null
           kuvaus?: string | null
-          pts_siirto?: boolean | null
+          pts_siirto?: number | null
           pvm?: string
           takuu_vuotta?: number | null
           tekija?: string | null
@@ -239,6 +239,7 @@ export type Database = {
       talo_dokumentit: {
         Row: {
           created_at: string
+          huolto_id: string | null
           id: string
           kiinteisto_id: string
           koko_bytes: number | null
@@ -251,6 +252,7 @@ export type Database = {
         }
         Insert: {
           created_at?: string
+          huolto_id?: string | null
           id?: string
           kiinteisto_id: string
           koko_bytes?: number | null
@@ -263,6 +265,7 @@ export type Database = {
         }
         Update: {
           created_at?: string
+          huolto_id?: string | null
           id?: string
           kiinteisto_id?: string
           koko_bytes?: number | null
