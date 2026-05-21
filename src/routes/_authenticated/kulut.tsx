@@ -15,6 +15,10 @@ import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, Tooltip, CartesianGri
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/kulut")({
+  loader: ({ context }) => {
+    if (typeof window === "undefined") return null;
+    return context.queryClient.ensureQueryData({ queryKey: ["kulut"], queryFn: () => getKulut(), staleTime: 30_000 });
+  },
   component: KulutPage,
 });
 
@@ -28,7 +32,7 @@ function KulutPage() {
   const delFn = useServerFn(deleteKulu);
   const saveAsFn = useServerFn(saveAsetukset);
   const qc = useQueryClient();
-  const { data, isLoading } = useQuery({ queryKey: ["kulut"], queryFn: () => fetchFn() });
+  const { data, isLoading } = useQuery({ queryKey: ["kulut"], queryFn: () => fetchFn(), staleTime: 30_000 });
   const [vuosi, setVuosi] = useState<number>(new Date().getFullYear());
 
   const addM = useMutation({
