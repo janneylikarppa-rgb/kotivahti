@@ -1,0 +1,1 @@
+ALTER TABLE public.talon_tiedot DROP COLUMN IF EXISTS sahkot_uusittu_vuosi, DROP COLUMN IF EXISTS viemari_uusittu_vuosi;
