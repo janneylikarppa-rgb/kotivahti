@@ -238,13 +238,9 @@ function TaloTiedotPage() {
               <Field label="Viemärimateriaali">
                 <SelectOrOther value={t.viemarimateriaali} options={VIEMARIMATERIAALIT} onChange={(v) => setT({ ...t, viemarimateriaali: v })} />
               </Field>
-              <Field label="Viemäri asennettu (vuosi)"><Input type="number" value={t.viemari_asennettu_vuosi ?? ""} onChange={(e) => setT({ ...t, viemari_asennettu_vuosi: e.target.value })} /></Field>
-            </Row>
-            <Field label="Viemäri uusittu / saneerattu (vuosi)"><Input type="number" value={t.viemari_uusittu_vuosi ?? ""} onChange={(e) => setT({ ...t, viemari_uusittu_vuosi: e.target.value })} /></Field>
+            <Field label="Viemäri asennettu (vuosi)"><Input type="number" value={t.viemari_asennettu_vuosi ?? ""} onChange={(e) => setT({ ...t, viemari_asennettu_vuosi: e.target.value })} /></Field>
 
-            <Row>
-              <Field label="Sähköt asennettu (vuosi)"><Input type="number" value={t.sahkot_asennettu_vuosi ?? ""} onChange={(e) => setT({ ...t, sahkot_asennettu_vuosi: e.target.value })} /></Field>
-              <Field label="Sähköt uusittu (vuosi)"><Input type="number" value={t.sahkot_uusittu_vuosi ?? ""} onChange={(e) => setT({ ...t, sahkot_uusittu_vuosi: e.target.value })} /></Field>
+            <Field label="Sähköt asennettu (vuosi)"><Input type="number" value={t.sahkot_asennettu_vuosi ?? ""} onChange={(e) => setT({ ...t, sahkot_asennettu_vuosi: e.target.value })} /></Field>
             </Row>
           </>)}
 
