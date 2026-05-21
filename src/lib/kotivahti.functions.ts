@@ -215,7 +215,7 @@ export const getHuollot = createServerFn({ method: "GET" })
         .select("*")
         .in("huolto_id", ids);
       for (const l of liitteet ?? []) {
-        (liiteByHuolto[l.huolto_id] ||= []).push(l);
+        if (l.huolto_id) (liiteByHuolto[l.huolto_id as string] ||= []).push(l);
       }
     }
     return (huollot ?? []).map((h: any) => ({ ...h, liitteet: liiteByHuolto[h.id] ?? [] }));
