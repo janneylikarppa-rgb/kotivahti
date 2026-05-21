@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { QueryClient, QueryClientProvider, useQueryClient } from "@tanstack/react-query";
 import {
   Outlet,
@@ -100,13 +100,21 @@ function AuthSync() {
   const router = useRouter();
   const queryClient = useQueryClient();
   const [session, setSession] = useState(() => getCachedSession() ?? null);
+  const authUserIdRef = useRef(session?.user.id ?? null);
   const isAuthenticated = !!session;
 
   useEffect(() => {
     return subscribeToSession((nextSession) => {
+      const nextUserId = nextSession?.user.id ?? null;
+      const authUserChanged = authUserIdRef.current !== nextUserId;
+
       setSession(nextSession);
-      router.invalidate();
-      queryClient.invalidateQueries();
+
+      if (authUserChanged) {
+        authUserIdRef.current = nextUserId;
+        router.invalidate();
+        queryClient.invalidateQueries();
+      }
     });
   }, [router, queryClient]);
 
