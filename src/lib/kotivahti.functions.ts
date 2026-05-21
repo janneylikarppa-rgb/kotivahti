@@ -161,6 +161,18 @@ export const addHuolto = createServerFn({ method: "POST" })
     return { ok: true };
   });
 
+const updateHuoltoSchema = huoltoSchema.partial().extend({ id: z.string().uuid() });
+
+export const updateHuolto = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) => updateHuoltoSchema.parse(input))
+  .handler(async ({ data, context }) => {
+    const { id, ...patch } = data;
+    const { error } = await context.supabase.from("huolto_historia").update(patch).eq("id", id);
+    if (error) throw error;
+    return { ok: true };
+  });
+
 export const deleteHuolto = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: unknown) => z.object({ id: z.string().uuid() }).parse(input))
@@ -185,6 +197,10 @@ export const getKuitatut = createServerFn({ method: "GET" })
     return { kuitatut: kuitatutRes.data ?? [], talon_tiedot: talonRes.data };
   });
 
+const KAUSI_NIMI: Record<string, string> = {
+  kevat: "Kevät", kesa: "Kesä", syksy: "Syksy", talvi: "Talvi", ympari_vuoden: "Ympäri vuoden",
+};
+
 const kuittausSchema = z.object({
   kausi_key: z.string().min(1).max(50),
   huolto_nimi: z.string().min(1).max(200),
@@ -202,22 +218,48 @@ export const kuittaaHuolto = createServerFn({ method: "POST" })
     if (!k) throw new Error("Kiinteistöä ei löytynyt");
     const vuosi = new Date().getFullYear();
     const pvm = new Date().toISOString().slice(0, 10);
-    const { tekija_nimi, ...row } = data;
+
+    // Hae olemassa oleva kuittaus + linkitetty historiarivi
+    const { data: existing } = await supabase
+      .from("vk_kuitatut").select("id, historia_id")
+      .eq("kiinteisto_id", k.id).eq("kausi_key", data.kausi_key)
+      .eq("huolto_nimi", data.huolto_nimi).eq("vuosi", vuosi).maybeSingle();
+
+    let historia_id: string | null = existing?.historia_id ?? null;
+
+    if (data.tekija === "jatetaan") {
+      // Poista linkitetty historia jos olemassa
+      if (historia_id) {
+        await supabase.from("huolto_historia").delete().eq("id", historia_id);
+        historia_id = null;
+      }
+    } else {
+      const huoltoRow = {
+        kiinteisto_id: k.id,
+        tyyppi: data.huolto_nimi,
+        kategoria: KAUSI_NIMI[data.kausi_key] ?? "Vuosikello",
+        kohde: "Vuosikello",
+        pvm,
+        tekija: data.tekija,
+        tekija_nimi: data.tekija_nimi ?? null,
+        kustannus: data.hinta,
+      };
+      if (historia_id) {
+        const { error } = await supabase.from("huolto_historia").update(huoltoRow).eq("id", historia_id);
+        if (error) throw error;
+      } else {
+        const { data: ins, error } = await supabase.from("huolto_historia").insert(huoltoRow).select("id").single();
+        if (error) throw error;
+        historia_id = ins.id;
+      }
+    }
+
+    const { tekija_nimi: _tn, ...row } = data;
     const { error } = await supabase.from("vk_kuitatut").upsert({
-      kiinteisto_id: k.id, vuosi, kuitattu_pvm: pvm, ...row,
+      kiinteisto_id: k.id, vuosi, kuitattu_pvm: pvm, historia_id, ...row,
     }, { onConflict: "kiinteisto_id,kausi_key,huolto_nimi,vuosi" });
     if (error) throw error;
 
-    if (data.tekija === "ammattilainen" && data.hinta > 0) {
-      await supabase.from("kulut").insert({
-        kiinteisto_id: k.id,
-        nimi: `Vuosikello – ${data.huolto_nimi}`,
-        kategoria: "huolto",
-        summa: data.hinta,
-        kuvaus: data.tekija_nimi ?? null,
-        pvm,
-      });
-    }
     return { ok: true };
   });
 
