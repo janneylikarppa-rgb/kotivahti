@@ -47,7 +47,9 @@ function KulutPage() {
   if (isLoading) return <p className="text-muted-foreground">Ladataan...</p>;
   const kulut = data?.kulut ?? [];
   const asetukset = data?.asetukset;
-  const vuosi = new Date().getFullYear();
+  const nykyinen = new Date().getFullYear();
+  const vuodetSaatavilla = Array.from(new Set([nykyinen, ...kulut.map((k: any) => new Date(k.pvm).getFullYear())])).sort((a, b) => b - a);
+  const [vuosi, setVuosi] = useStateClient(nykyinen);
   const tamaVuosi = kulut.filter((k: any) => new Date(k.pvm).getFullYear() === vuosi);
   const summa = tamaVuosi.reduce((s: number, k: any) => s + Number(k.summa || 0), 0);
 
@@ -62,9 +64,15 @@ function KulutPage() {
 
   return (
     <div className="mx-auto max-w-6xl space-y-8">
-      <header>
-        <p className="eyebrow mb-3 flex items-center gap-3"><span className="block h-px w-8 bg-primary" /> Kulujenseuranta</p>
-        <h1 className="font-serif text-4xl text-cream">Talon <em className="text-primary not-italic italic">kulut</em> {vuosi}</h1>
+      <header className="flex flex-wrap items-end justify-between gap-4">
+        <div>
+          <p className="eyebrow mb-3 flex items-center gap-3"><span className="block h-px w-8 bg-primary" /> Kulujenseuranta</p>
+          <h1 className="font-serif text-4xl text-cream">Talon <em className="text-primary not-italic italic">kulut</em></h1>
+        </div>
+        <Select value={String(vuosi)} onValueChange={(v) => setVuosi(Number(v))}>
+          <SelectTrigger className="w-32"><SelectValue /></SelectTrigger>
+          <SelectContent>{vuodetSaatavilla.map((v) => <SelectItem key={v} value={String(v)}>{v}</SelectItem>)}</SelectContent>
+        </Select>
       </header>
 
       <Tabs defaultValue="yhteenveto">
