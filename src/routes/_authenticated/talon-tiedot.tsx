@@ -26,6 +26,14 @@ const OSIOT = [
   { key: "dokumentit", nimi: "Dokumentit" },
 ];
 
+const KIINTEISTOTYYPIT = [
+  { key: "omakotitalo", nimi: "Omakotitalo" },
+  { key: "paritalo", nimi: "Paritalo" },
+  { key: "rivitalo", nimi: "Rivitalo" },
+  { key: "mokki", nimi: "Mökki" },
+];
+const ILP_MERKIT = ["Mitsubishi", "Daikin", "Panasonic", "Toshiba", "Fujitsu", "LG", "Samsung", "Sharp", "Muu"];
+
 const RAKENNUSTAVAT = ["Puurunko", "Hirsi", "Tiili", "Kevytsoraharkko (Leca)", "Betoniharkko", "Kevytbetoni (Siporex)", "Betonielementti", "Teräsrunko"];
 const JULKISIVUMATERIAALIT = ["Puu (lautaverhous)", "Tiili", "Rappaus", "Levyverhous", "Hirsi", "Pelti", "Kuitusementtilevy", "Kivi"];
 const KATTOTYYPIT = ["Harjakatto", "Pulpettikatto", "Aumakatto", "Mansardikatto", "Tasakatto", "Kaarikatto"];
