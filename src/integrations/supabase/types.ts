@@ -74,6 +74,8 @@ export type Database = {
         Row: {
           aktiivinen: boolean
           created_at: string
+          hankinta_vuosi: number | null
+          hankintatapa: string | null
           id: string
           kaupunki: string | null
           nimi: string | null
@@ -87,6 +89,8 @@ export type Database = {
         Insert: {
           aktiivinen?: boolean
           created_at?: string
+          hankinta_vuosi?: number | null
+          hankintatapa?: string | null
           id?: string
           kaupunki?: string | null
           nimi?: string | null
@@ -100,6 +104,8 @@ export type Database = {
         Update: {
           aktiivinen?: boolean
           created_at?: string
+          hankinta_vuosi?: number | null
+          hankintatapa?: string | null
           id?: string
           kaupunki?: string | null
           nimi?: string | null
@@ -209,6 +215,7 @@ export type Database = {
           email: string | null
           id: string
           nimi: string | null
+          puhelin: string | null
           updated_at: string
         }
         Insert: {
@@ -216,6 +223,7 @@ export type Database = {
           email?: string | null
           id: string
           nimi?: string | null
+          puhelin?: string | null
           updated_at?: string
         }
         Update: {
@@ -223,7 +231,47 @@ export type Database = {
           email?: string | null
           id?: string
           nimi?: string | null
+          puhelin?: string | null
           updated_at?: string
+        }
+        Relationships: []
+      }
+      talo_dokumentit: {
+        Row: {
+          created_at: string
+          id: string
+          kiinteisto_id: string
+          koko_bytes: number | null
+          kuvaus: string | null
+          lisatty_pvm: string
+          mime: string | null
+          nimi: string
+          tiedosto_polku: string
+          tyyppi: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          kiinteisto_id: string
+          koko_bytes?: number | null
+          kuvaus?: string | null
+          lisatty_pvm?: string
+          mime?: string | null
+          nimi: string
+          tiedosto_polku: string
+          tyyppi?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          kiinteisto_id?: string
+          koko_bytes?: number | null
+          kuvaus?: string | null
+          lisatty_pvm?: string
+          mime?: string | null
+          nimi?: string
+          tiedosto_polku?: string
+          tyyppi?: string
         }
         Relationships: []
       }
@@ -232,32 +280,55 @@ export type Database = {
           asukkaita: number | null
           created_at: string
           data: Json | null
+          eriste: string | null
+          hormit: string | null
           id: string
           ilmanvaihto: string | null
           ilmanvaihto_vuosi: number | null
           ilp_asennettu_vuosi: number | null
           ilp_malli: string | null
           ilp_merkki: string | null
+          iv_suodatin_vaihdettu: string | null
+          iv_suodatintyyppi: string | null
           julkisivu_maalattu_vuosi: number | null
           julkisivumateriaali: string | null
+          katto_pinta_ala: number | null
           katto_uusittu_vuosi: number | null
           kattomateriaali: string | null
+          kattoturvatuotteet: string | null
           kattotyyppi: string | null
           kerroksia: number | null
           kiinteisto_id: string
+          kiukaan_vuosi: number | null
+          kokonaispinta_ala: number | null
+          kourun_materiaali: string | null
+          kourun_pituus: number | null
           lammitys_asennettu_vuosi: number | null
           lammitys_lisatieto: Json | null
           lammitysmuoto: string | null
+          nuohous_pvm: string | null
+          nurmikon_pinta_ala: number | null
+          paasulun_sijainti: string | null
+          palovaroitin_paristot: string | null
+          palovaroittimia: number | null
+          perustus: string | null
           piha_lisatieto: string | null
           pihan_tyyppi: string | null
           pinta_ala: number | null
           putket_uusittu_vuosi: number | null
           putkimateriaali: string | null
+          rakennus_lisatieto: string | null
           rakennustapa: string | null
           raystaat_kunnostettu_vuosi: number | null
+          sadevesikaivot: number | null
           sahkot_asennettu_vuosi: number | null
+          salaojat: boolean | null
+          salaojat_tarkastettu: string | null
+          syoksytorvet: number | null
           terassi_kunnostettu_vuosi: number | null
           terassi_materiaali: string | null
+          terassi_pinta_ala: number | null
+          terassi_rakennettu_vuosi: number | null
           tilavuus: number | null
           tontin_pinta_ala: number | null
           updated_at: string
@@ -269,32 +340,55 @@ export type Database = {
           asukkaita?: number | null
           created_at?: string
           data?: Json | null
+          eriste?: string | null
+          hormit?: string | null
           id?: string
           ilmanvaihto?: string | null
           ilmanvaihto_vuosi?: number | null
           ilp_asennettu_vuosi?: number | null
           ilp_malli?: string | null
           ilp_merkki?: string | null
+          iv_suodatin_vaihdettu?: string | null
+          iv_suodatintyyppi?: string | null
           julkisivu_maalattu_vuosi?: number | null
           julkisivumateriaali?: string | null
+          katto_pinta_ala?: number | null
           katto_uusittu_vuosi?: number | null
           kattomateriaali?: string | null
+          kattoturvatuotteet?: string | null
           kattotyyppi?: string | null
           kerroksia?: number | null
           kiinteisto_id: string
+          kiukaan_vuosi?: number | null
+          kokonaispinta_ala?: number | null
+          kourun_materiaali?: string | null
+          kourun_pituus?: number | null
           lammitys_asennettu_vuosi?: number | null
           lammitys_lisatieto?: Json | null
           lammitysmuoto?: string | null
+          nuohous_pvm?: string | null
+          nurmikon_pinta_ala?: number | null
+          paasulun_sijainti?: string | null
+          palovaroitin_paristot?: string | null
+          palovaroittimia?: number | null
+          perustus?: string | null
           piha_lisatieto?: string | null
           pihan_tyyppi?: string | null
           pinta_ala?: number | null
           putket_uusittu_vuosi?: number | null
           putkimateriaali?: string | null
+          rakennus_lisatieto?: string | null
           rakennustapa?: string | null
           raystaat_kunnostettu_vuosi?: number | null
+          sadevesikaivot?: number | null
           sahkot_asennettu_vuosi?: number | null
+          salaojat?: boolean | null
+          salaojat_tarkastettu?: string | null
+          syoksytorvet?: number | null
           terassi_kunnostettu_vuosi?: number | null
           terassi_materiaali?: string | null
+          terassi_pinta_ala?: number | null
+          terassi_rakennettu_vuosi?: number | null
           tilavuus?: number | null
           tontin_pinta_ala?: number | null
           updated_at?: string
@@ -306,32 +400,55 @@ export type Database = {
           asukkaita?: number | null
           created_at?: string
           data?: Json | null
+          eriste?: string | null
+          hormit?: string | null
           id?: string
           ilmanvaihto?: string | null
           ilmanvaihto_vuosi?: number | null
           ilp_asennettu_vuosi?: number | null
           ilp_malli?: string | null
           ilp_merkki?: string | null
+          iv_suodatin_vaihdettu?: string | null
+          iv_suodatintyyppi?: string | null
           julkisivu_maalattu_vuosi?: number | null
           julkisivumateriaali?: string | null
+          katto_pinta_ala?: number | null
           katto_uusittu_vuosi?: number | null
           kattomateriaali?: string | null
+          kattoturvatuotteet?: string | null
           kattotyyppi?: string | null
           kerroksia?: number | null
           kiinteisto_id?: string
+          kiukaan_vuosi?: number | null
+          kokonaispinta_ala?: number | null
+          kourun_materiaali?: string | null
+          kourun_pituus?: number | null
           lammitys_asennettu_vuosi?: number | null
           lammitys_lisatieto?: Json | null
           lammitysmuoto?: string | null
+          nuohous_pvm?: string | null
+          nurmikon_pinta_ala?: number | null
+          paasulun_sijainti?: string | null
+          palovaroitin_paristot?: string | null
+          palovaroittimia?: number | null
+          perustus?: string | null
           piha_lisatieto?: string | null
           pihan_tyyppi?: string | null
           pinta_ala?: number | null
           putket_uusittu_vuosi?: number | null
           putkimateriaali?: string | null
+          rakennus_lisatieto?: string | null
           rakennustapa?: string | null
           raystaat_kunnostettu_vuosi?: number | null
+          sadevesikaivot?: number | null
           sahkot_asennettu_vuosi?: number | null
+          salaojat?: boolean | null
+          salaojat_tarkastettu?: string | null
+          syoksytorvet?: number | null
           terassi_kunnostettu_vuosi?: number | null
           terassi_materiaali?: string | null
+          terassi_pinta_ala?: number | null
+          terassi_rakennettu_vuosi?: number | null
           tilavuus?: number | null
           tontin_pinta_ala?: number | null
           updated_at?: string
