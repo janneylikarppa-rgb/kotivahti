@@ -236,6 +236,18 @@ function TaloTiedotPage() {
               </div>
             )}
 
+            <div className="rounded-md border border-border/60 bg-muted/30 p-4 space-y-4">
+              <p className="eyebrow text-muted-foreground">Ilmalämpöpumppu (lisälaite)</p>
+              <p className="text-xs text-muted-foreground">Jos talossa on ilmalämpöpumppu päälämmityksen lisäksi, kirjaa tähän.</p>
+              <Row>
+                <Field label="Merkki">
+                  <SelectOrOther value={t.ilp_merkki} options={ILP_MERKIT} onChange={(v) => setT({ ...t, ilp_merkki: v })} />
+                </Field>
+                <Field label="Mallimerkintä"><Input value={t.ilp_malli ?? ""} onChange={(e) => setT({ ...t, ilp_malli: e.target.value })} placeholder="Esim. MSZ-LN35VG" /></Field>
+              </Row>
+              <Field label="Asennusvuosi"><Input type="number" value={t.ilp_asennettu_vuosi ?? ""} onChange={(e) => setT({ ...t, ilp_asennettu_vuosi: e.target.value })} /></Field>
+            </div>
+
             <Row>
               <Field label="Ilmanvaihto">
                 <SelectOrOther value={t.ilmanvaihto} options={ILMANVAIHDOT} onChange={(v) => setT({ ...t, ilmanvaihto: v })} />
