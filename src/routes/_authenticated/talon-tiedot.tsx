@@ -78,7 +78,7 @@ function TaloTiedotPage() {
     }
   }, [data]);
 
-  const laite = t.lammitysmuoto ? LAITTEET[t.lammitysmuoto] : undefined;
+  const laite = t.lammitysmuoto ? MERKIT[t.lammitysmuoto] : undefined;
   const lammitysLisa = (t.lammitys_lisatieto && typeof t.lammitys_lisatieto === "object") ? t.lammitys_lisatieto : {};
   const setLisa = (patch: Record<string, any>) => setT({ ...t, lammitys_lisatieto: { ...lammitysLisa, ...patch } });
 
