@@ -171,6 +171,12 @@ function TaloTiedotPage() {
               <Field label="Kaupunki"><Input value={k.kaupunki ?? ""} onChange={(e) => setK({ ...k, kaupunki: e.target.value })} /></Field></Row>
             <Row><Field label="Asukkaita"><Input type="number" value={t.asukkaita ?? ""} onChange={(e) => setT({ ...t, asukkaita: e.target.value })} /></Field>
               <Field label="Kerroksia"><Input type="number" value={t.kerroksia ?? ""} onChange={(e) => setT({ ...t, kerroksia: e.target.value })} /></Field></Row>
+            <Field label="Kiinteistön tyyppi">
+              <Select value={k.tyyppi ?? ""} onValueChange={(v) => setK({ ...k, tyyppi: v })}>
+                <SelectTrigger><SelectValue placeholder="Valitse" /></SelectTrigger>
+                <SelectContent>{KIINTEISTOTYYPIT.map((kt) => <SelectItem key={kt.key} value={kt.key}>{kt.nimi}</SelectItem>)}</SelectContent>
+              </Select>
+            </Field>
           </>)}
 
           {active === 1 && (<>
