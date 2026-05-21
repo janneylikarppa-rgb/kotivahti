@@ -1,7 +1,7 @@
 import { createFileRoute, Link, redirect, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { getCachedSession, getReadySession, subscribeToSession } from "@/lib/auth-session";
+import { getCachedSession, getReadySession, hasPersistedSessionHint, subscribeToSession } from "@/lib/auth-session";
 import { lovable } from "@/integrations/lovable";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -20,13 +20,26 @@ export const Route = createFileRoute("/login")({
 function LoginPage() {
   const navigate = useNavigate();
   const [session, setSession] = useState(() => getCachedSession() ?? null);
+  const [waitingForStoredSession, setWaitingForStoredSession] = useState(
+    () => getCachedSession() === undefined && hasPersistedSessionHint(),
+  );
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
 
-  useEffect(() => subscribeToSession(setSession), []);
+  useEffect(() => {
+    const unsubscribe = subscribeToSession((nextSession) => {
+      setSession(nextSession);
+      setWaitingForStoredSession(false);
+    });
+    getReadySession().then((nextSession) => {
+      setSession(nextSession);
+      setWaitingForStoredSession(false);
+    });
+    return unsubscribe;
+  }, []);
 
-  if (session) {
+  if (session || waitingForStoredSession) {
     return <div className="min-h-screen bg-background" />;
   }
 
