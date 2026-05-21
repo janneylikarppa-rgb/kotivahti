@@ -1,7 +1,7 @@
 import { createFileRoute, Link, redirect, useNavigate } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { getReadySession } from "@/lib/auth-session";
+import { getCachedSession, getReadySession, subscribeToSession } from "@/lib/auth-session";
 import { lovable } from "@/integrations/lovable";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -19,9 +19,16 @@ export const Route = createFileRoute("/login")({
 
 function LoginPage() {
   const navigate = useNavigate();
+  const [session, setSession] = useState(() => getCachedSession() ?? null);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => subscribeToSession(setSession), []);
+
+  if (session) {
+    return <div className="min-h-screen bg-background" />;
+  }
 
   const handleEmailLogin = async (e: React.FormEvent) => {
     e.preventDefault();
