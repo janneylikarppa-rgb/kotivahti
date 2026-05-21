@@ -54,12 +54,20 @@ export const getTaloTiedot = createServerFn({ method: "GET" })
   .handler(async ({ context }) => {
     const { supabase, userId } = context;
     const k = await getActiveKiinteisto(supabase, userId);
-    if (!k) return { kiinteisto: null, talo: null };
-    const { data: talo } = await supabase.from("talon_tiedot").select("*").eq("kiinteisto_id", k.id).maybeSingle();
-    return { kiinteisto: k, talo };
+    if (!k) return { kiinteisto: null, talo: null, profile: null, dokumentit: [] };
+    const [taloRes, profRes, dokRes] = await Promise.all([
+      supabase.from("talon_tiedot").select("*").eq("kiinteisto_id", k.id).maybeSingle(),
+      supabase.from("profiles").select("nimi, email, puhelin").eq("id", userId).maybeSingle(),
+      supabase.from("talo_dokumentit").select("*").eq("kiinteisto_id", k.id).order("created_at", { ascending: false }),
+    ]);
+    return { kiinteisto: k, talo: taloRes.data, profile: profRes.data, dokumentit: dokRes.data ?? [] };
   });
 
 const taloSchema = z.object({
+  profile: z.object({
+    nimi: z.string().optional().nullable(),
+    puhelin: z.string().optional().nullable(),
+  }).optional(),
   kiinteisto: z.object({
     nimi: z.string().optional().nullable(),
     osoite: z.string().optional().nullable(),
@@ -67,19 +75,31 @@ const taloSchema = z.object({
     kaupunki: z.string().optional().nullable(),
     rakennusvuosi: z.number().int().optional().nullable(),
     tyyppi: z.string().optional().nullable(),
+    hankintatapa: z.string().optional().nullable(),
+    hankinta_vuosi: z.number().int().optional().nullable(),
   }),
   talo: z.object({
     pinta_ala: z.number().optional().nullable(),
+    kokonaispinta_ala: z.number().optional().nullable(),
     tilavuus: z.number().optional().nullable(),
     kerroksia: z.number().int().optional().nullable(),
     asukkaita: z.number().int().optional().nullable(),
     rakennustapa: z.string().optional().nullable(),
     julkisivumateriaali: z.string().optional().nullable(),
     julkisivu_maalattu_vuosi: z.number().int().optional().nullable(),
+    perustus: z.string().optional().nullable(),
+    eriste: z.string().optional().nullable(),
+    rakennus_lisatieto: z.string().optional().nullable(),
     kattotyyppi: z.string().optional().nullable(),
     kattomateriaali: z.string().optional().nullable(),
     katto_uusittu_vuosi: z.number().int().optional().nullable(),
+    katto_pinta_ala: z.number().optional().nullable(),
     raystaat_kunnostettu_vuosi: z.number().int().optional().nullable(),
+    hormit: z.string().optional().nullable(),
+    kattoturvatuotteet: z.string().optional().nullable(),
+    kourun_pituus: z.number().optional().nullable(),
+    kourun_materiaali: z.string().optional().nullable(),
+    syoksytorvet: z.number().int().optional().nullable(),
     lammitysmuoto: z.string().optional().nullable(),
     lammitys_asennettu_vuosi: z.number().int().optional().nullable(),
     ilp_merkki: z.string().optional().nullable(),
@@ -87,16 +107,29 @@ const taloSchema = z.object({
     ilp_asennettu_vuosi: z.number().int().optional().nullable(),
     ilmanvaihto: z.string().optional().nullable(),
     ilmanvaihto_vuosi: z.number().int().optional().nullable(),
+    iv_suodatintyyppi: z.string().optional().nullable(),
+    iv_suodatin_vaihdettu: z.string().optional().nullable(),
     putket_uusittu_vuosi: z.number().int().optional().nullable(),
     putkimateriaali: z.string().optional().nullable(),
     viemarimateriaali: z.string().optional().nullable(),
     viemari_asennettu_vuosi: z.number().int().optional().nullable(),
+    paasulun_sijainti: z.string().optional().nullable(),
     sahkot_asennettu_vuosi: z.number().int().optional().nullable(),
+    palovaroittimia: z.number().int().optional().nullable(),
+    palovaroitin_paristot: z.string().optional().nullable(),
+    kiukaan_vuosi: z.number().int().optional().nullable(),
+    nuohous_pvm: z.string().optional().nullable(),
     tontin_pinta_ala: z.number().optional().nullable(),
+    nurmikon_pinta_ala: z.number().optional().nullable(),
+    sadevesikaivot: z.number().int().optional().nullable(),
     pihan_tyyppi: z.string().optional().nullable(),
     piha_lisatieto: z.string().optional().nullable(),
     terassi_materiaali: z.string().optional().nullable(),
+    terassi_pinta_ala: z.number().optional().nullable(),
+    terassi_rakennettu_vuosi: z.number().int().optional().nullable(),
     terassi_kunnostettu_vuosi: z.number().int().optional().nullable(),
+    salaojat: z.boolean().optional().nullable(),
+    salaojat_tarkastettu: z.string().optional().nullable(),
     lammitys_lisatieto: z.record(z.string(), z.any()).optional().nullable(),
     valmiit_osiot: z.array(z.string()).optional(),
   }),
@@ -109,11 +142,57 @@ export const saveTaloTiedot = createServerFn({ method: "POST" })
     const { supabase, userId } = context;
     const k = await getActiveKiinteisto(supabase, userId);
     if (!k) throw new Error("Kiinteistöä ei löytynyt");
+    if (data.profile) {
+      const { error: pErr } = await supabase.from("profiles").update(data.profile).eq("id", userId);
+      if (pErr) throw pErr;
+    }
     const { error: kErr } = await supabase.from("kiinteistot").update(data.kiinteisto).eq("id", k.id);
     if (kErr) throw kErr;
     const { error: tErr } = await supabase.from("talon_tiedot").update(data.talo).eq("kiinteisto_id", k.id);
     if (tErr) throw tErr;
     return { ok: true };
+  });
+
+// ---------- Dokumentit ----------
+const dokSchema = z.object({
+  nimi: z.string().min(1).max(300),
+  tyyppi: z.enum(["dokumentti", "takuu", "kuitti", "lasku"]).default("dokumentti"),
+  tiedosto_polku: z.string().min(1).max(500),
+  mime: z.string().max(150).optional().nullable(),
+  koko_bytes: z.number().int().optional().nullable(),
+  kuvaus: z.string().max(1000).optional().nullable(),
+});
+
+export const addDokumentti = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) => dokSchema.parse(input))
+  .handler(async ({ data, context }) => {
+    const { supabase, userId } = context;
+    const k = await getActiveKiinteisto(supabase, userId);
+    if (!k) throw new Error("Kiinteistöä ei löytynyt");
+    const { error } = await supabase.from("talo_dokumentit").insert({ kiinteisto_id: k.id, ...data });
+    if (error) throw error;
+    return { ok: true };
+  });
+
+export const deleteDokumentti = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) => z.object({ id: z.string().uuid(), tiedosto_polku: z.string() }).parse(input))
+  .handler(async ({ data, context }) => {
+    const { supabase } = context;
+    await supabase.storage.from("talo-dokumentit").remove([data.tiedosto_polku]);
+    const { error } = await supabase.from("talo_dokumentit").delete().eq("id", data.id);
+    if (error) throw error;
+    return { ok: true };
+  });
+
+export const getDokumenttiUrl = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) => z.object({ polku: z.string() }).parse(input))
+  .handler(async ({ data, context }) => {
+    const { data: signed, error } = await context.supabase.storage.from("talo-dokumentit").createSignedUrl(data.polku, 300);
+    if (error) throw error;
+    return { url: signed.signedUrl };
   });
 
 // ---------- Huoltohistoria ----------
