@@ -66,6 +66,7 @@ const taloSchema = z.object({
     postinumero: z.string().optional().nullable(),
     kaupunki: z.string().optional().nullable(),
     rakennusvuosi: z.number().int().optional().nullable(),
+    tyyppi: z.string().optional().nullable(),
   }),
   talo: z.object({
     pinta_ala: z.number().optional().nullable(),
