@@ -9,6 +9,10 @@ import { ArrowRight, Wrench, Wallet, CalendarDays, Home } from "lucide-react";
 import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, Tooltip, CartesianGrid } from "recharts";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
+  loader: ({ context }) => {
+    if (typeof window === "undefined") return null;
+    return context.queryClient.ensureQueryData({ queryKey: ["dashboard"], queryFn: () => getDashboard(), staleTime: 30_000 });
+  },
   component: DashboardPage,
 });
 
@@ -16,7 +20,7 @@ const KK = ["Tam", "Hel", "Maa", "Huh", "Tou", "Kes", "Hei", "Elo", "Syy", "Lok"
 
 function DashboardPage() {
   const fetchFn = useServerFn(getDashboard);
-  const { data, isLoading } = useQuery({ queryKey: ["dashboard"], queryFn: () => fetchFn() });
+  const { data, isLoading } = useQuery({ queryKey: ["dashboard"], queryFn: () => fetchFn(), staleTime: 30_000 });
 
   if (isLoading) return <div className="text-muted-foreground">Ladataan...</div>;
   if (!data) return null;
