@@ -235,6 +235,9 @@ export type Database = {
           id: string
           ilmanvaihto: string | null
           ilmanvaihto_vuosi: number | null
+          ilp_asennettu_vuosi: number | null
+          ilp_malli: string | null
+          ilp_merkki: string | null
           julkisivu_maalattu_vuosi: number | null
           julkisivumateriaali: string | null
           katto_uusittu_vuosi: number | null
@@ -269,6 +272,9 @@ export type Database = {
           id?: string
           ilmanvaihto?: string | null
           ilmanvaihto_vuosi?: number | null
+          ilp_asennettu_vuosi?: number | null
+          ilp_malli?: string | null
+          ilp_merkki?: string | null
           julkisivu_maalattu_vuosi?: number | null
           julkisivumateriaali?: string | null
           katto_uusittu_vuosi?: number | null
@@ -303,6 +309,9 @@ export type Database = {
           id?: string
           ilmanvaihto?: string | null
           ilmanvaihto_vuosi?: number | null
+          ilp_asennettu_vuosi?: number | null
+          ilp_malli?: string | null
+          ilp_merkki?: string | null
           julkisivu_maalattu_vuosi?: number | null
           julkisivumateriaali?: string | null
           katto_uusittu_vuosi?: number | null
