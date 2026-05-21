@@ -202,9 +202,31 @@ export const getHuollot = createServerFn({ method: "GET" })
     const { supabase, userId } = context;
     const k = await getActiveKiinteisto(supabase, userId);
     if (!k) return [];
-    const { data } = await supabase.from("huolto_historia").select("*").eq("kiinteisto_id", k.id).order("pvm", { ascending: false });
-    return data ?? [];
+    const { data: huollot } = await supabase
+      .from("huolto_historia")
+      .select("*")
+      .eq("kiinteisto_id", k.id)
+      .order("pvm", { ascending: false });
+    const ids = (huollot ?? []).map((h: any) => h.id);
+    let liiteByHuolto: Record<string, any[]> = {};
+    if (ids.length > 0) {
+      const { data: liitteet } = await supabase
+        .from("talo_dokumentit")
+        .select("*")
+        .in("huolto_id", ids);
+      for (const l of liitteet ?? []) {
+        if (l.huolto_id) (liiteByHuolto[l.huolto_id as string] ||= []).push(l);
+      }
+    }
+    return (huollot ?? []).map((h: any) => ({ ...h, liitteet: liiteByHuolto[h.id] ?? [] }));
   });
+
+const liiteSchema = z.object({
+  nimi: z.string().min(1).max(300),
+  tiedosto_polku: z.string().min(1).max(500),
+  mime: z.string().max(150).optional().nullable(),
+  koko_bytes: z.number().int().optional().nullable(),
+});
 
 const huoltoSchema = z.object({
   tyyppi: z.string().min(1),
@@ -216,8 +238,24 @@ const huoltoSchema = z.object({
   tekija_nimi: z.string().optional().nullable(),
   kustannus: z.number().default(0),
   takuu_vuotta: z.number().int().default(0),
-  pts_siirto: z.boolean().default(false),
+  pts_siirto: z.number().int().min(0).max(50).default(0),
+  liitteet: z.array(liiteSchema).optional().default([]),
 });
+
+async function insertLiitteet(supabase: any, kiinteistoId: string, huoltoId: string, liitteet: any[]) {
+  if (!liitteet || liitteet.length === 0) return;
+  const rows = liitteet.map((l) => ({
+    kiinteisto_id: kiinteistoId,
+    huolto_id: huoltoId,
+    nimi: l.nimi,
+    tiedosto_polku: l.tiedosto_polku,
+    mime: l.mime ?? null,
+    koko_bytes: l.koko_bytes ?? null,
+    tyyppi: "kuitti",
+  }));
+  const { error } = await supabase.from("talo_dokumentit").insert(rows);
+  if (error) throw error;
+}
 
 export const addHuolto = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
@@ -226,8 +264,14 @@ export const addHuolto = createServerFn({ method: "POST" })
     const { supabase, userId } = context;
     const k = await getActiveKiinteisto(supabase, userId);
     if (!k) throw new Error("Kiinteistöä ei löytynyt");
-    const { error } = await supabase.from("huolto_historia").insert({ kiinteisto_id: k.id, ...data });
+    const { liitteet, ...row } = data;
+    const { data: inserted, error } = await supabase
+      .from("huolto_historia")
+      .insert({ kiinteisto_id: k.id, ...row })
+      .select("id")
+      .single();
     if (error) throw error;
+    await insertLiitteet(supabase, k.id, inserted.id, liitteet);
     if (Number(data.kustannus) > 0) {
       await supabase.from("kulut").insert({
         kiinteisto_id: k.id,
@@ -246,9 +290,13 @@ export const updateHuolto = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: unknown) => updateHuoltoSchema.parse(input))
   .handler(async ({ data, context }) => {
-    const { id, ...patch } = data;
-    const { error } = await context.supabase.from("huolto_historia").update(patch).eq("id", id);
+    const { supabase, userId } = context;
+    const k = await getActiveKiinteisto(supabase, userId);
+    if (!k) throw new Error("Kiinteistöä ei löytynyt");
+    const { id, liitteet, ...patch } = data;
+    const { error } = await supabase.from("huolto_historia").update(patch).eq("id", id);
     if (error) throw error;
+    await insertLiitteet(supabase, k.id, id, liitteet ?? []);
     return { ok: true };
   });
 
@@ -256,7 +304,28 @@ export const deleteHuolto = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: unknown) => z.object({ id: z.string().uuid() }).parse(input))
   .handler(async ({ data, context }) => {
-    const { error } = await context.supabase.from("huolto_historia").delete().eq("id", data.id);
+    const { supabase } = context;
+    // Poista linkitetyt liitteet storagesta
+    const { data: liitteet } = await supabase
+      .from("talo_dokumentit")
+      .select("tiedosto_polku")
+      .eq("huolto_id", data.id);
+    const paths = (liitteet ?? []).map((l: any) => l.tiedosto_polku);
+    if (paths.length > 0) {
+      await supabase.storage.from("talo-dokumentit").remove(paths);
+    }
+    const { error } = await supabase.from("huolto_historia").delete().eq("id", data.id);
+    if (error) throw error;
+    return { ok: true };
+  });
+
+export const deleteHuoltoLiite = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) => z.object({ id: z.string().uuid(), tiedosto_polku: z.string() }).parse(input))
+  .handler(async ({ data, context }) => {
+    const { supabase } = context;
+    await supabase.storage.from("talo-dokumentit").remove([data.tiedosto_polku]);
+    const { error } = await supabase.from("talo_dokumentit").delete().eq("id", data.id);
     if (error) throw error;
     return { ok: true };
   });
