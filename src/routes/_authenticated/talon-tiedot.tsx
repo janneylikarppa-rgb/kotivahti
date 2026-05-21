@@ -15,6 +15,10 @@ import { Check, Trash2, FileText, Download, Upload } from "lucide-react";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/talon-tiedot")({
+  loader: ({ context }) => {
+    if (typeof window === "undefined") return null;
+    return context.queryClient.ensureQueryData({ queryKey: ["talo"], queryFn: () => getTaloTiedot(), staleTime: 30_000 });
+  },
   component: TaloTiedotPage,
 });
 
@@ -90,7 +94,7 @@ function TaloTiedotPage() {
   const fetchFn = useServerFn(getTaloTiedot);
   const saveFn = useServerFn(saveTaloTiedot);
   const qc = useQueryClient();
-  const { data, isLoading } = useQuery({ queryKey: ["talo"], queryFn: () => fetchFn() });
+  const { data, isLoading } = useQuery({ queryKey: ["talo"], queryFn: () => fetchFn(), staleTime: 30_000 });
   const [active, setActive] = useState(0);
   const [k, setK] = useState<any>({});
   const [t, setT] = useState<any>({});
