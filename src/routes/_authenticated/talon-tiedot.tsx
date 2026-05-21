@@ -41,7 +41,7 @@ const LAMMITYS = [
   { key: "sahkolammitys", nimi: "Sähkölämmitys" },
   { key: "muu", nimi: "Muu" },
 ];
-const LAITTEET: Record<string, { tyyppi: string; merkit: string[] }> = {
+const MERKIT: Record<string, { tyyppi: string; merkit: string[] }> = {
   maalampo: { tyyppi: "Maalämpöpumppu", merkit: ["Nibe", "IVT", "Thermia", "Bosch", "Gebwell", "Mitsubishi", "Stiebel Eltron", "Oilon", "Muu"] },
   ilmavesilampo: { tyyppi: "Ilma-vesilämpöpumppu", merkit: ["Nibe", "Mitsubishi", "Daikin", "Panasonic", "Bosch", "Thermia", "Toshiba", "LG", "Muu"] },
   ilmalampopumppu: { tyyppi: "Ilmalämpöpumppu", merkit: ["Mitsubishi", "Daikin", "Panasonic", "Toshiba", "Fujitsu", "LG", "Samsung", "Sharp", "Muu"] },
@@ -78,7 +78,7 @@ function TaloTiedotPage() {
     }
   }, [data]);
 
-  const laite = t.lammitysmuoto ? LAITTEET[t.lammitysmuoto] : undefined;
+  const laite = t.lammitysmuoto ? MERKIT[t.lammitysmuoto] : undefined;
   const lammitysLisa = (t.lammitys_lisatieto && typeof t.lammitys_lisatieto === "object") ? t.lammitys_lisatieto : {};
   const setLisa = (patch: Record<string, any>) => setT({ ...t, lammitys_lisatieto: { ...lammitysLisa, ...patch } });
 
@@ -105,9 +105,7 @@ function TaloTiedotPage() {
           putkimateriaali: str(t.putkimateriaali),
           viemarimateriaali: str(t.viemarimateriaali),
           viemari_asennettu_vuosi: num(t.viemari_asennettu_vuosi),
-          viemari_uusittu_vuosi: num(t.viemari_uusittu_vuosi),
           sahkot_asennettu_vuosi: num(t.sahkot_asennettu_vuosi),
-          sahkot_uusittu_vuosi: num(t.sahkot_uusittu_vuosi),
           tontin_pinta_ala: num(t.tontin_pinta_ala),
           pihan_tyyppi: str(t.pihan_tyyppi), piha_lisatieto: str(t.piha_lisatieto),
           terassi_materiaali: str(t.terassi_materiaali),
@@ -219,19 +217,6 @@ function TaloTiedotPage() {
                   </Field>
                   <Field label="Mallimerkintä"><Input value={lammitysLisa.malli ?? ""} onChange={(e) => setLisa({ malli: e.target.value })} placeholder="Esim. F1255-12" /></Field>
                 </Row>
-                <Row>
-                  <Field label="Teho (kW)"><Input type="number" value={lammitysLisa.teho_kw ?? ""} onChange={(e) => setLisa({ teho_kw: e.target.value })} /></Field>
-                  <Field label="Sarjanumero"><Input value={lammitysLisa.sarjanumero ?? ""} onChange={(e) => setLisa({ sarjanumero: e.target.value })} /></Field>
-                </Row>
-                {(t.lammitysmuoto === "maalampo" || t.lammitysmuoto === "ilmavesilampo") && (
-                  <Row>
-                    <Field label="Varaaja (litraa)"><Input type="number" value={lammitysLisa.varaaja_litraa ?? ""} onChange={(e) => setLisa({ varaaja_litraa: e.target.value })} /></Field>
-                    <Field label="Lämmönkeruu / ulkoyksikkö"><Input value={lammitysLisa.keruu ?? ""} onChange={(e) => setLisa({ keruu: e.target.value })} placeholder="Esim. porakaivo 180 m" /></Field>
-                  </Row>
-                )}
-                {t.lammitysmuoto === "oljylammitys" && (
-                  <Field label="Säiliön tilavuus (litraa)"><Input type="number" value={lammitysLisa.sailio_litraa ?? ""} onChange={(e) => setLisa({ sailio_litraa: e.target.value })} /></Field>
-                )}
               </div>
             )}
 
@@ -255,12 +240,8 @@ function TaloTiedotPage() {
               </Field>
               <Field label="Viemäri asennettu (vuosi)"><Input type="number" value={t.viemari_asennettu_vuosi ?? ""} onChange={(e) => setT({ ...t, viemari_asennettu_vuosi: e.target.value })} /></Field>
             </Row>
-            <Field label="Viemäri uusittu / saneerattu (vuosi)"><Input type="number" value={t.viemari_uusittu_vuosi ?? ""} onChange={(e) => setT({ ...t, viemari_uusittu_vuosi: e.target.value })} /></Field>
 
-            <Row>
-              <Field label="Sähköt asennettu (vuosi)"><Input type="number" value={t.sahkot_asennettu_vuosi ?? ""} onChange={(e) => setT({ ...t, sahkot_asennettu_vuosi: e.target.value })} /></Field>
-              <Field label="Sähköt uusittu (vuosi)"><Input type="number" value={t.sahkot_uusittu_vuosi ?? ""} onChange={(e) => setT({ ...t, sahkot_uusittu_vuosi: e.target.value })} /></Field>
-            </Row>
+            <Field label="Sähköt asennettu (vuosi)"><Input type="number" value={t.sahkot_asennettu_vuosi ?? ""} onChange={(e) => setT({ ...t, sahkot_asennettu_vuosi: e.target.value })} /></Field>
           </>)}
 
           {active === 4 && (<>

@@ -253,7 +253,6 @@ export type Database = {
           rakennustapa: string | null
           raystaat_kunnostettu_vuosi: number | null
           sahkot_asennettu_vuosi: number | null
-          sahkot_uusittu_vuosi: number | null
           terassi_kunnostettu_vuosi: number | null
           terassi_materiaali: string | null
           tilavuus: number | null
@@ -261,7 +260,6 @@ export type Database = {
           updated_at: string
           valmiit_osiot: Json | null
           viemari_asennettu_vuosi: number | null
-          viemari_uusittu_vuosi: number | null
           viemarimateriaali: string | null
         }
         Insert: {
@@ -289,7 +287,6 @@ export type Database = {
           rakennustapa?: string | null
           raystaat_kunnostettu_vuosi?: number | null
           sahkot_asennettu_vuosi?: number | null
-          sahkot_uusittu_vuosi?: number | null
           terassi_kunnostettu_vuosi?: number | null
           terassi_materiaali?: string | null
           tilavuus?: number | null
@@ -297,7 +294,6 @@ export type Database = {
           updated_at?: string
           valmiit_osiot?: Json | null
           viemari_asennettu_vuosi?: number | null
-          viemari_uusittu_vuosi?: number | null
           viemarimateriaali?: string | null
         }
         Update: {
@@ -325,7 +321,6 @@ export type Database = {
           rakennustapa?: string | null
           raystaat_kunnostettu_vuosi?: number | null
           sahkot_asennettu_vuosi?: number | null
-          sahkot_uusittu_vuosi?: number | null
           terassi_kunnostettu_vuosi?: number | null
           terassi_materiaali?: string | null
           tilavuus?: number | null
@@ -333,7 +328,6 @@ export type Database = {
           updated_at?: string
           valmiit_osiot?: Json | null
           viemari_asennettu_vuosi?: number | null
-          viemari_uusittu_vuosi?: number | null
           viemarimateriaali?: string | null
         }
         Relationships: [
