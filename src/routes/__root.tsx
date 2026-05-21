@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { QueryClient, QueryClientProvider, useQueryClient } from "@tanstack/react-query";
 import {
   Outlet,
@@ -10,7 +10,7 @@ import {
 } from "@tanstack/react-router";
 
 import appCss from "../styles.css?url";
-import { supabase } from "@/integrations/supabase/client";
+import { getCachedSession, subscribeToSession } from "@/lib/auth-session";
 import { Toaster } from "@/components/ui/sonner";
 
 function NotFoundComponent() {
@@ -93,13 +93,21 @@ function RootShell({ children }: { children: React.ReactNode }) {
 function AuthSync() {
   const router = useRouter();
   const queryClient = useQueryClient();
+  const [session, setSession] = useState(() => getCachedSession() ?? null);
+  const isAuthenticated = !!session;
+
   useEffect(() => {
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(() => {
+    return subscribeToSession((nextSession) => {
+      setSession(nextSession);
       router.invalidate();
       queryClient.invalidateQueries();
     });
-    return () => subscription.unsubscribe();
   }, [router, queryClient]);
+
+  useEffect(() => {
+    document.documentElement.dataset.authenticated = isAuthenticated ? "true" : "false";
+  }, [isAuthenticated]);
+
   return null;
 }
 
