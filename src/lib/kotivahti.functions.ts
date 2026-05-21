@@ -186,10 +186,11 @@ export const getKuitatut = createServerFn({ method: "GET" })
   });
 
 const kuittausSchema = z.object({
-  kausi_key: z.string(),
-  huolto_nimi: z.string(),
-  tekija: z.string().default("itse"),
-  hinta: z.number().default(0),
+  kausi_key: z.string().min(1).max(50),
+  huolto_nimi: z.string().min(1).max(200),
+  tekija: z.enum(["itse", "ammattilainen", "jatetaan"]).default("itse"),
+  tekija_nimi: z.string().max(200).optional().nullable(),
+  hinta: z.number().min(0).max(1000000).default(0),
 });
 
 export const kuittaaHuolto = createServerFn({ method: "POST" })
@@ -206,12 +207,13 @@ export const kuittaaHuolto = createServerFn({ method: "POST" })
     }, { onConflict: "kiinteisto_id,kausi_key,huolto_nimi,vuosi" });
     if (error) throw error;
 
-    if (data.hinta > 0) {
+    if (data.tekija === "ammattilainen" && data.hinta > 0) {
       await supabase.from("kulut").insert({
         kiinteisto_id: k.id,
         nimi: `Vuosikello – ${data.huolto_nimi}`,
         kategoria: "huolto",
         summa: data.hinta,
+        kuvaus: data.tekija_nimi ?? null,
         pvm,
       });
     }
