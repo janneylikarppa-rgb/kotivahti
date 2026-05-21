@@ -51,15 +51,20 @@ function VuosikelloPage() {
 
       {/* Kausi-välilehdet */}
       <div className="grid grid-cols-2 md:grid-cols-5 gap-2">
-        {KAUDET.map((k) => (
-          <button key={k.key} onClick={() => setKausi(k.key)}
-            className={`flex flex-col items-center gap-1 rounded-md border p-3 transition ${
-              kausi === k.key ? "border-primary bg-primary/10" : "border-border hover:border-primary/40"
-            }`}>
-            <span className="text-2xl">{k.ikoni}</span>
-            <span className="text-xs uppercase tracking-wider">{k.nimi}</span>
-          </button>
-        ))}
+        {KAUDET.map((k) => {
+          const total = PERUSHUOLLOT[k.key].length;
+          const done = (kuitatut as any[]).filter((x) => x.kausi_key === k.key).length;
+          return (
+            <button key={k.key} onClick={() => setKausi(k.key)}
+              className={`flex flex-col items-center gap-1 rounded-md border p-3 transition ${
+                kausi === k.key ? "border-primary bg-primary/10" : "border-border hover:border-primary/40"
+              }`}>
+              <span className="text-2xl">{k.ikoni}</span>
+              <span className="text-xs uppercase tracking-wider">{k.nimi}</span>
+              <span className={`text-[10px] font-mono ${done === total && total > 0 ? "text-primary" : "text-muted-foreground"}`}>{done}/{total}</span>
+            </button>
+          );
+        })}
       </div>
 
       <Card className="gold-card">
