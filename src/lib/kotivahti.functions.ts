@@ -176,10 +176,13 @@ export const getKuitatut = createServerFn({ method: "GET" })
   .handler(async ({ context }) => {
     const { supabase, userId } = context;
     const k = await getActiveKiinteisto(supabase, userId);
-    if (!k) return [];
+    if (!k) return { kuitatut: [], talon_tiedot: null };
     const vuosi = new Date().getFullYear();
-    const { data } = await supabase.from("vk_kuitatut").select("*").eq("kiinteisto_id", k.id).eq("vuosi", vuosi);
-    return data ?? [];
+    const [kuitatutRes, talonRes] = await Promise.all([
+      supabase.from("vk_kuitatut").select("*").eq("kiinteisto_id", k.id).eq("vuosi", vuosi),
+      supabase.from("talon_tiedot").select("lammitysmuoto, ilp_merkki, ilmanvaihto, kattomateriaali, terassi_materiaali, julkisivumateriaali").eq("kiinteisto_id", k.id).maybeSingle(),
+    ]);
+    return { kuitatut: kuitatutRes.data ?? [], talon_tiedot: talonRes.data };
   });
 
 const kuittausSchema = z.object({
