@@ -16,7 +16,6 @@ function startListener() {
   listenerStarted = true;
   supabase.auth.onAuthStateChange((_event, session) => {
     cachedSession = session;
-    initialized = true;
     notify();
   });
 }
