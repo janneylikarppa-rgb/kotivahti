@@ -26,6 +26,14 @@ const OSIOT = [
   { key: "dokumentit", nimi: "Dokumentit" },
 ];
 
+const KIINTEISTOTYYPIT = [
+  { key: "omakotitalo", nimi: "Omakotitalo" },
+  { key: "paritalo", nimi: "Paritalo" },
+  { key: "rivitalo", nimi: "Rivitalo" },
+  { key: "mokki", nimi: "Mökki" },
+];
+const ILP_MERKIT = ["Mitsubishi", "Daikin", "Panasonic", "Toshiba", "Fujitsu", "LG", "Samsung", "Sharp", "Muu"];
+
 const RAKENNUSTAVAT = ["Puurunko", "Hirsi", "Tiili", "Kevytsoraharkko (Leca)", "Betoniharkko", "Kevytbetoni (Siporex)", "Betonielementti", "Teräsrunko"];
 const JULKISIVUMATERIAALIT = ["Puu (lautaverhous)", "Tiili", "Rappaus", "Levyverhous", "Hirsi", "Pelti", "Kuitusementtilevy", "Kivi"];
 const KATTOTYYPIT = ["Harjakatto", "Pulpettikatto", "Aumakatto", "Mansardikatto", "Tasakatto", "Kaarikatto"];
@@ -88,7 +96,7 @@ function TaloTiedotPage() {
       return saveFn({ data: {
         kiinteisto: {
           nimi: k.nimi, osoite: k.osoite, postinumero: k.postinumero, kaupunki: k.kaupunki,
-          rakennusvuosi: num(k.rakennusvuosi),
+          rakennusvuosi: num(k.rakennusvuosi), tyyppi: str(k.tyyppi),
         },
         talo: {
           pinta_ala: num(t.pinta_ala), tilavuus: num(t.tilavuus),
@@ -100,6 +108,8 @@ function TaloTiedotPage() {
           raystaat_kunnostettu_vuosi: num(t.raystaat_kunnostettu_vuosi),
           lammitysmuoto: str(t.lammitysmuoto), lammitys_asennettu_vuosi: num(t.lammitys_asennettu_vuosi),
           lammitys_lisatieto: lammitysLisa,
+          ilp_merkki: str(t.ilp_merkki), ilp_malli: str(t.ilp_malli),
+          ilp_asennettu_vuosi: num(t.ilp_asennettu_vuosi),
           ilmanvaihto: str(t.ilmanvaihto), ilmanvaihto_vuosi: num(t.ilmanvaihto_vuosi),
           putket_uusittu_vuosi: num(t.putket_uusittu_vuosi),
           putkimateriaali: str(t.putkimateriaali),
@@ -161,6 +171,12 @@ function TaloTiedotPage() {
               <Field label="Kaupunki"><Input value={k.kaupunki ?? ""} onChange={(e) => setK({ ...k, kaupunki: e.target.value })} /></Field></Row>
             <Row><Field label="Asukkaita"><Input type="number" value={t.asukkaita ?? ""} onChange={(e) => setT({ ...t, asukkaita: e.target.value })} /></Field>
               <Field label="Kerroksia"><Input type="number" value={t.kerroksia ?? ""} onChange={(e) => setT({ ...t, kerroksia: e.target.value })} /></Field></Row>
+            <Field label="Kiinteistön tyyppi">
+              <Select value={k.tyyppi ?? ""} onValueChange={(v) => setK({ ...k, tyyppi: v })}>
+                <SelectTrigger><SelectValue placeholder="Valitse" /></SelectTrigger>
+                <SelectContent>{KIINTEISTOTYYPIT.map((kt) => <SelectItem key={kt.key} value={kt.key}>{kt.nimi}</SelectItem>)}</SelectContent>
+              </Select>
+            </Field>
           </>)}
 
           {active === 1 && (<>
@@ -219,6 +235,18 @@ function TaloTiedotPage() {
                 </Row>
               </div>
             )}
+
+            <div className="rounded-md border border-border/60 bg-muted/30 p-4 space-y-4">
+              <p className="eyebrow text-muted-foreground">Ilmalämpöpumppu (lisälaite)</p>
+              <p className="text-xs text-muted-foreground">Jos talossa on ilmalämpöpumppu päälämmityksen lisäksi, kirjaa tähän.</p>
+              <Row>
+                <Field label="Merkki">
+                  <SelectOrOther value={t.ilp_merkki} options={ILP_MERKIT} onChange={(v) => setT({ ...t, ilp_merkki: v })} />
+                </Field>
+                <Field label="Mallimerkintä"><Input value={t.ilp_malli ?? ""} onChange={(e) => setT({ ...t, ilp_malli: e.target.value })} placeholder="Esim. MSZ-LN35VG" /></Field>
+              </Row>
+              <Field label="Asennusvuosi"><Input type="number" value={t.ilp_asennettu_vuosi ?? ""} onChange={(e) => setT({ ...t, ilp_asennettu_vuosi: e.target.value })} /></Field>
+            </div>
 
             <Row>
               <Field label="Ilmanvaihto">

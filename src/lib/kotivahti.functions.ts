@@ -66,6 +66,7 @@ const taloSchema = z.object({
     postinumero: z.string().optional().nullable(),
     kaupunki: z.string().optional().nullable(),
     rakennusvuosi: z.number().int().optional().nullable(),
+    tyyppi: z.string().optional().nullable(),
   }),
   talo: z.object({
     pinta_ala: z.number().optional().nullable(),
@@ -81,6 +82,9 @@ const taloSchema = z.object({
     raystaat_kunnostettu_vuosi: z.number().int().optional().nullable(),
     lammitysmuoto: z.string().optional().nullable(),
     lammitys_asennettu_vuosi: z.number().int().optional().nullable(),
+    ilp_merkki: z.string().optional().nullable(),
+    ilp_malli: z.string().optional().nullable(),
+    ilp_asennettu_vuosi: z.number().int().optional().nullable(),
     ilmanvaihto: z.string().optional().nullable(),
     ilmanvaihto_vuosi: z.number().int().optional().nullable(),
     putket_uusittu_vuosi: z.number().int().optional().nullable(),

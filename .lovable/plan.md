@@ -1,31 +1,29 @@
-# Talon tiedot -lomakkeen yksinkertaistus
+# Talon tiedot — viimeistely tuotedokumentin mukaan
 
-## Muutokset
+PDF:n `talon_tiedot`-skeema (s. 10–11) vahvistaa nykyiset muutokset:
+lämmitys = `lammitys` + `lammitys_vuosi` + `lammitys_malli` (ei tehoa/sarjanumeroa/varaajaa) ja sähköille/viemärille ei ole erillisiä "uusittu"-sarakkeita. Nämä on jo tehty.
 
-**1. Lämmitysosio (`talon-tiedot.tsx`)**
-- Pidetään lämmityslaitteen kentistä vain: **Merkki**, **Mallimerkintä**, **Lämmitys asennettu (vuosi)**.
-- Poistetaan: Teho (kW), Sarjanumero, Varaaja (litraa), Lämmönkeruu/ulkoyksikkö, Säiliön tilavuus.
-- `lammitys_lisatieto` JSONB-sarakkeeseen tallennetaan jatkossa vain `{ merkki, malli }`. Sarake säilyy ennallaan – vanha data ei katoa, mutta sitä ei näytetä tai päivitetä lomakkeelta.
+Kaksi puuttuvaa kohtaa dokumentista:
 
-**2. Sähköt**
-- Poistetaan "Sähköt uusittu (vuosi)" -kenttä lomakkeelta.
-- Jätetään vain "Sähköt asennettu (vuosi)" → PTS-suositus tarkastukselle asennusvuoden perusteella.
-- Pudotetaan `sahkot_uusittu_vuosi`-sarake migrationilla (käyttäjä vahvisti).
+## 1. Ilmalämpöpumppu **lisälaitteena**
 
-**3. Viemäri**
-- Poistetaan "Viemäri uusittu/saneerattu (vuosi)" -kenttä lomakkeelta.
-- Jätetään "Viemärimateriaali" + "Viemäri asennettu (vuosi)".
-- Pudotetaan `viemari_uusittu_vuosi`-sarake migrationilla.
+Dokumentti määrittelee erilliset kentät `ilp_vuosi` ja `ilp_malli` – ilmalämpöpumppu voi olla talossa **päälämmitysmuodon lisäksi** (esim. öljylämmitys + ILP tukena). Nyt ILP näkyy vain jos se on valittu pää­lämmitykseksi.
 
-## Tekniset askeleet
+**Toteutus:**
+- Migration: lisää `talon_tiedot`-tauluun `ilp_merkki text`, `ilp_malli text`, `ilp_asennettu_vuosi int`.
+- Lomake (teknisten alle oma kortti): "Ilmalämpöpumppu (lisälaite)" – merkki (SelectOrOther: Mitsubishi/Daikin/Panasonic/Toshiba/Fujitsu/LG/Samsung/Sharp/Muu), malli, asennusvuosi. Näytetään aina, ei riippuvainen päälämmitysmuodosta.
+- Zod-skeema + save-payload päivitys `kotivahti.functions.ts` ja `talon-tiedot.tsx`.
 
-1. **Migration**: `ALTER TABLE talon_tiedot DROP COLUMN sahkot_uusittu_vuosi, DROP COLUMN viemari_uusittu_vuosi;`
-2. **`src/lib/kotivahti.functions.ts`**: poista `sahkot_uusittu_vuosi` ja `viemari_uusittu_vuosi` Zod-skeemasta ja upsertista.
-3. **`src/routes/_authenticated/talon-tiedot.tsx`**:
-   - Poista yo. kentät teknisten järjestelmien osiosta.
-   - Yksinkertaista `LAITTEET`-renderöinti: vain merkki + malli (lämmitysmuotokohtaiset lisäkentät pois).
-4. Tarkasta että `types.ts` päivittyy migrationin jälkeen automaattisesti.
+## 2. Kiinteistön tyyppi -valinta perustietoihin
 
-## Huom tiedostosta
+Doc s. 10: `kiinteistot.tyyppi` = omakotitalo / paritalo / rivitalo / mökki. Sarake on jo olemassa (oletus `omakotitalo`), mutta lomakkeella ei ole valintaa.
 
-En pääse käsiksi `file:///C:/Users/...` -polkuun (paikallinen tiedosto omalla koneellasi). Jos kotivahti-tuotedokumentissa on lisäohjeita kenttiin, liitä sisältö chattiin niin saan ne sisällytettyä.
+**Toteutus:**
+- Perustiedot-välilehdelle Select: omakotitalo / paritalo / rivitalo / mökki.
+- Talletetaan `kiinteistot.tyyppi`-sarakkeeseen (jo skeemassa, vain payload + UI).
+
+## Mitä EI muuteta nyt
+
+- IV-kentät (`ilmanvaihto`, `ilmanvaihto_vuosi`) toimivat dokumentin `iv_tyyppi/iv_vuosi`-kenttiä vastaavasti – jätetään ennalleen.
+- Kattotyyppi/julkisivu/rakennustapa ovat lomakkeen lisätietoja (doc tallentaa loput `data` jsonb:hen) – pidetään omat sarakkeet ennallaan.
+- Monikiinteistö-valitsin topbariin (doc s. 9) on oma laajempi työ, ei tähän.
