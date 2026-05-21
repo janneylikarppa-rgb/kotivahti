@@ -1,0 +1,1 @@
+GRANT EXECUTE ON FUNCTION public.omistaa_kiinteiston(uuid) TO authenticated, anon;
