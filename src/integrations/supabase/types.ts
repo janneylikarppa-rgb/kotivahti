@@ -353,6 +353,7 @@ export type Database = {
         Row: {
           created_at: string
           hinta: number | null
+          historia_id: string | null
           huolto_nimi: string
           id: string
           kausi_key: string
@@ -364,6 +365,7 @@ export type Database = {
         Insert: {
           created_at?: string
           hinta?: number | null
+          historia_id?: string | null
           huolto_nimi: string
           id?: string
           kausi_key: string
@@ -375,6 +377,7 @@ export type Database = {
         Update: {
           created_at?: string
           hinta?: number | null
+          historia_id?: string | null
           huolto_nimi?: string
           id?: string
           kausi_key?: string
@@ -384,6 +387,13 @@ export type Database = {
           vuosi?: number
         }
         Relationships: [
+          {
+            foreignKeyName: "vk_kuitatut_historia_id_fkey"
+            columns: ["historia_id"]
+            isOneToOne: false
+            referencedRelation: "huolto_historia"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "vk_kuitatut_kiinteisto_id_fkey"
             columns: ["kiinteisto_id"]
