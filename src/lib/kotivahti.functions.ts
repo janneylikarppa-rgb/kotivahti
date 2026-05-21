@@ -262,8 +262,6 @@ export const kuittaaHuolto = createServerFn({ method: "POST" })
 
     return { ok: true };
   });
-    return { ok: true };
-  });
 
 // ---------- Kulut ----------
 export const getKulut = createServerFn({ method: "GET" })
