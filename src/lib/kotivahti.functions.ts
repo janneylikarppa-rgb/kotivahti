@@ -202,8 +202,9 @@ export const kuittaaHuolto = createServerFn({ method: "POST" })
     if (!k) throw new Error("Kiinteistöä ei löytynyt");
     const vuosi = new Date().getFullYear();
     const pvm = new Date().toISOString().slice(0, 10);
+    const { tekija_nimi, ...row } = data;
     const { error } = await supabase.from("vk_kuitatut").upsert({
-      kiinteisto_id: k.id, vuosi, kuitattu_pvm: pvm, ...data,
+      kiinteisto_id: k.id, vuosi, kuitattu_pvm: pvm, ...row,
     }, { onConflict: "kiinteisto_id,kausi_key,huolto_nimi,vuosi" });
     if (error) throw error;
 
