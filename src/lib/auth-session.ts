@@ -38,6 +38,15 @@ export function getCachedSession(): Session | null | undefined {
   return initialized ? cachedSession : undefined;
 }
 
+export function hasPersistedSessionHint(): boolean {
+  if (typeof window === "undefined") return false;
+  for (let i = 0; i < window.localStorage.length; i += 1) {
+    const key = window.localStorage.key(i) ?? "";
+    if (key.startsWith("sb-") && key.endsWith("-auth-token")) return true;
+  }
+  return false;
+}
+
 /** Awaits initial session restore on first call; sync thereafter. */
 export async function getReadySession(): Promise<Session | null> {
   if (!initialized) await ensureInit();
