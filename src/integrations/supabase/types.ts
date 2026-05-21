@@ -252,12 +252,17 @@ export type Database = {
           putkimateriaali: string | null
           rakennustapa: string | null
           raystaat_kunnostettu_vuosi: number | null
+          sahkot_asennettu_vuosi: number | null
           sahkot_uusittu_vuosi: number | null
+          terassi_kunnostettu_vuosi: number | null
+          terassi_materiaali: string | null
           tilavuus: number | null
           tontin_pinta_ala: number | null
           updated_at: string
           valmiit_osiot: Json | null
+          viemari_asennettu_vuosi: number | null
           viemari_uusittu_vuosi: number | null
+          viemarimateriaali: string | null
         }
         Insert: {
           asukkaita?: number | null
@@ -283,12 +288,17 @@ export type Database = {
           putkimateriaali?: string | null
           rakennustapa?: string | null
           raystaat_kunnostettu_vuosi?: number | null
+          sahkot_asennettu_vuosi?: number | null
           sahkot_uusittu_vuosi?: number | null
+          terassi_kunnostettu_vuosi?: number | null
+          terassi_materiaali?: string | null
           tilavuus?: number | null
           tontin_pinta_ala?: number | null
           updated_at?: string
           valmiit_osiot?: Json | null
+          viemari_asennettu_vuosi?: number | null
           viemari_uusittu_vuosi?: number | null
+          viemarimateriaali?: string | null
         }
         Update: {
           asukkaita?: number | null
@@ -314,12 +324,17 @@ export type Database = {
           putkimateriaali?: string | null
           rakennustapa?: string | null
           raystaat_kunnostettu_vuosi?: number | null
+          sahkot_asennettu_vuosi?: number | null
           sahkot_uusittu_vuosi?: number | null
+          terassi_kunnostettu_vuosi?: number | null
+          terassi_materiaali?: string | null
           tilavuus?: number | null
           tontin_pinta_ala?: number | null
           updated_at?: string
           valmiit_osiot?: Json | null
+          viemari_asennettu_vuosi?: number | null
           viemari_uusittu_vuosi?: number | null
+          viemarimateriaali?: string | null
         }
         Relationships: [
           {
