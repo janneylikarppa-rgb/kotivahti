@@ -1,51 +1,60 @@
 ## Tavoite
 
-Laajenna `Talon tiedot` -lomake vastaamaan käyttäjän määrittelemää 6 osion rakennetta. Lisää puuttuvat kentät tietokantaan, päivitä lomake ja lisää dokumenttien/takuiden tallennus.
+Päivitetään huoltohistoria vastaamaan tuotedokumentin osio 4.3:a. Migration on jo ajettu (pts_siirto → integer, talo_dokumentit.huolto_id lisätty).
 
-## 1. Tietokantamuutokset (uusi migration)
+## 1. `src/lib/kotivahti.functions.ts`
 
-**`profiles`-tauluun:**
-- `puhelin text` (omistajan puhelin)
+- `huoltoSchema`:
+  - `pts_siirto`: `z.number().int().min(0).max(50).default(0)` (boolean → vuotta)
+  - Lisätään valinnainen `liitteet: z.array({ nimi, tiedosto_polku, mime?, koko_bytes? }).default([])`
+- `addHuolto.handler`:
+  - Insert palauttaa `id` (`.select("id").single()`)
+  - Jos `liitteet.length > 0` → insert `talo_dokumentit`-tauluun jokainen liite: `{ kiinteisto_id, huolto_id: uusi id, nimi, tiedosto_polku, mime, koko_bytes, tyyppi: 'kuitti' }`
+  - Säilytä nykyinen kytkentä `kulut`-tauluun (kustannus > 0)
+- `updateHuolto.handler`:
+  - Ota `liitteet` erikseen patchista, sama insert-logiikka olemassa olevalle `id`:lle (vain uudet liitteet — frontti lähettää vain uudet)
+- Lisätään `deleteHuoltoLiite` server fn (`id`, `tiedosto_polku`) → poistaa storagesta ja `talo_dokumentit`-rivin
+- `getHuollot`: liitetään liitteet (`talo_dokumentit` joissa `huolto_id IN (...)`) ja palautetaan jokaisella huollolla `liitteet`-array
 
-**`kiinteistot`-tauluun:**
-- `hankintatapa text` (ostettu / rakennettu)
-- `hankinta_vuosi int`
-- Päivitä tyyppi-valikko: lisää `erillistalo`
+## 2. `src/routes/_authenticated/huoltohistoria.tsx` – `HuoltoForm`
 
-**`talon_tiedot`-tauluun, uudet sarakkeet:**
-- Rakennus: `kokonaispinta_ala numeric`, `perustus text`, `eriste text`, `rakennus_lisatieto text`
-- Katto: `katto_pinta_ala numeric`, `hormit text`, `kattoturvatuotteet text`, `kourun_pituus numeric`, `kourun_materiaali text`, `syoksytorvet int`
-- Tekniset: `iv_suodatintyyppi text`, `iv_suodatin_vaihdettu date`, `paasulun_sijainti text`, `palovaroittimia int`, `palovaroitin_paristot date`, `kiukaan_vuosi int`, `nuohous_pvm date`
-- Ulko: `nurmikon_pinta_ala numeric`, `sadevesikaivot int`, `terassi_pinta_ala numeric`, `terassi_rakennettu_vuosi int`, `salaojat boolean`, `salaojat_tarkastettu date`
+Korvataan kentät spek 4.3:n mukaan:
 
-**Uusi taulu `talo_dokumentit`:**
-- `id uuid pk`, `kiinteisto_id uuid not null`, `nimi text`, `tyyppi text` (dokumentti / takuu / kuitti / lasku), `tiedosto_url text`, `mime text`, `koko_bytes int`, `lisatty_pvm date default current_date`, `kuvaus text`, `created_at`
-- RLS: `omistaa_kiinteiston(kiinteisto_id)` kaikkiin operaatioihin
+- **Tyyppi** – Select: `huolto`, `tarkastus`, `remontti`, `maalaus`, `uusiminen`
+- **Kohde** – Select 20+ vaihtoehdolla (vakiolista `src/lib/huolto-kohteet.ts`):
+  - Lämmitysjärjestelmät: Öljykattila, Maalämpöpumppu, Ilma-vesilämpöpumppu, Ilmalämpöpumppu, Kaukolämpö-vaihdin, Poistoilmalämpöpumppu, Sähkökattila, Sähköpatterit
+  - Tekniikka: IV-kone, Käyttövesiputkisto, Viemäröinti, Sähköjärjestelmä, Lämminvesivaraaja
+  - Rakenne: Katto, Räystäät & kourut, Julkisivu, Ikkunat, Salaojat, Perustukset
+  - Sisätilat: Kylpyhuone/märkätila, Sauna & kiuas, Hormit & tulisijat
+  - Piha: Terassi, Piha-alue
+  - Muu (vapaa teksti)
+- **Kuvaus** – Textarea (ennallaan)
+- **Päivämäärä** – Date (ennallaan)
+- **Tekijä** – Select Itse/Ammattilainen (ennallaan)
+- **Tekijän nimi** – Text (ennallaan)
+- **Kustannus €** – Number, lisätään aputeksti "Menee automaattisesti kulujenseurantaan"
+- **Takuu (vuotta)** – Number (ennallaan)
+- **PTS-siirto (vuotta)** – Number-input (0 = ei siirtoa). Checkbox tilalle. Aputeksti: "Kuinka monella vuodella tämä siirtää PTS-suositusta"
+- **Liitteet** – uusi `<FileUpload>` -alue:
+  - Multi-file input
+  - Jokainen tiedosto ladataan `talo-dokumentit`-bucketiin polkuun `{user_id}/huolto/{timestamp}_{filename}` heti valittaessa
+  - Lista valituista liitteistä (poistettavissa ennen tallennusta)
+  - Editissä näytetään olemassa olevat liitteet `deleteHuoltoLiite`-painikkeella
 
-**Uusi storage bucket `talo-dokumentit`** (private) RLS-policyilla (käyttäjä saa kirjoittaa/lukea omiin kansioihinsa = `{kiinteisto_id}/...`).
+Lomakkeen submit lähettää `liitteet`-arrayn vain uusista latauksista.
 
-## 2. Server-funktiot (`src/lib/kotivahti.functions.ts`)
+## 3. Tietokantakytkentä – jo tehty migraatiossa
 
-- Laajenna `taloSchema` kaikilla uusilla kentillä (myös profiilin puhelin + hankintatiedot).
-- Päivitä `saveTaloTiedot` tallentamaan `profiles.puhelin` ja uudet `kiinteistot`-kentät.
-- Lisää: `listDokumentit`, `addDokumentti` (metadata storage-uploadin jälkeen), `deleteDokumentti`.
-
-## 3. Lomake (`src/routes/_authenticated/talon-tiedot.tsx`)
-
-Päivitä OSIOT kuusi väliotsikkoa käyttäjän rakenteen mukaan:
-
-1. **Perustiedot** – sijainti, kiinteistön tyyppi (lisää erillistalo), omistajan nimi/puhelin/email (readonly), hankintatapa + vuosi.
-2. **Rakennus** – rakennusvuosi, asuinpinta-ala, kokonaispinta-ala, kerrokset, kantava rakenne, julkisivu, perustus, eriste, lisätietoja.
-3. **Katto ja räystäät** – kattotyyppi, materiaali, pinta-ala, asennusvuosi, hormit, kattoturvatuotteet, kourut (pituus/materiaali/syöksytorvet).
-4. **Tekniset järjestelmät** – lämmitys (ennallaan) + ilmalämpöpumppu, IV (tyyppi/vuosi/suodatin/viim. vaihto), putket/viemärit + pääsulun sijainti, muut: palovaroittimet kpl + paristot vaihdettu, kiukaan vuosi, nuohous viimeksi, sähköt.
-5. **Ulkoalueet** – tontti (pinta-ala, nurmikko, sadevesikaivot), terassi (pinta-ala, materiaali, rakennettu, käsitelty viimeksi), salaojat (kyllä/ei + tarkastettu).
-6. **Dokumentit** – uploader (käyttää Lovable Cloud storagea), lista dokumenteista tyypeittäin (dokumentti/takuu/kuitti/lasku) + poisto.
+- `huolto_historia.pts_siirto`: integer (default 0)
+- `talo_dokumentit.huolto_id`: uuid (nullable, indeksoitu)
 
 ## 4. Mitä EI muuteta
 
-- Olemassa olevia kenttiä ei poisteta (yhteensopivuus huoltohistorian/vuosikellon datan kanssa).
-- PTS-logiikka ja vuosikellon dynaamiset huollot säilyvät; uudet kentät voidaan ottaa myöhemmin käyttöön niissä.
+- Vuosikellon kuittauslogiikka säilyy (luo `huolto_historia`-rivit pts_siirto = 0:lla)
+- Olemassa olevat huoltomerkinnät säilyvät; vanhat `pts_siirto = true` -rivit muuntuivat arvoon `1` migraatiossa
+- Talon tiedot -lomakkeen dokumenttiosio säilyy itsenäisenä (eri `huolto_id IS NULL` -filtteri)
 
 ## Tekninen huomio
 
-Toteutus tehdään järjestyksessä: 1) migration (odota hyväksyntä), 2) storage bucket + policyt samassa migrationissa, 3) server-fn päivitys, 4) lomakkeen UI, 5) dokumenttien upload-komponentti.
+- Uusi tiedosto: `src/lib/huolto-kohteet.ts` exportoi `HUOLTO_TYYPIT` ja `HUOLTO_KOHTEET` -taulukot
+- `getTaloTiedot` dokumentit-lista rajataan `huolto_id IS NULL`:iin jotta huollon liitteet eivät tuplaannu Talon tiedot -sivulle (vai näytetäänkö siellä myös – tämä on speksin mukaan ok kun "menee dokumenttiarkistoon")
