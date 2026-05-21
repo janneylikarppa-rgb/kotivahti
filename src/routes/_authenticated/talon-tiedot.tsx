@@ -217,19 +217,6 @@ function TaloTiedotPage() {
                   </Field>
                   <Field label="Mallimerkintä"><Input value={lammitysLisa.malli ?? ""} onChange={(e) => setLisa({ malli: e.target.value })} placeholder="Esim. F1255-12" /></Field>
                 </Row>
-                <Row>
-                  <Field label="Teho (kW)"><Input type="number" value={lammitysLisa.teho_kw ?? ""} onChange={(e) => setLisa({ teho_kw: e.target.value })} /></Field>
-                  <Field label="Sarjanumero"><Input value={lammitysLisa.sarjanumero ?? ""} onChange={(e) => setLisa({ sarjanumero: e.target.value })} /></Field>
-                </Row>
-                {(t.lammitysmuoto === "maalampo" || t.lammitysmuoto === "ilmavesilampo") && (
-                  <Row>
-                    <Field label="Varaaja (litraa)"><Input type="number" value={lammitysLisa.varaaja_litraa ?? ""} onChange={(e) => setLisa({ varaaja_litraa: e.target.value })} /></Field>
-                    <Field label="Lämmönkeruu / ulkoyksikkö"><Input value={lammitysLisa.keruu ?? ""} onChange={(e) => setLisa({ keruu: e.target.value })} placeholder="Esim. porakaivo 180 m" /></Field>
-                  </Row>
-                )}
-                {t.lammitysmuoto === "oljylammitys" && (
-                  <Field label="Säiliön tilavuus (litraa)"><Input type="number" value={lammitysLisa.sailio_litraa ?? ""} onChange={(e) => setLisa({ sailio_litraa: e.target.value })} /></Field>
-                )}
               </div>
             )}
 
