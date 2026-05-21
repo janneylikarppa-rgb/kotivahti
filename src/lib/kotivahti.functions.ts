@@ -176,17 +176,21 @@ export const getKuitatut = createServerFn({ method: "GET" })
   .handler(async ({ context }) => {
     const { supabase, userId } = context;
     const k = await getActiveKiinteisto(supabase, userId);
-    if (!k) return [];
+    if (!k) return { kuitatut: [], talon_tiedot: null };
     const vuosi = new Date().getFullYear();
-    const { data } = await supabase.from("vk_kuitatut").select("*").eq("kiinteisto_id", k.id).eq("vuosi", vuosi);
-    return data ?? [];
+    const [kuitatutRes, talonRes] = await Promise.all([
+      supabase.from("vk_kuitatut").select("*").eq("kiinteisto_id", k.id).eq("vuosi", vuosi),
+      supabase.from("talon_tiedot").select("lammitysmuoto, ilp_merkki, ilmanvaihto, kattomateriaali, terassi_materiaali, julkisivumateriaali").eq("kiinteisto_id", k.id).maybeSingle(),
+    ]);
+    return { kuitatut: kuitatutRes.data ?? [], talon_tiedot: talonRes.data };
   });
 
 const kuittausSchema = z.object({
-  kausi_key: z.string(),
-  huolto_nimi: z.string(),
-  tekija: z.string().default("itse"),
-  hinta: z.number().default(0),
+  kausi_key: z.string().min(1).max(50),
+  huolto_nimi: z.string().min(1).max(200),
+  tekija: z.enum(["itse", "ammattilainen", "jatetaan"]).default("itse"),
+  tekija_nimi: z.string().max(200).optional().nullable(),
+  hinta: z.number().min(0).max(1000000).default(0),
 });
 
 export const kuittaaHuolto = createServerFn({ method: "POST" })
@@ -198,17 +202,19 @@ export const kuittaaHuolto = createServerFn({ method: "POST" })
     if (!k) throw new Error("Kiinteistöä ei löytynyt");
     const vuosi = new Date().getFullYear();
     const pvm = new Date().toISOString().slice(0, 10);
+    const { tekija_nimi, ...row } = data;
     const { error } = await supabase.from("vk_kuitatut").upsert({
-      kiinteisto_id: k.id, vuosi, kuitattu_pvm: pvm, ...data,
+      kiinteisto_id: k.id, vuosi, kuitattu_pvm: pvm, ...row,
     }, { onConflict: "kiinteisto_id,kausi_key,huolto_nimi,vuosi" });
     if (error) throw error;
 
-    if (data.hinta > 0) {
+    if (data.tekija === "ammattilainen" && data.hinta > 0) {
       await supabase.from("kulut").insert({
         kiinteisto_id: k.id,
         nimi: `Vuosikello – ${data.huolto_nimi}`,
         kategoria: "huolto",
         summa: data.hinta,
+        kuvaus: data.tekija_nimi ?? null,
         pvm,
       });
     }
