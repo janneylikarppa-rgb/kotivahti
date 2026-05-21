@@ -1,4 +1,4 @@
-import { createFileRoute, Outlet, redirect } from "@tanstack/react-router";
+import { createFileRoute, Outlet, redirect, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { getCachedSession, getReadySession, subscribeToSession } from "@/lib/auth-session";
 import { SidebarProvider, SidebarTrigger, SidebarInset } from "@/components/ui/sidebar";
@@ -16,9 +16,19 @@ export const Route = createFileRoute("/_authenticated")({
 });
 
 function AuthenticatedLayout() {
+  const navigate = useNavigate();
   const [session, setSession] = useState(() => getCachedSession());
 
-  useEffect(() => subscribeToSession(setSession), []);
+  useEffect(() => {
+    const unsubscribe = subscribeToSession(setSession);
+    getReadySession().then((nextSession) => {
+      setSession(nextSession);
+      if (!nextSession) {
+        navigate({ to: "/login", search: { redirect: window.location.href } });
+      }
+    });
+    return unsubscribe;
+  }, [navigate]);
 
   if (!session) {
     return <div className="min-h-screen bg-background" />;
