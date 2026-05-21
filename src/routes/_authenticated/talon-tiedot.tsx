@@ -26,9 +26,39 @@ const OSIOT = [
   { key: "dokumentit", nimi: "Dokumentit" },
 ];
 
-const LAMMITYS = ["maalämpö", "ilmavesilämpö", "kaukolämpö", "öljylämmitys", "puulämmitys", "sähkölämmitys", "ilmalämpöpumppu", "pellettilämmitys", "muu"];
+const RAKENNUSTAVAT = ["Puurunko", "Hirsi", "Tiili", "Kevytsoraharkko (Leca)", "Betoniharkko", "Kevytbetoni (Siporex)", "Betonielementti", "Teräsrunko"];
+const JULKISIVUMATERIAALIT = ["Puu (lautaverhous)", "Tiili", "Rappaus", "Levyverhous", "Hirsi", "Pelti", "Kuitusementtilevy", "Kivi"];
+const KATTOTYYPIT = ["Harjakatto", "Pulpettikatto", "Aumakatto", "Mansardikatto", "Tasakatto", "Kaarikatto"];
+const KATTOMATERIAALIT = ["Konesaumattu peltikatto", "Profiilipeltikatto", "Tiilikatto (savitiili)", "Betonitiili", "Huopakatto", "Kumibitumikermi", "Pärekatto"];
+const LAMMITYS = [
+  { key: "maalampo", nimi: "Maalämpö" },
+  { key: "ilmavesilampo", nimi: "Ilma-vesilämpöpumppu" },
+  { key: "ilmalampopumppu", nimi: "Ilmalämpöpumppu" },
+  { key: "kaukolampo", nimi: "Kaukolämpö" },
+  { key: "oljylammitys", nimi: "Öljylämmitys" },
+  { key: "pellettilammitys", nimi: "Pellettilämmitys" },
+  { key: "puulammitys", nimi: "Puulämmitys" },
+  { key: "sahkolammitys", nimi: "Sähkölämmitys" },
+  { key: "muu", nimi: "Muu" },
+];
+const LAITTEET: Record<string, { tyyppi: string; merkit: string[] }> = {
+  maalampo: { tyyppi: "Maalämpöpumppu", merkit: ["Nibe", "IVT", "Thermia", "Bosch", "Gebwell", "Mitsubishi", "Stiebel Eltron", "Oilon", "Muu"] },
+  ilmavesilampo: { tyyppi: "Ilma-vesilämpöpumppu", merkit: ["Nibe", "Mitsubishi", "Daikin", "Panasonic", "Bosch", "Thermia", "Toshiba", "LG", "Muu"] },
+  ilmalampopumppu: { tyyppi: "Ilmalämpöpumppu", merkit: ["Mitsubishi", "Daikin", "Panasonic", "Toshiba", "Fujitsu", "LG", "Samsung", "Sharp", "Muu"] },
+  oljylammitys: { tyyppi: "Öljykattila", merkit: ["Jämä", "Kaukora", "Högfors", "Viessmann", "Buderus", "Oilon", "Muu"] },
+  pellettilammitys: { tyyppi: "Pellettikattila", merkit: ["Ariterm", "Biotech", "ÖkoFEN", "Kaukora", "Muu"] },
+  puulammitys: { tyyppi: "Puukattila", merkit: ["Jämä", "Kaukora", "Ariterm", "Högfors", "Muu"] },
+  kaukolampo: { tyyppi: "Lämmönjakokeskus", merkit: ["Alfa Laval", "Danfoss", "Gebwell", "Högfors", "Cetetherm", "Muu"] },
+  sahkolammitys: { tyyppi: "Sähkökattila / varaaja", merkit: ["Jäspi", "Kaukora", "Nibe", "Muu"] },
+};
+const ILMANVAIHDOT = ["Painovoimainen", "Koneellinen poisto", "Koneellinen tulo- ja poistoilmanvaihto (LTO)", "Hybridi"];
+const PUTKIMATERIAALIT = ["Kupariputket", "Komposiittiputket (PEX-Al-PEX)", "Muoviputket (PEX)", "Galvanoitu teräs", "Valurauta", "Muu"];
+const VIEMARIMATERIAALIT = ["Muovi (PVC/PP)", "Valurauta", "Betoni", "Keraaminen", "Lasikuitu", "Muu"];
+const PIHATYYPIT = ["Nurmi", "Sora", "Kiveys", "Asfaltti", "Laatoitus", "Luonnonniitty", "Sekoitus"];
+const TERASSIMATERIAALIT = ["Painekyllästetty puu", "Lämpökäsitelty puu", "Komposiitti", "Kestopuu (siperianlehtikuusi)", "Tiili/kiveys", "Betoni", "Ei terassia"];
 
 function num(v: any) { return v === "" || v == null ? null : Number(v); }
+function str(v: any) { return v === "" || v == null ? null : String(v); }
 
 function TaloTiedotPage() {
   const fetchFn = useServerFn(getTaloTiedot);
@@ -48,6 +78,10 @@ function TaloTiedotPage() {
     }
   }, [data]);
 
+  const laite = t.lammitysmuoto ? LAITTEET[t.lammitysmuoto] : undefined;
+  const lammitysLisa = (t.lammitys_lisatieto && typeof t.lammitys_lisatieto === "object") ? t.lammitys_lisatieto : {};
+  const setLisa = (patch: Record<string, any>) => setT({ ...t, lammitys_lisatieto: { ...lammitysLisa, ...patch } });
+
   const save = useMutation({
     mutationFn: (osioKey?: string) => {
       const uudet = osioKey && !valmiit.includes(osioKey) ? [...valmiit, osioKey] : valmiit;
@@ -59,19 +93,25 @@ function TaloTiedotPage() {
         talo: {
           pinta_ala: num(t.pinta_ala), tilavuus: num(t.tilavuus),
           kerroksia: num(t.kerroksia), asukkaita: num(t.asukkaita),
-          rakennustapa: t.rakennustapa, julkisivumateriaali: t.julkisivumateriaali,
+          rakennustapa: str(t.rakennustapa), julkisivumateriaali: str(t.julkisivumateriaali),
           julkisivu_maalattu_vuosi: num(t.julkisivu_maalattu_vuosi),
-          kattotyyppi: t.kattotyyppi, kattomateriaali: t.kattomateriaali,
+          kattotyyppi: str(t.kattotyyppi), kattomateriaali: str(t.kattomateriaali),
           katto_uusittu_vuosi: num(t.katto_uusittu_vuosi),
           raystaat_kunnostettu_vuosi: num(t.raystaat_kunnostettu_vuosi),
-          lammitysmuoto: t.lammitysmuoto, lammitys_asennettu_vuosi: num(t.lammitys_asennettu_vuosi),
-          ilmanvaihto: t.ilmanvaihto, ilmanvaihto_vuosi: num(t.ilmanvaihto_vuosi),
+          lammitysmuoto: str(t.lammitysmuoto), lammitys_asennettu_vuosi: num(t.lammitys_asennettu_vuosi),
+          lammitys_lisatieto: lammitysLisa,
+          ilmanvaihto: str(t.ilmanvaihto), ilmanvaihto_vuosi: num(t.ilmanvaihto_vuosi),
           putket_uusittu_vuosi: num(t.putket_uusittu_vuosi),
-          putkimateriaali: t.putkimateriaali,
+          putkimateriaali: str(t.putkimateriaali),
+          viemarimateriaali: str(t.viemarimateriaali),
+          viemari_asennettu_vuosi: num(t.viemari_asennettu_vuosi),
           viemari_uusittu_vuosi: num(t.viemari_uusittu_vuosi),
+          sahkot_asennettu_vuosi: num(t.sahkot_asennettu_vuosi),
           sahkot_uusittu_vuosi: num(t.sahkot_uusittu_vuosi),
           tontin_pinta_ala: num(t.tontin_pinta_ala),
-          pihan_tyyppi: t.pihan_tyyppi, piha_lisatieto: t.piha_lisatieto,
+          pihan_tyyppi: str(t.pihan_tyyppi), piha_lisatieto: str(t.piha_lisatieto),
+          terassi_materiaali: str(t.terassi_materiaali),
+          terassi_kunnostettu_vuosi: num(t.terassi_kunnostettu_vuosi),
           valmiit_osiot: uudet,
         },
       }}).then(() => { setValmiit(uudet); });
@@ -95,7 +135,6 @@ function TaloTiedotPage() {
         </div>
       </header>
 
-      {/* Step-navigation */}
       <div className="flex flex-wrap gap-2">
         {OSIOT.map((o, i) => (
           <button key={o.key} onClick={() => setActive(i)}
@@ -114,8 +153,11 @@ function TaloTiedotPage() {
         <CardContent className="pt-6 space-y-5">
           {active === 0 && (<>
             <h3 className="font-serif text-xl text-cream">1. Perustiedot</h3>
-            <Row><Field label="Talon nimi"><Input value={k.nimi ?? ""} onChange={(e) => setK({ ...k, nimi: e.target.value })} /></Field>
-              <Field label="Rakennusvuosi"><Input type="number" value={k.rakennusvuosi ?? ""} onChange={(e) => setK({ ...k, rakennusvuosi: e.target.value })} /></Field></Row>
+            <p className="text-xs text-muted-foreground">Talon nimi on oletuksena omistajan nimi – käytetään myös etusivun tervehdyksessä.</p>
+            <Row>
+              <Field label="Talon nimi (omistajan nimi)"><Input value={k.nimi ?? ""} onChange={(e) => setK({ ...k, nimi: e.target.value })} /></Field>
+              <Field label="Rakennusvuosi"><Input type="number" value={k.rakennusvuosi ?? ""} onChange={(e) => setK({ ...k, rakennusvuosi: e.target.value })} /></Field>
+            </Row>
             <Field label="Osoite"><Input value={k.osoite ?? ""} onChange={(e) => setK({ ...k, osoite: e.target.value })} /></Field>
             <Row><Field label="Postinumero"><Input value={k.postinumero ?? ""} onChange={(e) => setK({ ...k, postinumero: e.target.value })} /></Field>
               <Field label="Kaupunki"><Input value={k.kaupunki ?? ""} onChange={(e) => setK({ ...k, kaupunki: e.target.value })} /></Field></Row>
@@ -125,41 +167,116 @@ function TaloTiedotPage() {
 
           {active === 1 && (<>
             <h3 className="font-serif text-xl text-cream">2. Rakennus</h3>
-            <Row><Field label="Pinta-ala (m²)"><Input type="number" value={t.pinta_ala ?? ""} onChange={(e) => setT({ ...t, pinta_ala: e.target.value })} /></Field>
-              <Field label="Tilavuus (m³)"><Input type="number" value={t.tilavuus ?? ""} onChange={(e) => setT({ ...t, tilavuus: e.target.value })} /></Field></Row>
-            <Row><Field label="Rakennustapa"><Input value={t.rakennustapa ?? ""} onChange={(e) => setT({ ...t, rakennustapa: e.target.value })} placeholder="Esim. puurunko" /></Field>
-              <Field label="Julkisivumateriaali"><Input value={t.julkisivumateriaali ?? ""} onChange={(e) => setT({ ...t, julkisivumateriaali: e.target.value })} /></Field></Row>
+            <Row>
+              <Field label="Pinta-ala (m²)"><Input type="number" value={t.pinta_ala ?? ""} onChange={(e) => setT({ ...t, pinta_ala: e.target.value })} /></Field>
+              <Field label="Tilavuus (m³)"><Input type="number" value={t.tilavuus ?? ""} onChange={(e) => setT({ ...t, tilavuus: e.target.value })} /></Field>
+            </Row>
+            <Row>
+              <Field label="Rakennustapa">
+                <SelectOrOther value={t.rakennustapa} options={RAKENNUSTAVAT} onChange={(v) => setT({ ...t, rakennustapa: v })} />
+              </Field>
+              <Field label="Julkisivumateriaali">
+                <SelectOrOther value={t.julkisivumateriaali} options={JULKISIVUMATERIAALIT} onChange={(v) => setT({ ...t, julkisivumateriaali: v })} />
+              </Field>
+            </Row>
             <Field label="Julkisivu maalattu (vuosi)"><Input type="number" value={t.julkisivu_maalattu_vuosi ?? ""} onChange={(e) => setT({ ...t, julkisivu_maalattu_vuosi: e.target.value })} /></Field>
           </>)}
 
           {active === 2 && (<>
             <h3 className="font-serif text-xl text-cream">3. Katto ja räystäät</h3>
-            <Row><Field label="Kattotyyppi"><Input value={t.kattotyyppi ?? ""} onChange={(e) => setT({ ...t, kattotyyppi: e.target.value })} placeholder="Harja, tasa, ..." /></Field>
-              <Field label="Kattomateriaali"><Input value={t.kattomateriaali ?? ""} onChange={(e) => setT({ ...t, kattomateriaali: e.target.value })} placeholder="Pelti, tiili, ..." /></Field></Row>
+            <Row>
+              <Field label="Kattotyyppi">
+                <SelectOrOther value={t.kattotyyppi} options={KATTOTYYPIT} onChange={(v) => setT({ ...t, kattotyyppi: v })} />
+              </Field>
+              <Field label="Kattomateriaali">
+                <SelectOrOther value={t.kattomateriaali} options={KATTOMATERIAALIT} onChange={(v) => setT({ ...t, kattomateriaali: v })} />
+              </Field>
+            </Row>
             <Row><Field label="Katto uusittu (vuosi)"><Input type="number" value={t.katto_uusittu_vuosi ?? ""} onChange={(e) => setT({ ...t, katto_uusittu_vuosi: e.target.value })} /></Field>
               <Field label="Räystäät kunnostettu (vuosi)"><Input type="number" value={t.raystaat_kunnostettu_vuosi ?? ""} onChange={(e) => setT({ ...t, raystaat_kunnostettu_vuosi: e.target.value })} /></Field></Row>
           </>)}
 
           {active === 3 && (<>
             <h3 className="font-serif text-xl text-cream">4. Tekniset järjestelmät</h3>
-            <Row><Field label="Lämmitysmuoto">
-              <Select value={t.lammitysmuoto ?? ""} onValueChange={(v) => setT({ ...t, lammitysmuoto: v })}>
-                <SelectTrigger><SelectValue placeholder="Valitse" /></SelectTrigger>
-                <SelectContent>{LAMMITYS.map((l) => <SelectItem key={l} value={l}>{l}</SelectItem>)}</SelectContent>
-              </Select></Field>
-              <Field label="Lämmitys asennettu (vuosi)"><Input type="number" value={t.lammitys_asennettu_vuosi ?? ""} onChange={(e) => setT({ ...t, lammitys_asennettu_vuosi: e.target.value })} /></Field></Row>
-            <Row><Field label="Ilmanvaihto"><Input value={t.ilmanvaihto ?? ""} onChange={(e) => setT({ ...t, ilmanvaihto: e.target.value })} placeholder="Painovoimainen, koneellinen..." /></Field>
-              <Field label="Ilmanvaihto uusittu (vuosi)"><Input type="number" value={t.ilmanvaihto_vuosi ?? ""} onChange={(e) => setT({ ...t, ilmanvaihto_vuosi: e.target.value })} /></Field></Row>
-            <Row><Field label="Putkimateriaali"><Input value={t.putkimateriaali ?? ""} onChange={(e) => setT({ ...t, putkimateriaali: e.target.value })} /></Field>
-              <Field label="Putket uusittu (vuosi)"><Input type="number" value={t.putket_uusittu_vuosi ?? ""} onChange={(e) => setT({ ...t, putket_uusittu_vuosi: e.target.value })} /></Field></Row>
-            <Row><Field label="Viemäri uusittu (vuosi)"><Input type="number" value={t.viemari_uusittu_vuosi ?? ""} onChange={(e) => setT({ ...t, viemari_uusittu_vuosi: e.target.value })} /></Field>
-              <Field label="Sähköt uusittu (vuosi)"><Input type="number" value={t.sahkot_uusittu_vuosi ?? ""} onChange={(e) => setT({ ...t, sahkot_uusittu_vuosi: e.target.value })} /></Field></Row>
+            <p className="text-xs text-muted-foreground">Lämmityslaitteen merkki ja malli auttavat PTS-suositusten luonnissa (huoltovälit, käyttöikäennusteet).</p>
+
+            <Row>
+              <Field label="Lämmitysmuoto">
+                <Select value={t.lammitysmuoto ?? ""} onValueChange={(v) => setT({ ...t, lammitysmuoto: v })}>
+                  <SelectTrigger><SelectValue placeholder="Valitse" /></SelectTrigger>
+                  <SelectContent>{LAMMITYS.map((l) => <SelectItem key={l.key} value={l.key}>{l.nimi}</SelectItem>)}</SelectContent>
+                </Select>
+              </Field>
+              <Field label="Lämmitys asennettu (vuosi)"><Input type="number" value={t.lammitys_asennettu_vuosi ?? ""} onChange={(e) => setT({ ...t, lammitys_asennettu_vuosi: e.target.value })} /></Field>
+            </Row>
+
+            {laite && (
+              <div className="rounded-md border border-primary/30 bg-primary/5 p-4 space-y-4">
+                <p className="eyebrow text-primary">{laite.tyyppi}</p>
+                <Row>
+                  <Field label="Merkki">
+                    <SelectOrOther value={lammitysLisa.merkki} options={laite.merkit} onChange={(v) => setLisa({ merkki: v })} />
+                  </Field>
+                  <Field label="Mallimerkintä"><Input value={lammitysLisa.malli ?? ""} onChange={(e) => setLisa({ malli: e.target.value })} placeholder="Esim. F1255-12" /></Field>
+                </Row>
+                <Row>
+                  <Field label="Teho (kW)"><Input type="number" value={lammitysLisa.teho_kw ?? ""} onChange={(e) => setLisa({ teho_kw: e.target.value })} /></Field>
+                  <Field label="Sarjanumero"><Input value={lammitysLisa.sarjanumero ?? ""} onChange={(e) => setLisa({ sarjanumero: e.target.value })} /></Field>
+                </Row>
+                {(t.lammitysmuoto === "maalampo" || t.lammitysmuoto === "ilmavesilampo") && (
+                  <Row>
+                    <Field label="Varaaja (litraa)"><Input type="number" value={lammitysLisa.varaaja_litraa ?? ""} onChange={(e) => setLisa({ varaaja_litraa: e.target.value })} /></Field>
+                    <Field label="Lämmönkeruu / ulkoyksikkö"><Input value={lammitysLisa.keruu ?? ""} onChange={(e) => setLisa({ keruu: e.target.value })} placeholder="Esim. porakaivo 180 m" /></Field>
+                  </Row>
+                )}
+                {t.lammitysmuoto === "oljylammitys" && (
+                  <Field label="Säiliön tilavuus (litraa)"><Input type="number" value={lammitysLisa.sailio_litraa ?? ""} onChange={(e) => setLisa({ sailio_litraa: e.target.value })} /></Field>
+                )}
+              </div>
+            )}
+
+            <Row>
+              <Field label="Ilmanvaihto">
+                <SelectOrOther value={t.ilmanvaihto} options={ILMANVAIHDOT} onChange={(v) => setT({ ...t, ilmanvaihto: v })} />
+              </Field>
+              <Field label="Ilmanvaihto uusittu (vuosi)"><Input type="number" value={t.ilmanvaihto_vuosi ?? ""} onChange={(e) => setT({ ...t, ilmanvaihto_vuosi: e.target.value })} /></Field>
+            </Row>
+
+            <Row>
+              <Field label="Putkimateriaali">
+                <SelectOrOther value={t.putkimateriaali} options={PUTKIMATERIAALIT} onChange={(v) => setT({ ...t, putkimateriaali: v })} />
+              </Field>
+              <Field label="Putket uusittu (vuosi)"><Input type="number" value={t.putket_uusittu_vuosi ?? ""} onChange={(e) => setT({ ...t, putket_uusittu_vuosi: e.target.value })} /></Field>
+            </Row>
+
+            <Row>
+              <Field label="Viemärimateriaali">
+                <SelectOrOther value={t.viemarimateriaali} options={VIEMARIMATERIAALIT} onChange={(v) => setT({ ...t, viemarimateriaali: v })} />
+              </Field>
+              <Field label="Viemäri asennettu (vuosi)"><Input type="number" value={t.viemari_asennettu_vuosi ?? ""} onChange={(e) => setT({ ...t, viemari_asennettu_vuosi: e.target.value })} /></Field>
+            </Row>
+            <Field label="Viemäri uusittu / saneerattu (vuosi)"><Input type="number" value={t.viemari_uusittu_vuosi ?? ""} onChange={(e) => setT({ ...t, viemari_uusittu_vuosi: e.target.value })} /></Field>
+
+            <Row>
+              <Field label="Sähköt asennettu (vuosi)"><Input type="number" value={t.sahkot_asennettu_vuosi ?? ""} onChange={(e) => setT({ ...t, sahkot_asennettu_vuosi: e.target.value })} /></Field>
+              <Field label="Sähköt uusittu (vuosi)"><Input type="number" value={t.sahkot_uusittu_vuosi ?? ""} onChange={(e) => setT({ ...t, sahkot_uusittu_vuosi: e.target.value })} /></Field>
+            </Row>
           </>)}
 
           {active === 4 && (<>
             <h3 className="font-serif text-xl text-cream">5. Ulkoalueet</h3>
-            <Row><Field label="Tontin pinta-ala (m²)"><Input type="number" value={t.tontin_pinta_ala ?? ""} onChange={(e) => setT({ ...t, tontin_pinta_ala: e.target.value })} /></Field>
-              <Field label="Pihan tyyppi"><Input value={t.pihan_tyyppi ?? ""} onChange={(e) => setT({ ...t, pihan_tyyppi: e.target.value })} placeholder="Nurmi, sora, kiveys..." /></Field></Row>
+            <Row>
+              <Field label="Tontin pinta-ala (m²)"><Input type="number" value={t.tontin_pinta_ala ?? ""} onChange={(e) => setT({ ...t, tontin_pinta_ala: e.target.value })} /></Field>
+              <Field label="Pihan tyyppi">
+                <SelectOrOther value={t.pihan_tyyppi} options={PIHATYYPIT} onChange={(v) => setT({ ...t, pihan_tyyppi: v })} />
+              </Field>
+            </Row>
+            <Row>
+              <Field label="Terassin materiaali">
+                <SelectOrOther value={t.terassi_materiaali} options={TERASSIMATERIAALIT} onChange={(v) => setT({ ...t, terassi_materiaali: v })} />
+              </Field>
+              <Field label="Terassi kunnostettu (vuosi)"><Input type="number" value={t.terassi_kunnostettu_vuosi ?? ""} onChange={(e) => setT({ ...t, terassi_kunnostettu_vuosi: e.target.value })} /></Field>
+            </Row>
             <Field label="Lisätietoa pihasta"><Textarea rows={3} value={t.piha_lisatieto ?? ""} onChange={(e) => setT({ ...t, piha_lisatieto: e.target.value })} /></Field>
           </>)}
 
@@ -188,4 +305,30 @@ function Row({ children }: { children: React.ReactNode }) {
 }
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return <div className="space-y-2"><Label>{label}</Label>{children}</div>;
+}
+
+function SelectOrOther({ value, options, onChange }: { value: string | null | undefined; options: string[]; onChange: (v: string) => void }) {
+  const isPreset = !!value && options.includes(value);
+  const [other, setOther] = useState(!value || isPreset ? false : true);
+  const selectValue = other ? "__muu__" : (value ?? "");
+  return (
+    <div className="space-y-2">
+      <Select
+        value={selectValue}
+        onValueChange={(v) => {
+          if (v === "__muu__") { setOther(true); onChange(""); }
+          else { setOther(false); onChange(v); }
+        }}
+      >
+        <SelectTrigger><SelectValue placeholder="Valitse" /></SelectTrigger>
+        <SelectContent>
+          {options.map((o) => <SelectItem key={o} value={o}>{o}</SelectItem>)}
+          <SelectItem value="__muu__">Muu / oma…</SelectItem>
+        </SelectContent>
+      </Select>
+      {other && (
+        <Input placeholder="Kirjoita oma" value={value ?? ""} onChange={(e) => onChange(e.target.value)} />
+      )}
+    </div>
+  );
 }
