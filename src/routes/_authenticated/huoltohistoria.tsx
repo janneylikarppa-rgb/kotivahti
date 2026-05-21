@@ -31,6 +31,10 @@ import { Paperclip, Pencil, Plus, Trash2, Upload, X } from "lucide-react";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/huoltohistoria")({
+  loader: ({ context }) => {
+    if (typeof window === "undefined") return null;
+    return context.queryClient.ensureQueryData({ queryKey: ["huollot"], queryFn: () => getHuollot(), staleTime: 30_000 });
+  },
   component: HuoltoPage,
 });
 
@@ -40,7 +44,7 @@ function HuoltoPage() {
   const updFn = useServerFn(updateHuolto);
   const delFn = useServerFn(deleteHuolto);
   const qc = useQueryClient();
-  const { data = [], isLoading } = useQuery({ queryKey: ["huollot"], queryFn: () => fetchFn() });
+  const { data = [], isLoading } = useQuery({ queryKey: ["huollot"], queryFn: () => fetchFn(), staleTime: 30_000 });
   const [open, setOpen] = useState(false);
   const [editing, setEditing] = useState<any | null>(null);
 
