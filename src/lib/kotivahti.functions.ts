@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { generoiAutoRivit, getHuoltovali, laskeTila, type PtsRivi } from "./pts-saannot";
 
 // ---------- Active kiinteistö ----------
 async function getActiveKiinteisto(supabase: any, userId: string) {
