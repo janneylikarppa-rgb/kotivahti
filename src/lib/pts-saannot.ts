@@ -54,7 +54,11 @@ export const PTS_SAANNOT: PtsKohteenSaanto[] = [
     koskee: (t) => ehkaInt(t?.ilp_asennettu_vuosi) != null },
   // Talotekniikka
   { kohde: "Ilmanvaihtokone", kategoria: "Talotekniikka", kayttoika: 20, huoltovali: 5,
-    lahdeVuosi: (t) => ehkaInt(t?.ilmanvaihto_vuosi) },
+    lahdeVuosi: (t) => ehkaInt(t?.ilmanvaihto_vuosi),
+    koskee: (t) => !String(t?.ilmanvaihto ?? "").toLowerCase().includes("painovoima") },
+  { kohde: "Painovoimaisen ilmanvaihdon kartoitus", kategoria: "Talotekniikka", kayttoika: 20, huoltovali: 10,
+    lahdeVuosi: (t) => rakennusVuosi(t),
+    koskee: (t) => String(t?.ilmanvaihto ?? "").toLowerCase().includes("painovoima") },
   { kohde: "Käyttövesiputkisto", kategoria: "Talotekniikka", kayttoika: 40, huoltovali: 10,
     lahdeVuosi: (t) => ehkaInt(t?.putket_uusittu_vuosi) ?? rakennusVuosi(t) },
   { kohde: "Viemäröinti", kategoria: "Talotekniikka", kayttoika: 40, huoltovali: 10,
