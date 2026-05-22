@@ -11,7 +11,7 @@ import {
   updateHuolto,
 } from "@/lib/kotivahti.functions";
 import { HUOLTO_KOHDE_RYHMAT, HUOLTO_TYYPIT } from "@/lib/huolto-kohteet";
-import { tukeeLaitePaivitysta } from "@/lib/laite-paivitys";
+import { materiaalivaihtoehdot, tukeeLaitePaivitysta, tukeeMerkkiMalli } from "@/lib/laite-paivitys";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -183,8 +183,10 @@ function HuoltoForm({
     pts_siirto: initial?.pts_siirto != null ? String(initial.pts_siirto) : "0",
   });
   const [paivitaTalo, setPaivitaTalo] = useState(false);
-  const [laite, setLaite] = useState({ merkki: "", malli: "", asennusvuosi: "" });
+  const [laite, setLaite] = useState({ merkki: "", malli: "", asennusvuosi: "", materiaali: "" });
   const voiPaivittaa = tukeeLaitePaivitysta(form.kohde);
+  const naytaMerkkiMalli = tukeeMerkkiMalli(form.kohde);
+  const matOptiot = materiaalivaihtoehdot(form.kohde);
   const [uudet, setUudet] = useState<Liite[]>([]);
   const [vanhat, setVanhat] = useState<any[]>(initial?.liitteet ?? []);
   const [uploading, setUploading] = useState(false);
@@ -253,9 +255,10 @@ function HuoltoForm({
         e.preventDefault();
         const laite_paivitys = paivitaTalo && voiPaivittaa
           ? {
-              merkki: laite.merkki.trim() || null,
-              malli: laite.malli.trim() || null,
+              merkki: naytaMerkkiMalli ? (laite.merkki.trim() || null) : null,
+              malli: naytaMerkkiMalli ? (laite.malli.trim() || null) : null,
               asennusvuosi: laite.asennusvuosi ? Number(laite.asennusvuosi) : null,
+              materiaali: matOptiot.length > 0 ? (laite.materiaali.trim() || null) : null,
             }
           : null;
         onSubmit({
@@ -353,22 +356,43 @@ function HuoltoForm({
               className="mt-1 accent-primary"
             />
             <span>
-              <span className="text-cream font-medium">Päivitä talon tiedot tällä laitteella</span>
-              <span className="block text-xs text-muted-foreground">Asennusvuosi (ja tarvittaessa merkki/malli) tallennetaan automaattisesti talon tietoihin kohteelle "{form.kohde}".</span>
+              <span className="text-cream font-medium">Päivitä talon tiedot tämän remontin perusteella</span>
+              <span className="block text-xs text-muted-foreground">
+                {naytaMerkkiMalli
+                  ? `Asennusvuosi (ja tarvittaessa merkki/malli) tallennetaan kohteelle "${form.kohde}". Tieto päivittää myös PTS-suosituksen huolto- ja uusimissyklin.`
+                  : `Uusi materiaali ja vuosi tallennetaan kohteelle "${form.kohde}". Tieto päivittää myös PTS-suosituksen huolto- ja uusimissyklin.`}
+              </span>
             </span>
           </label>
           {paivitaTalo && (
-            <div className="grid grid-cols-3 gap-3">
+            <div className="grid grid-cols-2 gap-3 md:grid-cols-3">
+              {naytaMerkkiMalli && (
+                <>
+                  <div className="space-y-1">
+                    <Label className="text-xs">Merkki</Label>
+                    <Input value={laite.merkki} onChange={(e) => setLaite({ ...laite, merkki: e.target.value })} placeholder="Esim. Nibe" />
+                  </div>
+                  <div className="space-y-1">
+                    <Label className="text-xs">Malli</Label>
+                    <Input value={laite.malli} onChange={(e) => setLaite({ ...laite, malli: e.target.value })} placeholder="Esim. S1255-12" />
+                  </div>
+                </>
+              )}
+              {matOptiot.length > 0 && (
+                <div className="space-y-1 col-span-2 md:col-span-1">
+                  <Label className="text-xs">Materiaali / tyyppi</Label>
+                  <Select value={laite.materiaali || undefined} onValueChange={(v) => setLaite({ ...laite, materiaali: v })}>
+                    <SelectTrigger><SelectValue placeholder="Valitse" /></SelectTrigger>
+                    <SelectContent>
+                      {matOptiot.map((o) => (
+                        <SelectItem key={o} value={o}>{o}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              )}
               <div className="space-y-1">
-                <Label className="text-xs">Merkki</Label>
-                <Input value={laite.merkki} onChange={(e) => setLaite({ ...laite, merkki: e.target.value })} placeholder="Esim. Nibe" />
-              </div>
-              <div className="space-y-1">
-                <Label className="text-xs">Malli</Label>
-                <Input value={laite.malli} onChange={(e) => setLaite({ ...laite, malli: e.target.value })} placeholder="Esim. S1255-12" />
-              </div>
-              <div className="space-y-1">
-                <Label className="text-xs">Asennusvuosi</Label>
+                <Label className="text-xs">{naytaMerkkiMalli ? "Asennusvuosi" : "Uusittu vuosi"}</Label>
                 <Input type="number" min="1900" max="2100" value={laite.asennusvuosi} onChange={(e) => setLaite({ ...laite, asennusvuosi: e.target.value })} placeholder={String(new Date(form.pvm).getFullYear())} />
               </div>
             </div>
