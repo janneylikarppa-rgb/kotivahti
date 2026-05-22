@@ -117,16 +117,22 @@ function summaaSiirto(huollot: any[], kohde: string): number {
     .reduce((s, h) => s + (Number(h.pts_siirto) || 0), 0);
 }
 
+export type Lykkays = { kohde: string; lykatty_vuoteen: number; peruste?: string | null };
+
 export function generoiAutoRivit(
   talo: any,
   huollot: any[],
   kuitatut: { kohde: string }[],
   aikajanneVuotta = 10,
+  lykkaykset: Lykkays[] = [],
 ): PtsRivi[] {
   if (!talo) return [];
   const nyt = new Date().getFullYear();
   const maxVuosi = nyt + aikajanneVuotta;
   const kuitatutSet = new Set(kuitatut.map((k) => k.kohde.toLowerCase()));
+  const lykkaysMap = new Map(
+    lykkaykset.map((l) => [l.kohde.toLowerCase(), l] as const),
+  );
 
   const rivit: PtsRivi[] = [];
   for (const s of PTS_SAANNOT) {
@@ -136,6 +142,13 @@ export function generoiAutoRivit(
     if (lahde == null) continue;
     const siirto = summaaSiirto(huollot, s.kohde);
     let toimenpide = lahde + s.kayttoika - 2 + siirto;
+    const lyk = lykkaysMap.get(s.kohde.toLowerCase());
+    const alkuperainen = toimenpide;
+    let lykatty = false;
+    if (lyk && lyk.lykatty_vuoteen > toimenpide) {
+      toimenpide = lyk.lykatty_vuoteen;
+      lykatty = true;
+    }
     // jos jo ylitetty selvästi, päivitä "nyt"-vuoteen mutta merkitse ylitys
     const ylitetty = toimenpide < nyt ? nyt - toimenpide : 0;
     if (toimenpide < nyt) toimenpide = nyt;
@@ -151,6 +164,9 @@ export function generoiAutoRivit(
       tila: ylitetty > 0 ? "kiireellinen" : laskeTila(vuosiaJaljella),
       huoltovali: s.huoltovali,
       ylitettyVuosia: ylitetty || undefined,
+      lykatty: lykatty || undefined,
+      lykkaysPeruste: lykatty ? lyk?.peruste ?? null : undefined,
+      alkuperainenVuosi: lykatty ? alkuperainen : undefined,
     });
   }
   return rivit;
