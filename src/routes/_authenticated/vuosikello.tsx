@@ -66,6 +66,38 @@ function VuosikelloPage() {
         <p className="mt-3 text-muted-foreground">Kuittaa tehdyt huollot. Kuittaukset nollautuvat vuodenvaihteessa.</p>
       </header>
 
+      {erapaivat.length > 0 && (
+        <Card className="gold-card border border-red-500/30">
+          <CardContent className="pt-6 space-y-3">
+            <div className="flex items-center gap-2 text-red-300">
+              <AlertTriangle className="h-4 w-4" />
+              <p className="eyebrow text-red-300">Huoltoväli täynnä</p>
+            </div>
+            <p className="text-sm text-muted-foreground">
+              Seuraaville kohteille suositeltu huoltoväli on tullut täyteen. Varaa aika tai kuittaa tehdyksi.
+            </p>
+            <ul className="space-y-2">
+              {erapaivat.map((r: any) => (
+                <li key={r.kohde} className="flex items-start gap-2 text-sm">
+                  <span className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-red-400" />
+                  <div className="flex-1">
+                    <span className="text-cream">{r.kohde}</span>
+                    <span className="ml-2 text-xs text-muted-foreground">
+                      huoltoväli {r.huoltovali} v
+                      {r.viimeisinHuoltoVuosi ? ` · viimeksi ${r.viimeisinHuoltoVuosi}` : " · ei aiempaa merkintää"}
+                    </span>
+                  </div>
+                </li>
+              ))}
+            </ul>
+            <Button asChild variant="link" className="px-0 text-primary">
+              <Link to="/pts">Avaa PTS <ArrowRight className="ml-1 h-3.5 w-3.5" /></Link>
+            </Button>
+          </CardContent>
+        </Card>
+      )}
+
+
       {/* Kausi-välilehdet */}
       <div className="grid grid-cols-2 md:grid-cols-5 gap-2">
         {KAUDET.map((k) => {
