@@ -343,8 +343,39 @@ function HuoltoForm({
         </div>
       </div>
 
-      <div className="space-y-2">
-        <Label>Liitteet (kuitit, tarjoukset, valokuvat)</Label>
+      {voiPaivittaa && (
+        <div className="space-y-3 rounded-md border border-primary/30 bg-primary/5 p-3">
+          <label className="flex items-start gap-2 text-sm cursor-pointer">
+            <input
+              type="checkbox"
+              checked={paivitaTalo}
+              onChange={(e) => setPaivitaTalo(e.target.checked)}
+              className="mt-1 accent-primary"
+            />
+            <span>
+              <span className="text-cream font-medium">Päivitä talon tiedot tällä laitteella</span>
+              <span className="block text-xs text-muted-foreground">Asennusvuosi (ja tarvittaessa merkki/malli) tallennetaan automaattisesti talon tietoihin kohteelle "{form.kohde}".</span>
+            </span>
+          </label>
+          {paivitaTalo && (
+            <div className="grid grid-cols-3 gap-3">
+              <div className="space-y-1">
+                <Label className="text-xs">Merkki</Label>
+                <Input value={laite.merkki} onChange={(e) => setLaite({ ...laite, merkki: e.target.value })} placeholder="Esim. Nibe" />
+              </div>
+              <div className="space-y-1">
+                <Label className="text-xs">Malli</Label>
+                <Input value={laite.malli} onChange={(e) => setLaite({ ...laite, malli: e.target.value })} placeholder="Esim. S1255-12" />
+              </div>
+              <div className="space-y-1">
+                <Label className="text-xs">Asennusvuosi</Label>
+                <Input type="number" min="1900" max="2100" value={laite.asennusvuosi} onChange={(e) => setLaite({ ...laite, asennusvuosi: e.target.value })} placeholder={String(new Date(form.pvm).getFullYear())} />
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+
         <div className="rounded-md border border-dashed border-border p-3 space-y-2">
           {vanhat.length > 0 && (
             <ul className="space-y-1">
