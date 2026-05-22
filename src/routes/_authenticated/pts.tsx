@@ -7,6 +7,8 @@ import {
   deletePtsRivi,
   getPts,
   kuittaaPtsRivi,
+  lykkaaPtsRivi,
+  peruLykkays,
 } from "@/lib/kotivahti.functions";
 import { getSisaltoteksti, getYlitetytTeksti } from "@/lib/pts-sisaltotekstit";
 import { HUOLTO_KOHDE_RYHMAT } from "@/lib/huolto-kohteet";
@@ -32,7 +34,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Plus, Check, Trash2, Wrench, AlertTriangle, Calendar } from "lucide-react";
+import { Plus, Check, Trash2, Wrench, AlertTriangle, Calendar, Clock, Undo2 } from "lucide-react";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/pts")({
