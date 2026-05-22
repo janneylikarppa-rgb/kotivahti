@@ -124,9 +124,11 @@ export type Database = {
           id: string
           kiinteisto_id: string
           sahko_energia_snt: number | null
+          sahko_perusmaksu_eur_kk: number | null
           sahko_siirto_snt: number | null
           updated_at: string
           vesi_jatevesi_eur_m3: number | null
+          vesi_perusmaksu_eur_kk: number | null
           vesi_puhdas_eur_m3: number | null
         }
         Insert: {
@@ -134,9 +136,11 @@ export type Database = {
           id?: string
           kiinteisto_id: string
           sahko_energia_snt?: number | null
+          sahko_perusmaksu_eur_kk?: number | null
           sahko_siirto_snt?: number | null
           updated_at?: string
           vesi_jatevesi_eur_m3?: number | null
+          vesi_perusmaksu_eur_kk?: number | null
           vesi_puhdas_eur_m3?: number | null
         }
         Update: {
@@ -144,9 +148,11 @@ export type Database = {
           id?: string
           kiinteisto_id?: string
           sahko_energia_snt?: number | null
+          sahko_perusmaksu_eur_kk?: number | null
           sahko_siirto_snt?: number | null
           updated_at?: string
           vesi_jatevesi_eur_m3?: number | null
+          vesi_perusmaksu_eur_kk?: number | null
           vesi_puhdas_eur_m3?: number | null
         }
         Relationships: [
