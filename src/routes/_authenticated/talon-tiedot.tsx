@@ -73,6 +73,7 @@ const MERKIT: Record<string, { tyyppi: string; merkit: string[] }> = {
   sahkolammitys: { tyyppi: "Sähkökattila / varaaja", merkit: ["Jäspi", "Kaukora", "Nibe", "Muu"] },
 };
 const ILMANVAIHDOT = ["Painovoimainen", "Koneellinen poisto", "Koneellinen tulo- ja poistoilmanvaihto (LTO)", "Hybridi"];
+const IKKUNATYYPIT = ["3-lasinen MSE", "3-lasinen MEK", "2-lasinen", "2+1-lasinen", "Sekoitus", "Muu"];
 const IV_SUODATTIMET = ["F7 (vakio)", "M5", "ePM1", "ePM10", "Aktiivihiili", "Muu"];
 const PUTKIMATERIAALIT = ["Kupariputket", "Komposiittiputket (PEX-Al-PEX)", "Muoviputket (PEX)", "Galvanoitu teräs", "Valurauta", "Muu"];
 const VIEMARIMATERIAALIT = ["Muovi (PVC/PP)", "Valurauta", "Betoni", "Keraaminen", "Lasikuitu", "Muu"];
@@ -153,6 +154,7 @@ function TaloTiedotPage() {
         putket_uusittu_vuosi: num(t.putket_uusittu_vuosi),
         putkimateriaali: str(t.putkimateriaali),
         viemarimateriaali: str(t.viemarimateriaali), viemari_asennettu_vuosi: num(t.viemari_asennettu_vuosi),
+        ikkunat_tyyppi: str(t.ikkunat_tyyppi), ikkunat_uusittu_vuosi: num(t.ikkunat_uusittu_vuosi),
         paasulun_sijainti: str(t.paasulun_sijainti),
         sahkot_asennettu_vuosi: num(t.sahkot_asennettu_vuosi),
         palovaroittimia: num(t.palovaroittimia), palovaroitin_paristot: dateStr(t.palovaroitin_paristot),
@@ -424,6 +426,14 @@ function TaloTiedotPage() {
               <Field label="Viemäri asennettu (vuosi)"><Input type="number" value={t.viemari_asennettu_vuosi ?? ""} onChange={(e) => setT({ ...t, viemari_asennettu_vuosi: e.target.value })} /></Field>
             </Row>
             <Field label="Pääsulun sijainti"><Input value={t.paasulun_sijainti ?? ""} onChange={(e) => setT({ ...t, paasulun_sijainti: e.target.value })} placeholder="Esim. tekninen tila, kellari" /></Field>
+
+            <p className="eyebrow text-primary pt-4">Ikkunat</p>
+            <Row>
+              <Field label="Ikkunatyyppi">
+                <SelectOrOther value={t.ikkunat_tyyppi} options={IKKUNATYYPIT} onChange={(v) => setT({ ...t, ikkunat_tyyppi: v })} />
+              </Field>
+              <Field label="Ikkunat uusittu (vuosi)"><Input type="number" value={t.ikkunat_uusittu_vuosi ?? ""} onChange={(e) => setT({ ...t, ikkunat_uusittu_vuosi: e.target.value })} placeholder="Jätä tyhjäksi jos alkuperäiset" /></Field>
+            </Row>
 
             <p className="eyebrow text-primary pt-4">Muut laitteet</p>
             <Row>

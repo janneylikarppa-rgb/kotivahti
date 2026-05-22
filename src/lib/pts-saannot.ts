@@ -80,7 +80,7 @@ export const PTS_SAANNOT: PtsKohteenSaanto[] = [
     lahdeVuosi: (t) => rakennusVuosi(t),
     koskee: (t) => t?.salaojat === true || rakennusVuosi(t) != null },
   { kohde: "Ikkunat", kategoria: "Rakenne", kayttoika: 30, huoltovali: 10,
-    lahdeVuosi: (t) => rakennusVuosi(t) },
+    lahdeVuosi: (t) => ehkaInt(t?.ikkunat_uusittu_vuosi) ?? rakennusVuosi(t) },
   // Sisä
   { kohde: "Kylpyhuone / märkätila", kategoria: "Sisätilat", kayttoika: 25, huoltovali: 10,
     lahdeVuosi: (t) => rakennusVuosi(t) },
