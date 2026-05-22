@@ -450,7 +450,7 @@ function TaloTiedotPage() {
               <Field label="Kiukaan asennusvuosi"><Input type="number" value={t.kiukaan_vuosi ?? ""} onChange={(e) => setT({ ...t, kiukaan_vuosi: e.target.value })} /></Field>
               <Field label="Nuohous viimeksi"><Input type="date" value={t.nuohous_pvm ?? ""} onChange={(e) => setT({ ...t, nuohous_pvm: e.target.value })} /></Field>
             </Row>
-            <Field label="Sähköt asennettu (vuosi)"><Input type="number" value={t.sahkot_asennettu_vuosi ?? ""} onChange={(e) => setT({ ...t, sahkot_asennettu_vuosi: e.target.value })} /></Field>
+            <Field label="Sähköjärjestelmän asennusvuosi"><Input type="number" value={t.sahkot_asennettu_vuosi ?? ""} onChange={(e) => setT({ ...t, sahkot_asennettu_vuosi: e.target.value })} placeholder="Jätä tyhjäksi jos alkuperäinen" /></Field>
           </>)}
 
           {active === 4 && (<>
