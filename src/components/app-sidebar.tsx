@@ -30,9 +30,14 @@ export function AppSidebar() {
   const navigate = useNavigate();
   const { isMobile, setOpenMobile } = useSidebar();
 
+  useEffect(() => {
+    if (isMobile) setOpenMobile(false);
+  }, [path, isMobile, setOpenMobile]);
+
   const handleNav = () => {
     if (isMobile) setOpenMobile(false);
   };
+
 
   const handleLogout = async () => {
     if (isMobile) setOpenMobile(false);
