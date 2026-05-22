@@ -47,6 +47,7 @@ function VuosikelloPage() {
       qc.invalidateQueries({ queryKey: ["kuitatut"] });
       qc.invalidateQueries({ queryKey: ["kulut"] });
       qc.invalidateQueries({ queryKey: ["dashboard"] });
+      qc.invalidateQueries({ queryKey: ["huollot"] });
       setValittu(null);
     },
     onError: (e: any) => toast.error(e.message),
