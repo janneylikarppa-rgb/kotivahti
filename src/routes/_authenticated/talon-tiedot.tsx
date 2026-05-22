@@ -423,13 +423,13 @@ function TaloTiedotPage() {
               <Field label="Käyttövesiputket">
                 <SelectOrOther value={t.putkimateriaali} options={PUTKIMATERIAALIT} onChange={(v) => setT({ ...t, putkimateriaali: v })} />
               </Field>
-              <Field label="Putkien asennusvuosi"><Input type="number" value={t.putket_uusittu_vuosi ?? ""} onChange={(e) => setT({ ...t, putket_uusittu_vuosi: e.target.value })} /></Field>
+              <Field label="Putkien asennusvuosi"><Input type="number" value={t.putket_uusittu_vuosi ?? ""} onChange={(e) => setT({ ...t, putket_uusittu_vuosi: e.target.value })} placeholder="Jätä tyhjäksi jos alkuperäiset" /></Field>
             </Row>
             <Row>
               <Field label="Viemärien materiaali">
                 <SelectOrOther value={t.viemarimateriaali} options={VIEMARIMATERIAALIT} onChange={(v) => setT({ ...t, viemarimateriaali: v })} />
               </Field>
-              <Field label="Viemäri asennettu (vuosi)"><Input type="number" value={t.viemari_asennettu_vuosi ?? ""} onChange={(e) => setT({ ...t, viemari_asennettu_vuosi: e.target.value })} /></Field>
+              <Field label="Viemärien asennusvuosi"><Input type="number" value={t.viemari_asennettu_vuosi ?? ""} onChange={(e) => setT({ ...t, viemari_asennettu_vuosi: e.target.value })} placeholder="Jätä tyhjäksi jos alkuperäiset" /></Field>
             </Row>
             <Field label="Pääsulun sijainti"><Input value={t.paasulun_sijainti ?? ""} onChange={(e) => setT({ ...t, paasulun_sijainti: e.target.value })} placeholder="Esim. tekninen tila, kellari" /></Field>
 
@@ -438,7 +438,7 @@ function TaloTiedotPage() {
               <Field label="Ikkunatyyppi">
                 <SelectOrOther value={t.ikkunat_tyyppi} options={IKKUNATYYPIT} onChange={(v) => setT({ ...t, ikkunat_tyyppi: v })} />
               </Field>
-              <Field label="Ikkunat uusittu (vuosi)"><Input type="number" value={t.ikkunat_uusittu_vuosi ?? ""} onChange={(e) => setT({ ...t, ikkunat_uusittu_vuosi: e.target.value })} placeholder="Jätä tyhjäksi jos alkuperäiset" /></Field>
+              <Field label="Ikkunoiden asennusvuosi"><Input type="number" value={t.ikkunat_uusittu_vuosi ?? ""} onChange={(e) => setT({ ...t, ikkunat_uusittu_vuosi: e.target.value })} placeholder="Jätä tyhjäksi jos alkuperäiset" /></Field>
             </Row>
 
             <p className="eyebrow text-primary pt-4">Muut laitteet</p>
