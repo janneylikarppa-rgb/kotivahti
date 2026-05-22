@@ -679,3 +679,80 @@ export const kuittaaPtsRivi = createServerFn({ method: "POST" })
     }
     return { ok: true };
   });
+
+// ---------- Kiinteistöjen hallinta ----------
+export const listKiinteistot = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const { supabase, userId } = context;
+    const [{ data: kiinteistot, error }, { data: prof }] = await Promise.all([
+      supabase
+        .from("kiinteistot")
+        .select("id, nimi, osoite, kaupunki, tyyppi, aktiivinen, created_at")
+        .eq("user_id", userId)
+        .eq("aktiivinen", true)
+        .order("created_at", { ascending: true }),
+      supabase.from("profiles").select("valittu_kiinteisto_id").eq("id", userId).maybeSingle(),
+    ]);
+    if (error) throw error;
+    const lista = kiinteistot ?? [];
+    let valittuId: string | null = (prof?.valittu_kiinteisto_id as string | null) ?? null;
+    if (!valittuId || !lista.find((k: any) => k.id === valittuId)) {
+      valittuId = lista[0]?.id ?? null;
+    }
+    return { kiinteistot: lista, valittuId };
+  });
+
+export const setValittuKiinteisto = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) => z.object({ id: z.string().uuid() }).parse(input))
+  .handler(async ({ data, context }) => {
+    const { supabase, userId } = context;
+    const { data: omistus, error: oErr } = await supabase
+      .from("kiinteistot")
+      .select("id")
+      .eq("id", data.id)
+      .eq("user_id", userId)
+      .maybeSingle();
+    if (oErr) throw oErr;
+    if (!omistus) throw new Error("Kiinteistöä ei löytynyt");
+    const { error } = await supabase
+      .from("profiles")
+      .update({ valittu_kiinteisto_id: data.id })
+      .eq("id", userId);
+    if (error) throw error;
+    return { ok: true };
+  });
+
+const lisaaKiinteistoSchema = z.object({
+  nimi: z.string().min(1).max(120),
+  tyyppi: z.string().min(1).max(50).default("omakotitalo"),
+  osoite: z.string().max(200).optional().nullable(),
+  kaupunki: z.string().max(120).optional().nullable(),
+  rakennusvuosi: z.number().int().min(1700).max(2100).optional().nullable(),
+});
+
+export const addKiinteisto = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) => lisaaKiinteistoSchema.parse(input))
+  .handler(async ({ data, context }) => {
+    const { supabase, userId } = context;
+    const { data: uusi, error } = await supabase
+      .from("kiinteistot")
+      .insert({
+        user_id: userId,
+        nimi: data.nimi,
+        tyyppi: data.tyyppi,
+        osoite: data.osoite ?? null,
+        kaupunki: data.kaupunki ?? null,
+        rakennusvuosi: data.rakennusvuosi ?? null,
+      })
+      .select("id")
+      .single();
+    if (error) throw error;
+    await supabase.from("talon_tiedot").insert({ kiinteisto_id: uusi.id });
+    await supabase.from("kulu_asetukset").insert({ kiinteisto_id: uusi.id });
+    await supabase.from("profiles").update({ valittu_kiinteisto_id: uusi.id }).eq("id", userId);
+    return { ok: true, id: uusi.id };
+  });
+
