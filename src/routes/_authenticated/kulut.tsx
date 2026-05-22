@@ -220,26 +220,30 @@ function KuluLisaaDialog({ asetukset, onAdd, loading }: { asetukset: any; onAdd:
 function AsetuksetForm({ asetukset, onSave, loading }: { asetukset: any; onSave: (v: any) => void; loading: boolean }) {
   const [se, setSe] = useState(asetukset?.sahko_energia_snt ?? 10);
   const [ss, setSs] = useState(asetukset?.sahko_siirto_snt ?? 5);
+  const [sp, setSp] = useState(asetukset?.sahko_perusmaksu_eur_kk ?? 0);
   const [vp, setVp] = useState(asetukset?.vesi_puhdas_eur_m3 ?? 2.5);
   const [vj, setVj] = useState(asetukset?.vesi_jatevesi_eur_m3 ?? 3.5);
+  const [vpm, setVpm] = useState(asetukset?.vesi_perusmaksu_eur_kk ?? 0);
 
   return (
     <Card className="gold-card"><CardContent className="pt-6 space-y-5">
       <div>
         <h3 className="font-serif text-lg text-cream mb-3">Sähkö</h3>
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-3 gap-3">
           <div className="space-y-2"><Label>Energia (snt/kWh)</Label><Input type="number" step="0.01" value={se} onChange={(e) => setSe(Number(e.target.value))} /></div>
           <div className="space-y-2"><Label>Siirto (snt/kWh)</Label><Input type="number" step="0.01" value={ss} onChange={(e) => setSs(Number(e.target.value))} /></div>
+          <div className="space-y-2"><Label>Perusmaksu (€/kk)</Label><Input type="number" step="0.01" value={sp} onChange={(e) => setSp(Number(e.target.value))} /></div>
         </div>
       </div>
       <div>
         <h3 className="font-serif text-lg text-cream mb-3">Vesi</h3>
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-3 gap-3">
           <div className="space-y-2"><Label>Puhdas vesi (€/m³)</Label><Input type="number" step="0.01" value={vp} onChange={(e) => setVp(Number(e.target.value))} /></div>
           <div className="space-y-2"><Label>Jätevesi (€/m³)</Label><Input type="number" step="0.01" value={vj} onChange={(e) => setVj(Number(e.target.value))} /></div>
+          <div className="space-y-2"><Label>Perusmaksu (€/kk)</Label><Input type="number" step="0.01" value={vpm} onChange={(e) => setVpm(Number(e.target.value))} /></div>
         </div>
       </div>
-      <Button onClick={() => onSave({ sahko_energia_snt: se, sahko_siirto_snt: ss, vesi_puhdas_eur_m3: vp, vesi_jatevesi_eur_m3: vj })}
+      <Button onClick={() => onSave({ sahko_energia_snt: se, sahko_siirto_snt: ss, sahko_perusmaksu_eur_kk: sp, vesi_puhdas_eur_m3: vp, vesi_jatevesi_eur_m3: vj, vesi_perusmaksu_eur_kk: vpm })}
               disabled={loading} className="uppercase tracking-wider font-semibold">
         {loading ? "Tallennetaan..." : "Tallenna asetukset"}
       </Button>
