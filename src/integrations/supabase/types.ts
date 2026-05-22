@@ -263,6 +263,33 @@ export type Database = {
         }
         Relationships: []
       }
+      pts_lykkaykset: {
+        Row: {
+          created_at: string
+          id: string
+          kiinteisto_id: string
+          kohde: string
+          lykatty_vuoteen: number
+          peruste: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          kiinteisto_id: string
+          kohde: string
+          lykatty_vuoteen: number
+          peruste?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          kiinteisto_id?: string
+          kohde?: string
+          lykatty_vuoteen?: number
+          peruste?: string | null
+        }
+        Relationships: []
+      }
       pts_rivit: {
         Row: {
           created_at: string
