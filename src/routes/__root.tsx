@@ -35,18 +35,37 @@ function NotFoundComponent() {
   );
 }
 
+function isChunkLoadError(error: unknown): boolean {
+  const msg = (error as any)?.message ?? String(error ?? "");
+  return /Importing a module script failed|Failed to fetch dynamically imported module|ChunkLoadError|Loading chunk \d+ failed|Load failed/i.test(msg);
+}
+
 function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
   console.error(error);
   const router = useRouter();
+  const chunkError = isChunkLoadError(error);
+
+  useEffect(() => {
+    if (chunkError && typeof window !== "undefined") {
+      const key = "__kotivahti_chunk_reload";
+      if (!sessionStorage.getItem(key)) {
+        sessionStorage.setItem(key, "1");
+        window.location.reload();
+      }
+    }
+  }, [chunkError]);
+
   return (
     <div className="flex min-h-screen items-center justify-center bg-background px-4">
       <div className="max-w-md text-center">
         <p className="eyebrow mb-4">Virhe</p>
-        <h1 className="text-3xl font-serif text-cream">Sivua ei voitu ladata</h1>
-        <p className="mt-2 text-sm text-muted-foreground">{error.message}</p>
+        <h1 className="text-3xl font-serif text-cream">{chunkError ? "Päivitetään sovellusta..." : "Sivua ei voitu ladata"}</h1>
+        <p className="mt-2 text-sm text-muted-foreground">{chunkError ? "Hetki, ladataan uusin versio." : error.message}</p>
         <div className="mt-6 flex justify-center gap-2">
           <button
             onClick={() => {
+              if (typeof window !== "undefined") sessionStorage.removeItem("__kotivahti_chunk_reload");
+              if (chunkError && typeof window !== "undefined") { window.location.reload(); return; }
               router.invalidate();
               reset();
             }}
@@ -59,6 +78,7 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
     </div>
   );
 }
+
 
 export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()({
   head: () => ({
