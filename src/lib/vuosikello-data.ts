@@ -142,6 +142,11 @@ export function dynamicHuollot(t: TalonTiedotLite | null | undefined): Partial<R
     out.kesa.push("Terassilaudoituksen öljyäminen / käsittely");
   }
 
+  if (t.terassi_lasitettu === true) {
+    out.kevat.push("Terassilasien pesu ja kiskojen puhdistus");
+    out.kesa.push("Terassilasituksen tiivisteiden ja rullien tarkastus");
+  }
+
   if (t.julkisivumateriaali?.toLowerCase().includes("puu")) {
     out.kesa.push("Puujulkisivun maalipinnan tarkastus");
   }
