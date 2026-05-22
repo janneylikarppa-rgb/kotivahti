@@ -139,7 +139,7 @@ function LandingPage() {
               </li>
               <li className="flex gap-3">
                 <span className="text-primary">✓</span>
-                <span className="text-foreground/90">Kylpyhuone remontoitu 2022</span>
+                <span className="text-foreground/90">​</span>
               </li>
               <li className="flex gap-3">
                 <span className="text-primary">!</span>
