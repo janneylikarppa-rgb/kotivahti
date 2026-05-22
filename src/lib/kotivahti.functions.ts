@@ -481,3 +481,126 @@ export const saveAsetukset = createServerFn({ method: "POST" })
     if (error) throw error;
     return { ok: true };
   });
+
+// ---------- PTS-suunnitelma ----------
+export const getPts = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const { supabase, userId } = context;
+    const k = await getActiveKiinteisto(supabase, userId);
+    if (!k) return { rivit: [], talonTiedotPuuttuu: true };
+    const [taloRes, huoltoRes, omatRes, kuitatutRes] = await Promise.all([
+      supabase.from("talon_tiedot").select("*").eq("kiinteisto_id", k.id).maybeSingle(),
+      supabase.from("huolto_historia").select("kohde, pts_siirto").eq("kiinteisto_id", k.id),
+      supabase.from("pts_rivit").select("*").eq("kiinteisto_id", k.id),
+      supabase.from("pts_kuitatut").select("kohde").eq("kiinteisto_id", k.id),
+    ]);
+    const talo = taloRes.data ? { ...taloRes.data, rakennusvuosi: k.rakennusvuosi } : null;
+    const auto = generoiAutoRivit(talo, huoltoRes.data ?? [], kuitatutRes.data ?? [], 10);
+    const nyt = new Date().getFullYear();
+    const omat: PtsRivi[] = (omatRes.data ?? []).map((r: any) => {
+      const jaljella = r.vuosi - nyt;
+      return {
+        id: r.id,
+        lahde: "oma" as const,
+        kohde: r.kohde,
+        kategoria: "Oma",
+        vuosi: r.vuosi,
+        vuosiaJaljella: jaljella,
+        tila: laskeTila(jaljella),
+        kuvaus: r.kuvaus,
+        huoltovali: 0,
+      };
+    });
+    const rivit = [...auto, ...omat].sort((a, b) => a.vuosi - b.vuosi);
+    const talonTiedotPuuttuu = !talo || (!talo.lammitysmuoto && !talo.kattomateriaali && !talo.rakennusvuosi);
+    return { rivit, talonTiedotPuuttuu };
+  });
+
+const ptsRiviSchema = z.object({
+  vuosi: z.number().int().min(2000).max(2100),
+  kohde: z.string().min(1).max(200),
+  kuvaus: z.string().max(2000).optional().nullable(),
+});
+
+export const addPtsRivi = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) => ptsRiviSchema.parse(input))
+  .handler(async ({ data, context }) => {
+    const { supabase, userId } = context;
+    const k = await getActiveKiinteisto(supabase, userId);
+    if (!k) throw new Error("Kiinteistöä ei löytynyt");
+    const { error } = await supabase.from("pts_rivit").insert({ kiinteisto_id: k.id, ...data });
+    if (error) throw error;
+    return { ok: true };
+  });
+
+export const deletePtsRivi = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) => z.object({ id: z.string().uuid() }).parse(input))
+  .handler(async ({ data, context }) => {
+    const { error } = await context.supabase.from("pts_rivit").delete().eq("id", data.id);
+    if (error) throw error;
+    return { ok: true };
+  });
+
+const ptsKuittausSchema = z.object({
+  kohde: z.string().min(1).max(200),
+  lahde: z.enum(["auto", "oma"]),
+  rivi_id: z.string().uuid().optional().nullable(),
+  pvm: z.string().min(1),
+  tekija: z.enum(["itse", "ammattilainen"]).default("itse"),
+  tekija_nimi: z.string().max(200).optional().nullable(),
+  kustannus: z.number().min(0).default(0),
+  kuvaus: z.string().max(2000).optional().nullable(),
+});
+
+export const kuittaaPtsRivi = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) => ptsKuittausSchema.parse(input))
+  .handler(async ({ data, context }) => {
+    const { supabase, userId } = context;
+    const k = await getActiveKiinteisto(supabase, userId);
+    if (!k) throw new Error("Kiinteistöä ei löytynyt");
+    const huoltovali = getHuoltovali(data.kohde);
+
+    // Luo huoltohistoria-rivi
+    const { data: hist, error: histErr } = await supabase
+      .from("huolto_historia")
+      .insert({
+        kiinteisto_id: k.id,
+        tyyppi: "huolto",
+        kategoria: "PTS",
+        kohde: data.kohde,
+        pvm: data.pvm,
+        tekija: data.tekija,
+        tekija_nimi: data.tekija_nimi ?? null,
+        kustannus: data.kustannus,
+        kuvaus: data.kuvaus ?? null,
+        pts_siirto: huoltovali,
+      })
+      .select("id")
+      .single();
+    if (histErr) throw histErr;
+
+    // Kulu jos hinta
+    if (Number(data.kustannus) > 0) {
+      await supabase.from("kulut").insert({
+        kiinteisto_id: k.id,
+        nimi: `PTS – ${data.kohde}`,
+        kategoria: "huolto",
+        summa: data.kustannus,
+        pvm: data.pvm,
+      });
+    }
+
+    if (data.lahde === "oma" && data.rivi_id) {
+      await supabase.from("pts_rivit").delete().eq("id", data.rivi_id);
+    } else {
+      await supabase.from("pts_kuitatut").upsert(
+        { kiinteisto_id: k.id, kohde: data.kohde, historia_id: hist.id, kuitattu_pvm: data.pvm },
+        { onConflict: "kiinteisto_id,kohde" },
+      );
+    }
+    return { ok: true };
+  });
