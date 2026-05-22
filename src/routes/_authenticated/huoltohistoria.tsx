@@ -376,6 +376,8 @@ function HuoltoForm({
         </div>
       )}
 
+      <div className="space-y-2">
+        <Label>Liitteet (kuitit, tarjoukset, valokuvat)</Label>
         <div className="rounded-md border border-dashed border-border p-3 space-y-2">
           {vanhat.length > 0 && (
             <ul className="space-y-1">
