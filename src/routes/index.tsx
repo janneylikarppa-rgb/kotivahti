@@ -274,7 +274,7 @@ function LandingPage() {
                 className="flex-1 text-[0.8rem] font-semibold py-2 rounded-md transition hover:brightness-125"
                 style={{ background: "#0D1F14", color: "#C9A84C" }}
               >
-                Tilaa huolto
+                Tilaa kuntoarvio
               </button>
               <button
                 className="flex-1 text-[0.8rem] font-semibold py-2 rounded-md transition hover:bg-black/5"
