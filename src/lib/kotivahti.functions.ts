@@ -99,6 +99,7 @@ const taloSchema = z.object({
     rakennustapa: z.string().optional().nullable(),
     julkisivumateriaali: z.string().optional().nullable(),
     julkisivu_maalattu_vuosi: z.number().int().optional().nullable(),
+    julkisivu_asennettu_vuosi: z.number().int().optional().nullable(),
     perustus: z.string().optional().nullable(),
     eriste: z.string().optional().nullable(),
     rakennus_lisatieto: z.string().optional().nullable(),
