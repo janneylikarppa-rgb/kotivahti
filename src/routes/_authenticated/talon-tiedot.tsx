@@ -177,7 +177,7 @@ function TaloTiedotPage() {
       delete (payload as any)._uudet;
       await saveFn({ data: payload });
       setValmiit(uudet);
-      dirty.current = false;
+      
       return opts;
     },
     onSuccess: (opts) => {
