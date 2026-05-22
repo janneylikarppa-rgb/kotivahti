@@ -427,6 +427,14 @@ function TaloTiedotPage() {
             </Row>
             <Field label="Pääsulun sijainti"><Input value={t.paasulun_sijainti ?? ""} onChange={(e) => setT({ ...t, paasulun_sijainti: e.target.value })} placeholder="Esim. tekninen tila, kellari" /></Field>
 
+            <p className="eyebrow text-primary pt-4">Ikkunat</p>
+            <Row>
+              <Field label="Ikkunatyyppi">
+                <SelectOrOther value={t.ikkunat_tyyppi} options={IKKUNATYYPIT} onChange={(v) => setT({ ...t, ikkunat_tyyppi: v })} />
+              </Field>
+              <Field label="Ikkunat uusittu (vuosi)"><Input type="number" value={t.ikkunat_uusittu_vuosi ?? ""} onChange={(e) => setT({ ...t, ikkunat_uusittu_vuosi: e.target.value })} placeholder="Jätä tyhjäksi jos alkuperäiset" /></Field>
+            </Row>
+
             <p className="eyebrow text-primary pt-4">Muut laitteet</p>
             <Row>
               <Field label="Palovaroittimia (kpl)"><Input type="number" value={t.palovaroittimia ?? ""} onChange={(e) => setT({ ...t, palovaroittimia: e.target.value })} /></Field>
