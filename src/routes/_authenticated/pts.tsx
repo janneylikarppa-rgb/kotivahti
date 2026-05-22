@@ -220,6 +220,8 @@ function PtsPage() {
         otsikko="🔴 Kiireellinen"
         rivit={ryhmat.kiireellinen}
         onKuittaa={setKuittaa}
+        onLykkaa={setLykkaa}
+        onPeruLykkays={(k) => peruM.mutate(k)}
         onDelete={(id) => delM.mutate(id)}
         tyhja="Ei kiireellisiä toimenpiteitä – hienoa työtä!"
         defaultOpen
@@ -228,6 +230,8 @@ function PtsPage() {
         otsikko="🟡 Lähivuosina"
         rivit={ryhmat.lahivuosina}
         onKuittaa={setKuittaa}
+        onLykkaa={setLykkaa}
+        onPeruLykkays={(k) => peruM.mutate(k)}
         onDelete={(id) => delM.mutate(id)}
         tyhja="Ei toimenpiteitä lähivuosille."
       />
@@ -235,6 +239,8 @@ function PtsPage() {
         otsikko="🟢 Seurannassa"
         rivit={ryhmat.seurannassa}
         onKuittaa={setKuittaa}
+        onLykkaa={setLykkaa}
+        onPeruLykkays={(k) => peruM.mutate(k)}
         onDelete={(id) => delM.mutate(id)}
         tyhja="Ei seurattavia kohteita 10 vuoden ikkunassa."
       />
@@ -244,6 +250,20 @@ function PtsPage() {
           <KuittausDialog
             rivi={kuittaa}
             onSubmit={(v) => kuittausM.mutate({ ...v, kohde: kuittaa.kohde, lahde: kuittaa.lahde, rivi_id: kuittaa.lahde === "oma" ? kuittaa.id : null })}
+          />
+        )}
+      </Dialog>
+
+      <Dialog open={!!lykkaa} onOpenChange={(o) => !o && setLykkaa(null)}>
+        {lykkaa && (
+          <LykkaysDialog
+            rivi={lykkaa}
+            onSubmit={(v) => lykkaysM.mutate({
+              ...v,
+              kohde: lykkaa.kohde,
+              lahde: lykkaa.lahde,
+              rivi_id: lykkaa.lahde === "oma" ? lykkaa.id : null,
+            })}
           />
         )}
       </Dialog>
@@ -263,11 +283,13 @@ function RyhmaPill({ tila, count }: { tila: keyof typeof TILA_META; count: numbe
 }
 
 function RyhmaOsio({
-  otsikko, rivit, onKuittaa, onDelete, tyhja, defaultOpen,
+  otsikko, rivit, onKuittaa, onLykkaa, onPeruLykkays, onDelete, tyhja, defaultOpen,
 }: {
   otsikko: string;
   rivit: PtsRivi[];
   onKuittaa: (r: PtsRivi) => void;
+  onLykkaa: (r: PtsRivi) => void;
+  onPeruLykkays: (kohde: string) => void;
   onDelete: (id: string) => void;
   tyhja: string;
   defaultOpen?: boolean;
