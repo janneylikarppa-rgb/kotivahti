@@ -101,7 +101,7 @@ function TaloTiedotPage() {
   const [p, setP] = useState<any>({});
   const [valmiit, setValmiit] = useState<string[]>([]);
   const hydrated = useRef(false);
-  const dirty = useRef(false);
+  
   const [autoStatus, setAutoStatus] = useState<"idle" | "saving" | "saved">("idle");
 
   useEffect(() => {
