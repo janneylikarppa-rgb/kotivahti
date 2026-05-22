@@ -153,6 +153,7 @@ function TaloTiedotPage() {
         putket_uusittu_vuosi: num(t.putket_uusittu_vuosi),
         putkimateriaali: str(t.putkimateriaali),
         viemarimateriaali: str(t.viemarimateriaali), viemari_asennettu_vuosi: num(t.viemari_asennettu_vuosi),
+        ikkunat_tyyppi: str(t.ikkunat_tyyppi), ikkunat_uusittu_vuosi: num(t.ikkunat_uusittu_vuosi),
         paasulun_sijainti: str(t.paasulun_sijainti),
         sahkot_asennettu_vuosi: num(t.sahkot_asennettu_vuosi),
         palovaroittimia: num(t.palovaroittimia), palovaroitin_paristot: dateStr(t.palovaroitin_paristot),
