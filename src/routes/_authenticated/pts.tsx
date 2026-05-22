@@ -310,7 +310,16 @@ function RyhmaOsio({
           {rivit.length === 0 ? (
             <div className="rounded-md border border-dashed border-cream/10 p-6 text-center text-sm text-cream/50">{tyhja}</div>
           ) : (
-            rivit.map((r) => <PtsKortti key={r.id} rivi={r} onKuittaa={onKuittaa} onDelete={onDelete} />)
+            rivit.map((r) => (
+              <PtsKortti
+                key={r.id}
+                rivi={r}
+                onKuittaa={onKuittaa}
+                onLykkaa={onLykkaa}
+                onPeruLykkays={onPeruLykkays}
+                onDelete={onDelete}
+              />
+            ))
           )}
         </div>
       )}
@@ -318,7 +327,15 @@ function RyhmaOsio({
   );
 }
 
-function PtsKortti({ rivi, onKuittaa, onDelete }: { rivi: PtsRivi; onKuittaa: (r: PtsRivi) => void; onDelete: (id: string) => void }) {
+function PtsKortti({
+  rivi, onKuittaa, onLykkaa, onPeruLykkays, onDelete,
+}: {
+  rivi: PtsRivi;
+  onKuittaa: (r: PtsRivi) => void;
+  onLykkaa: (r: PtsRivi) => void;
+  onPeruLykkays: (kohde: string) => void;
+  onDelete: (id: string) => void;
+}) {
   const m = TILA_META[rivi.tila];
   const ylitetty = rivi.ylitettyVuosia && rivi.ylitettyVuosia > 2;
   const teksti = ylitetty
@@ -341,10 +358,28 @@ function PtsKortti({ rivi, onKuittaa, onDelete }: { rivi: PtsRivi; onKuittaa: (r
             </span>
           </div>
         </div>
+        {rivi.lykatty && (
+          <div className="flex flex-wrap items-center gap-2 rounded-md border border-amber-500/30 bg-amber-500/10 px-3 py-2 text-xs text-amber-200">
+            <Clock className="h-3.5 w-3.5" />
+            <span>
+              Siirretty eteenpäin
+              {rivi.alkuperainenVuosi ? ` (alkuperäinen suositus ${rivi.alkuperainenVuosi})` : ""}
+              {rivi.lykkaysPeruste ? ` – ${rivi.lykkaysPeruste}` : ""}
+            </span>
+            {rivi.lahde === "auto" && (
+              <Button size="sm" variant="ghost" className="ml-auto h-6 px-2 text-amber-200 hover:text-amber-100" onClick={() => onPeruLykkays(rivi.kohde)}>
+                <Undo2 className="mr-1 h-3 w-3" /> Peru siirto
+              </Button>
+            )}
+          </div>
+        )}
         <p className="text-sm leading-relaxed text-cream/75">{teksti}</p>
         <div className="flex flex-wrap gap-2">
           <Button size="sm" onClick={() => onKuittaa(rivi)}>
             <Check className="mr-1 h-4 w-4" /> Kuittaa tehdyksi
+          </Button>
+          <Button size="sm" variant="secondary" onClick={() => onLykkaa(rivi)}>
+            <Clock className="mr-1 h-4 w-4" /> Siirrä eteenpäin
           </Button>
           <Button size="sm" variant="secondary" onClick={() => toast.info("Ammattilaisen tilaus tulee pian käyttöön")}>
             <Wrench className="mr-1 h-4 w-4" /> Tilaa ammattilainen
