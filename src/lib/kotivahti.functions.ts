@@ -124,6 +124,8 @@ const taloSchema = z.object({
     putkimateriaali: z.string().optional().nullable(),
     viemarimateriaali: z.string().optional().nullable(),
     viemari_asennettu_vuosi: z.number().int().optional().nullable(),
+    ikkunat_tyyppi: z.string().optional().nullable(),
+    ikkunat_uusittu_vuosi: z.number().int().optional().nullable(),
     paasulun_sijainti: z.string().optional().nullable(),
     sahkot_asennettu_vuosi: z.number().int().optional().nullable(),
     palovaroittimia: z.number().int().optional().nullable(),
