@@ -73,6 +73,7 @@ const MERKIT: Record<string, { tyyppi: string; merkit: string[] }> = {
   sahkolammitys: { tyyppi: "Sähkökattila / varaaja", merkit: ["Jäspi", "Kaukora", "Nibe", "Muu"] },
 };
 const ILMANVAIHDOT = ["Painovoimainen", "Koneellinen poisto", "Koneellinen tulo- ja poistoilmanvaihto (LTO)", "Hybridi"];
+const IKKUNATYYPIT = ["3-lasinen MSE", "3-lasinen MEK", "2-lasinen", "2+1-lasinen", "Sekoitus", "Muu"];
 const IV_SUODATTIMET = ["F7 (vakio)", "M5", "ePM1", "ePM10", "Aktiivihiili", "Muu"];
 const PUTKIMATERIAALIT = ["Kupariputket", "Komposiittiputket (PEX-Al-PEX)", "Muoviputket (PEX)", "Galvanoitu teräs", "Valurauta", "Muu"];
 const VIEMARIMATERIAALIT = ["Muovi (PVC/PP)", "Valurauta", "Betoni", "Keraaminen", "Lasikuitu", "Muu"];
