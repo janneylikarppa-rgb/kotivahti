@@ -481,7 +481,7 @@ function TaloTiedotPage() {
               <Button variant="outline" disabled={active === OSIOT.length - 1} onClick={() => setActive((a) => Math.min(OSIOT.length - 1, a + 1))}>Seuraava</Button>
             </div>
             {active !== 5 && (
-              <Button onClick={() => save.mutate(OSIOT[active].key)} disabled={save.isPending} className="uppercase tracking-wider font-semibold">
+              <Button onClick={() => save.mutate({ osioKey: OSIOT[active].key })} disabled={save.isPending} className="uppercase tracking-wider font-semibold">
                 {save.isPending ? "Tallennetaan..." : "Tallenna ja merkitse valmiiksi"}
               </Button>
             )}
