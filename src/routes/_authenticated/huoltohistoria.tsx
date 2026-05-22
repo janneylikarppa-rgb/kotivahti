@@ -11,6 +11,7 @@ import {
   updateHuolto,
 } from "@/lib/kotivahti.functions";
 import { HUOLTO_KOHDE_RYHMAT, HUOLTO_TYYPIT } from "@/lib/huolto-kohteet";
+import { tukeeLaitePaivitysta } from "@/lib/laite-paivitys";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -181,6 +182,9 @@ function HuoltoForm({
     takuu_vuotta: initial?.takuu_vuotta != null ? String(initial.takuu_vuotta) : "",
     pts_siirto: initial?.pts_siirto != null ? String(initial.pts_siirto) : "0",
   });
+  const [paivitaTalo, setPaivitaTalo] = useState(false);
+  const [laite, setLaite] = useState({ merkki: "", malli: "", asennusvuosi: "" });
+  const voiPaivittaa = tukeeLaitePaivitysta(form.kohde);
   const [uudet, setUudet] = useState<Liite[]>([]);
   const [vanhat, setVanhat] = useState<any[]>(initial?.liitteet ?? []);
   const [uploading, setUploading] = useState(false);
@@ -247,12 +251,20 @@ function HuoltoForm({
     <form
       onSubmit={(e) => {
         e.preventDefault();
+        const laite_paivitys = paivitaTalo && voiPaivittaa
+          ? {
+              merkki: laite.merkki.trim() || null,
+              malli: laite.malli.trim() || null,
+              asennusvuosi: laite.asennusvuosi ? Number(laite.asennusvuosi) : null,
+            }
+          : null;
         onSubmit({
           ...form,
           kustannus: Number(form.kustannus || 0),
           takuu_vuotta: Number(form.takuu_vuotta || 0),
           pts_siirto: Number(form.pts_siirto || 0),
           liitteet: uudet,
+          laite_paivitys,
         });
       }}
       className="space-y-4"
@@ -330,6 +342,39 @@ function HuoltoForm({
           <p className="text-[10px] text-muted-foreground">Siirtää suositusta vuosilla</p>
         </div>
       </div>
+
+      {voiPaivittaa && (
+        <div className="space-y-3 rounded-md border border-primary/30 bg-primary/5 p-3">
+          <label className="flex items-start gap-2 text-sm cursor-pointer">
+            <input
+              type="checkbox"
+              checked={paivitaTalo}
+              onChange={(e) => setPaivitaTalo(e.target.checked)}
+              className="mt-1 accent-primary"
+            />
+            <span>
+              <span className="text-cream font-medium">Päivitä talon tiedot tällä laitteella</span>
+              <span className="block text-xs text-muted-foreground">Asennusvuosi (ja tarvittaessa merkki/malli) tallennetaan automaattisesti talon tietoihin kohteelle "{form.kohde}".</span>
+            </span>
+          </label>
+          {paivitaTalo && (
+            <div className="grid grid-cols-3 gap-3">
+              <div className="space-y-1">
+                <Label className="text-xs">Merkki</Label>
+                <Input value={laite.merkki} onChange={(e) => setLaite({ ...laite, merkki: e.target.value })} placeholder="Esim. Nibe" />
+              </div>
+              <div className="space-y-1">
+                <Label className="text-xs">Malli</Label>
+                <Input value={laite.malli} onChange={(e) => setLaite({ ...laite, malli: e.target.value })} placeholder="Esim. S1255-12" />
+              </div>
+              <div className="space-y-1">
+                <Label className="text-xs">Asennusvuosi</Label>
+                <Input type="number" min="1900" max="2100" value={laite.asennusvuosi} onChange={(e) => setLaite({ ...laite, asennusvuosi: e.target.value })} placeholder={String(new Date(form.pvm).getFullYear())} />
+              </div>
+            </div>
+          )}
+        </div>
+      )}
 
       <div className="space-y-2">
         <Label>Liitteet (kuitit, tarjoukset, valokuvat)</Label>

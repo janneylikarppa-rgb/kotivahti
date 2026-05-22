@@ -2,6 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { generoiAutoRivit, getHuoltovali, laskeTila, type PtsRivi } from "./pts-saannot";
+import { rakennaTaloPatch, tukeeLaitePaivitysta } from "./laite-paivitys";
 
 // ---------- Active kiinteistö ----------
 async function getActiveKiinteisto(supabase: any, userId: string) {
@@ -253,7 +254,32 @@ const huoltoSchema = z.object({
   takuu_vuotta: z.number().int().default(0),
   pts_siirto: z.number().int().min(0).max(50).default(0),
   liitteet: z.array(liiteSchema).optional().default([]),
+  laite_paivitys: z.object({
+    merkki: z.string().optional().nullable(),
+    malli: z.string().optional().nullable(),
+    asennusvuosi: z.number().int().min(1900).max(2200).optional().nullable(),
+  }).optional().nullable(),
 });
+
+async function paivitaTaloLaitteella(
+  supabase: any,
+  kiinteistoId: string,
+  kohde: string | null | undefined,
+  lp: { merkki?: string | null; malli?: string | null; asennusvuosi?: number | null } | null | undefined,
+) {
+  if (!kohde || !lp || !tukeeLaitePaivitysta(kohde)) return;
+  const onTyhja = !lp.merkki?.trim() && !lp.malli?.trim() && lp.asennusvuosi == null;
+  if (onTyhja) return;
+  const { data: nykyinen } = await supabase
+    .from("talon_tiedot")
+    .select("lammitys_lisatieto")
+    .eq("kiinteisto_id", kiinteistoId)
+    .maybeSingle();
+  const patch = rakennaTaloPatch(kohde, lp, (nykyinen?.lammitys_lisatieto ?? {}) as Record<string, any>);
+  if (Object.keys(patch).length === 0) return;
+  await supabase.from("talon_tiedot").update(patch).eq("kiinteisto_id", kiinteistoId);
+}
+
 
 async function insertLiitteet(supabase: any, kiinteistoId: string, huoltoId: string, liitteet: any[]) {
   if (!liitteet || liitteet.length === 0) return;
@@ -277,7 +303,7 @@ export const addHuolto = createServerFn({ method: "POST" })
     const { supabase, userId } = context;
     const k = await getActiveKiinteisto(supabase, userId);
     if (!k) throw new Error("Kiinteistöä ei löytynyt");
-    const { liitteet, ...row } = data;
+    const { liitteet, laite_paivitys, ...row } = data;
     const { data: inserted, error } = await supabase
       .from("huolto_historia")
       .insert({ kiinteisto_id: k.id, ...row })
@@ -294,6 +320,7 @@ export const addHuolto = createServerFn({ method: "POST" })
         pvm: data.pvm,
       });
     }
+    await paivitaTaloLaitteella(supabase, k.id, data.kohde, laite_paivitys);
     return { ok: true };
   });
 
@@ -306,10 +333,11 @@ export const updateHuolto = createServerFn({ method: "POST" })
     const { supabase, userId } = context;
     const k = await getActiveKiinteisto(supabase, userId);
     if (!k) throw new Error("Kiinteistöä ei löytynyt");
-    const { id, liitteet, ...patch } = data;
+    const { id, liitteet, laite_paivitys, ...patch } = data;
     const { error } = await supabase.from("huolto_historia").update(patch).eq("id", id);
     if (error) throw error;
     await insertLiitteet(supabase, k.id, id, liitteet ?? []);
+    await paivitaTaloLaitteella(supabase, k.id, data.kohde, laite_paivitys);
     return { ok: true };
   });
 
