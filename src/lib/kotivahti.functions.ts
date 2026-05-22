@@ -258,6 +258,7 @@ const huoltoSchema = z.object({
     merkki: z.string().optional().nullable(),
     malli: z.string().optional().nullable(),
     asennusvuosi: z.number().int().min(1900).max(2200).optional().nullable(),
+    materiaali: z.string().max(150).optional().nullable(),
   }).optional().nullable(),
 });
 
@@ -265,10 +266,10 @@ async function paivitaTaloLaitteella(
   supabase: any,
   kiinteistoId: string,
   kohde: string | null | undefined,
-  lp: { merkki?: string | null; malli?: string | null; asennusvuosi?: number | null } | null | undefined,
+  lp: { merkki?: string | null; malli?: string | null; asennusvuosi?: number | null; materiaali?: string | null } | null | undefined,
 ) {
   if (!kohde || !lp || !tukeeLaitePaivitysta(kohde)) return;
-  const onTyhja = !lp.merkki?.trim() && !lp.malli?.trim() && lp.asennusvuosi == null;
+  const onTyhja = !lp.merkki?.trim() && !lp.malli?.trim() && lp.asennusvuosi == null && !lp.materiaali?.trim();
   if (onTyhja) return;
   const { data: nykyinen } = await supabase
     .from("talon_tiedot")
