@@ -100,6 +100,9 @@ function TaloTiedotPage() {
   const [t, setT] = useState<any>({});
   const [p, setP] = useState<any>({});
   const [valmiit, setValmiit] = useState<string[]>([]);
+  const hydrated = useRef(false);
+  
+  const [autoStatus, setAutoStatus] = useState<"idle" | "saving" | "saved">("idle");
 
   useEffect(() => {
     if (data?.kiinteisto) setK(data.kiinteisto);
@@ -108,61 +111,102 @@ function TaloTiedotPage() {
       setT(data.talo);
       setValmiit(Array.isArray(data.talo.valmiit_osiot) ? data.talo.valmiit_osiot as string[] : []);
     }
+    if (data) {
+      // Merkitään hydratoiduksi seuraavan tickin jälkeen ettei autosave laukea heti
+      const id = setTimeout(() => { hydrated.current = true; }, 50);
+      return () => clearTimeout(id);
+    }
   }, [data]);
 
   const laite = t.lammitysmuoto ? MERKIT[t.lammitysmuoto] : undefined;
   const lammitysLisa = (t.lammitys_lisatieto && typeof t.lammitys_lisatieto === "object") ? t.lammitys_lisatieto : {};
   const setLisa = (patch: Record<string, any>) => setT({ ...t, lammitys_lisatieto: { ...lammitysLisa, ...patch } });
 
+
+  const buildPayload = (osioKey?: string) => {
+    const uudet = osioKey && !valmiit.includes(osioKey) ? [...valmiit, osioKey] : valmiit;
+    return {
+      profile: { nimi: str(p.nimi), puhelin: str(p.puhelin) },
+      kiinteisto: {
+        nimi: k.nimi, osoite: k.osoite, postinumero: k.postinumero, kaupunki: k.kaupunki,
+        rakennusvuosi: num(k.rakennusvuosi), tyyppi: str(k.tyyppi),
+        hankintatapa: str(k.hankintatapa), hankinta_vuosi: num(k.hankinta_vuosi),
+      },
+      talo: {
+        pinta_ala: num(t.pinta_ala), kokonaispinta_ala: num(t.kokonaispinta_ala), tilavuus: num(t.tilavuus),
+        kerroksia: num(t.kerroksia), asukkaita: num(t.asukkaita),
+        rakennustapa: str(t.rakennustapa), julkisivumateriaali: str(t.julkisivumateriaali),
+        julkisivu_maalattu_vuosi: num(t.julkisivu_maalattu_vuosi),
+        perustus: str(t.perustus), eriste: str(t.eriste), rakennus_lisatieto: str(t.rakennus_lisatieto),
+        kattotyyppi: str(t.kattotyyppi), kattomateriaali: str(t.kattomateriaali),
+        katto_uusittu_vuosi: num(t.katto_uusittu_vuosi),
+        katto_pinta_ala: num(t.katto_pinta_ala),
+        raystaat_kunnostettu_vuosi: num(t.raystaat_kunnostettu_vuosi),
+        hormit: str(t.hormit), kattoturvatuotteet: str(t.kattoturvatuotteet),
+        kourun_pituus: num(t.kourun_pituus), kourun_materiaali: str(t.kourun_materiaali),
+        syoksytorvet: num(t.syoksytorvet),
+        lammitysmuoto: str(t.lammitysmuoto), lammitys_asennettu_vuosi: num(t.lammitys_asennettu_vuosi),
+        lammitys_lisatieto: lammitysLisa,
+        ilp_merkki: str(t.ilp_merkki), ilp_malli: str(t.ilp_malli), ilp_asennettu_vuosi: num(t.ilp_asennettu_vuosi),
+        ilmanvaihto: str(t.ilmanvaihto), ilmanvaihto_vuosi: num(t.ilmanvaihto_vuosi),
+        iv_suodatintyyppi: str(t.iv_suodatintyyppi), iv_suodatin_vaihdettu: dateStr(t.iv_suodatin_vaihdettu),
+        putket_uusittu_vuosi: num(t.putket_uusittu_vuosi),
+        putkimateriaali: str(t.putkimateriaali),
+        viemarimateriaali: str(t.viemarimateriaali), viemari_asennettu_vuosi: num(t.viemari_asennettu_vuosi),
+        paasulun_sijainti: str(t.paasulun_sijainti),
+        sahkot_asennettu_vuosi: num(t.sahkot_asennettu_vuosi),
+        palovaroittimia: num(t.palovaroittimia), palovaroitin_paristot: dateStr(t.palovaroitin_paristot),
+        kiukaan_vuosi: num(t.kiukaan_vuosi), nuohous_pvm: dateStr(t.nuohous_pvm),
+        tontin_pinta_ala: num(t.tontin_pinta_ala), nurmikon_pinta_ala: num(t.nurmikon_pinta_ala),
+        sadevesikaivot: num(t.sadevesikaivot),
+        pihan_tyyppi: str(t.pihan_tyyppi), piha_lisatieto: str(t.piha_lisatieto),
+        terassi_materiaali: str(t.terassi_materiaali), terassi_pinta_ala: num(t.terassi_pinta_ala),
+        terassi_rakennettu_vuosi: num(t.terassi_rakennettu_vuosi),
+        terassi_kunnostettu_vuosi: num(t.terassi_kunnostettu_vuosi),
+        salaojat: boolOrNull(t.salaojat), salaojat_tarkastettu: dateStr(t.salaojat_tarkastettu),
+        valmiit_osiot: uudet,
+      },
+      _uudet: uudet,
+    };
+  };
+
   const save = useMutation({
-    mutationFn: (osioKey?: string) => {
-      const uudet = osioKey && !valmiit.includes(osioKey) ? [...valmiit, osioKey] : valmiit;
-      return saveFn({ data: {
-        profile: { nimi: str(p.nimi), puhelin: str(p.puhelin) },
-        kiinteisto: {
-          nimi: k.nimi, osoite: k.osoite, postinumero: k.postinumero, kaupunki: k.kaupunki,
-          rakennusvuosi: num(k.rakennusvuosi), tyyppi: str(k.tyyppi),
-          hankintatapa: str(k.hankintatapa), hankinta_vuosi: num(k.hankinta_vuosi),
-        },
-        talo: {
-          pinta_ala: num(t.pinta_ala), kokonaispinta_ala: num(t.kokonaispinta_ala), tilavuus: num(t.tilavuus),
-          kerroksia: num(t.kerroksia), asukkaita: num(t.asukkaita),
-          rakennustapa: str(t.rakennustapa), julkisivumateriaali: str(t.julkisivumateriaali),
-          julkisivu_maalattu_vuosi: num(t.julkisivu_maalattu_vuosi),
-          perustus: str(t.perustus), eriste: str(t.eriste), rakennus_lisatieto: str(t.rakennus_lisatieto),
-          kattotyyppi: str(t.kattotyyppi), kattomateriaali: str(t.kattomateriaali),
-          katto_uusittu_vuosi: num(t.katto_uusittu_vuosi),
-          katto_pinta_ala: num(t.katto_pinta_ala),
-          raystaat_kunnostettu_vuosi: num(t.raystaat_kunnostettu_vuosi),
-          hormit: str(t.hormit), kattoturvatuotteet: str(t.kattoturvatuotteet),
-          kourun_pituus: num(t.kourun_pituus), kourun_materiaali: str(t.kourun_materiaali),
-          syoksytorvet: num(t.syoksytorvet),
-          lammitysmuoto: str(t.lammitysmuoto), lammitys_asennettu_vuosi: num(t.lammitys_asennettu_vuosi),
-          lammitys_lisatieto: lammitysLisa,
-          ilp_merkki: str(t.ilp_merkki), ilp_malli: str(t.ilp_malli), ilp_asennettu_vuosi: num(t.ilp_asennettu_vuosi),
-          ilmanvaihto: str(t.ilmanvaihto), ilmanvaihto_vuosi: num(t.ilmanvaihto_vuosi),
-          iv_suodatintyyppi: str(t.iv_suodatintyyppi), iv_suodatin_vaihdettu: dateStr(t.iv_suodatin_vaihdettu),
-          putket_uusittu_vuosi: num(t.putket_uusittu_vuosi),
-          putkimateriaali: str(t.putkimateriaali),
-          viemarimateriaali: str(t.viemarimateriaali), viemari_asennettu_vuosi: num(t.viemari_asennettu_vuosi),
-          paasulun_sijainti: str(t.paasulun_sijainti),
-          sahkot_asennettu_vuosi: num(t.sahkot_asennettu_vuosi),
-          palovaroittimia: num(t.palovaroittimia), palovaroitin_paristot: dateStr(t.palovaroitin_paristot),
-          kiukaan_vuosi: num(t.kiukaan_vuosi), nuohous_pvm: dateStr(t.nuohous_pvm),
-          tontin_pinta_ala: num(t.tontin_pinta_ala), nurmikon_pinta_ala: num(t.nurmikon_pinta_ala),
-          sadevesikaivot: num(t.sadevesikaivot),
-          pihan_tyyppi: str(t.pihan_tyyppi), piha_lisatieto: str(t.piha_lisatieto),
-          terassi_materiaali: str(t.terassi_materiaali), terassi_pinta_ala: num(t.terassi_pinta_ala),
-          terassi_rakennettu_vuosi: num(t.terassi_rakennettu_vuosi),
-          terassi_kunnostettu_vuosi: num(t.terassi_kunnostettu_vuosi),
-          salaojat: boolOrNull(t.salaojat), salaojat_tarkastettu: dateStr(t.salaojat_tarkastettu),
-          valmiit_osiot: uudet,
-        },
-      }}).then(() => { setValmiit(uudet); });
+    mutationFn: async (opts: { osioKey?: string; silent?: boolean } = {}) => {
+      const payload = buildPayload(opts.osioKey);
+      const uudet = payload._uudet;
+      delete (payload as any)._uudet;
+      await saveFn({ data: payload });
+      setValmiit(uudet);
+      
+      return opts;
     },
-    onSuccess: () => { toast.success("Tallennettu"); qc.invalidateQueries({ queryKey: ["talo"] }); qc.invalidateQueries({ queryKey: ["dashboard"] }); },
-    onError: (e: any) => toast.error(e.message),
+    onSuccess: (opts) => {
+      qc.invalidateQueries({ queryKey: ["talo"] });
+      qc.invalidateQueries({ queryKey: ["dashboard"] });
+      if (opts?.silent) {
+        setAutoStatus("saved");
+        setTimeout(() => setAutoStatus("idle"), 1500);
+      } else {
+        toast.success("Tallennettu");
+      }
+    },
+    onError: (e: any, opts) => {
+      if (opts?.silent) setAutoStatus("idle");
+      toast.error(e.message);
+    },
   });
+
+  // Autosave (debounced)
+  useEffect(() => {
+    if (!hydrated.current) return;
+    setAutoStatus("saving");
+    const id = setTimeout(() => {
+      save.mutate({ silent: true });
+    }, 1500);
+    return () => clearTimeout(id);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [k, t, p]);
+
 
   if (isLoading) return <p className="text-muted-foreground">Ladataan...</p>;
 
@@ -172,7 +216,17 @@ function TaloTiedotPage() {
     <div className="mx-auto max-w-5xl space-y-6">
       <header>
         <p className="eyebrow mb-3 flex items-center gap-3"><span className="block h-px w-8 bg-primary" /> Talon tiedot</p>
-        <h1 className="font-serif text-4xl text-cream">Rakennuksen <em className="text-primary not-italic italic">profiili</em></h1>
+        <div className="flex items-start justify-between gap-4 flex-wrap">
+          <h1 className="font-serif text-4xl text-cream">Rakennuksen <em className="text-primary not-italic italic">profiili</em></h1>
+          <div className="flex items-center gap-3">
+            <span className="text-xs font-mono text-muted-foreground min-w-[120px] text-right">
+              {autoStatus === "saving" ? "Tallennetaan..." : autoStatus === "saved" ? "✓ Tallennettu" : "Automaattitallennus"}
+            </span>
+            <Button onClick={() => save.mutate({})} disabled={save.isPending} variant="outline" className="uppercase tracking-wider font-semibold">
+              Tallenna tiedot
+            </Button>
+          </div>
+        </div>
         <div className="mt-6 flex items-center justify-between gap-4">
           <Progress value={edistyminen} className="h-2 flex-1" />
           <span className="text-sm text-muted-foreground font-mono">{valmiit.length}/{OSIOT.length}</span>
@@ -437,7 +491,7 @@ function TaloTiedotPage() {
               <Button variant="outline" disabled={active === OSIOT.length - 1} onClick={() => setActive((a) => Math.min(OSIOT.length - 1, a + 1))}>Seuraava</Button>
             </div>
             {active !== 5 && (
-              <Button onClick={() => save.mutate(OSIOT[active].key)} disabled={save.isPending} className="uppercase tracking-wider font-semibold">
+              <Button onClick={() => save.mutate({ osioKey: OSIOT[active].key })} disabled={save.isPending} className="uppercase tracking-wider font-semibold">
                 {save.isPending ? "Tallennetaan..." : "Tallenna ja merkitse valmiiksi"}
               </Button>
             )}
