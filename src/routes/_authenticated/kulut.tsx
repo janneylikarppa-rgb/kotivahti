@@ -163,10 +163,12 @@ function KuluLisaaDialog({ asetukset, onAdd, loading }: { asetukset: any; onAdd:
   const [kwh, setKwh] = useState("");
   const [mittari, setMittari] = useState("");
 
-  const sahkoHinta = asetukset ? (Number(kwh || 0) * (Number(asetukset.sahko_energia_snt || 0) + Number(asetukset.sahko_siirto_snt || 0)) / 100) : 0;
+  const sahkoPerus = Number(asetukset?.sahko_perusmaksu_eur_kk || 0);
+  const vesiPerus = Number(asetukset?.vesi_perusmaksu_eur_kk || 0);
+  const sahkoHinta = asetukset ? (Number(kwh || 0) * (Number(asetukset.sahko_energia_snt || 0) + Number(asetukset.sahko_siirto_snt || 0)) / 100) + sahkoPerus : 0;
   const edellinen = Number(asetukset?.edellinen_mittarilukema || 0);
   const m3 = mittari ? Math.max(0, Number(mittari) - edellinen) : 0;
-  const vesiHinta = asetukset ? m3 * (Number(asetukset.vesi_puhdas_eur_m3 || 0) + Number(asetukset.vesi_jatevesi_eur_m3 || 0)) : 0;
+  const vesiHinta = asetukset ? m3 * (Number(asetukset.vesi_puhdas_eur_m3 || 0) + Number(asetukset.vesi_jatevesi_eur_m3 || 0)) + vesiPerus : 0;
 
   const submit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -197,10 +199,10 @@ function KuluLisaaDialog({ asetukset, onAdd, loading }: { asetukset: any; onAdd:
 
           {kat === "sahko" ? (<>
             <div className="space-y-2"><Label>Kulutus (kWh)</Label><Input type="number" min="0" step="0.01" value={kwh} onChange={(e) => setKwh(e.target.value)} required /></div>
-            <p className="text-sm text-muted-foreground">Hinta: <span className="text-primary font-mono">{sahkoHinta.toFixed(2)} €</span> ({(Number(asetukset?.sahko_energia_snt ?? 0) + Number(asetukset?.sahko_siirto_snt ?? 0)).toFixed(2)} snt/kWh)</p>
+            <p className="text-sm text-muted-foreground">Hinta: <span className="text-primary font-mono">{sahkoHinta.toFixed(2)} €</span> ({(Number(asetukset?.sahko_energia_snt ?? 0) + Number(asetukset?.sahko_siirto_snt ?? 0)).toFixed(2)} snt/kWh{sahkoPerus > 0 ? ` + ${sahkoPerus.toFixed(2)} € perusmaksu` : ""})</p>
           </>) : kat === "vesi" ? (<>
             <div className="space-y-2"><Label>Mittarilukema (m³)</Label><Input type="number" min="0" step="0.001" value={mittari} onChange={(e) => setMittari(e.target.value)} required /></div>
-            <p className="text-sm text-muted-foreground">Kulutus: {m3.toFixed(2)} m³ · Hinta: <span className="text-primary font-mono">{vesiHinta.toFixed(2)} €</span></p>
+            <p className="text-sm text-muted-foreground">Kulutus: {m3.toFixed(2)} m³ · Hinta: <span className="text-primary font-mono">{vesiHinta.toFixed(2)} €</span>{vesiPerus > 0 ? ` (sis. ${vesiPerus.toFixed(2)} € perusmaksu)` : ""}</p>
             {edellinen > 0 && <p className="text-xs text-muted-foreground">Edellinen lukema: {edellinen}</p>}
           </>) : (
             <div className="space-y-2"><Label>Summa (€)</Label><Input type="number" min="0" step="0.01" value={summa} onChange={(e) => setSumma(e.target.value)} required /></div>
@@ -218,26 +220,30 @@ function KuluLisaaDialog({ asetukset, onAdd, loading }: { asetukset: any; onAdd:
 function AsetuksetForm({ asetukset, onSave, loading }: { asetukset: any; onSave: (v: any) => void; loading: boolean }) {
   const [se, setSe] = useState(asetukset?.sahko_energia_snt ?? 10);
   const [ss, setSs] = useState(asetukset?.sahko_siirto_snt ?? 5);
+  const [sp, setSp] = useState(asetukset?.sahko_perusmaksu_eur_kk ?? 0);
   const [vp, setVp] = useState(asetukset?.vesi_puhdas_eur_m3 ?? 2.5);
   const [vj, setVj] = useState(asetukset?.vesi_jatevesi_eur_m3 ?? 3.5);
+  const [vpm, setVpm] = useState(asetukset?.vesi_perusmaksu_eur_kk ?? 0);
 
   return (
     <Card className="gold-card"><CardContent className="pt-6 space-y-5">
       <div>
         <h3 className="font-serif text-lg text-cream mb-3">Sähkö</h3>
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-3 gap-3">
           <div className="space-y-2"><Label>Energia (snt/kWh)</Label><Input type="number" step="0.01" value={se} onChange={(e) => setSe(Number(e.target.value))} /></div>
           <div className="space-y-2"><Label>Siirto (snt/kWh)</Label><Input type="number" step="0.01" value={ss} onChange={(e) => setSs(Number(e.target.value))} /></div>
+          <div className="space-y-2"><Label>Perusmaksu (€/kk)</Label><Input type="number" step="0.01" value={sp} onChange={(e) => setSp(Number(e.target.value))} /></div>
         </div>
       </div>
       <div>
         <h3 className="font-serif text-lg text-cream mb-3">Vesi</h3>
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-3 gap-3">
           <div className="space-y-2"><Label>Puhdas vesi (€/m³)</Label><Input type="number" step="0.01" value={vp} onChange={(e) => setVp(Number(e.target.value))} /></div>
           <div className="space-y-2"><Label>Jätevesi (€/m³)</Label><Input type="number" step="0.01" value={vj} onChange={(e) => setVj(Number(e.target.value))} /></div>
+          <div className="space-y-2"><Label>Perusmaksu (€/kk)</Label><Input type="number" step="0.01" value={vpm} onChange={(e) => setVpm(Number(e.target.value))} /></div>
         </div>
       </div>
-      <Button onClick={() => onSave({ sahko_energia_snt: se, sahko_siirto_snt: ss, vesi_puhdas_eur_m3: vp, vesi_jatevesi_eur_m3: vj })}
+      <Button onClick={() => onSave({ sahko_energia_snt: se, sahko_siirto_snt: ss, sahko_perusmaksu_eur_kk: sp, vesi_puhdas_eur_m3: vp, vesi_jatevesi_eur_m3: vj, vesi_perusmaksu_eur_kk: vpm })}
               disabled={loading} className="uppercase tracking-wider font-semibold">
         {loading ? "Tallennetaan..." : "Tallenna asetukset"}
       </Button>
