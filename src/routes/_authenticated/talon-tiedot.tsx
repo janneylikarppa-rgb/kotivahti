@@ -138,6 +138,7 @@ function TaloTiedotPage() {
         kerroksia: num(t.kerroksia), asukkaita: num(t.asukkaita),
         rakennustapa: str(t.rakennustapa), julkisivumateriaali: str(t.julkisivumateriaali),
         julkisivu_maalattu_vuosi: num(t.julkisivu_maalattu_vuosi),
+        julkisivu_asennettu_vuosi: num(t.julkisivu_asennettu_vuosi),
         perustus: str(t.perustus), eriste: str(t.eriste), rakennus_lisatieto: str(t.rakennus_lisatieto),
         kattotyyppi: str(t.kattotyyppi), kattomateriaali: str(t.kattomateriaali),
         katto_uusittu_vuosi: num(t.katto_uusittu_vuosi),
