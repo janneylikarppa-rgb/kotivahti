@@ -376,6 +376,8 @@ export type Database = {
           eriste: string | null
           hormit: string | null
           id: string
+          ikkunat_tyyppi: string | null
+          ikkunat_uusittu_vuosi: number | null
           ilmanvaihto: string | null
           ilmanvaihto_vuosi: number | null
           ilp_asennettu_vuosi: number | null
@@ -436,6 +438,8 @@ export type Database = {
           eriste?: string | null
           hormit?: string | null
           id?: string
+          ikkunat_tyyppi?: string | null
+          ikkunat_uusittu_vuosi?: number | null
           ilmanvaihto?: string | null
           ilmanvaihto_vuosi?: number | null
           ilp_asennettu_vuosi?: number | null
@@ -496,6 +500,8 @@ export type Database = {
           eriste?: string | null
           hormit?: string | null
           id?: string
+          ikkunat_tyyppi?: string | null
+          ikkunat_uusittu_vuosi?: number | null
           ilmanvaihto?: string | null
           ilmanvaihto_vuosi?: number | null
           ilp_asennettu_vuosi?: number | null
