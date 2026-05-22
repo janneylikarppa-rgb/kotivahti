@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { Link, useRouterState, useNavigate } from "@tanstack/react-router";
 import { LayoutDashboard, Home, Wrench, CalendarDays, Wallet, LogOut, ClipboardList } from "lucide-react";
 import {
@@ -29,9 +30,14 @@ export function AppSidebar() {
   const navigate = useNavigate();
   const { isMobile, setOpenMobile } = useSidebar();
 
+  useEffect(() => {
+    if (isMobile) setOpenMobile(false);
+  }, [path, isMobile, setOpenMobile]);
+
   const handleNav = () => {
     if (isMobile) setOpenMobile(false);
   };
+
 
   const handleLogout = async () => {
     if (isMobile) setOpenMobile(false);
