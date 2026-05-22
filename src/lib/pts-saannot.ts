@@ -88,6 +88,9 @@ export const PTS_SAANNOT: PtsKohteenSaanto[] = [
   { kohde: "Terassi (puu)", kategoria: "Piha", kayttoika: 20, huoltovali: 3,
     lahdeVuosi: (t) => ehkaInt(t?.terassi_rakennettu_vuosi),
     koskee: (t) => String(t?.terassi_materiaali ?? "").toLowerCase().includes("puu") || ehkaInt(t?.terassi_rakennettu_vuosi) != null },
+  { kohde: "Terassin lasitus", kategoria: "Piha", kayttoika: 30, huoltovali: 2,
+    lahdeVuosi: (t) => ehkaInt(t?.terassi_lasitus_vuosi) ?? ehkaInt(t?.terassi_rakennettu_vuosi),
+    koskee: (t) => t?.terassi_lasitettu === true },
 ];
 
 export type PtsTila = "kiireellinen" | "lahivuosina" | "seurannassa";
