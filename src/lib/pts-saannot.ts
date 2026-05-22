@@ -99,6 +99,9 @@ export type PtsRivi = {
   kuvaus?: string | null;
   huoltovali: number; // 0 jos oma
   ylitettyVuosia?: number; // jos kohde on ylittänyt käyttöikänsä
+  lykatty?: boolean; // käyttäjä on siirtänyt tätä riviä eteenpäin
+  lykkaysPeruste?: string | null;
+  alkuperainenVuosi?: number; // alkuperäinen suositusvuosi ennen lykkäystä
 };
 
 export function laskeTila(vuosiaJaljella: number): PtsTila {
