@@ -303,7 +303,7 @@ export const addHuolto = createServerFn({ method: "POST" })
     const { supabase, userId } = context;
     const k = await getActiveKiinteisto(supabase, userId);
     if (!k) throw new Error("Kiinteistöä ei löytynyt");
-    const { liitteet, ...row } = data;
+    const { liitteet, laite_paivitys, ...row } = data;
     const { data: inserted, error } = await supabase
       .from("huolto_historia")
       .insert({ kiinteisto_id: k.id, ...row })
@@ -320,6 +320,7 @@ export const addHuolto = createServerFn({ method: "POST" })
         pvm: data.pvm,
       });
     }
+    await paivitaTaloLaitteella(supabase, k.id, data.kohde, laite_paivitys);
     return { ok: true };
   });
 
@@ -332,10 +333,11 @@ export const updateHuolto = createServerFn({ method: "POST" })
     const { supabase, userId } = context;
     const k = await getActiveKiinteisto(supabase, userId);
     if (!k) throw new Error("Kiinteistöä ei löytynyt");
-    const { id, liitteet, ...patch } = data;
+    const { id, liitteet, laite_paivitys, ...patch } = data;
     const { error } = await supabase.from("huolto_historia").update(patch).eq("id", id);
     if (error) throw error;
     await insertLiitteet(supabase, k.id, id, liitteet ?? []);
+    await paivitaTaloLaitteella(supabase, k.id, data.kohde, laite_paivitys);
     return { ok: true };
   });
 
