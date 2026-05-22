@@ -115,6 +115,12 @@ function LoginPage() {
       {/* Oikea: lomake */}
       <div className="flex items-center justify-center p-6 sm:p-12">
         <div className="w-full max-w-md">
+          <Link
+            to="/"
+            className="inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-primary mb-6"
+          >
+            ← Etusivulle
+          </Link>
           <p className="eyebrow mb-3">Kirjaudu</p>
           <h2 className="font-serif text-3xl text-cream mb-2">Tervetuloa takaisin</h2>
           <p className="text-sm text-muted-foreground mb-8">
@@ -126,6 +132,7 @@ function LoginPage() {
               Luo tili
             </Link>
           </p>
+
 
           <form onSubmit={handleEmailLogin} className="space-y-4">
             <div className="space-y-2">
