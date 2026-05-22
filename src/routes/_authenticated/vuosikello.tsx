@@ -29,11 +29,14 @@ type Kuitattu = { kausi_key: string; huolto_nimi: string; tekija: string | null;
 
 function VuosikelloPage() {
   const fetchFn = useServerFn(getKuitatut);
+  const fetchPts = useServerFn(getPts);
   const kuittaaFn = useServerFn(kuittaaHuolto);
   const qc = useQueryClient();
   const { data } = useQuery({ queryKey: ["kuitatut"], queryFn: () => fetchFn() });
+  const { data: ptsData } = useQuery({ queryKey: ["pts"], queryFn: () => fetchPts(), staleTime: 30_000 });
   const kuitatut: Kuitattu[] = (data?.kuitatut as Kuitattu[]) ?? [];
   const talon = data?.talon_tiedot ?? null;
+  const erapaivat = ((ptsData?.rivit as any[]) ?? []).filter((r) => r.huoltoErapaiva);
   const [kausi, setKausi] = useState<Kausi>(autoKausi());
   const [valittu, setValittu] = useState<string | null>(null);
 
