@@ -163,10 +163,12 @@ function KuluLisaaDialog({ asetukset, onAdd, loading }: { asetukset: any; onAdd:
   const [kwh, setKwh] = useState("");
   const [mittari, setMittari] = useState("");
 
-  const sahkoHinta = asetukset ? (Number(kwh || 0) * (Number(asetukset.sahko_energia_snt || 0) + Number(asetukset.sahko_siirto_snt || 0)) / 100) : 0;
+  const sahkoPerus = Number(asetukset?.sahko_perusmaksu_eur_kk || 0);
+  const vesiPerus = Number(asetukset?.vesi_perusmaksu_eur_kk || 0);
+  const sahkoHinta = asetukset ? (Number(kwh || 0) * (Number(asetukset.sahko_energia_snt || 0) + Number(asetukset.sahko_siirto_snt || 0)) / 100) + sahkoPerus : 0;
   const edellinen = Number(asetukset?.edellinen_mittarilukema || 0);
   const m3 = mittari ? Math.max(0, Number(mittari) - edellinen) : 0;
-  const vesiHinta = asetukset ? m3 * (Number(asetukset.vesi_puhdas_eur_m3 || 0) + Number(asetukset.vesi_jatevesi_eur_m3 || 0)) : 0;
+  const vesiHinta = asetukset ? m3 * (Number(asetukset.vesi_puhdas_eur_m3 || 0) + Number(asetukset.vesi_jatevesi_eur_m3 || 0)) + vesiPerus : 0;
 
   const submit = (e: React.FormEvent) => {
     e.preventDefault();
