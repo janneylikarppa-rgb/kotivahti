@@ -109,6 +109,8 @@ export type PtsRivi = {
   lykatty?: boolean; // käyttäjä on siirtänyt tätä riviä eteenpäin
   lykkaysPeruste?: string | null;
   alkuperainenVuosi?: number; // alkuperäinen suositusvuosi ennen lykkäystä
+  huoltoErapaiva?: boolean; // huoltoväli on täynnä, määräaikainen huolto ajankohtainen
+  viimeisinHuoltoVuosi?: number | null;
 };
 
 export function laskeTila(vuosiaJaljella: number): PtsTila {
