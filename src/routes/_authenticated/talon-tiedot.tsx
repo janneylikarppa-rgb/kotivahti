@@ -327,7 +327,10 @@ function TaloTiedotPage() {
                 <SelectOrOther value={t.eriste} options={ERISTEET} onChange={(v) => setT({ ...t, eriste: v })} />
               </Field>
             </Row>
-            <Field label="Julkisivu maalattu (vuosi)"><Input type="number" value={t.julkisivu_maalattu_vuosi ?? ""} onChange={(e) => setT({ ...t, julkisivu_maalattu_vuosi: e.target.value })} /></Field>
+            <Row>
+              <Field label="Julkisivun asennusvuosi"><Input type="number" value={t.julkisivu_asennettu_vuosi ?? ""} onChange={(e) => setT({ ...t, julkisivu_asennettu_vuosi: e.target.value })} placeholder="Jätä tyhjäksi jos alkuperäinen" /></Field>
+              <Field label="Julkisivu maalattu / huollettu (vuosi)"><Input type="number" value={t.julkisivu_maalattu_vuosi ?? ""} onChange={(e) => setT({ ...t, julkisivu_maalattu_vuosi: e.target.value })} placeholder="Jätä tyhjäksi jos ei tiedossa" /></Field>
+            </Row>
             <Field label="Lisätietoja rakennuksesta"><Textarea rows={3} value={t.rakennus_lisatieto ?? ""} onChange={(e) => setT({ ...t, rakennus_lisatieto: e.target.value })} /></Field>
           </>)}
 
