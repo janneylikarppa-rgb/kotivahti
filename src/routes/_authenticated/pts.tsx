@@ -201,7 +201,7 @@ function PtsPage() {
       )}
 
       <div className="flex flex-wrap items-center gap-3">
-        <div className="grid grid-cols-3 gap-2">
+        <div className="hidden md:grid grid-cols-3 gap-2">
           <RyhmaPill tila="kiireellinen" count={ryhmat.kiireellinen.length} />
           <RyhmaPill tila="lahivuosina" count={ryhmat.lahivuosina.length} />
           <RyhmaPill tila="seurannassa" count={ryhmat.seurannassa.length} />
