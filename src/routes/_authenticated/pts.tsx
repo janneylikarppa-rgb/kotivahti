@@ -95,6 +95,8 @@ function PtsPage() {
   const addFn = useServerFn(addPtsRivi);
   const delFn = useServerFn(deletePtsRivi);
   const kuittausFn = useServerFn(kuittaaPtsRivi);
+  const lykkaysFn = useServerFn(lykkaaPtsRivi);
+  const peruFn = useServerFn(peruLykkays);
   const qc = useQueryClient();
   const { data, isLoading } = useQuery({
     queryKey: ["pts"],
@@ -104,6 +106,7 @@ function PtsPage() {
 
   const [addOpen, setAddOpen] = useState(false);
   const [kuittaa, setKuittaa] = useState<PtsRivi | null>(null);
+  const [lykkaa, setLykkaa] = useState<PtsRivi | null>(null);
 
   const invalidate = () => {
     qc.invalidateQueries({ queryKey: ["pts"] });
@@ -135,6 +138,22 @@ function PtsPage() {
       setKuittaa(null);
       invalidate();
     },
+    onError: (e: any) => toast.error(e.message),
+  });
+
+  const lykkaysM = useMutation({
+    mutationFn: (input: any) => lykkaysFn({ data: input }),
+    onSuccess: () => {
+      toast.success("Siirretty eteenpäin – palaa näkyviin sovittuna vuonna");
+      setLykkaa(null);
+      invalidate();
+    },
+    onError: (e: any) => toast.error(e.message),
+  });
+
+  const peruM = useMutation({
+    mutationFn: (kohde: string) => peruFn({ data: { kohde } }),
+    onSuccess: () => { toast.success("Siirto peruttu"); invalidate(); },
     onError: (e: any) => toast.error(e.message),
   });
 
