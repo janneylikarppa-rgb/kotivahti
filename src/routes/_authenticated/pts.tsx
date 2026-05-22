@@ -481,3 +481,40 @@ function KuittausDialog({ rivi, onSubmit }: { rivi: PtsRivi; onSubmit: (v: any) 
     </DialogContent>
   );
 }
+
+function LykkaysDialog({
+  rivi, onSubmit,
+}: {
+  rivi: PtsRivi;
+  onSubmit: (v: { vuosia: number; peruste?: string | null }) => void;
+}) {
+  const [vuosia, setVuosia] = useState(2);
+  const [peruste, setPeruste] = useState("");
+  const nyt = new Date().getFullYear();
+  const pohjaVuosi = Math.max(rivi.vuosi, nyt);
+  const uusiVuosi = pohjaVuosi + vuosia;
+  return (
+    <DialogContent>
+      <DialogHeader><DialogTitle>Siirrä eteenpäin: {rivi.kohde}</DialogTitle></DialogHeader>
+      <div className="space-y-4">
+        <p className="text-sm text-cream/70">
+          Toimenpide piilotetaan listalta ja palaa automaattisesti näkyviin valitun vuosimäärän kuluttua.
+        </p>
+        <div className="grid gap-2">
+          <Label>Kuinka monta vuotta eteenpäin?</Label>
+          <Input type="number" min={1} max={30} value={vuosia} onChange={(e) => setVuosia(Math.max(1, Number(e.target.value) || 1))} />
+          <div className="text-xs text-cream/60">
+            Uusi suositusvuosi: <span className="text-cream">{uusiVuosi}</span>
+          </div>
+        </div>
+        <div className="grid gap-2">
+          <Label>Perustelu (vapaaehtoinen)</Label>
+          <Textarea value={peruste} onChange={(e) => setPeruste(e.target.value)} placeholder="Esim. tarkastettu, ei tarvetta vielä – katsotaan uudestaan parin vuoden päästä" />
+        </div>
+        <Button className="w-full" onClick={() => onSubmit({ vuosia, peruste: peruste || null })}>
+          <Clock className="mr-2 h-4 w-4" /> Siirrä
+        </Button>
+      </div>
+    </DialogContent>
+  );
+}
