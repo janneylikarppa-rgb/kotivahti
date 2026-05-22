@@ -108,6 +108,11 @@ const TEKSTIT: Record<string, Viestit> = {
     "Lahonneet rakenteet ovat turvallisuusriski. Tarkasta erityisesti kantavat tolpat ja pintalaudat.",
     "Käyttöikä ylitetty: rakenteiden uusiminen on suositeltavaa turvallisuussyistä.",
   ],
+  "Terassin lasitus": [
+    "Terassilasituksen käyttöikä on noin 25–30 vuotta. Kiskot, rullat ja tiivisteet kannattaa tarkastaa ja puhdistaa noin 2 vuoden välein – jumiutuneet rullat aiheuttavat lasien rikkoutumisen.",
+    "Tiivisteiden kovettuminen, kiskojen jumittuminen tai vesivuoto kiskoja pitkin viittaa huoltotarpeeseen. Tarkasta myös pulttien kireys ja lasien kiinnitys.",
+    "Käyttöikä ylitetty: tiivisteiden, kiskojen ja koneiston uusiminen tai koko järjestelmän vaihto kannattaa suunnitella – vesivuoto saattaa vaurioittaa terassirakennetta.",
+  ],
 };
 
 const OLETUS: Viestit = [
