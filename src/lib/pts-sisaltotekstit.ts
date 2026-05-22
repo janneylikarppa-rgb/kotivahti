@@ -94,9 +94,9 @@ const TEKSTIT: Record<string, Viestit> = {
     "Käyttöikä ylitetty: ikkunoiden uusiminen on yleensä kannattavaa sekä energian että viihtyvyyden takia.",
   ],
   "Kylpyhuone / märkätila": [
-    "Kylpyhuoneen pintojen käyttöikä on noin 25 vuotta. Vedeneristyksen kunto on kriittisin asia.",
-    "Vanhentunut vedeneristys vuotaa hiljalleen. Vakuutus ei korvaa vauriota, jos rakenne on ylittänyt iän selvästi.",
-    "Käyttöikä ylitetty: kosteusvaurion riski on suuri. Märkätilaremontti kannattaa suunnitella pian – piilevä vaurio on kallein.",
+    "Kylpyhuoneen pintojen käyttöikä on noin 25 vuotta. Vedeneristyksen kunto on kriittisin asia. Suositellaan myös tarkastamaan silikonisaumat sekä laattojen saumat säännöllisesti – haljennut silikoni tai irtoava sauma päästää vettä rakenteisiin pitkään huomaamatta.",
+    "Vanhentunut vedeneristys vuotaa hiljalleen. Vakuutus ei korvaa vauriota, jos rakenne on ylittänyt iän selvästi. Tarkasta erityisesti suihkunurkan, kylpyammeen reunan ja lattiakaivon silikonit sekä saumat – uusi tarvittaessa.",
+    "Käyttöikä ylitetty: kosteusvaurion riski on suuri. Märkätilaremontti kannattaa suunnitella pian – piilevä vaurio on kallein. Halkeilleet silikonit ja saumat ovat usein ensimmäinen merkki alkavasta vauriosta.",
   ],
   "Terassi (puu)": [
     "Puuterassin käyttöikä on noin 20 vuotta. Öljyäminen joka 2–3 vuosi pidentää käyttöikää huomattavasti.",

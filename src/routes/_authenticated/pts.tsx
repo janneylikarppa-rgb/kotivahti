@@ -7,6 +7,8 @@ import {
   deletePtsRivi,
   getPts,
   kuittaaPtsRivi,
+  lykkaaPtsRivi,
+  peruLykkays,
 } from "@/lib/kotivahti.functions";
 import { getSisaltoteksti, getYlitetytTeksti } from "@/lib/pts-sisaltotekstit";
 import { HUOLTO_KOHDE_RYHMAT } from "@/lib/huolto-kohteet";
@@ -32,7 +34,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Plus, Check, Trash2, Wrench, AlertTriangle, Calendar } from "lucide-react";
+import { Plus, Check, Trash2, Wrench, AlertTriangle, Calendar, Clock, Undo2 } from "lucide-react";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/pts")({
@@ -62,6 +64,9 @@ type PtsRivi = {
   kuvaus?: string | null;
   huoltovali: number;
   ylitettyVuosia?: number;
+  lykatty?: boolean;
+  lykkaysPeruste?: string | null;
+  alkuperainenVuosi?: number;
 };
 
 const TILA_META: Record<string, { label: string; emoji: string; chip: string; ring: string }> = {
@@ -90,6 +95,8 @@ function PtsPage() {
   const addFn = useServerFn(addPtsRivi);
   const delFn = useServerFn(deletePtsRivi);
   const kuittausFn = useServerFn(kuittaaPtsRivi);
+  const lykkaysFn = useServerFn(lykkaaPtsRivi);
+  const peruFn = useServerFn(peruLykkays);
   const qc = useQueryClient();
   const { data, isLoading } = useQuery({
     queryKey: ["pts"],
@@ -99,6 +106,7 @@ function PtsPage() {
 
   const [addOpen, setAddOpen] = useState(false);
   const [kuittaa, setKuittaa] = useState<PtsRivi | null>(null);
+  const [lykkaa, setLykkaa] = useState<PtsRivi | null>(null);
 
   const invalidate = () => {
     qc.invalidateQueries({ queryKey: ["pts"] });
@@ -130,6 +138,22 @@ function PtsPage() {
       setKuittaa(null);
       invalidate();
     },
+    onError: (e: any) => toast.error(e.message),
+  });
+
+  const lykkaysM = useMutation({
+    mutationFn: (input: any) => lykkaysFn({ data: input }),
+    onSuccess: () => {
+      toast.success("Siirretty eteenpäin – palaa näkyviin sovittuna vuonna");
+      setLykkaa(null);
+      invalidate();
+    },
+    onError: (e: any) => toast.error(e.message),
+  });
+
+  const peruM = useMutation({
+    mutationFn: (kohde: string) => peruFn({ data: { kohde } }),
+    onSuccess: () => { toast.success("Siirto peruttu"); invalidate(); },
     onError: (e: any) => toast.error(e.message),
   });
 
@@ -196,6 +220,8 @@ function PtsPage() {
         otsikko="🔴 Kiireellinen"
         rivit={ryhmat.kiireellinen}
         onKuittaa={setKuittaa}
+        onLykkaa={setLykkaa}
+        onPeruLykkays={(k) => peruM.mutate(k)}
         onDelete={(id) => delM.mutate(id)}
         tyhja="Ei kiireellisiä toimenpiteitä – hienoa työtä!"
         defaultOpen
@@ -204,6 +230,8 @@ function PtsPage() {
         otsikko="🟡 Lähivuosina"
         rivit={ryhmat.lahivuosina}
         onKuittaa={setKuittaa}
+        onLykkaa={setLykkaa}
+        onPeruLykkays={(k) => peruM.mutate(k)}
         onDelete={(id) => delM.mutate(id)}
         tyhja="Ei toimenpiteitä lähivuosille."
       />
@@ -211,6 +239,8 @@ function PtsPage() {
         otsikko="🟢 Seurannassa"
         rivit={ryhmat.seurannassa}
         onKuittaa={setKuittaa}
+        onLykkaa={setLykkaa}
+        onPeruLykkays={(k) => peruM.mutate(k)}
         onDelete={(id) => delM.mutate(id)}
         tyhja="Ei seurattavia kohteita 10 vuoden ikkunassa."
       />
@@ -220,6 +250,20 @@ function PtsPage() {
           <KuittausDialog
             rivi={kuittaa}
             onSubmit={(v) => kuittausM.mutate({ ...v, kohde: kuittaa.kohde, lahde: kuittaa.lahde, rivi_id: kuittaa.lahde === "oma" ? kuittaa.id : null })}
+          />
+        )}
+      </Dialog>
+
+      <Dialog open={!!lykkaa} onOpenChange={(o) => !o && setLykkaa(null)}>
+        {lykkaa && (
+          <LykkaysDialog
+            rivi={lykkaa}
+            onSubmit={(v) => lykkaysM.mutate({
+              ...v,
+              kohde: lykkaa.kohde,
+              lahde: lykkaa.lahde,
+              rivi_id: lykkaa.lahde === "oma" ? lykkaa.id : null,
+            })}
           />
         )}
       </Dialog>
@@ -239,11 +283,13 @@ function RyhmaPill({ tila, count }: { tila: keyof typeof TILA_META; count: numbe
 }
 
 function RyhmaOsio({
-  otsikko, rivit, onKuittaa, onDelete, tyhja, defaultOpen,
+  otsikko, rivit, onKuittaa, onLykkaa, onPeruLykkays, onDelete, tyhja, defaultOpen,
 }: {
   otsikko: string;
   rivit: PtsRivi[];
   onKuittaa: (r: PtsRivi) => void;
+  onLykkaa: (r: PtsRivi) => void;
+  onPeruLykkays: (kohde: string) => void;
   onDelete: (id: string) => void;
   tyhja: string;
   defaultOpen?: boolean;
@@ -264,7 +310,16 @@ function RyhmaOsio({
           {rivit.length === 0 ? (
             <div className="rounded-md border border-dashed border-cream/10 p-6 text-center text-sm text-cream/50">{tyhja}</div>
           ) : (
-            rivit.map((r) => <PtsKortti key={r.id} rivi={r} onKuittaa={onKuittaa} onDelete={onDelete} />)
+            rivit.map((r) => (
+              <PtsKortti
+                key={r.id}
+                rivi={r}
+                onKuittaa={onKuittaa}
+                onLykkaa={onLykkaa}
+                onPeruLykkays={onPeruLykkays}
+                onDelete={onDelete}
+              />
+            ))
           )}
         </div>
       )}
@@ -272,7 +327,15 @@ function RyhmaOsio({
   );
 }
 
-function PtsKortti({ rivi, onKuittaa, onDelete }: { rivi: PtsRivi; onKuittaa: (r: PtsRivi) => void; onDelete: (id: string) => void }) {
+function PtsKortti({
+  rivi, onKuittaa, onLykkaa, onPeruLykkays, onDelete,
+}: {
+  rivi: PtsRivi;
+  onKuittaa: (r: PtsRivi) => void;
+  onLykkaa: (r: PtsRivi) => void;
+  onPeruLykkays: (kohde: string) => void;
+  onDelete: (id: string) => void;
+}) {
   const m = TILA_META[rivi.tila];
   const ylitetty = rivi.ylitettyVuosia && rivi.ylitettyVuosia > 2;
   const teksti = ylitetty
@@ -295,10 +358,28 @@ function PtsKortti({ rivi, onKuittaa, onDelete }: { rivi: PtsRivi; onKuittaa: (r
             </span>
           </div>
         </div>
+        {rivi.lykatty && (
+          <div className="flex flex-wrap items-center gap-2 rounded-md border border-amber-500/30 bg-amber-500/10 px-3 py-2 text-xs text-amber-200">
+            <Clock className="h-3.5 w-3.5" />
+            <span>
+              Siirretty eteenpäin
+              {rivi.alkuperainenVuosi ? ` (alkuperäinen suositus ${rivi.alkuperainenVuosi})` : ""}
+              {rivi.lykkaysPeruste ? ` – ${rivi.lykkaysPeruste}` : ""}
+            </span>
+            {rivi.lahde === "auto" && (
+              <Button size="sm" variant="ghost" className="ml-auto h-6 px-2 text-amber-200 hover:text-amber-100" onClick={() => onPeruLykkays(rivi.kohde)}>
+                <Undo2 className="mr-1 h-3 w-3" /> Peru siirto
+              </Button>
+            )}
+          </div>
+        )}
         <p className="text-sm leading-relaxed text-cream/75">{teksti}</p>
         <div className="flex flex-wrap gap-2">
           <Button size="sm" onClick={() => onKuittaa(rivi)}>
             <Check className="mr-1 h-4 w-4" /> Kuittaa tehdyksi
+          </Button>
+          <Button size="sm" variant="secondary" onClick={() => onLykkaa(rivi)}>
+            <Clock className="mr-1 h-4 w-4" /> Siirrä eteenpäin
           </Button>
           <Button size="sm" variant="secondary" onClick={() => toast.info("Ammattilaisen tilaus tulee pian käyttöön")}>
             <Wrench className="mr-1 h-4 w-4" /> Tilaa ammattilainen
@@ -395,6 +476,43 @@ function KuittausDialog({ rivi, onSubmit }: { rivi: PtsRivi; onSubmit: (v: any) 
         </div>
         <Button className="w-full" onClick={() => onSubmit({ pvm, tekija, tekija_nimi: tekijaNimi || null, kustannus, kuvaus: kuvaus || null })}>
           <Check className="mr-2 h-4 w-4" /> Tallenna
+        </Button>
+      </div>
+    </DialogContent>
+  );
+}
+
+function LykkaysDialog({
+  rivi, onSubmit,
+}: {
+  rivi: PtsRivi;
+  onSubmit: (v: { vuosia: number; peruste?: string | null }) => void;
+}) {
+  const [vuosia, setVuosia] = useState(2);
+  const [peruste, setPeruste] = useState("");
+  const nyt = new Date().getFullYear();
+  const pohjaVuosi = Math.max(rivi.vuosi, nyt);
+  const uusiVuosi = pohjaVuosi + vuosia;
+  return (
+    <DialogContent>
+      <DialogHeader><DialogTitle>Siirrä eteenpäin: {rivi.kohde}</DialogTitle></DialogHeader>
+      <div className="space-y-4">
+        <p className="text-sm text-cream/70">
+          Toimenpide piilotetaan listalta ja palaa automaattisesti näkyviin valitun vuosimäärän kuluttua.
+        </p>
+        <div className="grid gap-2">
+          <Label>Kuinka monta vuotta eteenpäin?</Label>
+          <Input type="number" min={1} max={30} value={vuosia} onChange={(e) => setVuosia(Math.max(1, Number(e.target.value) || 1))} />
+          <div className="text-xs text-cream/60">
+            Uusi suositusvuosi: <span className="text-cream">{uusiVuosi}</span>
+          </div>
+        </div>
+        <div className="grid gap-2">
+          <Label>Perustelu (vapaaehtoinen)</Label>
+          <Textarea value={peruste} onChange={(e) => setPeruste(e.target.value)} placeholder="Esim. tarkastettu, ei tarvetta vielä – katsotaan uudestaan parin vuoden päästä" />
+        </div>
+        <Button className="w-full" onClick={() => onSubmit({ vuosia, peruste: peruste || null })}>
+          <Clock className="mr-2 h-4 w-4" /> Siirrä
         </Button>
       </div>
     </DialogContent>

@@ -489,14 +489,15 @@ export const getPts = createServerFn({ method: "GET" })
     const { supabase, userId } = context;
     const k = await getActiveKiinteisto(supabase, userId);
     if (!k) return { rivit: [], talonTiedotPuuttuu: true };
-    const [taloRes, huoltoRes, omatRes, kuitatutRes] = await Promise.all([
+    const [taloRes, huoltoRes, omatRes, kuitatutRes, lykkaysRes] = await Promise.all([
       supabase.from("talon_tiedot").select("*").eq("kiinteisto_id", k.id).maybeSingle(),
       supabase.from("huolto_historia").select("kohde, pts_siirto").eq("kiinteisto_id", k.id),
       supabase.from("pts_rivit").select("*").eq("kiinteisto_id", k.id),
       supabase.from("pts_kuitatut").select("kohde").eq("kiinteisto_id", k.id),
+      supabase.from("pts_lykkaykset").select("kohde, lykatty_vuoteen, peruste").eq("kiinteisto_id", k.id),
     ]);
     const talo = taloRes.data ? { ...taloRes.data, rakennusvuosi: k.rakennusvuosi } : null;
-    const auto = generoiAutoRivit(talo, huoltoRes.data ?? [], kuitatutRes.data ?? [], 10);
+    const auto = generoiAutoRivit(talo, huoltoRes.data ?? [], kuitatutRes.data ?? [], 10, lykkaysRes.data ?? []);
     const nyt = new Date().getFullYear();
     const omat: PtsRivi[] = (omatRes.data ?? []).map((r: any) => {
       const jaljella = r.vuosi - nyt;
@@ -515,6 +516,68 @@ export const getPts = createServerFn({ method: "GET" })
     const rivit = [...auto, ...omat].sort((a, b) => a.vuosi - b.vuosi);
     const talonTiedotPuuttuu = !talo || (!talo.lammitysmuoto && !talo.kattomateriaali && !talo.rakennusvuosi);
     return { rivit, talonTiedotPuuttuu };
+  });
+
+const lykkaysSchema = z.object({
+  kohde: z.string().min(1).max(200),
+  lahde: z.enum(["auto", "oma"]),
+  rivi_id: z.string().uuid().optional().nullable(),
+  vuosia: z.number().int().min(1).max(30),
+  peruste: z.string().max(1000).optional().nullable(),
+});
+
+export const lykkaaPtsRivi = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) => lykkaysSchema.parse(input))
+  .handler(async ({ data, context }) => {
+    const { supabase, userId } = context;
+    const k = await getActiveKiinteisto(supabase, userId);
+    if (!k) throw new Error("Kiinteistöä ei löytynyt");
+    const nyt = new Date().getFullYear();
+
+    if (data.lahde === "oma") {
+      if (!data.rivi_id) throw new Error("Rivin tunniste puuttuu");
+      const { data: rivi, error: rErr } = await supabase
+        .from("pts_rivit").select("vuosi").eq("id", data.rivi_id).maybeSingle();
+      if (rErr) throw rErr;
+      const uusiVuosi = Math.max(rivi?.vuosi ?? nyt, nyt) + data.vuosia;
+      const lisays = data.peruste ? `\n[Siirretty ${data.vuosia} v eteenpäin: ${data.peruste}]` : `\n[Siirretty ${data.vuosia} v eteenpäin]`;
+      const { error } = await supabase
+        .from("pts_rivit")
+        .update({ vuosi: uusiVuosi, kuvaus: lisays })
+        .eq("id", data.rivi_id);
+      if (error) throw error;
+      return { ok: true };
+    }
+
+    // auto: päivitä tai luo lykkäys
+    const { data: existing } = await supabase
+      .from("pts_lykkaykset").select("lykatty_vuoteen")
+      .eq("kiinteisto_id", k.id).eq("kohde", data.kohde).maybeSingle();
+    const pohjaVuosi = Math.max(existing?.lykatty_vuoteen ?? nyt, nyt);
+    const uusiVuosi = pohjaVuosi + data.vuosia;
+    const { error } = await supabase
+      .from("pts_lykkaykset")
+      .upsert(
+        { kiinteisto_id: k.id, kohde: data.kohde, lykatty_vuoteen: uusiVuosi, peruste: data.peruste ?? null },
+        { onConflict: "kiinteisto_id,kohde" },
+      );
+    if (error) throw error;
+    return { ok: true };
+  });
+
+export const peruLykkays = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) => z.object({ kohde: z.string().min(1).max(200) }).parse(input))
+  .handler(async ({ data, context }) => {
+    const { supabase, userId } = context;
+    const k = await getActiveKiinteisto(supabase, userId);
+    if (!k) throw new Error("Kiinteistöä ei löytynyt");
+    const { error } = await supabase
+      .from("pts_lykkaykset").delete()
+      .eq("kiinteisto_id", k.id).eq("kohde", data.kohde);
+    if (error) throw error;
+    return { ok: true };
   });
 
 const ptsRiviSchema = z.object({
