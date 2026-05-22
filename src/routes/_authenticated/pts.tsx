@@ -64,6 +64,9 @@ type PtsRivi = {
   kuvaus?: string | null;
   huoltovali: number;
   ylitettyVuosia?: number;
+  lykatty?: boolean;
+  lykkaysPeruste?: string | null;
+  alkuperainenVuosi?: number;
 };
 
 const TILA_META: Record<string, { label: string; emoji: string; chip: string; ring: string }> = {
