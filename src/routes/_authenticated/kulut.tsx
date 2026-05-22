@@ -165,17 +165,28 @@ function KuluLisaaDialog({ asetukset, onAdd, loading }: { asetukset: any; onAdd:
 
   const sahkoPerus = Number(asetukset?.sahko_perusmaksu_eur_kk || 0);
   const vesiPerus = Number(asetukset?.vesi_perusmaksu_eur_kk || 0);
-  const sahkoHinta = asetukset ? (Number(kwh || 0) * (Number(asetukset.sahko_energia_snt || 0) + Number(asetukset.sahko_siirto_snt || 0)) / 100) + sahkoPerus : 0;
+  const sahkoTariffi = Number(asetukset?.sahko_energia_snt || 0) + Number(asetukset?.sahko_siirto_snt || 0);
+  const sahkoHintaLaskettu = kwh && sahkoTariffi > 0 ? (Number(kwh) * sahkoTariffi / 100) + sahkoPerus : 0;
   const edellinen = Number(asetukset?.edellinen_mittarilukema || 0);
   const m3 = mittari ? Math.max(0, Number(mittari) - edellinen) : 0;
-  const vesiHinta = asetukset ? m3 * (Number(asetukset.vesi_puhdas_eur_m3 || 0) + Number(asetukset.vesi_jatevesi_eur_m3 || 0)) + vesiPerus : 0;
+  const vesiTariffi = Number(asetukset?.vesi_puhdas_eur_m3 || 0) + Number(asetukset?.vesi_jatevesi_eur_m3 || 0);
+  const vesiHintaLaskettu = m3 && vesiTariffi > 0 ? m3 * vesiTariffi + vesiPerus : 0;
 
   const submit = (e: React.FormEvent) => {
     e.preventDefault();
     let v: any = { nimi: nimi || KAT_LABEL[kat], kategoria: kat, pvm };
-    if (kat === "sahko") { v.kwh = Number(kwh || 0); v.summa = Number(sahkoHinta.toFixed(2)); }
-    else if (kat === "vesi") { v.mittarilukema = Number(mittari); v.kulutus_m3 = m3; v.summa = Number(vesiHinta.toFixed(2)); }
-    else { v.summa = Number(summa || 0); }
+    if (kat === "sahko") {
+      if (kwh) v.kwh = Number(kwh);
+      const manuaali = Number(summa || 0);
+      v.summa = manuaali > 0 ? manuaali : Number(sahkoHintaLaskettu.toFixed(2));
+    } else if (kat === "vesi") {
+      if (mittari) { v.mittarilukema = Number(mittari); v.kulutus_m3 = m3; }
+      const manuaali = Number(summa || 0);
+      v.summa = manuaali > 0 ? manuaali : Number(vesiHintaLaskettu.toFixed(2));
+    } else {
+      v.summa = Number(summa || 0);
+    }
+    if (!v.summa || v.summa <= 0) { toast.error("Anna summa tai mittarilukema/kulutus"); return; }
     onAdd(v);
     setOpen(false); setNimi(""); setSumma(""); setKwh(""); setMittari("");
   };
@@ -198,12 +209,17 @@ function KuluLisaaDialog({ asetukset, onAdd, loading }: { asetukset: any; onAdd:
           </div>
 
           {kat === "sahko" ? (<>
-            <div className="space-y-2"><Label>Kulutus (kWh)</Label><Input type="number" min="0" step="0.01" value={kwh} onChange={(e) => setKwh(e.target.value)} required /></div>
-            <p className="text-sm text-muted-foreground">Hinta: <span className="text-primary font-mono">{sahkoHinta.toFixed(2)} €</span> ({(Number(asetukset?.sahko_energia_snt ?? 0) + Number(asetukset?.sahko_siirto_snt ?? 0)).toFixed(2)} snt/kWh{sahkoPerus > 0 ? ` + ${sahkoPerus.toFixed(2)} € perusmaksu` : ""})</p>
+            <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-2"><Label>Kulutus (kWh)</Label><Input type="number" min="0" step="0.01" value={kwh} onChange={(e) => setKwh(e.target.value)} placeholder="valinnainen" /></div>
+              <div className="space-y-2"><Label>Laskun summa (€)</Label><Input type="number" min="0" step="0.01" value={summa} onChange={(e) => setSumma(e.target.value)} placeholder={sahkoHintaLaskettu > 0 ? sahkoHintaLaskettu.toFixed(2) : "esim. 120.50"} /></div>
+            </div>
+            <p className="text-xs text-muted-foreground">{sahkoTariffi > 0 ? <>Jos jätät summan tyhjäksi, lasketaan kulutuksesta: <span className="text-primary font-mono">{sahkoHintaLaskettu.toFixed(2)} €</span></> : "Voit antaa kulutuksen, summan tai molemmat. Aseta hinnat asetuksissa automaattilaskentaa varten."}</p>
           </>) : kat === "vesi" ? (<>
-            <div className="space-y-2"><Label>Mittarilukema (m³)</Label><Input type="number" min="0" step="0.001" value={mittari} onChange={(e) => setMittari(e.target.value)} required /></div>
-            <p className="text-sm text-muted-foreground">Kulutus: {m3.toFixed(2)} m³ · Hinta: <span className="text-primary font-mono">{vesiHinta.toFixed(2)} €</span>{vesiPerus > 0 ? ` (sis. ${vesiPerus.toFixed(2)} € perusmaksu)` : ""}</p>
-            {edellinen > 0 && <p className="text-xs text-muted-foreground">Edellinen lukema: {edellinen}</p>}
+            <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-2"><Label>Mittarilukema (m³)</Label><Input type="number" min="0" step="0.001" value={mittari} onChange={(e) => setMittari(e.target.value)} placeholder="valinnainen" /></div>
+              <div className="space-y-2"><Label>Laskun summa (€)</Label><Input type="number" min="0" step="0.01" value={summa} onChange={(e) => setSumma(e.target.value)} placeholder={vesiHintaLaskettu > 0 ? vesiHintaLaskettu.toFixed(2) : "esim. 65.00"} /></div>
+            </div>
+            <p className="text-xs text-muted-foreground">{vesiTariffi > 0 ? <>Kulutus: {m3.toFixed(2)} m³ · Laskettu hinta: <span className="text-primary font-mono">{vesiHintaLaskettu.toFixed(2)} €</span>{edellinen > 0 ? ` · Edellinen lukema: ${edellinen}` : ""}</> : "Voit antaa mittarilukeman, summan tai molemmat. Aseta hinnat asetuksissa automaattilaskentaa varten."}</p>
           </>) : (
             <div className="space-y-2"><Label>Summa (€)</Label><Input type="number" min="0" step="0.01" value={summa} onChange={(e) => setSumma(e.target.value)} required /></div>
           )}
