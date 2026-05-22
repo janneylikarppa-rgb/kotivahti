@@ -198,7 +198,7 @@ function TaloTiedotPage() {
 
   // Autosave (debounced)
   useEffect(() => {
-    if (!hydrated.current || !dirty.current) return;
+    if (!hydrated.current) return;
     setAutoStatus("saving");
     const id = setTimeout(() => {
       save.mutate({ silent: true });
