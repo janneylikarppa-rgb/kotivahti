@@ -199,10 +199,10 @@ function KuluLisaaDialog({ asetukset, onAdd, loading }: { asetukset: any; onAdd:
 
           {kat === "sahko" ? (<>
             <div className="space-y-2"><Label>Kulutus (kWh)</Label><Input type="number" min="0" step="0.01" value={kwh} onChange={(e) => setKwh(e.target.value)} required /></div>
-            <p className="text-sm text-muted-foreground">Hinta: <span className="text-primary font-mono">{sahkoHinta.toFixed(2)} €</span> ({(Number(asetukset?.sahko_energia_snt ?? 0) + Number(asetukset?.sahko_siirto_snt ?? 0)).toFixed(2)} snt/kWh)</p>
+            <p className="text-sm text-muted-foreground">Hinta: <span className="text-primary font-mono">{sahkoHinta.toFixed(2)} €</span> ({(Number(asetukset?.sahko_energia_snt ?? 0) + Number(asetukset?.sahko_siirto_snt ?? 0)).toFixed(2)} snt/kWh{sahkoPerus > 0 ? ` + ${sahkoPerus.toFixed(2)} € perusmaksu` : ""})</p>
           </>) : kat === "vesi" ? (<>
             <div className="space-y-2"><Label>Mittarilukema (m³)</Label><Input type="number" min="0" step="0.001" value={mittari} onChange={(e) => setMittari(e.target.value)} required /></div>
-            <p className="text-sm text-muted-foreground">Kulutus: {m3.toFixed(2)} m³ · Hinta: <span className="text-primary font-mono">{vesiHinta.toFixed(2)} €</span></p>
+            <p className="text-sm text-muted-foreground">Kulutus: {m3.toFixed(2)} m³ · Hinta: <span className="text-primary font-mono">{vesiHinta.toFixed(2)} €</span>{vesiPerus > 0 ? ` (sis. ${vesiPerus.toFixed(2)} € perusmaksu)` : ""}</p>
             {edellinen > 0 && <p className="text-xs text-muted-foreground">Edellinen lukema: {edellinen}</p>}
           </>) : (
             <div className="space-y-2"><Label>Summa (€)</Label><Input type="number" min="0" step="0.01" value={summa} onChange={(e) => setSumma(e.target.value)} required /></div>
