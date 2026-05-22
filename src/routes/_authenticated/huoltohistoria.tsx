@@ -182,6 +182,9 @@ function HuoltoForm({
     takuu_vuotta: initial?.takuu_vuotta != null ? String(initial.takuu_vuotta) : "",
     pts_siirto: initial?.pts_siirto != null ? String(initial.pts_siirto) : "0",
   });
+  const [paivitaTalo, setPaivitaTalo] = useState(false);
+  const [laite, setLaite] = useState({ merkki: "", malli: "", asennusvuosi: "" });
+  const voiPaivittaa = tukeeLaitePaivitysta(form.kohde);
   const [uudet, setUudet] = useState<Liite[]>([]);
   const [vanhat, setVanhat] = useState<any[]>(initial?.liitteet ?? []);
   const [uploading, setUploading] = useState(false);
