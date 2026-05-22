@@ -421,6 +421,8 @@ export type Database = {
           salaojat_tarkastettu: string | null
           syoksytorvet: number | null
           terassi_kunnostettu_vuosi: number | null
+          terassi_lasitettu: boolean | null
+          terassi_lasitus_vuosi: number | null
           terassi_materiaali: string | null
           terassi_pinta_ala: number | null
           terassi_rakennettu_vuosi: number | null
@@ -483,6 +485,8 @@ export type Database = {
           salaojat_tarkastettu?: string | null
           syoksytorvet?: number | null
           terassi_kunnostettu_vuosi?: number | null
+          terassi_lasitettu?: boolean | null
+          terassi_lasitus_vuosi?: number | null
           terassi_materiaali?: string | null
           terassi_pinta_ala?: number | null
           terassi_rakennettu_vuosi?: number | null
@@ -545,6 +549,8 @@ export type Database = {
           salaojat_tarkastettu?: string | null
           syoksytorvet?: number | null
           terassi_kunnostettu_vuosi?: number | null
+          terassi_lasitettu?: boolean | null
+          terassi_lasitus_vuosi?: number | null
           terassi_materiaali?: string | null
           terassi_pinta_ala?: number | null
           terassi_rakennettu_vuosi?: number | null

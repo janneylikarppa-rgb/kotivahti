@@ -67,6 +67,8 @@ type PtsRivi = {
   lykatty?: boolean;
   lykkaysPeruste?: string | null;
   alkuperainenVuosi?: number;
+  huoltoErapaiva?: boolean;
+  viimeisinHuoltoVuosi?: number | null;
 };
 
 const TILA_META: Record<string, { label: string; emoji: string; chip: string; ring: string }> = {
@@ -371,6 +373,17 @@ function PtsKortti({
                 <Undo2 className="mr-1 h-3 w-3" /> Peru siirto
               </Button>
             )}
+          </div>
+        )}
+        {rivi.huoltoErapaiva && (
+          <div className="flex flex-wrap items-center gap-2 rounded-md border border-red-500/30 bg-red-500/10 px-3 py-2 text-xs text-red-200">
+            <AlertTriangle className="h-3.5 w-3.5" />
+            <span>
+              Huoltoväli ({rivi.huoltovali} v) on täynnä – määräaikainen huolto on ajankohtainen.
+              {rivi.viimeisinHuoltoVuosi
+                ? ` Viimeisin huoltomerkintä vuodelta ${rivi.viimeisinHuoltoVuosi}.`
+                : " Huoltohistoriasta ei löydy aiempaa merkintää."}
+            </span>
           </div>
         )}
         <p className="text-sm leading-relaxed text-cream/75">{teksti}</p>

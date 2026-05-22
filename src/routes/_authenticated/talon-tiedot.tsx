@@ -165,6 +165,8 @@ function TaloTiedotPage() {
         terassi_materiaali: str(t.terassi_materiaali), terassi_pinta_ala: num(t.terassi_pinta_ala),
         terassi_rakennettu_vuosi: num(t.terassi_rakennettu_vuosi),
         terassi_kunnostettu_vuosi: num(t.terassi_kunnostettu_vuosi),
+        terassi_lasitettu: boolOrNull(t.terassi_lasitettu),
+        terassi_lasitus_vuosi: num(t.terassi_lasitus_vuosi),
         salaojat: boolOrNull(t.salaojat), salaojat_tarkastettu: dateStr(t.salaojat_tarkastettu),
         valmiit_osiot: uudet,
       },
@@ -473,6 +475,18 @@ function TaloTiedotPage() {
             <Row>
               <Field label="Rakennettu vuonna"><Input type="number" value={t.terassi_rakennettu_vuosi ?? ""} onChange={(e) => setT({ ...t, terassi_rakennettu_vuosi: e.target.value })} /></Field>
               <Field label="Käsitelty / maalattu viimeksi"><Input type="number" value={t.terassi_kunnostettu_vuosi ?? ""} onChange={(e) => setT({ ...t, terassi_kunnostettu_vuosi: e.target.value })} /></Field>
+            </Row>
+            <Row>
+              <Field label="Lasitus">
+                <Select value={t.terassi_lasitettu == null ? "" : String(t.terassi_lasitettu)} onValueChange={(v) => setT({ ...t, terassi_lasitettu: v === "true" })}>
+                  <SelectTrigger><SelectValue placeholder="Valitse" /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="true">Kyllä, lasitettu</SelectItem>
+                    <SelectItem value="false">Ei lasitusta</SelectItem>
+                  </SelectContent>
+                </Select>
+              </Field>
+              <Field label="Lasitus asennettu vuonna"><Input type="number" value={t.terassi_lasitus_vuosi ?? ""} onChange={(e) => setT({ ...t, terassi_lasitus_vuosi: e.target.value })} disabled={t.terassi_lasitettu !== true} /></Field>
             </Row>
 
             <p className="eyebrow text-primary pt-4">Salaojat</p>

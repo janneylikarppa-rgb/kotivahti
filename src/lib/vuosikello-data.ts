@@ -82,6 +82,7 @@ export type TalonTiedotLite = {
   ilmanvaihto?: string | null;
   kattomateriaali?: string | null;
   terassi_materiaali?: string | null;
+  terassi_lasitettu?: boolean | null;
   julkisivumateriaali?: string | null;
 };
 
@@ -139,6 +140,11 @@ export function dynamicHuollot(t: TalonTiedotLite | null | undefined): Partial<R
 
   if (t.terassi_materiaali?.toLowerCase().includes("puu")) {
     out.kesa.push("Terassilaudoituksen öljyäminen / käsittely");
+  }
+
+  if (t.terassi_lasitettu === true) {
+    out.kevat.push("Terassilasien pesu ja kiskojen puhdistus");
+    out.kesa.push("Terassilasituksen tiivisteiden ja rullien tarkastus");
   }
 
   if (t.julkisivumateriaali?.toLowerCase().includes("puu")) {

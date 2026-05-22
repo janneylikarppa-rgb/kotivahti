@@ -88,6 +88,9 @@ export const PTS_SAANNOT: PtsKohteenSaanto[] = [
   { kohde: "Terassi (puu)", kategoria: "Piha", kayttoika: 20, huoltovali: 3,
     lahdeVuosi: (t) => ehkaInt(t?.terassi_rakennettu_vuosi),
     koskee: (t) => String(t?.terassi_materiaali ?? "").toLowerCase().includes("puu") || ehkaInt(t?.terassi_rakennettu_vuosi) != null },
+  { kohde: "Terassin lasitus", kategoria: "Piha", kayttoika: 30, huoltovali: 2,
+    lahdeVuosi: (t) => ehkaInt(t?.terassi_lasitus_vuosi) ?? ehkaInt(t?.terassi_rakennettu_vuosi),
+    koskee: (t) => t?.terassi_lasitettu === true },
 ];
 
 export type PtsTila = "kiireellinen" | "lahivuosina" | "seurannassa";
@@ -106,6 +109,8 @@ export type PtsRivi = {
   lykatty?: boolean; // käyttäjä on siirtänyt tätä riviä eteenpäin
   lykkaysPeruste?: string | null;
   alkuperainenVuosi?: number; // alkuperäinen suositusvuosi ennen lykkäystä
+  huoltoErapaiva?: boolean; // huoltoväli on täynnä, määräaikainen huolto ajankohtainen
+  viimeisinHuoltoVuosi?: number | null;
 };
 
 export function laskeTila(vuosiaJaljella: number): PtsTila {
@@ -119,6 +124,15 @@ function summaaSiirto(huollot: any[], kohde: string): number {
   return (huollot ?? [])
     .filter((h) => (h.kohde ?? "").toLowerCase() === kohde.toLowerCase())
     .reduce((s, h) => s + (Number(h.pts_siirto) || 0), 0);
+}
+
+// Viimeisin huoltovuosi (huolto- tai tarkastusmerkintä) annetulle kohteelle
+function viimeisinHuoltoVuosi(huollot: any[], kohde: string): number | null {
+  const vuodet = (huollot ?? [])
+    .filter((h) => (h.kohde ?? "").toLowerCase() === kohde.toLowerCase() && h.pvm)
+    .map((h) => new Date(h.pvm).getFullYear())
+    .filter((v) => Number.isFinite(v));
+  return vuodet.length > 0 ? Math.max(...vuodet) : null;
 }
 
 export type Lykkays = { kohde: string; lykatty_vuoteen: number; peruste?: string | null };
@@ -156,25 +170,36 @@ export function generoiAutoRivit(
     // jos jo ylitetty selvästi, päivitä "nyt"-vuoteen mutta merkitse ylitys
     const ylitetty = toimenpide < nyt ? nyt - toimenpide : 0;
     if (toimenpide < nyt) toimenpide = nyt;
-    if (toimenpide > maxVuosi) continue;
-    const vuosiaJaljella = toimenpide - nyt;
+
+    // Huoltovälin laskenta: jos viimeisestä huollosta (tai asennuksesta) on
+    // kulunut yli huoltovälin verran vuosia, määräaikainen huolto on ajankohtainen.
+    const viimHuolto = viimeisinHuoltoVuosi(huollot, s.kohde);
+    const huoltoLahde = viimHuolto ?? lahde;
+    const huoltoErapaiva = s.huoltovali > 0 && (nyt - huoltoLahde) >= s.huoltovali;
+
+    if (toimenpide > maxVuosi && !huoltoErapaiva) continue;
+    const naytaVuosi = Math.min(toimenpide, maxVuosi);
+    const vuosiaJaljella = naytaVuosi - nyt;
     rivit.push({
       id: `auto:${s.kohde}`,
       lahde: "auto",
       kohde: s.kohde,
       kategoria: s.kategoria,
-      vuosi: toimenpide,
+      vuosi: naytaVuosi,
       vuosiaJaljella,
-      tila: ylitetty > 0 ? "kiireellinen" : laskeTila(vuosiaJaljella),
+      tila: ylitetty > 0 || huoltoErapaiva ? "kiireellinen" : laskeTila(vuosiaJaljella),
       huoltovali: s.huoltovali,
       ylitettyVuosia: ylitetty || undefined,
       lykatty: lykatty || undefined,
       lykkaysPeruste: lykatty ? lyk?.peruste ?? null : undefined,
       alkuperainenVuosi: lykatty ? alkuperainen : undefined,
+      huoltoErapaiva: huoltoErapaiva || undefined,
+      viimeisinHuoltoVuosi: viimHuolto,
     });
   }
   return rivit;
 }
+
 
 export function getHuoltovali(kohde: string): number {
   const s = PTS_SAANNOT.find((x) => x.kohde.toLowerCase() === kohde.toLowerCase());

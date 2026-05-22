@@ -1,8 +1,8 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
-import { getKuitatut, kuittaaHuolto } from "@/lib/kotivahti.functions";
+import { getKuitatut, getPts, kuittaaHuolto } from "@/lib/kotivahti.functions";
 import { KAUDET, kaikkiHuollot, PERUSHUOLLOT, dynamicHuollot, type Kausi } from "@/lib/vuosikello-data";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -10,7 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Check, Circle, MinusCircle, Sparkles } from "lucide-react";
+import { AlertTriangle, ArrowRight, Check, Circle, MinusCircle, Sparkles } from "lucide-react";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/vuosikello")({
@@ -29,11 +29,14 @@ type Kuitattu = { kausi_key: string; huolto_nimi: string; tekija: string | null;
 
 function VuosikelloPage() {
   const fetchFn = useServerFn(getKuitatut);
+  const fetchPts = useServerFn(getPts);
   const kuittaaFn = useServerFn(kuittaaHuolto);
   const qc = useQueryClient();
   const { data } = useQuery({ queryKey: ["kuitatut"], queryFn: () => fetchFn() });
+  const { data: ptsData } = useQuery({ queryKey: ["pts"], queryFn: () => fetchPts(), staleTime: 30_000 });
   const kuitatut: Kuitattu[] = (data?.kuitatut as Kuitattu[]) ?? [];
   const talon = data?.talon_tiedot ?? null;
+  const erapaivat = ((ptsData?.rivit as any[]) ?? []).filter((r) => r.huoltoErapaiva);
   const [kausi, setKausi] = useState<Kausi>(autoKausi());
   const [valittu, setValittu] = useState<string | null>(null);
 
@@ -62,6 +65,38 @@ function VuosikelloPage() {
         <h1 className="font-serif text-4xl text-cream">Kauden <em className="text-primary not-italic italic">työt</em></h1>
         <p className="mt-3 text-muted-foreground">Kuittaa tehdyt huollot. Kuittaukset nollautuvat vuodenvaihteessa.</p>
       </header>
+
+      {erapaivat.length > 0 && (
+        <Card className="gold-card border border-red-500/30">
+          <CardContent className="pt-6 space-y-3">
+            <div className="flex items-center gap-2 text-red-300">
+              <AlertTriangle className="h-4 w-4" />
+              <p className="eyebrow text-red-300">Huoltoväli täynnä</p>
+            </div>
+            <p className="text-sm text-muted-foreground">
+              Seuraaville kohteille suositeltu huoltoväli on tullut täyteen. Varaa aika tai kuittaa tehdyksi.
+            </p>
+            <ul className="space-y-2">
+              {erapaivat.map((r: any) => (
+                <li key={r.kohde} className="flex items-start gap-2 text-sm">
+                  <span className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-red-400" />
+                  <div className="flex-1">
+                    <span className="text-cream">{r.kohde}</span>
+                    <span className="ml-2 text-xs text-muted-foreground">
+                      huoltoväli {r.huoltovali} v
+                      {r.viimeisinHuoltoVuosi ? ` · viimeksi ${r.viimeisinHuoltoVuosi}` : " · ei aiempaa merkintää"}
+                    </span>
+                  </div>
+                </li>
+              ))}
+            </ul>
+            <Button asChild variant="link" className="px-0 text-primary">
+              <Link to="/pts">Avaa PTS <ArrowRight className="ml-1 h-3.5 w-3.5" /></Link>
+            </Button>
+          </CardContent>
+        </Card>
+      )}
+
 
       {/* Kausi-välilehdet */}
       <div className="grid grid-cols-2 md:grid-cols-5 gap-2">
