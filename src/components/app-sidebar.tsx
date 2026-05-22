@@ -11,6 +11,7 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
+  useSidebar,
 } from "@/components/ui/sidebar";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -26,8 +27,14 @@ const items = [
 export function AppSidebar() {
   const path = useRouterState({ select: (s) => s.location.pathname });
   const navigate = useNavigate();
+  const { isMobile, setOpenMobile } = useSidebar();
+
+  const handleNav = () => {
+    if (isMobile) setOpenMobile(false);
+  };
 
   const handleLogout = async () => {
+    if (isMobile) setOpenMobile(false);
     await supabase.auth.signOut();
     navigate({ to: "/login" });
   };
@@ -50,7 +57,7 @@ export function AppSidebar() {
               {items.map((item) => (
                 <SidebarMenuItem key={item.url}>
                   <SidebarMenuButton asChild isActive={path === item.url} tooltip={item.title}>
-                    <Link to={item.url} className="flex items-center gap-2">
+                    <Link to={item.url} className="flex items-center gap-2" onClick={handleNav}>
                       <item.icon className="h-4 w-4" />
                       <span>{item.title}</span>
                     </Link>
