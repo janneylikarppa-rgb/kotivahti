@@ -53,6 +53,11 @@ const TEKSTIT: Record<string, Viestit> = {
     "Vanhentunut IV-kone heikentää sisäilmaa ja voi aiheuttaa kosteusongelmia rakenteissa.",
     "Käyttöikä ylitetty: huono ilmanvaihto on yksi yleisimmistä syistä kosteusvaurioihin. Uusiminen on kannattavaa.",
   ],
+  "Painovoimaisen ilmanvaihdon kartoitus": [
+    "Painovoimainen ilmanvaihto toimii ilman konetta – lämpötilaerojen ja tuulen avulla. Suositellaan ilmanvaihdon tilanteen kartoitusta noin 15–20 vuoden välein. Tyypillisiä puutteita: ilmanvaihto heikkenee talvella tuulettomilla keleillä, ei lämmöntalteenottoa (hukkaa 30–40 % lämmitysenergiasta), korvausilma tulee hallitsemattomasti rakenteiden raoista ja kosteus voi tiivistyä rakenteisiin. Hormien tukkeutuminen ja tiivistyneet ikkunat heikentävät toimintaa entisestään.",
+    "Painovoimaisen ilmanvaihdon riittävyys kannattaa tarkistuttaa: heikko ilmanvaihto kasvattaa kosteus- ja homevaurioiden riskiä sekä heikentää sisäilman laatua. Kartoituksessa selviää, riittääkö nykyinen järjestelmä vai tarvitaanko korvausilmaventtiilejä, hormien puhdistus tai koneellisen poiston/LTO:n lisäys.",
+    "Kartoitus on viivästynyt. Tilaa ilmanvaihdon kuntoarvio ammattilaiselta – painovoimaisen järjestelmän puutteet näkyvät usein vasta kosteusvaurioina tai sisäilmaoireiluna.",
+  ],
   "Käyttövesiputkisto": [
     "Käyttövesiputkien käyttöikä on noin 40 vuotta. Tarkasta liitokset säännöllisesti vuotojen varalta.",
     "Vanhat putket vuotavat usein piilossa rakenteissa. Vesivahinko ei aina ole vakuutuksen korvattava, jos putkisto on selvästi yli iän.",
