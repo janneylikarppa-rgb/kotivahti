@@ -27,8 +27,14 @@ const items = [
 export function AppSidebar() {
   const path = useRouterState({ select: (s) => s.location.pathname });
   const navigate = useNavigate();
+  const { isMobile, setOpenMobile } = useSidebar();
+
+  const handleNav = () => {
+    if (isMobile) setOpenMobile(false);
+  };
 
   const handleLogout = async () => {
+    if (isMobile) setOpenMobile(false);
     await supabase.auth.signOut();
     navigate({ to: "/login" });
   };
