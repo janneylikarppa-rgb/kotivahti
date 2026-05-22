@@ -77,9 +77,10 @@ function LandingPage() {
         >
           <div className="max-w-xl">
             <p
-              className="text-xs font-semibold tracking-[0.22em] uppercase animate-in fade-in slide-in-from-top-2 duration-500"
+              className="text-xs font-semibold tracking-[0.22em] uppercase animate-in fade-in slide-in-from-top-2 duration-500 flex items-center gap-3"
               style={{ color: "#C9A84C" }}
             >
+              <span style={{ display: "inline-block", width: 28, height: 1, background: "#C9A84C" }} />
               Ilmainen talokirja
             </p>
             <h1
@@ -226,9 +227,9 @@ function LandingPage() {
                 </div>
                 <div className="grid grid-cols-3 gap-2">
                   {[
-                    { v: "2 480 €", l: "Sähkö" },
-                    { v: "580 €", l: "Vesi" },
-                    { v: "2 340 €", l: "Lämpö" },
+                    { v: "2 480€", l: "Sähkö" },
+                    { v: "580€", l: "Vesi" },
+                    { v: "2 340€", l: "Lämpö" },
                   ].map((c) => (
                     <div
                       key={c.l}
@@ -238,7 +239,7 @@ function LandingPage() {
                       <div className="font-serif text-base" style={{ color: "#0D1F14" }}>
                         {c.v}
                       </div>
-                      <div className="text-[0.65rem] mt-0.5" style={{ color: "#6B5A42" }}>
+                      <div className="text-[0.6rem] mt-0.5 font-semibold tracking-[0.14em] uppercase" style={{ color: "#6B5A42" }}>
                         {c.l}
                       </div>
                     </div>
@@ -273,7 +274,7 @@ function LandingPage() {
                 className="flex-1 text-[0.8rem] font-semibold py-2 rounded-md transition hover:brightness-125"
                 style={{ background: "#0D1F14", color: "#C9A84C" }}
               >
-                Tilaa huolto
+                Tilaa kuntoarvio
               </button>
               <button
                 className="flex-1 text-[0.8rem] font-semibold py-2 rounded-md transition hover:bg-black/5"
@@ -298,7 +299,7 @@ function LandingPage() {
               </em>
             </h2>
             <p className="text-sm font-light leading-relaxed self-end" style={{ color: "#6B5A42" }}>
-              Kuusi toimintoa jotka pitävät talosi tiedot, huollot ja kulut järjestyksessä – automaattisesti.
+              Kuusi toimintoa jotka tekevät talostasi hyvin hoidetun – automaattisesti ja ilman vaivaa.
             </p>
           </div>
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
