@@ -236,6 +236,60 @@ export type Database = {
         }
         Relationships: []
       }
+      pts_kuitatut: {
+        Row: {
+          created_at: string
+          historia_id: string | null
+          id: string
+          kiinteisto_id: string
+          kohde: string
+          kuitattu_pvm: string
+        }
+        Insert: {
+          created_at?: string
+          historia_id?: string | null
+          id?: string
+          kiinteisto_id: string
+          kohde: string
+          kuitattu_pvm?: string
+        }
+        Update: {
+          created_at?: string
+          historia_id?: string | null
+          id?: string
+          kiinteisto_id?: string
+          kohde?: string
+          kuitattu_pvm?: string
+        }
+        Relationships: []
+      }
+      pts_rivit: {
+        Row: {
+          created_at: string
+          id: string
+          kiinteisto_id: string
+          kohde: string
+          kuvaus: string | null
+          vuosi: number
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          kiinteisto_id: string
+          kohde: string
+          kuvaus?: string | null
+          vuosi: number
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          kiinteisto_id?: string
+          kohde?: string
+          kuvaus?: string | null
+          vuosi?: number
+        }
+        Relationships: []
+      }
       talo_dokumentit: {
         Row: {
           created_at: string
