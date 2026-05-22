@@ -1,5 +1,5 @@
 import { Link, useRouterState, useNavigate } from "@tanstack/react-router";
-import { LayoutDashboard, Home, Wrench, CalendarDays, Wallet, LogOut } from "lucide-react";
+import { LayoutDashboard, Home, Wrench, CalendarDays, Wallet, LogOut, ClipboardList } from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
@@ -18,6 +18,7 @@ const items = [
   { title: "Yleiskuva", url: "/dashboard", icon: LayoutDashboard },
   { title: "Talon tiedot", url: "/talon-tiedot", icon: Home },
   { title: "Huoltohistoria", url: "/huoltohistoria", icon: Wrench },
+  { title: "PTS-suunnitelma", url: "/pts", icon: ClipboardList },
   { title: "Vuosikello", url: "/vuosikello", icon: CalendarDays },
   { title: "Kulut", url: "/kulut", icon: Wallet },
 ] as const;

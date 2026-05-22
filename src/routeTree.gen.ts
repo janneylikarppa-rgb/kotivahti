@@ -15,6 +15,7 @@ import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedVuosikelloRouteImport } from './routes/_authenticated/vuosikello'
 import { Route as AuthenticatedTalonTiedotRouteImport } from './routes/_authenticated/talon-tiedot'
+import { Route as AuthenticatedPtsRouteImport } from './routes/_authenticated/pts'
 import { Route as AuthenticatedKulutRouteImport } from './routes/_authenticated/kulut'
 import { Route as AuthenticatedHuoltohistoriaRouteImport } from './routes/_authenticated/huoltohistoria'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
@@ -49,6 +50,11 @@ const AuthenticatedTalonTiedotRoute =
     path: '/talon-tiedot',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
+const AuthenticatedPtsRoute = AuthenticatedPtsRouteImport.update({
+  id: '/pts',
+  path: '/pts',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
 const AuthenticatedKulutRoute = AuthenticatedKulutRouteImport.update({
   id: '/kulut',
   path: '/kulut',
@@ -73,6 +79,7 @@ export interface FileRoutesByFullPath {
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/huoltohistoria': typeof AuthenticatedHuoltohistoriaRoute
   '/kulut': typeof AuthenticatedKulutRoute
+  '/pts': typeof AuthenticatedPtsRoute
   '/talon-tiedot': typeof AuthenticatedTalonTiedotRoute
   '/vuosikello': typeof AuthenticatedVuosikelloRoute
 }
@@ -83,6 +90,7 @@ export interface FileRoutesByTo {
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/huoltohistoria': typeof AuthenticatedHuoltohistoriaRoute
   '/kulut': typeof AuthenticatedKulutRoute
+  '/pts': typeof AuthenticatedPtsRoute
   '/talon-tiedot': typeof AuthenticatedTalonTiedotRoute
   '/vuosikello': typeof AuthenticatedVuosikelloRoute
 }
@@ -95,6 +103,7 @@ export interface FileRoutesById {
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/huoltohistoria': typeof AuthenticatedHuoltohistoriaRoute
   '/_authenticated/kulut': typeof AuthenticatedKulutRoute
+  '/_authenticated/pts': typeof AuthenticatedPtsRoute
   '/_authenticated/talon-tiedot': typeof AuthenticatedTalonTiedotRoute
   '/_authenticated/vuosikello': typeof AuthenticatedVuosikelloRoute
 }
@@ -107,6 +116,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/huoltohistoria'
     | '/kulut'
+    | '/pts'
     | '/talon-tiedot'
     | '/vuosikello'
   fileRoutesByTo: FileRoutesByTo
@@ -117,6 +127,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/huoltohistoria'
     | '/kulut'
+    | '/pts'
     | '/talon-tiedot'
     | '/vuosikello'
   id:
@@ -128,6 +139,7 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard'
     | '/_authenticated/huoltohistoria'
     | '/_authenticated/kulut'
+    | '/_authenticated/pts'
     | '/_authenticated/talon-tiedot'
     | '/_authenticated/vuosikello'
   fileRoutesById: FileRoutesById
@@ -183,6 +195,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedTalonTiedotRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/pts': {
+      id: '/_authenticated/pts'
+      path: '/pts'
+      fullPath: '/pts'
+      preLoaderRoute: typeof AuthenticatedPtsRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/kulut': {
       id: '/_authenticated/kulut'
       path: '/kulut'
@@ -211,6 +230,7 @@ interface AuthenticatedRouteChildren {
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedHuoltohistoriaRoute: typeof AuthenticatedHuoltohistoriaRoute
   AuthenticatedKulutRoute: typeof AuthenticatedKulutRoute
+  AuthenticatedPtsRoute: typeof AuthenticatedPtsRoute
   AuthenticatedTalonTiedotRoute: typeof AuthenticatedTalonTiedotRoute
   AuthenticatedVuosikelloRoute: typeof AuthenticatedVuosikelloRoute
 }
@@ -219,6 +239,7 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedHuoltohistoriaRoute: AuthenticatedHuoltohistoriaRoute,
   AuthenticatedKulutRoute: AuthenticatedKulutRoute,
+  AuthenticatedPtsRoute: AuthenticatedPtsRoute,
   AuthenticatedTalonTiedotRoute: AuthenticatedTalonTiedotRoute,
   AuthenticatedVuosikelloRoute: AuthenticatedVuosikelloRoute,
 }
