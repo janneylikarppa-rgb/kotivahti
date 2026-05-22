@@ -153,7 +153,10 @@ export function rakennaTaloPatch(
       if (mat) patch.ikkunat_tyyppi = mat;
       break;
     case "Julkisivu":
-      if (v != null) patch.julkisivu_maalattu_vuosi = v;
+      if (v != null) {
+        patch.julkisivu_asennettu_vuosi = v;
+        patch.julkisivu_maalattu_vuosi = v;
+      }
       if (mat) patch.julkisivumateriaali = mat;
       break;
     case "Terassi":

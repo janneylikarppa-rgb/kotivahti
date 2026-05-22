@@ -41,31 +41,31 @@ function isChunkLoadError(error: unknown): boolean {
 }
 
 function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
-  console.error(error);
   const router = useRouter();
   const chunkError = isChunkLoadError(error);
 
-  useEffect(() => {
-    if (chunkError && typeof window !== "undefined") {
-      const key = "__kotivahti_chunk_reload";
-      if (!sessionStorage.getItem(key)) {
-        sessionStorage.setItem(key, "1");
-        window.location.reload();
-      }
+  if (chunkError && typeof window !== "undefined") {
+    const key = "__kotivahti_chunk_reload";
+    if (!sessionStorage.getItem(key)) {
+      sessionStorage.setItem(key, "1");
+      // Aseta reload heti — ei flash-virhenäkymää
+      window.location.reload();
     }
-  }, [chunkError]);
+    // Renderöi tyhjä tausta uudelleenlatauksen ajan
+    return <div className="min-h-screen bg-background" />;
+  }
+
+  console.error(error);
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-background px-4">
       <div className="max-w-md text-center">
         <p className="eyebrow mb-4">Virhe</p>
-        <h1 className="text-3xl font-serif text-cream">{chunkError ? "Päivitetään sovellusta..." : "Sivua ei voitu ladata"}</h1>
-        <p className="mt-2 text-sm text-muted-foreground">{chunkError ? "Hetki, ladataan uusin versio." : error.message}</p>
+        <h1 className="text-3xl font-serif text-cream">Sivua ei voitu ladata</h1>
+        <p className="mt-2 text-sm text-muted-foreground">{error.message}</p>
         <div className="mt-6 flex justify-center gap-2">
           <button
             onClick={() => {
-              if (typeof window !== "undefined") sessionStorage.removeItem("__kotivahti_chunk_reload");
-              if (chunkError && typeof window !== "undefined") { window.location.reload(); return; }
               router.invalidate();
               reset();
             }}

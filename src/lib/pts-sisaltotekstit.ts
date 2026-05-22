@@ -88,6 +88,36 @@ const TEKSTIT: Record<string, Viestit> = {
     "Hilseilevä maali altistaa puun säälle. Lahovaurio etenee pian, kun puu on suojaamattomana.",
     "Maalauskäsittely on ohittanut käyttöikänsä. Lahovaurioiden riski kasvaa nopeasti – maalaus kannattaa tilata ensi kaudelle.",
   ],
+  "Puujulkisivun uusiminen": [
+    "Puujulkisivun (lautaverhouksen) tekninen käyttöikä on noin 50 vuotta säännöllisellä huoltomaalauksella. Tarkkaile erityisesti sokkelin yläosaa, ikkunoiden ympäristöä ja räystäiden alaosia – niissä lahovauriot näkyvät ensin.",
+    "Lahonneet laudat kannattaa vaihtaa ajoissa. Jos vaurioita on laajemmin, koko verhouksen uusiminen tulee suunnitella – samalla voi parantaa lisäeristystä.",
+    "Käyttöikä ylitetty: verhouksen uusiminen on ajankohtaista. Piilevät lahovauriot voivat ulottua tuulensuojaan ja runkoon asti.",
+  ],
+  "Hirsijulkisivun peruskorjaus": [
+    "Hirsijulkisivu kestää oikein hoidettuna jopa 80–100 vuotta. Hirsien välien tilkkeet ja ulkopinnan käsittely tarkastetaan noin 15 vuoden välein.",
+    "Vajonneet tilkkeet ja vaurioitunut pintakäsittely päästävät kosteuden hirteen. Tilkitse ja käsittele ajoissa.",
+    "Peruskorjaus on viivästynyt. Hirsien alaosat ja nurkat kannattaa tarkastuttaa – paikalliset vauriot voi vielä korjata ennen suurempaa työtä.",
+  ],
+  "Tiilijulkisivun saumaus": [
+    "Tiilijulkisivu kestää 100+ vuotta, mutta saumalaastit haurastuvat ja niiden uusiminen on tarpeen noin 40 vuoden välein. Pienet saumakorjaukset tehdään 10 vuoden välein.",
+    "Rapistuneet saumat päästävät kosteuden tiiliin – pakkasrapautuminen voi vaurioittaa tiiliä peruuttamattomasti.",
+    "Saumaus on viivästynyt: pakkasrapautumisriski on todellinen. Tarkastuta julkisivu ja saumaa kuluneet kohdat pian.",
+  ],
+  "Rapatun julkisivun huolto": [
+    "Rappauspinnan käyttöikä on noin 30–50 vuotta. Halkeamat ja irronneet kohdat kannattaa paikata 10 vuoden välein, ja pinta huoltomaalata noin 15–20 vuoden välein.",
+    "Halkeamat päästävät veden rappauksen taakse, jolloin pakkanen irrottaa pintoja laajemmalti. Paikkaa ja maalaa ajoissa.",
+    "Huoltoaika ylitetty: pakkasvaurioiden ja kosteusongelmien riski on suuri. Tilaa rappauksen kuntoarvio.",
+  ],
+  "Levyverhouksen uusiminen": [
+    "Levyverhouksen (kuitusementti, mineriittilevy yms.) käyttöikä on noin 40 vuotta. Saumat, kiinnikkeet ja tuuletusrako tarkastetaan 10 vuoden välein.",
+    "Vanhat levyt voivat sisältää asbestia – ennen 1988 asennettujen levyjen purkutyö vaatii asbestikartoituksen. Suunnittele uusiminen huolella.",
+    "Käyttöikä ylitetty: kiinnitysten ja tuuletuksen kunto on syytä tarkistuttaa. Uusimisen yhteydessä asbestin mahdollisuus huomioitava.",
+  ],
+  "Peltijulkisivun maalaus": [
+    "Peltijulkisivun maalipinta uusitaan noin 20 vuoden välein. Pinta pestään ja paikkamaalataan 5 vuoden välein.",
+    "Ruoste etenee maalipinnan rikkoutuessa nopeasti. Paikkamaalaus on edullinen tapa ehkäistä laajaa korroosiota.",
+    "Maalaus on viivästynyt: ruostevauriot voivat vaatia jo levyjen vaihtoa. Tilaa kuntoarvio.",
+  ],
   "Salaojat": [
     "Salaojien käyttöikä on noin 40 vuotta. Tarkastus 5 vuoden välein paljastaa tukkeumat.",
     "Tukkeutuneet salaojat ohjaavat veden perustuksia vasten. Tämä on yleisin syy kellarin kosteusongelmiin.",

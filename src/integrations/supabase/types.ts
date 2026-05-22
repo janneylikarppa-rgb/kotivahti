@@ -385,6 +385,7 @@ export type Database = {
           ilp_merkki: string | null
           iv_suodatin_vaihdettu: string | null
           iv_suodatintyyppi: string | null
+          julkisivu_asennettu_vuosi: number | null
           julkisivu_maalattu_vuosi: number | null
           julkisivumateriaali: string | null
           katto_pinta_ala: number | null
@@ -449,6 +450,7 @@ export type Database = {
           ilp_merkki?: string | null
           iv_suodatin_vaihdettu?: string | null
           iv_suodatintyyppi?: string | null
+          julkisivu_asennettu_vuosi?: number | null
           julkisivu_maalattu_vuosi?: number | null
           julkisivumateriaali?: string | null
           katto_pinta_ala?: number | null
@@ -513,6 +515,7 @@ export type Database = {
           ilp_merkki?: string | null
           iv_suodatin_vaihdettu?: string | null
           iv_suodatintyyppi?: string | null
+          julkisivu_asennettu_vuosi?: number | null
           julkisivu_maalattu_vuosi?: number | null
           julkisivumateriaali?: string | null
           katto_pinta_ala?: number | null

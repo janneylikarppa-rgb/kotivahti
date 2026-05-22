@@ -1,0 +1,1 @@
+ALTER TABLE public.talon_tiedot ADD COLUMN IF NOT EXISTS julkisivu_asennettu_vuosi integer;
