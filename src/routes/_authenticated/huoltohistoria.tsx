@@ -11,6 +11,7 @@ import {
   updateHuolto,
 } from "@/lib/kotivahti.functions";
 import { HUOLTO_KOHDE_RYHMAT, HUOLTO_TYYPIT } from "@/lib/huolto-kohteet";
+import { tukeeLaitePaivitysta } from "@/lib/laite-paivitys";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
