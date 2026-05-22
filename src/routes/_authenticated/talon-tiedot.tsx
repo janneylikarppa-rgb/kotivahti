@@ -165,6 +165,8 @@ function TaloTiedotPage() {
         terassi_materiaali: str(t.terassi_materiaali), terassi_pinta_ala: num(t.terassi_pinta_ala),
         terassi_rakennettu_vuosi: num(t.terassi_rakennettu_vuosi),
         terassi_kunnostettu_vuosi: num(t.terassi_kunnostettu_vuosi),
+        terassi_lasitettu: boolOrNull(t.terassi_lasitettu),
+        terassi_lasitus_vuosi: num(t.terassi_lasitus_vuosi),
         salaojat: boolOrNull(t.salaojat), salaojat_tarkastettu: dateStr(t.salaojat_tarkastettu),
         valmiit_osiot: uudet,
       },
