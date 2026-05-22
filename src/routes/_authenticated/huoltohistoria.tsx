@@ -251,12 +251,20 @@ function HuoltoForm({
     <form
       onSubmit={(e) => {
         e.preventDefault();
+        const laite_paivitys = paivitaTalo && voiPaivittaa
+          ? {
+              merkki: laite.merkki.trim() || null,
+              malli: laite.malli.trim() || null,
+              asennusvuosi: laite.asennusvuosi ? Number(laite.asennusvuosi) : null,
+            }
+          : null;
         onSubmit({
           ...form,
           kustannus: Number(form.kustannus || 0),
           takuu_vuotta: Number(form.takuu_vuotta || 0),
           pts_siirto: Number(form.pts_siirto || 0),
           liitteet: uudet,
+          laite_paivitys,
         });
       }}
       className="space-y-4"
