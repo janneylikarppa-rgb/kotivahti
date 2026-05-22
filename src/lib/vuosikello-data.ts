@@ -82,6 +82,7 @@ export type TalonTiedotLite = {
   ilmanvaihto?: string | null;
   kattomateriaali?: string | null;
   terassi_materiaali?: string | null;
+  terassi_lasitettu?: boolean | null;
   julkisivumateriaali?: string | null;
 };
 
