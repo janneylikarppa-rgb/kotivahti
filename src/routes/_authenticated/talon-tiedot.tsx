@@ -120,12 +120,8 @@ function TaloTiedotPage() {
 
   const laite = t.lammitysmuoto ? MERKIT[t.lammitysmuoto] : undefined;
   const lammitysLisa = (t.lammitys_lisatieto && typeof t.lammitys_lisatieto === "object") ? t.lammitys_lisatieto : {};
-  const setLisa = (patch: Record<string, any>) => { dirty.current = true; setT({ ...t, lammitys_lisatieto: { ...lammitysLisa, ...patch } }); };
+  const setLisa = (patch: Record<string, any>) => setT({ ...t, lammitys_lisatieto: { ...lammitysLisa, ...patch } });
 
-  // Wrapper-setterit jotka merkitsevät muutoksen
-  const setKi = (v: any) => { dirty.current = true; setK(v); };
-  const setTi = (v: any) => { dirty.current = true; setT(v); };
-  const setPi = (v: any) => { dirty.current = true; setP(v); };
 
   const buildPayload = (osioKey?: string) => {
     const uudet = osioKey && !valmiit.includes(osioKey) ? [...valmiit, osioKey] : valmiit;
