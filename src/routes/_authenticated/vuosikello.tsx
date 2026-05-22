@@ -1,8 +1,8 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
-import { getKuitatut, kuittaaHuolto } from "@/lib/kotivahti.functions";
+import { getKuitatut, getPts, kuittaaHuolto } from "@/lib/kotivahti.functions";
 import { KAUDET, kaikkiHuollot, PERUSHUOLLOT, dynamicHuollot, type Kausi } from "@/lib/vuosikello-data";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -10,7 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Check, Circle, MinusCircle, Sparkles } from "lucide-react";
+import { AlertTriangle, ArrowRight, Check, Circle, MinusCircle, Sparkles } from "lucide-react";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/vuosikello")({
