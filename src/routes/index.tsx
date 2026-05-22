@@ -227,9 +227,9 @@ function LandingPage() {
                 </div>
                 <div className="grid grid-cols-3 gap-2">
                   {[
-                    { v: "2 480 €", l: "Sähkö" },
-                    { v: "580 €", l: "Vesi" },
-                    { v: "2 340 €", l: "Lämpö" },
+                    { v: "2 480€", l: "Sähkö" },
+                    { v: "580€", l: "Vesi" },
+                    { v: "2 340€", l: "Lämpö" },
                   ].map((c) => (
                     <div
                       key={c.l}
@@ -239,7 +239,7 @@ function LandingPage() {
                       <div className="font-serif text-base" style={{ color: "#0D1F14" }}>
                         {c.v}
                       </div>
-                      <div className="text-[0.65rem] mt-0.5" style={{ color: "#6B5A42" }}>
+                      <div className="text-[0.6rem] mt-0.5 font-semibold tracking-[0.14em] uppercase" style={{ color: "#6B5A42" }}>
                         {c.l}
                       </div>
                     </div>
