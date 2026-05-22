@@ -5,16 +5,26 @@ import { generoiAutoRivit, getHuoltovali, laskeTila, type PtsRivi } from "./pts-
 
 // ---------- Active kiinteistö ----------
 async function getActiveKiinteisto(supabase: any, userId: string) {
-  const { data, error } = await supabase
+  const { data: kaikki, error } = await supabase
     .from("kiinteistot")
     .select("*")
     .eq("user_id", userId)
     .eq("aktiivinen", true)
-    .order("created_at", { ascending: true })
-    .limit(1)
-    .maybeSingle();
+    .order("created_at", { ascending: true });
   if (error) throw error;
-  return data;
+  if (!kaikki || kaikki.length === 0) return null;
+
+  const { data: prof } = await supabase
+    .from("profiles")
+    .select("valittu_kiinteisto_id")
+    .eq("id", userId)
+    .maybeSingle();
+  const valittuId = prof?.valittu_kiinteisto_id as string | null | undefined;
+  if (valittuId) {
+    const match = kaikki.find((k: any) => k.id === valittuId);
+    if (match) return match;
+  }
+  return kaikki[0];
 }
 
 // ---------- Dashboard yhteenveto ----------
