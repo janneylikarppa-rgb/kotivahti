@@ -534,7 +534,7 @@ export const getPts = createServerFn({ method: "GET" })
     if (!k) return { rivit: [], talonTiedotPuuttuu: true };
     const [taloRes, huoltoRes, omatRes, kuitatutRes, lykkaysRes] = await Promise.all([
       supabase.from("talon_tiedot").select("*").eq("kiinteisto_id", k.id).maybeSingle(),
-      supabase.from("huolto_historia").select("kohde, pts_siirto").eq("kiinteisto_id", k.id),
+      supabase.from("huolto_historia").select("kohde, pts_siirto, pvm").eq("kiinteisto_id", k.id),
       supabase.from("pts_rivit").select("*").eq("kiinteisto_id", k.id),
       supabase.from("pts_kuitatut").select("kohde").eq("kiinteisto_id", k.id),
       supabase.from("pts_lykkaykset").select("kohde, lykatty_vuoteen, peruste").eq("kiinteisto_id", k.id),
