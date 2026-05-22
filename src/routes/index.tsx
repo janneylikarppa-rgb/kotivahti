@@ -77,9 +77,10 @@ function LandingPage() {
         >
           <div className="max-w-xl">
             <p
-              className="text-xs font-semibold tracking-[0.22em] uppercase animate-in fade-in slide-in-from-top-2 duration-500"
+              className="text-xs font-semibold tracking-[0.22em] uppercase animate-in fade-in slide-in-from-top-2 duration-500 flex items-center gap-3"
               style={{ color: "#C9A84C" }}
             >
+              <span style={{ display: "inline-block", width: 28, height: 1, background: "#C9A84C" }} />
               Ilmainen talokirja
             </p>
             <h1
