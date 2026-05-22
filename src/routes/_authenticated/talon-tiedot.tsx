@@ -216,7 +216,17 @@ function TaloTiedotPage() {
     <div className="mx-auto max-w-5xl space-y-6">
       <header>
         <p className="eyebrow mb-3 flex items-center gap-3"><span className="block h-px w-8 bg-primary" /> Talon tiedot</p>
-        <h1 className="font-serif text-4xl text-cream">Rakennuksen <em className="text-primary not-italic italic">profiili</em></h1>
+        <div className="flex items-start justify-between gap-4 flex-wrap">
+          <h1 className="font-serif text-4xl text-cream">Rakennuksen <em className="text-primary not-italic italic">profiili</em></h1>
+          <div className="flex items-center gap-3">
+            <span className="text-xs font-mono text-muted-foreground min-w-[120px] text-right">
+              {autoStatus === "saving" ? "Tallennetaan..." : autoStatus === "saved" ? "✓ Tallennettu" : "Automaattitallennus"}
+            </span>
+            <Button onClick={() => save.mutate({})} disabled={save.isPending} variant="outline" className="uppercase tracking-wider font-semibold">
+              Tallenna tiedot
+            </Button>
+          </div>
+        </div>
         <div className="mt-6 flex items-center justify-between gap-4">
           <Progress value={edistyminen} className="h-2 flex-1" />
           <span className="text-sm text-muted-foreground font-mono">{valmiit.length}/{OSIOT.length}</span>
