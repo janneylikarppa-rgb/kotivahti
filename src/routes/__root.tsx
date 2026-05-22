@@ -145,13 +145,37 @@ function AuthSync() {
   return null;
 }
 
+function ChunkReloadGuard() {
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const key = "__kotivahti_chunk_reload";
+    // Clear stale reload flag after successful load
+    const t = setTimeout(() => sessionStorage.removeItem(key), 3000);
+    const onPreloadError = (e: Event) => {
+      e.preventDefault();
+      if (!sessionStorage.getItem(key)) {
+        sessionStorage.setItem(key, "1");
+        window.location.reload();
+      }
+    };
+    window.addEventListener("vite:preloadError", onPreloadError as EventListener);
+    return () => {
+      clearTimeout(t);
+      window.removeEventListener("vite:preloadError", onPreloadError as EventListener);
+    };
+  }, []);
+  return null;
+}
+
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
   return (
     <QueryClientProvider client={queryClient}>
+      <ChunkReloadGuard />
       <AuthSync />
       <Outlet />
       <Toaster />
     </QueryClientProvider>
   );
 }
+
