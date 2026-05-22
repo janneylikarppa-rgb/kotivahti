@@ -466,8 +466,10 @@ export const deleteKulu = createServerFn({ method: "POST" })
 const asetuksetSchema = z.object({
   sahko_energia_snt: z.number(),
   sahko_siirto_snt: z.number(),
+  sahko_perusmaksu_eur_kk: z.number().optional(),
   vesi_puhdas_eur_m3: z.number(),
   vesi_jatevesi_eur_m3: z.number(),
+  vesi_perusmaksu_eur_kk: z.number().optional(),
 });
 
 export const saveAsetukset = createServerFn({ method: "POST" })
