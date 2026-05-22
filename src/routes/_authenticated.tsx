@@ -47,6 +47,7 @@ function AuthenticatedLayout() {
         <header className="sticky top-0 z-10 flex h-14 items-center gap-3 border-b border-border/60 bg-background/80 px-4 backdrop-blur">
           <SidebarTrigger className="text-muted-foreground hover:text-cream" />
           <div className="font-serif text-base text-cream">Kotivahti</div>
+          <PropertySwitcher />
         </header>
         <main className="flex-1 px-4 py-8 md:px-8 lg:px-12">
           <Outlet />
