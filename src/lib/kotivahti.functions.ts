@@ -1,8 +1,89 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
-import { generoiAutoRivit, getHuoltovali, laskeTila, type PtsRivi } from "./pts-saannot";
+import { PTS_KOHTEET, ptsKohdeAvaimella, paatteleKohdeAvain, laskeKiireellisyys } from "./pts-kohteet";
 import { rakennaTaloPatch, tukeeLaitePaivitysta } from "./laite-paivitys";
+
+// ---------- PTS-päivitys: yhteinen helper ----------
+// Päivittää pts_suunnitelma-rivin kun huolto/remontti kirjataan.
+async function paivitaPts(
+  supabase: any,
+  kiinteistoId: string,
+  kohdeAvain: string | null | undefined,
+  tyyppi: string,
+  vuosi: number,
+  ptsSiirto: number = 0,
+) {
+  if (!kohdeAvain) return;
+  const { data: rivi } = await supabase
+    .from("pts_suunnitelma")
+    .select("*")
+    .eq("kiinteisto_id", kiinteistoId)
+    .eq("kohde_avain", kohdeAvain)
+    .eq("oma_rivi", false)
+    .maybeSingle();
+  if (!rivi) return;
+
+  const nyt = new Date().getFullYear();
+  let toimenpide = rivi.toimenpide_vuosi as number;
+  const patch: any = { paivitetty_at: new Date().toISOString() };
+  const t = tyyppi.toLowerCase();
+
+  if (t === "uusiminen" || t === "remontti") {
+    const kayttoika = Number(rivi.kayttoika) || 0;
+    toimenpide = vuosi + Math.max(kayttoika - 2, 1);
+    patch.viimeisin_uusiminen_vuosi = vuosi;
+    patch.lahde_vuosi = vuosi;
+  } else if (t === "huolto" || t === "tarkastus" || t === "maalaus") {
+    const huoltovali = Number(rivi.huoltovali) || 0;
+    if (huoltovali > 0) {
+      toimenpide = Math.max(toimenpide, vuosi + huoltovali);
+    }
+    patch.viimeisin_huolto_vuosi = vuosi;
+  }
+  if (ptsSiirto > 0) {
+    toimenpide = (rivi.toimenpide_vuosi as number) + ptsSiirto;
+  }
+  patch.toimenpide_vuosi = toimenpide;
+  patch.kiireellisyys = laskeKiireellisyys(toimenpide - nyt);
+
+  await supabase.from("pts_suunnitelma").update(patch).eq("id", rivi.id);
+}
+
+// Seedaa puuttuvat autorivit pts_suunnitelmaan talon_tiedot-pohjalta
+async function seedPts(supabase: any, kiinteistoId: string, talo: any) {
+  if (!talo) return;
+  const { data: olemassa } = await supabase
+    .from("pts_suunnitelma")
+    .select("kohde_avain")
+    .eq("kiinteisto_id", kiinteistoId)
+    .eq("oma_rivi", false);
+  const olemassaSet = new Set((olemassa ?? []).map((r: any) => r.kohde_avain));
+  const nyt = new Date().getFullYear();
+  const lisattavat: any[] = [];
+  for (const kohde of PTS_KOHTEET) {
+    if (olemassaSet.has(kohde.avain)) continue;
+    if (kohde.koskee && !kohde.koskee(talo)) continue;
+    const lahde = kohde.lahdeVuosi(talo);
+    if (lahde == null) continue;
+    const toimenpide = Math.max(nyt, lahde + Math.max(kohde.kayttoika - 2, 1));
+    lisattavat.push({
+      kiinteisto_id: kiinteistoId,
+      kohde_avain: kohde.avain,
+      kohde_nimi: kohde.nimi,
+      kategoria: kohde.kategoria,
+      kayttoika: kohde.kayttoika,
+      huoltovali: kohde.huoltovali,
+      lahde_vuosi: lahde,
+      toimenpide_vuosi: toimenpide,
+      kiireellisyys: laskeKiireellisyys(toimenpide - nyt),
+      oma_rivi: false,
+    });
+  }
+  if (lisattavat.length > 0) {
+    await supabase.from("pts_suunnitelma").insert(lisattavat);
+  }
+}
 
 // ---------- Active kiinteistö ----------
 async function getActiveKiinteisto(supabase: any, userId: string) {
