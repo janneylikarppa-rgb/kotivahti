@@ -607,38 +607,47 @@ export const saveAsetukset = createServerFn({ method: "POST" })
     return { ok: true };
   });
 
-// ---------- PTS-suunnitelma ----------
+// ---------- PTS-suunnitelma (pts_suunnitelma-taulu) ----------
 export const getPts = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
     const { supabase, userId } = context;
     const k = await getActiveKiinteisto(supabase, userId);
     if (!k) return { rivit: [], talonTiedotPuuttuu: true };
-    const [taloRes, huoltoRes, omatRes, kuitatutRes, lykkaysRes] = await Promise.all([
-      supabase.from("talon_tiedot").select("*").eq("kiinteisto_id", k.id).maybeSingle(),
-      supabase.from("huolto_historia").select("kohde, pts_siirto, pvm").eq("kiinteisto_id", k.id),
-      supabase.from("pts_rivit").select("*").eq("kiinteisto_id", k.id),
-      supabase.from("pts_kuitatut").select("kohde").eq("kiinteisto_id", k.id),
-      supabase.from("pts_lykkaykset").select("kohde, lykatty_vuoteen, peruste").eq("kiinteisto_id", k.id),
-    ]);
-    const talo = taloRes.data ? { ...taloRes.data, rakennusvuosi: k.rakennusvuosi } : null;
-    const auto = generoiAutoRivit(talo, huoltoRes.data ?? [], kuitatutRes.data ?? [], 10, lykkaysRes.data ?? []);
+    const { data: taloRaw } = await supabase.from("talon_tiedot").select("*").eq("kiinteisto_id", k.id).maybeSingle();
+    const talo = taloRaw ? { ...taloRaw, rakennusvuosi: k.rakennusvuosi } : null;
+
+    // Seedaa puuttuvat autorivit
+    await seedPts(supabase, k.id, talo);
+
+    const { data: rivitData } = await supabase
+      .from("pts_suunnitelma").select("*").eq("kiinteisto_id", k.id);
+
     const nyt = new Date().getFullYear();
-    const omat: PtsRivi[] = (omatRes.data ?? []).map((r: any) => {
-      const jaljella = r.vuosi - nyt;
+    const rivit = (rivitData ?? []).map((r: any) => {
+      const jaljella = (r.toimenpide_vuosi as number) - nyt;
+      const huoltoErapaiva = Number(r.huoltovali) > 0
+        && (nyt - (Number(r.viimeisin_huolto_vuosi ?? r.lahde_vuosi ?? nyt))) >= Number(r.huoltovali);
+      const paivitetty = r.paivitetty_at
+        ? (Date.now() - new Date(r.paivitetty_at).getTime()) < 5000
+        : false;
       return {
         id: r.id,
-        lahde: "oma" as const,
-        kohde: r.kohde,
-        kategoria: "Oma",
-        vuosi: r.vuosi,
+        lahde: r.oma_rivi ? "oma" : "auto",
+        kohde: r.kohde_nimi,
+        kohdeAvain: r.kohde_avain,
+        kategoria: r.kategoria,
+        vuosi: r.toimenpide_vuosi,
         vuosiaJaljella: jaljella,
-        tila: laskeTila(jaljella),
+        tila: huoltoErapaiva ? "kiireellinen" : r.kiireellisyys,
         kuvaus: r.kuvaus,
-        huoltovali: 0,
+        huoltovali: r.huoltovali,
+        viimeisinHuoltoVuosi: r.viimeisin_huolto_vuosi,
+        huoltoErapaiva,
+        paivitetty,
       };
-    });
-    const rivit = [...auto, ...omat].sort((a, b) => a.vuosi - b.vuosi);
+    }).sort((a: any, b: any) => a.vuosi - b.vuosi);
+
     const talonTiedotPuuttuu = !talo || (!talo.lammitysmuoto && !talo.kattomateriaali && !talo.rakennusvuosi);
     return { rivit, talonTiedotPuuttuu };
   });
@@ -658,35 +667,25 @@ export const lykkaaPtsRivi = createServerFn({ method: "POST" })
     const { supabase, userId } = context;
     const k = await getActiveKiinteisto(supabase, userId);
     if (!k) throw new Error("Kiinteistöä ei löytynyt");
+    if (!data.rivi_id) throw new Error("Rivin tunniste puuttuu");
     const nyt = new Date().getFullYear();
-
-    if (data.lahde === "oma") {
-      if (!data.rivi_id) throw new Error("Rivin tunniste puuttuu");
-      const { data: rivi, error: rErr } = await supabase
-        .from("pts_rivit").select("vuosi").eq("id", data.rivi_id).maybeSingle();
-      if (rErr) throw rErr;
-      const uusiVuosi = Math.max(rivi?.vuosi ?? nyt, nyt) + data.vuosia;
-      const lisays = data.peruste ? `\n[Siirretty ${data.vuosia} v eteenpäin: ${data.peruste}]` : `\n[Siirretty ${data.vuosia} v eteenpäin]`;
-      const { error } = await supabase
-        .from("pts_rivit")
-        .update({ vuosi: uusiVuosi, kuvaus: lisays })
-        .eq("id", data.rivi_id);
-      if (error) throw error;
-      return { ok: true };
-    }
-
-    // auto: päivitä tai luo lykkäys
-    const { data: existing } = await supabase
-      .from("pts_lykkaykset").select("lykatty_vuoteen")
-      .eq("kiinteisto_id", k.id).eq("kohde", data.kohde).maybeSingle();
-    const pohjaVuosi = Math.max(existing?.lykatty_vuoteen ?? nyt, nyt);
-    const uusiVuosi = pohjaVuosi + data.vuosia;
+    const { data: rivi } = await supabase
+      .from("pts_suunnitelma").select("toimenpide_vuosi, kuvaus")
+      .eq("id", data.rivi_id).maybeSingle();
+    const pohja = Math.max(((rivi as any)?.toimenpide_vuosi as number) ?? nyt, nyt);
+    const uusiVuosi = pohja + data.vuosia;
+    const kuvausLisa = data.peruste
+      ? `[Siirretty ${data.vuosia} v: ${data.peruste}]`
+      : `[Siirretty ${data.vuosia} v]`;
     const { error } = await supabase
-      .from("pts_lykkaykset")
-      .upsert(
-        { kiinteisto_id: k.id, kohde: data.kohde, lykatty_vuoteen: uusiVuosi, peruste: data.peruste ?? null },
-        { onConflict: "kiinteisto_id,kohde" },
-      );
+      .from("pts_suunnitelma")
+      .update({
+        toimenpide_vuosi: uusiVuosi,
+        kiireellisyys: laskeKiireellisyys(uusiVuosi - nyt),
+        kuvaus: kuvausLisa,
+        paivitetty_at: new Date().toISOString(),
+      })
+      .eq("id", data.rivi_id);
     if (error) throw error;
     return { ok: true };
   });
@@ -698,10 +697,21 @@ export const peruLykkays = createServerFn({ method: "POST" })
     const { supabase, userId } = context;
     const k = await getActiveKiinteisto(supabase, userId);
     if (!k) throw new Error("Kiinteistöä ei löytynyt");
-    const { error } = await supabase
-      .from("pts_lykkaykset").delete()
-      .eq("kiinteisto_id", k.id).eq("kohde", data.kohde);
-    if (error) throw error;
+    // Etsi autorivi kohde_nimellä ja resetoi lähdevuoteen
+    const { data: rivi } = await supabase
+      .from("pts_suunnitelma").select("*")
+      .eq("kiinteisto_id", k.id).eq("kohde_nimi", data.kohde).eq("oma_rivi", false).maybeSingle();
+    if (!rivi) return { ok: true };
+    const r: any = rivi;
+    const nyt = new Date().getFullYear();
+    const lahde = r.lahde_vuosi ?? nyt;
+    const toimenpide = Math.max(nyt, lahde + Math.max((r.kayttoika ?? 0) - 2, 1));
+    await supabase.from("pts_suunnitelma").update({
+      toimenpide_vuosi: toimenpide,
+      kiireellisyys: laskeKiireellisyys(toimenpide - nyt),
+      kuvaus: null,
+      paivitetty_at: new Date().toISOString(),
+    }).eq("id", r.id);
     return { ok: true };
   });
 
@@ -718,7 +728,19 @@ export const addPtsRivi = createServerFn({ method: "POST" })
     const { supabase, userId } = context;
     const k = await getActiveKiinteisto(supabase, userId);
     if (!k) throw new Error("Kiinteistöä ei löytynyt");
-    const { error } = await supabase.from("pts_rivit").insert({ kiinteisto_id: k.id, ...data });
+    const nyt = new Date().getFullYear();
+    const { error } = await supabase.from("pts_suunnitelma").insert({
+      kiinteisto_id: k.id,
+      kohde_avain: `oma_${Date.now()}`,
+      kohde_nimi: data.kohde,
+      kategoria: "Muu",
+      kayttoika: 0,
+      huoltovali: 0,
+      toimenpide_vuosi: data.vuosi,
+      kiireellisyys: laskeKiireellisyys(data.vuosi - nyt),
+      kuvaus: data.kuvaus ?? null,
+      oma_rivi: true,
+    });
     if (error) throw error;
     return { ok: true };
   });
@@ -727,7 +749,7 @@ export const deletePtsRivi = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: unknown) => z.object({ id: z.string().uuid() }).parse(input))
   .handler(async ({ data, context }) => {
-    const { error } = await context.supabase.from("pts_rivit").delete().eq("id", data.id);
+    const { error } = await context.supabase.from("pts_suunnitelma").delete().eq("id", data.id);
     if (error) throw error;
     return { ok: true };
   });
@@ -750,7 +772,15 @@ export const kuittaaPtsRivi = createServerFn({ method: "POST" })
     const { supabase, userId } = context;
     const k = await getActiveKiinteisto(supabase, userId);
     if (!k) throw new Error("Kiinteistöä ei löytynyt");
-    const huoltovali = getHuoltovali(data.kohde);
+
+    // Hae PTS-rivi (oma tai auto)
+    let kohdeAvain: string | null = null;
+    if (data.rivi_id) {
+      const { data: r } = await supabase
+        .from("pts_suunnitelma").select("kohde_avain, oma_rivi")
+        .eq("id", data.rivi_id).maybeSingle();
+      kohdeAvain = (r as any)?.kohde_avain ?? null;
+    }
 
     // Luo huoltohistoria-rivi
     const { data: hist, error: histErr } = await supabase
@@ -760,38 +790,46 @@ export const kuittaaPtsRivi = createServerFn({ method: "POST" })
         tyyppi: "huolto",
         kategoria: "PTS",
         kohde: data.kohde,
+        kohde_avain: kohdeAvain,
         pvm: data.pvm,
         tekija: data.tekija,
         tekija_nimi: data.tekija_nimi ?? null,
         kustannus: data.kustannus,
         kuvaus: data.kuvaus ?? null,
-        pts_siirto: huoltovali,
       })
       .select("id")
       .single();
     if (histErr) throw histErr;
 
     // Kulu jos hinta
+    let kuluId: string | null = null;
     if (Number(data.kustannus) > 0) {
-      await supabase.from("kulut").insert({
+      const { data: kulu } = await supabase.from("kulut").insert({
         kiinteisto_id: k.id,
         nimi: `PTS – ${data.kohde}`,
         kategoria: "huolto",
         summa: data.kustannus,
         pvm: data.pvm,
-      });
+        huolto_id: hist.id,
+        kohde_avain: kohdeAvain,
+      }).select("id").single();
+      kuluId = (kulu as any)?.id ?? null;
+      if (kuluId) {
+        await supabase.from("huolto_historia").update({ kulu_id: kuluId }).eq("id", hist.id);
+      }
     }
 
+    // PTS-päivitys
+    const vuosi = new Date(data.pvm).getFullYear();
     if (data.lahde === "oma" && data.rivi_id) {
-      await supabase.from("pts_rivit").delete().eq("id", data.rivi_id);
+      await supabase.from("pts_suunnitelma").delete().eq("id", data.rivi_id);
     } else {
-      await supabase.from("pts_kuitatut").upsert(
-        { kiinteisto_id: k.id, kohde: data.kohde, historia_id: hist.id, kuitattu_pvm: data.pvm },
-        { onConflict: "kiinteisto_id,kohde" },
-      );
+      await paivitaPts(supabase, k.id, kohdeAvain, "huolto", vuosi, 0);
     }
     return { ok: true };
   });
+
+
 
 // ---------- Kiinteistöjen hallinta ----------
 export const listKiinteistot = createServerFn({ method: "GET" })
