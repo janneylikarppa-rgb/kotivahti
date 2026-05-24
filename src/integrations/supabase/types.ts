@@ -21,6 +21,8 @@ export type Database = {
           kategoria: string | null
           kiinteisto_id: string
           kohde: string | null
+          kohde_avain: string | null
+          kulu_id: string | null
           kustannus: number | null
           kuvaus: string | null
           pts_siirto: number | null
@@ -36,6 +38,8 @@ export type Database = {
           kategoria?: string | null
           kiinteisto_id: string
           kohde?: string | null
+          kohde_avain?: string | null
+          kulu_id?: string | null
           kustannus?: number | null
           kuvaus?: string | null
           pts_siirto?: number | null
@@ -51,6 +55,8 @@ export type Database = {
           kategoria?: string | null
           kiinteisto_id?: string
           kohde?: string | null
+          kohde_avain?: string | null
+          kulu_id?: string | null
           kustannus?: number | null
           kuvaus?: string | null
           pts_siirto?: number | null
@@ -168,9 +174,11 @@ export type Database = {
       kulut: {
         Row: {
           created_at: string
+          huolto_id: string | null
           id: string
           kategoria: string
           kiinteisto_id: string
+          kohde_avain: string | null
           kulutus_m3: number | null
           kuvaus: string | null
           kwh: number | null
@@ -181,9 +189,11 @@ export type Database = {
         }
         Insert: {
           created_at?: string
+          huolto_id?: string | null
           id?: string
           kategoria?: string
           kiinteisto_id: string
+          kohde_avain?: string | null
           kulutus_m3?: number | null
           kuvaus?: string | null
           kwh?: number | null
@@ -194,9 +204,11 @@ export type Database = {
         }
         Update: {
           created_at?: string
+          huolto_id?: string | null
           id?: string
           kategoria?: string
           kiinteisto_id?: string
+          kohde_avain?: string | null
           kulutus_m3?: number | null
           kuvaus?: string | null
           kwh?: number | null
@@ -245,84 +257,60 @@ export type Database = {
         }
         Relationships: []
       }
-      pts_kuitatut: {
+      pts_suunnitelma: {
         Row: {
           created_at: string
-          historia_id: string | null
+          huoltovali: number
           id: string
+          kategoria: string
+          kayttoika: number
           kiinteisto_id: string
-          kohde: string
-          kuitattu_pvm: string
-        }
-        Insert: {
-          created_at?: string
-          historia_id?: string | null
-          id?: string
-          kiinteisto_id: string
-          kohde: string
-          kuitattu_pvm?: string
-        }
-        Update: {
-          created_at?: string
-          historia_id?: string | null
-          id?: string
-          kiinteisto_id?: string
-          kohde?: string
-          kuitattu_pvm?: string
-        }
-        Relationships: []
-      }
-      pts_lykkaykset: {
-        Row: {
-          created_at: string
-          id: string
-          kiinteisto_id: string
-          kohde: string
-          lykatty_vuoteen: number
-          peruste: string | null
-        }
-        Insert: {
-          created_at?: string
-          id?: string
-          kiinteisto_id: string
-          kohde: string
-          lykatty_vuoteen: number
-          peruste?: string | null
-        }
-        Update: {
-          created_at?: string
-          id?: string
-          kiinteisto_id?: string
-          kohde?: string
-          lykatty_vuoteen?: number
-          peruste?: string | null
-        }
-        Relationships: []
-      }
-      pts_rivit: {
-        Row: {
-          created_at: string
-          id: string
-          kiinteisto_id: string
-          kohde: string
+          kiireellisyys: string
+          kohde_avain: string
+          kohde_nimi: string
           kuvaus: string | null
-          vuosi: number
+          lahde_vuosi: number | null
+          oma_rivi: boolean
+          paivitetty_at: string
+          toimenpide_vuosi: number
+          viimeisin_huolto_vuosi: number | null
+          viimeisin_uusiminen_vuosi: number | null
         }
         Insert: {
           created_at?: string
+          huoltovali?: number
           id?: string
+          kategoria: string
+          kayttoika?: number
           kiinteisto_id: string
-          kohde: string
+          kiireellisyys?: string
+          kohde_avain: string
+          kohde_nimi: string
           kuvaus?: string | null
-          vuosi: number
+          lahde_vuosi?: number | null
+          oma_rivi?: boolean
+          paivitetty_at?: string
+          toimenpide_vuosi: number
+          viimeisin_huolto_vuosi?: number | null
+          viimeisin_uusiminen_vuosi?: number | null
         }
         Update: {
           created_at?: string
+          huoltovali?: number
           id?: string
+          kategoria?: string
+          kayttoika?: number
           kiinteisto_id?: string
-          kohde?: string
+          kiireellisyys?: string
+          kohde_avain?: string
+          kohde_nimi?: string
           kuvaus?: string | null
-          vuosi?: number
+          lahde_vuosi?: number | null
+          oma_rivi?: boolean
+          paivitetty_at?: string
+          toimenpide_vuosi?: number
+          viimeisin_huolto_vuosi?: number | null
+          viimeisin_uusiminen_vuosi?: number | null
         }
         Relationships: []
       }
