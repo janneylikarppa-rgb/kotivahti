@@ -449,10 +449,15 @@ export const updateHuolto = createServerFn({ method: "POST" })
 
 export const deleteHuolto = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input: unknown) => z.object({ id: z.string().uuid() }).parse(input))
+  .inputValidator((input: unknown) =>
+    z.object({ id: z.string().uuid(), poista_myos_linkitetty: z.boolean().default(false) }).parse(input))
   .handler(async ({ data, context }) => {
     const { supabase } = context;
-    // Poista linkitetyt liitteet storagesta
+    // Hae linkitetty kulu_id ennen poistoa
+    const { data: huolto } = await supabase
+      .from("huolto_historia").select("kulu_id").eq("id", data.id).maybeSingle();
+    const kuluId = (huolto as any)?.kulu_id ?? null;
+
     const { data: liitteet } = await supabase
       .from("talo_dokumentit")
       .select("tiedosto_polku")
@@ -463,7 +468,11 @@ export const deleteHuolto = createServerFn({ method: "POST" })
     }
     const { error } = await supabase.from("huolto_historia").delete().eq("id", data.id);
     if (error) throw error;
-    return { ok: true };
+
+    if (data.poista_myos_linkitetty && kuluId) {
+      await supabase.from("kulut").delete().eq("id", kuluId);
+    }
+    return { ok: true, oli_linkitetty: !!kuluId };
   });
 
 export const deleteHuoltoLiite = createServerFn({ method: "POST" })
