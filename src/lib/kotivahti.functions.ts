@@ -328,6 +328,7 @@ const huoltoSchema = z.object({
   tyyppi: z.string().min(1),
   kategoria: z.string().optional().nullable(),
   kohde: z.string().optional().nullable(),
+  kohde_avain: z.string().optional().nullable(),
   kuvaus: z.string().optional().nullable(),
   pvm: z.string().min(1),
   tekija: z.string().default("itse"),
@@ -335,6 +336,7 @@ const huoltoSchema = z.object({
   kustannus: z.number().default(0),
   takuu_vuotta: z.number().int().default(0),
   pts_siirto: z.number().int().min(0).max(50).default(0),
+  linkita_kulut: z.boolean().default(true),
   liitteet: z.array(liiteSchema).optional().default([]),
   laite_paivitys: z.object({
     merkki: z.string().optional().nullable(),
@@ -386,24 +388,45 @@ export const addHuolto = createServerFn({ method: "POST" })
     const { supabase, userId } = context;
     const k = await getActiveKiinteisto(supabase, userId);
     if (!k) throw new Error("Kiinteistöä ei löytynyt");
-    const { liitteet, laite_paivitys, ...row } = data;
+    const { liitteet, laite_paivitys, linkita_kulut, ...row } = data;
+
+    // Päättele kohde_avain jos käyttäjä ei antanut
+    let kohdeAvain = row.kohde_avain ?? null;
+    if (!kohdeAvain && row.kohde) {
+      const { data: talo } = await supabase
+        .from("talon_tiedot").select("*").eq("kiinteisto_id", k.id).maybeSingle();
+      kohdeAvain = paatteleKohdeAvain(row.kohde, talo);
+    }
+
     const { data: inserted, error } = await supabase
       .from("huolto_historia")
-      .insert({ kiinteisto_id: k.id, ...row })
+      .insert({ kiinteisto_id: k.id, ...row, kohde_avain: kohdeAvain })
       .select("id")
       .single();
     if (error) throw error;
     await insertLiitteet(supabase, k.id, inserted.id, liitteet);
-    if (Number(data.kustannus) > 0) {
-      await supabase.from("kulut").insert({
+
+    // Linkitetty kulu jos toggle päällä ja kustannus > 0
+    if (linkita_kulut && Number(data.kustannus) > 0) {
+      const { data: kulu } = await supabase.from("kulut").insert({
         kiinteisto_id: k.id,
         nimi: `${data.tyyppi}${data.kohde ? ` – ${data.kohde}` : ""}`,
         kategoria: "huolto",
         summa: data.kustannus,
         pvm: data.pvm,
-      });
+        huolto_id: inserted.id,
+        kohde_avain: kohdeAvain,
+      }).select("id").single();
+      if (kulu?.id) {
+        await supabase.from("huolto_historia").update({ kulu_id: kulu.id }).eq("id", inserted.id);
+      }
     }
     await paivitaTaloLaitteella(supabase, k.id, data.kohde, laite_paivitys);
+
+    // PTS-päivitys
+    const vuosi = new Date(data.pvm).getFullYear();
+    await paivitaPts(supabase, k.id, kohdeAvain, data.tyyppi, vuosi, data.pts_siirto ?? 0);
+
     return { ok: true };
   });
 
@@ -416,7 +439,7 @@ export const updateHuolto = createServerFn({ method: "POST" })
     const { supabase, userId } = context;
     const k = await getActiveKiinteisto(supabase, userId);
     if (!k) throw new Error("Kiinteistöä ei löytynyt");
-    const { id, liitteet, laite_paivitys, ...patch } = data;
+    const { id, liitteet, laite_paivitys, linkita_kulut: _lk, ...patch } = data;
     const { error } = await supabase.from("huolto_historia").update(patch).eq("id", id);
     if (error) throw error;
     await insertLiitteet(supabase, k.id, id, liitteet ?? []);
@@ -426,10 +449,15 @@ export const updateHuolto = createServerFn({ method: "POST" })
 
 export const deleteHuolto = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input: unknown) => z.object({ id: z.string().uuid() }).parse(input))
+  .inputValidator((input: unknown) =>
+    z.object({ id: z.string().uuid(), poista_myos_linkitetty: z.boolean().default(false) }).parse(input))
   .handler(async ({ data, context }) => {
     const { supabase } = context;
-    // Poista linkitetyt liitteet storagesta
+    // Hae linkitetty kulu_id ennen poistoa
+    const { data: huolto } = await supabase
+      .from("huolto_historia").select("kulu_id").eq("id", data.id).maybeSingle();
+    const kuluId = (huolto as any)?.kulu_id ?? null;
+
     const { data: liitteet } = await supabase
       .from("talo_dokumentit")
       .select("tiedosto_polku")
@@ -440,7 +468,11 @@ export const deleteHuolto = createServerFn({ method: "POST" })
     }
     const { error } = await supabase.from("huolto_historia").delete().eq("id", data.id);
     if (error) throw error;
-    return { ok: true };
+
+    if (data.poista_myos_linkitetty && kuluId) {
+      await supabase.from("kulut").delete().eq("id", kuluId);
+    }
+    return { ok: true, oli_linkitetty: !!kuluId };
   });
 
 export const deleteHuoltoLiite = createServerFn({ method: "POST" })
@@ -558,6 +590,14 @@ const kuluSchema = z.object({
   mittarilukema: z.number().optional().nullable(),
   kulutus_m3: z.number().optional().nullable(),
   kuvaus: z.string().optional().nullable(),
+  kohde_avain: z.string().optional().nullable(),
+  // Huoltohistoria-linkitys kun kategoria = huolto
+  linkita_huoltohistoriaan: z.boolean().default(false),
+  huolto_kohde: z.string().optional().nullable(),
+  huolto_tyyppi: z.string().optional().nullable(),
+  huolto_tekija: z.enum(["itse", "ammattilainen"]).default("itse"),
+  huolto_tekija_nimi: z.string().optional().nullable(),
+  huolto_takuu_vuotta: z.number().int().min(0).max(50).default(0),
 });
 
 export const addKulu = createServerFn({ method: "POST" })
@@ -567,23 +607,71 @@ export const addKulu = createServerFn({ method: "POST" })
     const { supabase, userId } = context;
     const k = await getActiveKiinteisto(supabase, userId);
     if (!k) throw new Error("Kiinteistöä ei löytynyt");
-    const { error } = await supabase.from("kulut").insert({ kiinteisto_id: k.id, ...data });
+    const {
+      linkita_huoltohistoriaan, huolto_kohde, huolto_tyyppi,
+      huolto_tekija, huolto_tekija_nimi, huolto_takuu_vuotta,
+      ...kuluRow
+    } = data;
+
+    // Päättele kohde_avain
+    let kohdeAvain = kuluRow.kohde_avain ?? null;
+    if (!kohdeAvain && (huolto_kohde || kuluRow.nimi)) {
+      const { data: talo } = await supabase
+        .from("talon_tiedot").select("*").eq("kiinteisto_id", k.id).maybeSingle();
+      kohdeAvain = paatteleKohdeAvain(huolto_kohde ?? kuluRow.nimi, talo);
+    }
+
+    const { data: kulu, error } = await supabase
+      .from("kulut").insert({ kiinteisto_id: k.id, ...kuluRow, kohde_avain: kohdeAvain })
+      .select("id").single();
     if (error) throw error;
 
-    // Jos mittarilukema vesi → tallenna asetuksiin edelliseksi
     if (data.kategoria === "vesi" && data.mittarilukema != null) {
       await supabase.from("kulu_asetukset").update({ edellinen_mittarilukema: data.mittarilukema }).eq("kiinteisto_id", k.id);
+    }
+
+    // Linkitetty huoltohistoria-rivi
+    if (linkita_huoltohistoriaan && data.kategoria === "huolto") {
+      const tyyppi = huolto_tyyppi ?? "huolto";
+      const { data: hist } = await supabase.from("huolto_historia").insert({
+        kiinteisto_id: k.id,
+        tyyppi,
+        kategoria: "Kulut",
+        kohde: huolto_kohde ?? null,
+        kohde_avain: kohdeAvain,
+        kuvaus: kuluRow.kuvaus ?? null,
+        pvm: data.pvm,
+        tekija: huolto_tekija,
+        tekija_nimi: huolto_tekija_nimi ?? null,
+        kustannus: data.summa,
+        takuu_vuotta: huolto_takuu_vuotta,
+        kulu_id: kulu.id,
+      }).select("id").single();
+      if (hist?.id) {
+        await supabase.from("kulut").update({ huolto_id: hist.id }).eq("id", kulu.id);
+      }
+      // PTS-päivitys
+      const vuosi = new Date(data.pvm).getFullYear();
+      await paivitaPts(supabase, k.id, kohdeAvain, tyyppi, vuosi, 0);
     }
     return { ok: true };
   });
 
 export const deleteKulu = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input: unknown) => z.object({ id: z.string().uuid() }).parse(input))
+  .inputValidator((input: unknown) =>
+    z.object({ id: z.string().uuid(), poista_myos_linkitetty: z.boolean().default(false) }).parse(input))
   .handler(async ({ data, context }) => {
-    const { error } = await context.supabase.from("kulut").delete().eq("id", data.id);
+    const { supabase } = context;
+    const { data: kulu } = await supabase
+      .from("kulut").select("huolto_id").eq("id", data.id).maybeSingle();
+    const huoltoId = (kulu as any)?.huolto_id ?? null;
+    const { error } = await supabase.from("kulut").delete().eq("id", data.id);
     if (error) throw error;
-    return { ok: true };
+    if (data.poista_myos_linkitetty && huoltoId) {
+      await supabase.from("huolto_historia").delete().eq("id", huoltoId);
+    }
+    return { ok: true, oli_linkitetty: !!huoltoId };
   });
 
 const asetuksetSchema = z.object({

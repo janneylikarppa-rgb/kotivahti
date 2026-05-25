@@ -1,9 +1,13 @@
 import { createFileRoute, Outlet, redirect, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
 import { getCachedSession, getReadySession, subscribeToSession } from "@/lib/auth-session";
 import { SidebarProvider, SidebarTrigger, SidebarInset } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/app-sidebar";
 import { PropertySwitcher } from "@/components/property-switcher";
+import { useRealtimeSync } from "@/hooks/use-realtime-sync";
+import { listKiinteistot } from "@/lib/kotivahti.functions";
 
 export const Route = createFileRoute("/_authenticated")({
   beforeLoad: async ({ location }) => {
@@ -39,6 +43,18 @@ function AuthenticatedLayout() {
   if (!session) {
     return <div className="min-h-screen bg-background" />;
   }
+
+  return <AuthenticatedShell />;
+}
+
+function AuthenticatedShell() {
+  const listFn = useServerFn(listKiinteistot);
+  const { data } = useQuery({
+    queryKey: ["kiinteistot-list"],
+    queryFn: () => listFn({}),
+    staleTime: 30_000,
+  });
+  useRealtimeSync(data?.valittuId ?? null);
 
   return (
     <SidebarProvider>

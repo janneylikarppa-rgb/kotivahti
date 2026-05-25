@@ -41,7 +41,12 @@ function KulutPage() {
     onError: (e: any) => toast.error(e.message),
   });
   const delM = useMutation({
-    mutationFn: (id: string) => delFn({ data: { id } }),
+    mutationFn: async (kulu: any) => {
+      const poista_myos_linkitetty = !!kulu.huolto_id
+        ? window.confirm("Tähän kuluun on linkitetty huoltohistorian merkintä. Poistetaanko myös huoltomerkintä?")
+        : false;
+      return delFn({ data: { id: kulu.id, poista_myos_linkitetty } });
+    },
     onSuccess: () => { qc.invalidateQueries({ queryKey: ["kulut"] }); qc.invalidateQueries({ queryKey: ["dashboard"] }); },
   });
   const saveM = useMutation({
@@ -125,11 +130,14 @@ function KulutPage() {
                   <li key={k.id} className="flex items-center gap-4 px-4 py-3">
                     <span className="eyebrow w-28 text-muted-foreground">{KAT_LABEL[k.kategoria] || k.kategoria}</span>
                     <div className="flex-1">
-                      <p className="text-cream">{k.nimi}</p>
+                      <p className="text-cream flex items-center gap-1">
+                        {k.huolto_id && <span title="Linkitetty huoltohistoriaan" aria-label="Linkitetty huoltohistoriaan">🔧</span>}
+                        {k.nimi}
+                      </p>
                       <p className="text-xs text-muted-foreground">{new Date(k.pvm).toLocaleDateString("fi-FI")}{k.kwh ? ` · ${k.kwh} kWh` : ""}{k.kulutus_m3 ? ` · ${k.kulutus_m3} m³` : ""}</p>
                     </div>
                     <span className="font-mono text-primary">{Number(k.summa).toFixed(2)} €</span>
-                    <Button variant="ghost" size="icon" onClick={() => delM.mutate(k.id)}><Trash2 className="h-4 w-4" /></Button>
+                    <Button variant="ghost" size="icon" onClick={() => delM.mutate(k)}><Trash2 className="h-4 w-4" /></Button>
                   </li>
                 ))}
               </ul>
