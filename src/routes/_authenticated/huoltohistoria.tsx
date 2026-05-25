@@ -135,7 +135,7 @@ function HuoltoPage() {
                     </div>
                     {Number(h.kustannus) > 0 && <span className="font-mono text-primary">{Number(h.kustannus).toFixed(0)} €</span>}
                     <Button variant="ghost" size="icon" onClick={() => setEditing(h)} aria-label="Muokkaa"><Pencil className="h-4 w-4" /></Button>
-                    <Button variant="ghost" size="icon" onClick={() => { if (confirm("Poistetaanko huoltomerkintä?")) delM.mutate(h.id); }} aria-label="Poista"><Trash2 className="h-4 w-4" /></Button>
+                    <Button variant="ghost" size="icon" onClick={() => { if (confirm("Poistetaanko huoltomerkintä?")) delM.mutate(h); }} aria-label="Poista"><Trash2 className="h-4 w-4" /></Button>
                   </CardContent>
                 </Card>
               ))}
