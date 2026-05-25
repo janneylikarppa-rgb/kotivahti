@@ -68,7 +68,12 @@ function HuoltoPage() {
     onError: (e: any) => toast.error(e.message),
   });
   const delM = useMutation({
-    mutationFn: (id: string) => delFn({ data: { id } }),
+    mutationFn: async (h: any) => {
+      const poista_myos_linkitetty = !!h.kulu_id
+        ? window.confirm("Tähän huoltoon on linkitetty kulu. Poistetaanko myös kulu?")
+        : false;
+      return delFn({ data: { id: h.id, poista_myos_linkitetty } });
+    },
     onSuccess: () => { toast.success("Poistettu"); invalidate(); },
     onError: (e: any) => toast.error(e.message),
   });
