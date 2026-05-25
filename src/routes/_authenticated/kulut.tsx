@@ -41,7 +41,12 @@ function KulutPage() {
     onError: (e: any) => toast.error(e.message),
   });
   const delM = useMutation({
-    mutationFn: (id: string) => delFn({ data: { id } }),
+    mutationFn: async (kulu: any) => {
+      const poista_myos_linkitetty = !!kulu.huolto_id
+        ? window.confirm("Tähän kuluun on linkitetty huoltohistorian merkintä. Poistetaanko myös huoltomerkintä?")
+        : false;
+      return delFn({ data: { id: kulu.id, poista_myos_linkitetty } });
+    },
     onSuccess: () => { qc.invalidateQueries({ queryKey: ["kulut"] }); qc.invalidateQueries({ queryKey: ["dashboard"] }); },
   });
   const saveM = useMutation({
