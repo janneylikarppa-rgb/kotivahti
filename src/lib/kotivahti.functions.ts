@@ -439,7 +439,7 @@ export const updateHuolto = createServerFn({ method: "POST" })
     const { supabase, userId } = context;
     const k = await getActiveKiinteisto(supabase, userId);
     if (!k) throw new Error("Kiinteistöä ei löytynyt");
-    const { id, liitteet, laite_paivitys, ...patch } = data;
+    const { id, liitteet, laite_paivitys, linkita_kulut: _lk, ...patch } = data;
     const { error } = await supabase.from("huolto_historia").update(patch).eq("id", id);
     if (error) throw error;
     await insertLiitteet(supabase, k.id, id, liitteet ?? []);
