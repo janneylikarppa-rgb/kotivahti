@@ -55,6 +55,8 @@ function AuthenticatedShell() {
     staleTime: 30_000,
   });
   useRealtimeSync(data?.valittuId ?? null);
+
+  return (
     <SidebarProvider>
       <AppSidebar />
       <SidebarInset className="bg-background">
