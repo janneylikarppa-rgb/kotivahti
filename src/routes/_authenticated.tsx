@@ -44,7 +44,17 @@ function AuthenticatedLayout() {
     return <div className="min-h-screen bg-background" />;
   }
 
-  return (
+  return <AuthenticatedShell />;
+}
+
+function AuthenticatedShell() {
+  const listFn = useServerFn(listKiinteistot);
+  const { data } = useQuery({
+    queryKey: ["kiinteistot-list"],
+    queryFn: () => listFn({}),
+    staleTime: 30_000,
+  });
+  useRealtimeSync(data?.valittuId ?? null);
     <SidebarProvider>
       <AppSidebar />
       <SidebarInset className="bg-background">
