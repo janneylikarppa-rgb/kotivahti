@@ -328,6 +328,7 @@ const huoltoSchema = z.object({
   tyyppi: z.string().min(1),
   kategoria: z.string().optional().nullable(),
   kohde: z.string().optional().nullable(),
+  kohde_avain: z.string().optional().nullable(),
   kuvaus: z.string().optional().nullable(),
   pvm: z.string().min(1),
   tekija: z.string().default("itse"),
@@ -335,6 +336,7 @@ const huoltoSchema = z.object({
   kustannus: z.number().default(0),
   takuu_vuotta: z.number().int().default(0),
   pts_siirto: z.number().int().min(0).max(50).default(0),
+  linkita_kulut: z.boolean().default(true),
   liitteet: z.array(liiteSchema).optional().default([]),
   laite_paivitys: z.object({
     merkki: z.string().optional().nullable(),
