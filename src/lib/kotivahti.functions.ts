@@ -388,24 +388,45 @@ export const addHuolto = createServerFn({ method: "POST" })
     const { supabase, userId } = context;
     const k = await getActiveKiinteisto(supabase, userId);
     if (!k) throw new Error("Kiinteistöä ei löytynyt");
-    const { liitteet, laite_paivitys, ...row } = data;
+    const { liitteet, laite_paivitys, linkita_kulut, ...row } = data;
+
+    // Päättele kohde_avain jos käyttäjä ei antanut
+    let kohdeAvain = row.kohde_avain ?? null;
+    if (!kohdeAvain && row.kohde) {
+      const { data: talo } = await supabase
+        .from("talon_tiedot").select("*").eq("kiinteisto_id", k.id).maybeSingle();
+      kohdeAvain = paatteleKohdeAvain(row.kohde, talo);
+    }
+
     const { data: inserted, error } = await supabase
       .from("huolto_historia")
-      .insert({ kiinteisto_id: k.id, ...row })
+      .insert({ kiinteisto_id: k.id, ...row, kohde_avain: kohdeAvain })
       .select("id")
       .single();
     if (error) throw error;
     await insertLiitteet(supabase, k.id, inserted.id, liitteet);
-    if (Number(data.kustannus) > 0) {
-      await supabase.from("kulut").insert({
+
+    // Linkitetty kulu jos toggle päällä ja kustannus > 0
+    if (linkita_kulut && Number(data.kustannus) > 0) {
+      const { data: kulu } = await supabase.from("kulut").insert({
         kiinteisto_id: k.id,
         nimi: `${data.tyyppi}${data.kohde ? ` – ${data.kohde}` : ""}`,
         kategoria: "huolto",
         summa: data.kustannus,
         pvm: data.pvm,
-      });
+        huolto_id: inserted.id,
+        kohde_avain: kohdeAvain,
+      }).select("id").single();
+      if (kulu?.id) {
+        await supabase.from("huolto_historia").update({ kulu_id: kulu.id }).eq("id", inserted.id);
+      }
     }
     await paivitaTaloLaitteella(supabase, k.id, data.kohde, laite_paivitys);
+
+    // PTS-päivitys
+    const vuosi = new Date(data.pvm).getFullYear();
+    await paivitaPts(supabase, k.id, kohdeAvain, data.tyyppi, vuosi, data.pts_siirto ?? 0);
+
     return { ok: true };
   });
 
