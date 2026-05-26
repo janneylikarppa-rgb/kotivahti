@@ -1,4 +1,4 @@
-import { createFileRoute, redirect, Link } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
@@ -12,7 +12,6 @@ import {
 } from "@/lib/kotivahti.functions";
 import { getSisaltoteksti, getYlitetytTeksti } from "@/lib/pts-sisaltotekstit";
 import { HUOLTO_KOHDE_RYHMAT } from "@/lib/huolto-kohteet";
-import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -38,10 +37,6 @@ import { Plus, Check, Trash2, Wrench, AlertTriangle, Calendar, Clock, Undo2 } fr
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/pts")({
-  beforeLoad: async () => {
-    const { data, error } = await supabase.auth.getUser();
-    if (error || !data.user) throw redirect({ to: "/login" });
-  },
   loader: ({ context }) => {
     if (typeof window === "undefined") return null;
     return context.queryClient.ensureQueryData({
