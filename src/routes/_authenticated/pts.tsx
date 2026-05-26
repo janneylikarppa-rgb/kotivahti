@@ -252,10 +252,19 @@ function PtsPage() {
 
       <Dialog open={!!kuittaa} onOpenChange={(o) => !o && setKuittaa(null)}>
         {kuittaa && (
-          <KuittausDialog
-            rivi={kuittaa}
-            onSubmit={(v) => kuittausM.mutate({ ...v, kohde: kuittaa.kohde, lahde: kuittaa.lahde, rivi_id: kuittaa.id })}
-          />
+          <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle className="font-serif text-2xl">Kuittaa tehdyksi: {kuittaa.kohde}</DialogTitle>
+            </DialogHeader>
+            <HuoltoForm
+              lockKohde
+              initial={{ tyyppi: "huolto", kohde: kuittaa.kohde, kategoria: "PTS" }}
+              loading={kuittausM.isPending}
+              submitLabel="Kuittaa tehdyksi"
+              invalidate={invalidate}
+              onSubmit={(values) => kuittausM.mutate({ rivi: kuittaa, values })}
+            />
+          </DialogContent>
         )}
       </Dialog>
 
