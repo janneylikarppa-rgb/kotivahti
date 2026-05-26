@@ -246,7 +246,7 @@ function PtsPage() {
         {kuittaa && (
           <KuittausDialog
             rivi={kuittaa}
-            onSubmit={(v) => kuittausM.mutate({ ...v, kohde: kuittaa.kohde, lahde: kuittaa.lahde, rivi_id: kuittaa.lahde === "oma" ? kuittaa.id : null })}
+            onSubmit={(v) => kuittausM.mutate({ ...v, kohde: kuittaa.kohde, lahde: kuittaa.lahde, rivi_id: kuittaa.id })}
           />
         )}
       </Dialog>
@@ -259,7 +259,7 @@ function PtsPage() {
               ...v,
               kohde: lykkaa.kohde,
               lahde: lykkaa.lahde,
-              rivi_id: lykkaa.lahde === "oma" ? lykkaa.id : null,
+              rivi_id: lykkaa.id,
             })}
           />
         )}
