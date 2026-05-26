@@ -5,31 +5,16 @@ import { useState } from "react";
 import {
   addHuolto,
   deleteHuolto,
-  deleteHuoltoLiite,
-  getDokumenttiUrl,
   getHuollot,
   updateHuolto,
 } from "@/lib/kotivahti.functions";
-import { HUOLTO_KOHDE_RYHMAT, HUOLTO_TYYPIT } from "@/lib/huolto-kohteet";
-import { materiaalivaihtoehdot, tukeeLaitePaivitysta, tukeeMerkkiMalli } from "@/lib/laite-paivitys";
-import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectLabel,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Paperclip, Pencil, Plus, Trash2, Upload, X } from "lucide-react";
+import { HuoltoForm } from "@/components/huolto-form";
+import { Paperclip, Pencil, Plus, Trash2 } from "lucide-react";
 import { toast } from "sonner";
+
 
 export const Route = createFileRoute("/_authenticated/huoltohistoria")({
   loader: ({ context }) => {
