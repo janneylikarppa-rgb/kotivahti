@@ -132,7 +132,12 @@ function PtsPage() {
   });
 
   const kuittausM = useMutation({
-    mutationFn: (input: any) => kuittausFn({ data: input }),
+    mutationFn: async (input: { rivi: PtsRivi; values: any }) => {
+      await huoltoFn({ data: input.values });
+      if (input.rivi.lahde === "oma") {
+        await invalidateDelPts({ data: { id: input.rivi.id } });
+      }
+    },
     onSuccess: () => {
       toast.success("Merkitty tehdyksi – kirjattu huoltohistoriaan");
       setKuittaa(null);
