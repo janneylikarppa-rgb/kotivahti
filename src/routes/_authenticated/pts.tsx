@@ -461,51 +461,6 @@ function LisaaRiviDialog({ onSubmit }: { onSubmit: (v: { vuosi: number; kohde: s
   );
 }
 
-function KuittausDialog({ rivi, onSubmit }: { rivi: PtsRivi; onSubmit: (v: any) => void }) {
-  const [pvm, setPvm] = useState(new Date().toISOString().slice(0, 10));
-  const [tekija, setTekija] = useState<"itse" | "ammattilainen">("itse");
-  const [tekijaNimi, setTekijaNimi] = useState("");
-  const [kustannus, setKustannus] = useState(0);
-  const [kuvaus, setKuvaus] = useState("");
-  return (
-    <DialogContent>
-      <DialogHeader><DialogTitle>Kuittaa tehdyksi: {rivi.kohde}</DialogTitle></DialogHeader>
-      <div className="space-y-4">
-        <div className="grid gap-2">
-          <Label>Päivämäärä</Label>
-          <Input type="date" value={pvm} onChange={(e) => setPvm(e.target.value)} />
-        </div>
-        <div className="grid gap-2">
-          <Label>Tekijä</Label>
-          <Select value={tekija} onValueChange={(v) => setTekija(v as any)}>
-            <SelectTrigger><SelectValue /></SelectTrigger>
-            <SelectContent>
-              <SelectItem value="itse">Itse</SelectItem>
-              <SelectItem value="ammattilainen">Ammattilainen</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-        {tekija === "ammattilainen" && (
-          <div className="grid gap-2">
-            <Label>Tekijän nimi</Label>
-            <Input value={tekijaNimi} onChange={(e) => setTekijaNimi(e.target.value)} placeholder="Yritys / henkilö" />
-          </div>
-        )}
-        <div className="grid gap-2">
-          <Label>Kustannus € (vapaaehtoinen)</Label>
-          <Input type="number" min={0} step="0.01" value={kustannus} onChange={(e) => setKustannus(Number(e.target.value))} />
-        </div>
-        <div className="grid gap-2">
-          <Label>Kuvaus</Label>
-          <Textarea value={kuvaus} onChange={(e) => setKuvaus(e.target.value)} placeholder="Mitä tehtiin?" />
-        </div>
-        <Button className="w-full" onClick={() => onSubmit({ pvm, tekija, tekija_nimi: tekijaNimi || null, kustannus, kuvaus: kuvaus || null })}>
-          <Check className="mr-2 h-4 w-4" /> Tallenna
-        </Button>
-      </div>
-    </DialogContent>
-  );
-}
 
 function LykkaysDialog({
   rivi, onSubmit,
