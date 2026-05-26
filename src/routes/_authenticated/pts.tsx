@@ -93,7 +93,8 @@ function PtsPage() {
   const fetchFn = useServerFn(getPts);
   const addFn = useServerFn(addPtsRivi);
   const delFn = useServerFn(deletePtsRivi);
-  const kuittausFn = useServerFn(kuittaaPtsRivi);
+  const huoltoFn = useServerFn(addHuolto);
+  const invalidateDelPts = useServerFn(deletePtsRivi);
   const lykkaysFn = useServerFn(lykkaaPtsRivi);
   const peruFn = useServerFn(peruLykkays);
   const qc = useQueryClient();
