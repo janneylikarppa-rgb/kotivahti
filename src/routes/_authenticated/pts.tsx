@@ -3,15 +3,17 @@ import { useServerFn } from "@tanstack/react-start";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import {
+  addHuolto,
   addPtsRivi,
   deletePtsRivi,
   getPts,
-  kuittaaPtsRivi,
   lykkaaPtsRivi,
   peruLykkays,
 } from "@/lib/kotivahti.functions";
+import { HuoltoForm } from "@/components/huolto-form";
 import { getSisaltoteksti, getYlitetytTeksti } from "@/lib/pts-sisaltotekstit";
 import { HUOLTO_KOHDE_RYHMAT } from "@/lib/huolto-kohteet";
+
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -91,7 +93,8 @@ function PtsPage() {
   const fetchFn = useServerFn(getPts);
   const addFn = useServerFn(addPtsRivi);
   const delFn = useServerFn(deletePtsRivi);
-  const kuittausFn = useServerFn(kuittaaPtsRivi);
+  const huoltoFn = useServerFn(addHuolto);
+  const invalidateDelPts = useServerFn(deletePtsRivi);
   const lykkaysFn = useServerFn(lykkaaPtsRivi);
   const peruFn = useServerFn(peruLykkays);
   const qc = useQueryClient();
@@ -129,7 +132,12 @@ function PtsPage() {
   });
 
   const kuittausM = useMutation({
-    mutationFn: (input: any) => kuittausFn({ data: input }),
+    mutationFn: async (input: { rivi: PtsRivi; values: any }) => {
+      await huoltoFn({ data: input.values });
+      if (input.rivi.lahde === "oma") {
+        await invalidateDelPts({ data: { id: input.rivi.id } });
+      }
+    },
     onSuccess: () => {
       toast.success("Merkitty tehdyksi – kirjattu huoltohistoriaan");
       setKuittaa(null);
@@ -244,10 +252,19 @@ function PtsPage() {
 
       <Dialog open={!!kuittaa} onOpenChange={(o) => !o && setKuittaa(null)}>
         {kuittaa && (
-          <KuittausDialog
-            rivi={kuittaa}
-            onSubmit={(v) => kuittausM.mutate({ ...v, kohde: kuittaa.kohde, lahde: kuittaa.lahde, rivi_id: kuittaa.id })}
-          />
+          <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle className="font-serif text-2xl">Kuittaa tehdyksi: {kuittaa.kohde}</DialogTitle>
+            </DialogHeader>
+            <HuoltoForm
+              lockKohde
+              initial={{ tyyppi: "huolto", kohde: kuittaa.kohde, kategoria: "PTS" }}
+              loading={kuittausM.isPending}
+              submitLabel="Kuittaa tehdyksi"
+              invalidate={invalidate}
+              onSubmit={(values) => kuittausM.mutate({ rivi: kuittaa, values })}
+            />
+          </DialogContent>
         )}
       </Dialog>
 
@@ -444,51 +461,6 @@ function LisaaRiviDialog({ onSubmit }: { onSubmit: (v: { vuosi: number; kohde: s
   );
 }
 
-function KuittausDialog({ rivi, onSubmit }: { rivi: PtsRivi; onSubmit: (v: any) => void }) {
-  const [pvm, setPvm] = useState(new Date().toISOString().slice(0, 10));
-  const [tekija, setTekija] = useState<"itse" | "ammattilainen">("itse");
-  const [tekijaNimi, setTekijaNimi] = useState("");
-  const [kustannus, setKustannus] = useState(0);
-  const [kuvaus, setKuvaus] = useState("");
-  return (
-    <DialogContent>
-      <DialogHeader><DialogTitle>Kuittaa tehdyksi: {rivi.kohde}</DialogTitle></DialogHeader>
-      <div className="space-y-4">
-        <div className="grid gap-2">
-          <Label>Päivämäärä</Label>
-          <Input type="date" value={pvm} onChange={(e) => setPvm(e.target.value)} />
-        </div>
-        <div className="grid gap-2">
-          <Label>Tekijä</Label>
-          <Select value={tekija} onValueChange={(v) => setTekija(v as any)}>
-            <SelectTrigger><SelectValue /></SelectTrigger>
-            <SelectContent>
-              <SelectItem value="itse">Itse</SelectItem>
-              <SelectItem value="ammattilainen">Ammattilainen</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-        {tekija === "ammattilainen" && (
-          <div className="grid gap-2">
-            <Label>Tekijän nimi</Label>
-            <Input value={tekijaNimi} onChange={(e) => setTekijaNimi(e.target.value)} placeholder="Yritys / henkilö" />
-          </div>
-        )}
-        <div className="grid gap-2">
-          <Label>Kustannus € (vapaaehtoinen)</Label>
-          <Input type="number" min={0} step="0.01" value={kustannus} onChange={(e) => setKustannus(Number(e.target.value))} />
-        </div>
-        <div className="grid gap-2">
-          <Label>Kuvaus</Label>
-          <Textarea value={kuvaus} onChange={(e) => setKuvaus(e.target.value)} placeholder="Mitä tehtiin?" />
-        </div>
-        <Button className="w-full" onClick={() => onSubmit({ pvm, tekija, tekija_nimi: tekijaNimi || null, kustannus, kuvaus: kuvaus || null })}>
-          <Check className="mr-2 h-4 w-4" /> Tallenna
-        </Button>
-      </div>
-    </DialogContent>
-  );
-}
 
 function LykkaysDialog({
   rivi, onSubmit,
