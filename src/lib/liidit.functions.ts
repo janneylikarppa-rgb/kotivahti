@@ -115,13 +115,10 @@ export const luoLiidi = createServerFn({ method: "POST" })
       .single();
     if (insErr) throw insErr;
 
-    // Sähköpostit – käytetään admin-asetuksesta luettavaa toggle-arvoa.
-    // Asetukset luetaan suoraan käyttäjän sessiossa: RLS sallii vain adminin
-    // lukea, joten käytetään here-kontekstissa olevaa supabase-clientia ja
-    // jos rivi ei ole luettavissa, käsitellään ON-tilassa false.
+    // Sähköpostit – luetaan asetukset ja ammattilaiset admin-clientilla (RLS bypass).
     let automaatioPaalla = false;
     try {
-      const { data: asetus } = await supabase.from("liidi_asetukset").select("automaatio_paalla").limit(1).maybeSingle();
+      const { data: asetus } = await supabaseAdmin.from("liidi_asetukset").select("automaatio_paalla").limit(1).maybeSingle();
       if (asetus) automaatioPaalla = !!asetus.automaatio_paalla;
     } catch {
       automaatioPaalla = false;
