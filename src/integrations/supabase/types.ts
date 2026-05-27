@@ -14,6 +14,42 @@ export type Database = {
   }
   public: {
     Tables: {
+      ammattilaiset: {
+        Row: {
+          aktiivinen: boolean
+          created_at: string
+          id: string
+          kategoria: string
+          prioriteetti: number
+          puhelin: string | null
+          sahkoposti: string
+          updated_at: string
+          yritys: string
+        }
+        Insert: {
+          aktiivinen?: boolean
+          created_at?: string
+          id?: string
+          kategoria: string
+          prioriteetti?: number
+          puhelin?: string | null
+          sahkoposti: string
+          updated_at?: string
+          yritys: string
+        }
+        Update: {
+          aktiivinen?: boolean
+          created_at?: string
+          id?: string
+          kategoria?: string
+          prioriteetti?: number
+          puhelin?: string | null
+          sahkoposti?: string
+          updated_at?: string
+          yritys?: string
+        }
+        Relationships: []
+      }
       huolto_historia: {
         Row: {
           created_at: string
@@ -226,6 +262,90 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      liidi_asetukset: {
+        Row: {
+          automaatio_paalla: boolean
+          id: string
+          updated_at: string
+        }
+        Insert: {
+          automaatio_paalla?: boolean
+          id?: string
+          updated_at?: string
+        }
+        Update: {
+          automaatio_paalla?: boolean
+          id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      liidit: {
+        Row: {
+          ajoitus: string
+          created_at: string
+          id: string
+          kategoria: string
+          kiinteisto_id: string
+          kuvaus: string | null
+          lahetetty_at: string | null
+          lammitys: string | null
+          lisatieto: string | null
+          nimi: string
+          osoite: string | null
+          palvelu: string
+          pts_kohde: string | null
+          puhelin: string
+          rakennus_vuosi: number | null
+          sahkoposti: string
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          ajoitus: string
+          created_at?: string
+          id?: string
+          kategoria: string
+          kiinteisto_id: string
+          kuvaus?: string | null
+          lahetetty_at?: string | null
+          lammitys?: string | null
+          lisatieto?: string | null
+          nimi: string
+          osoite?: string | null
+          palvelu: string
+          pts_kohde?: string | null
+          puhelin: string
+          rakennus_vuosi?: number | null
+          sahkoposti: string
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          ajoitus?: string
+          created_at?: string
+          id?: string
+          kategoria?: string
+          kiinteisto_id?: string
+          kuvaus?: string | null
+          lahetetty_at?: string | null
+          lammitys?: string | null
+          lisatieto?: string | null
+          nimi?: string
+          osoite?: string | null
+          palvelu?: string
+          pts_kohde?: string | null
+          puhelin?: string
+          rakennus_vuosi?: number | null
+          sahkoposti?: string
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
       }
       profiles: {
         Row: {
@@ -562,6 +682,27 @@ export type Database = {
           },
         ]
       }
+      user_roles: {
+        Row: {
+          created_at: string
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
       vk_kuitatut: {
         Row: {
           created_at: string
@@ -621,13 +762,20 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
       omistaa_kiinteiston: {
         Args: { _kiinteisto_id: string }
         Returns: boolean
       }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "admin" | "user"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -754,6 +902,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["admin", "user"],
+    },
   },
 } as const
