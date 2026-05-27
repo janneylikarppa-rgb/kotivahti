@@ -129,8 +129,8 @@ export const luoLiidi = createServerFn({ method: "POST" })
       const v = asiakkaanVahvistus(liidiRow);
       await lahetaEmail({ to: liidiRow.sahkoposti, subject: v.subject, html: v.html });
 
-      // Ammattilaisille
-      const { data: amm } = await supabase
+      // Ammattilaisille (admin-clientilla – RLS estäisi käyttäjältä)
+      const { data: amm } = await supabaseAdmin
         .from("ammattilaiset")
         .select("sahkoposti")
         .eq("kategoria", liidiRow.kategoria)
