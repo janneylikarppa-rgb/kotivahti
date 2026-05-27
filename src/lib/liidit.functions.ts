@@ -3,6 +3,7 @@ import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { LIIDI_KATEGORIAT } from "@/lib/liidit-kategoriat";
 import { asiakkaanVahvistus, ammattilaisenLiidi, lahetaEmail } from "@/lib/email.server";
+import { supabaseAdmin } from "@/integrations/supabase/client.server";
 
 const kategoriaSchema = z.enum(LIIDI_KATEGORIAT as unknown as [string, ...string[]]);
 
