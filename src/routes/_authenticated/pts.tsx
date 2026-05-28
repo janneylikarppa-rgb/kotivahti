@@ -406,8 +406,8 @@ function PtsKortti({
           <Button size="sm" variant="secondary" onClick={() => onLykkaa(rivi)}>
             <Clock className="mr-1 h-4 w-4" /> Siirrä eteenpäin
           </Button>
-          <Button size="sm" variant="secondary" onClick={() => toast.info("Ammattilaisen tilaus tulee pian käyttöön")}>
-            <Wrench className="mr-1 h-4 w-4" /> Tilaa ammattilainen
+          <Button size="sm" variant="secondary" onClick={() => onPyydaArvio(rivi)}>
+            <Wrench className="mr-1 h-4 w-4" /> Pyydä kuntoarviota
           </Button>
           {rivi.lahde === "oma" && (
             <Button size="sm" variant="ghost" className="ml-auto text-cream/60 hover:text-red-300" onClick={() => onDelete(rivi.id)}>
