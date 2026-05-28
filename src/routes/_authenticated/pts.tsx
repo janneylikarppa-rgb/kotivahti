@@ -362,13 +362,14 @@ function RyhmaOsio({
 }
 
 function PtsKortti({
-  rivi, onKuittaa, onLykkaa, onPeruLykkays, onDelete,
+  rivi, onKuittaa, onLykkaa, onPeruLykkays, onDelete, onPyydaArvio,
 }: {
   rivi: PtsRivi;
   onKuittaa: (r: PtsRivi) => void;
   onLykkaa: (r: PtsRivi) => void;
   onPeruLykkays: (kohde: string) => void;
   onDelete: (id: string) => void;
+  onPyydaArvio: (r: PtsRivi) => void;
 }) {
   const m = TILA_META[rivi.tila];
   const ylitetty = rivi.ylitettyVuosia && rivi.ylitettyVuosia > 2;
