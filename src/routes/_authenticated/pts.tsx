@@ -315,7 +315,7 @@ function RyhmaPill({ tila, count }: { tila: keyof typeof TILA_META; count: numbe
 }
 
 function RyhmaOsio({
-  otsikko, rivit, onKuittaa, onLykkaa, onPeruLykkays, onDelete, tyhja, defaultOpen,
+  otsikko, rivit, onKuittaa, onLykkaa, onPeruLykkays, onDelete, onPyydaArvio, tyhja, defaultOpen,
 }: {
   otsikko: string;
   rivit: PtsRivi[];
@@ -323,6 +323,7 @@ function RyhmaOsio({
   onLykkaa: (r: PtsRivi) => void;
   onPeruLykkays: (kohde: string) => void;
   onDelete: (id: string) => void;
+  onPyydaArvio: (r: PtsRivi) => void;
   tyhja: string;
   defaultOpen?: boolean;
 }) {
@@ -350,6 +351,7 @@ function RyhmaOsio({
                 onLykkaa={onLykkaa}
                 onPeruLykkays={onPeruLykkays}
                 onDelete={onDelete}
+                onPyydaArvio={onPyydaArvio}
               />
             ))
           )}
