@@ -23,6 +23,8 @@ const items = [
   { title: "PTS-suunnitelma", url: "/pts", icon: ClipboardList },
   { title: "Vuosikello", url: "/vuosikello", icon: CalendarDays },
   { title: "Kulut", url: "/kulut", icon: Wallet },
+  { title: "Pyynnöt", url: "/pyynnot", icon: Send },
+  { title: "Admin", url: "/admin", icon: Shield },
 ] as const;
 
 export function AppSidebar() {
