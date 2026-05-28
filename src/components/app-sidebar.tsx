@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { Link, useRouterState, useNavigate } from "@tanstack/react-router";
-import { LayoutDashboard, Home, Wrench, CalendarDays, Wallet, LogOut, ClipboardList } from "lucide-react";
+import { LayoutDashboard, Home, Wrench, CalendarDays, Wallet, LogOut, ClipboardList, Send, Shield } from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
