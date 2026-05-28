@@ -231,6 +231,7 @@ function PtsPage() {
         onLykkaa={setLykkaa}
         onPeruLykkays={(k) => peruM.mutate(k)}
         onDelete={(id) => delM.mutate(id)}
+        onPyydaArvio={setLiidiRivi}
         tyhja="Ei kiireellisiä toimenpiteitä – hienoa työtä!"
         defaultOpen
       />
@@ -241,6 +242,7 @@ function PtsPage() {
         onLykkaa={setLykkaa}
         onPeruLykkays={(k) => peruM.mutate(k)}
         onDelete={(id) => delM.mutate(id)}
+        onPyydaArvio={setLiidiRivi}
         tyhja="Ei toimenpiteitä lähivuosille."
       />
       <RyhmaOsio
@@ -250,6 +252,7 @@ function PtsPage() {
         onLykkaa={setLykkaa}
         onPeruLykkays={(k) => peruM.mutate(k)}
         onDelete={(id) => delM.mutate(id)}
+        onPyydaArvio={setLiidiRivi}
         tyhja="Ei seurattavia kohteita 10 vuoden ikkunassa."
       />
 
@@ -284,6 +287,18 @@ function PtsPage() {
           />
         )}
       </Dialog>
+
+      <LiidiDialog
+        open={!!liidiRivi}
+        onOpenChange={(o) => !o && setLiidiRivi(null)}
+        esitaytetty={liidiRivi ? {
+          palvelu: "kuntoarvio",
+          kategoria: arvaaKategoria(liidiRivi.kohde),
+          kuvaus: `PTS-suunnitelma suosittelee kuntoarviota: ${liidiRivi.kohde}, arvioitu toimenpidevuosi ${liidiRivi.vuosi}.`,
+          pts_kohde: liidiRivi.kohde,
+          lukitseKategoria: false,
+        } : undefined}
+      />
     </div>
   );
 }
