@@ -37,6 +37,8 @@ import {
 } from "@/components/ui/dialog";
 import { Plus, Check, Trash2, Wrench, AlertTriangle, Calendar, Clock, Undo2 } from "lucide-react";
 import { toast } from "sonner";
+import { LiidiDialog } from "@/components/liidi-dialog";
+import { arvaaKategoria } from "@/lib/liidit-kategoriat";
 
 export const Route = createFileRoute("/_authenticated/pts")({
   loader: ({ context }) => {
@@ -107,6 +109,7 @@ function PtsPage() {
   const [addOpen, setAddOpen] = useState(false);
   const [kuittaa, setKuittaa] = useState<PtsRivi | null>(null);
   const [lykkaa, setLykkaa] = useState<PtsRivi | null>(null);
+  const [liidiRivi, setLiidiRivi] = useState<PtsRivi | null>(null);
 
   const invalidate = () => {
     qc.invalidateQueries({ queryKey: ["pts"] });
@@ -228,6 +231,7 @@ function PtsPage() {
         onLykkaa={setLykkaa}
         onPeruLykkays={(k) => peruM.mutate(k)}
         onDelete={(id) => delM.mutate(id)}
+        onPyydaArvio={setLiidiRivi}
         tyhja="Ei kiireellisiä toimenpiteitä – hienoa työtä!"
         defaultOpen
       />
@@ -238,6 +242,7 @@ function PtsPage() {
         onLykkaa={setLykkaa}
         onPeruLykkays={(k) => peruM.mutate(k)}
         onDelete={(id) => delM.mutate(id)}
+        onPyydaArvio={setLiidiRivi}
         tyhja="Ei toimenpiteitä lähivuosille."
       />
       <RyhmaOsio
@@ -247,6 +252,7 @@ function PtsPage() {
         onLykkaa={setLykkaa}
         onPeruLykkays={(k) => peruM.mutate(k)}
         onDelete={(id) => delM.mutate(id)}
+        onPyydaArvio={setLiidiRivi}
         tyhja="Ei seurattavia kohteita 10 vuoden ikkunassa."
       />
 
@@ -281,6 +287,18 @@ function PtsPage() {
           />
         )}
       </Dialog>
+
+      <LiidiDialog
+        open={!!liidiRivi}
+        onOpenChange={(o) => !o && setLiidiRivi(null)}
+        esitaytetty={liidiRivi ? {
+          palvelu: "kuntoarvio",
+          kategoria: arvaaKategoria(liidiRivi.kohde),
+          kuvaus: `PTS-suunnitelma suosittelee kuntoarviota: ${liidiRivi.kohde}, arvioitu toimenpidevuosi ${liidiRivi.vuosi}.`,
+          pts_kohde: liidiRivi.kohde,
+          lukitseKategoria: false,
+        } : undefined}
+      />
     </div>
   );
 }
@@ -297,7 +315,7 @@ function RyhmaPill({ tila, count }: { tila: keyof typeof TILA_META; count: numbe
 }
 
 function RyhmaOsio({
-  otsikko, rivit, onKuittaa, onLykkaa, onPeruLykkays, onDelete, tyhja, defaultOpen,
+  otsikko, rivit, onKuittaa, onLykkaa, onPeruLykkays, onDelete, onPyydaArvio, tyhja, defaultOpen,
 }: {
   otsikko: string;
   rivit: PtsRivi[];
@@ -305,6 +323,7 @@ function RyhmaOsio({
   onLykkaa: (r: PtsRivi) => void;
   onPeruLykkays: (kohde: string) => void;
   onDelete: (id: string) => void;
+  onPyydaArvio: (r: PtsRivi) => void;
   tyhja: string;
   defaultOpen?: boolean;
 }) {
@@ -332,6 +351,7 @@ function RyhmaOsio({
                 onLykkaa={onLykkaa}
                 onPeruLykkays={onPeruLykkays}
                 onDelete={onDelete}
+                onPyydaArvio={onPyydaArvio}
               />
             ))
           )}
@@ -342,13 +362,14 @@ function RyhmaOsio({
 }
 
 function PtsKortti({
-  rivi, onKuittaa, onLykkaa, onPeruLykkays, onDelete,
+  rivi, onKuittaa, onLykkaa, onPeruLykkays, onDelete, onPyydaArvio,
 }: {
   rivi: PtsRivi;
   onKuittaa: (r: PtsRivi) => void;
   onLykkaa: (r: PtsRivi) => void;
   onPeruLykkays: (kohde: string) => void;
   onDelete: (id: string) => void;
+  onPyydaArvio: (r: PtsRivi) => void;
 }) {
   const m = TILA_META[rivi.tila];
   const ylitetty = rivi.ylitettyVuosia && rivi.ylitettyVuosia > 2;
@@ -406,8 +427,8 @@ function PtsKortti({
           <Button size="sm" variant="secondary" onClick={() => onLykkaa(rivi)}>
             <Clock className="mr-1 h-4 w-4" /> Siirrä eteenpäin
           </Button>
-          <Button size="sm" variant="secondary" onClick={() => toast.info("Ammattilaisen tilaus tulee pian käyttöön")}>
-            <Wrench className="mr-1 h-4 w-4" /> Tilaa ammattilainen
+          <Button size="sm" variant="secondary" onClick={() => onPyydaArvio(rivi)}>
+            <Wrench className="mr-1 h-4 w-4" /> Pyydä kuntoarviota
           </Button>
           {rivi.lahde === "oma" && (
             <Button size="sm" variant="ghost" className="ml-auto text-cream/60 hover:text-red-300" onClick={() => onDelete(rivi.id)}>

@@ -15,10 +15,12 @@ import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedVuosikelloRouteImport } from './routes/_authenticated/vuosikello'
 import { Route as AuthenticatedTalonTiedotRouteImport } from './routes/_authenticated/talon-tiedot'
+import { Route as AuthenticatedPyynnotRouteImport } from './routes/_authenticated/pyynnot'
 import { Route as AuthenticatedPtsRouteImport } from './routes/_authenticated/pts'
 import { Route as AuthenticatedKulutRouteImport } from './routes/_authenticated/kulut'
 import { Route as AuthenticatedHuoltohistoriaRouteImport } from './routes/_authenticated/huoltohistoria'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
+import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 
 const RekisteroidyRoute = RekisteroidyRouteImport.update({
   id: '/rekisteroidy',
@@ -50,6 +52,11 @@ const AuthenticatedTalonTiedotRoute =
     path: '/talon-tiedot',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
+const AuthenticatedPyynnotRoute = AuthenticatedPyynnotRouteImport.update({
+  id: '/pyynnot',
+  path: '/pyynnot',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
 const AuthenticatedPtsRoute = AuthenticatedPtsRouteImport.update({
   id: '/pts',
   path: '/pts',
@@ -71,15 +78,22 @@ const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
   path: '/dashboard',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
+const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
   '/rekisteroidy': typeof RekisteroidyRoute
+  '/admin': typeof AuthenticatedAdminRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/huoltohistoria': typeof AuthenticatedHuoltohistoriaRoute
   '/kulut': typeof AuthenticatedKulutRoute
   '/pts': typeof AuthenticatedPtsRoute
+  '/pyynnot': typeof AuthenticatedPyynnotRoute
   '/talon-tiedot': typeof AuthenticatedTalonTiedotRoute
   '/vuosikello': typeof AuthenticatedVuosikelloRoute
 }
@@ -87,10 +101,12 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
   '/rekisteroidy': typeof RekisteroidyRoute
+  '/admin': typeof AuthenticatedAdminRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/huoltohistoria': typeof AuthenticatedHuoltohistoriaRoute
   '/kulut': typeof AuthenticatedKulutRoute
   '/pts': typeof AuthenticatedPtsRoute
+  '/pyynnot': typeof AuthenticatedPyynnotRoute
   '/talon-tiedot': typeof AuthenticatedTalonTiedotRoute
   '/vuosikello': typeof AuthenticatedVuosikelloRoute
 }
@@ -100,10 +116,12 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteWithChildren
   '/login': typeof LoginRoute
   '/rekisteroidy': typeof RekisteroidyRoute
+  '/_authenticated/admin': typeof AuthenticatedAdminRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/huoltohistoria': typeof AuthenticatedHuoltohistoriaRoute
   '/_authenticated/kulut': typeof AuthenticatedKulutRoute
   '/_authenticated/pts': typeof AuthenticatedPtsRoute
+  '/_authenticated/pyynnot': typeof AuthenticatedPyynnotRoute
   '/_authenticated/talon-tiedot': typeof AuthenticatedTalonTiedotRoute
   '/_authenticated/vuosikello': typeof AuthenticatedVuosikelloRoute
 }
@@ -113,10 +131,12 @@ export interface FileRouteTypes {
     | '/'
     | '/login'
     | '/rekisteroidy'
+    | '/admin'
     | '/dashboard'
     | '/huoltohistoria'
     | '/kulut'
     | '/pts'
+    | '/pyynnot'
     | '/talon-tiedot'
     | '/vuosikello'
   fileRoutesByTo: FileRoutesByTo
@@ -124,10 +144,12 @@ export interface FileRouteTypes {
     | '/'
     | '/login'
     | '/rekisteroidy'
+    | '/admin'
     | '/dashboard'
     | '/huoltohistoria'
     | '/kulut'
     | '/pts'
+    | '/pyynnot'
     | '/talon-tiedot'
     | '/vuosikello'
   id:
@@ -136,10 +158,12 @@ export interface FileRouteTypes {
     | '/_authenticated'
     | '/login'
     | '/rekisteroidy'
+    | '/_authenticated/admin'
     | '/_authenticated/dashboard'
     | '/_authenticated/huoltohistoria'
     | '/_authenticated/kulut'
     | '/_authenticated/pts'
+    | '/_authenticated/pyynnot'
     | '/_authenticated/talon-tiedot'
     | '/_authenticated/vuosikello'
   fileRoutesById: FileRoutesById
@@ -195,6 +219,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedTalonTiedotRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/pyynnot': {
+      id: '/_authenticated/pyynnot'
+      path: '/pyynnot'
+      fullPath: '/pyynnot'
+      preLoaderRoute: typeof AuthenticatedPyynnotRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/pts': {
       id: '/_authenticated/pts'
       path: '/pts'
@@ -223,23 +254,34 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/admin': {
+      id: '/_authenticated/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AuthenticatedAdminRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
   }
 }
 
 interface AuthenticatedRouteChildren {
+  AuthenticatedAdminRoute: typeof AuthenticatedAdminRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedHuoltohistoriaRoute: typeof AuthenticatedHuoltohistoriaRoute
   AuthenticatedKulutRoute: typeof AuthenticatedKulutRoute
   AuthenticatedPtsRoute: typeof AuthenticatedPtsRoute
+  AuthenticatedPyynnotRoute: typeof AuthenticatedPyynnotRoute
   AuthenticatedTalonTiedotRoute: typeof AuthenticatedTalonTiedotRoute
   AuthenticatedVuosikelloRoute: typeof AuthenticatedVuosikelloRoute
 }
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
+  AuthenticatedAdminRoute: AuthenticatedAdminRoute,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedHuoltohistoriaRoute: AuthenticatedHuoltohistoriaRoute,
   AuthenticatedKulutRoute: AuthenticatedKulutRoute,
   AuthenticatedPtsRoute: AuthenticatedPtsRoute,
+  AuthenticatedPyynnotRoute: AuthenticatedPyynnotRoute,
   AuthenticatedTalonTiedotRoute: AuthenticatedTalonTiedotRoute,
   AuthenticatedVuosikelloRoute: AuthenticatedVuosikelloRoute,
 }
@@ -257,3 +299,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
