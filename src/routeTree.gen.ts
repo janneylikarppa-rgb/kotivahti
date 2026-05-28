@@ -20,6 +20,7 @@ import { Route as AuthenticatedPtsRouteImport } from './routes/_authenticated/pt
 import { Route as AuthenticatedKulutRouteImport } from './routes/_authenticated/kulut'
 import { Route as AuthenticatedHuoltohistoriaRouteImport } from './routes/_authenticated/huoltohistoria'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
+import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 
 const RekisteroidyRoute = RekisteroidyRouteImport.update({
   id: '/rekisteroidy',
@@ -77,11 +78,17 @@ const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
   path: '/dashboard',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
+const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
   '/rekisteroidy': typeof RekisteroidyRoute
+  '/admin': typeof AuthenticatedAdminRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/huoltohistoria': typeof AuthenticatedHuoltohistoriaRoute
   '/kulut': typeof AuthenticatedKulutRoute
@@ -94,6 +101,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
   '/rekisteroidy': typeof RekisteroidyRoute
+  '/admin': typeof AuthenticatedAdminRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/huoltohistoria': typeof AuthenticatedHuoltohistoriaRoute
   '/kulut': typeof AuthenticatedKulutRoute
@@ -108,6 +116,7 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteWithChildren
   '/login': typeof LoginRoute
   '/rekisteroidy': typeof RekisteroidyRoute
+  '/_authenticated/admin': typeof AuthenticatedAdminRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/huoltohistoria': typeof AuthenticatedHuoltohistoriaRoute
   '/_authenticated/kulut': typeof AuthenticatedKulutRoute
@@ -122,6 +131,7 @@ export interface FileRouteTypes {
     | '/'
     | '/login'
     | '/rekisteroidy'
+    | '/admin'
     | '/dashboard'
     | '/huoltohistoria'
     | '/kulut'
@@ -134,6 +144,7 @@ export interface FileRouteTypes {
     | '/'
     | '/login'
     | '/rekisteroidy'
+    | '/admin'
     | '/dashboard'
     | '/huoltohistoria'
     | '/kulut'
@@ -147,6 +158,7 @@ export interface FileRouteTypes {
     | '/_authenticated'
     | '/login'
     | '/rekisteroidy'
+    | '/_authenticated/admin'
     | '/_authenticated/dashboard'
     | '/_authenticated/huoltohistoria'
     | '/_authenticated/kulut'
@@ -242,10 +254,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/admin': {
+      id: '/_authenticated/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AuthenticatedAdminRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
   }
 }
 
 interface AuthenticatedRouteChildren {
+  AuthenticatedAdminRoute: typeof AuthenticatedAdminRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedHuoltohistoriaRoute: typeof AuthenticatedHuoltohistoriaRoute
   AuthenticatedKulutRoute: typeof AuthenticatedKulutRoute
@@ -256,6 +276,7 @@ interface AuthenticatedRouteChildren {
 }
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
+  AuthenticatedAdminRoute: AuthenticatedAdminRoute,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedHuoltohistoriaRoute: AuthenticatedHuoltohistoriaRoute,
   AuthenticatedKulutRoute: AuthenticatedKulutRoute,
