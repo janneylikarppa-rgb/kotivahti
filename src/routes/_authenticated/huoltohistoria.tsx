@@ -151,6 +151,16 @@ function HuoltoPage() {
           )}
         </DialogContent>
       </Dialog>
+
+      <LiidiDialog
+        open={!!tilaaH}
+        onOpenChange={(o) => !o && setTilaaH(null)}
+        esitaytetty={tilaaH ? {
+          palvelu: "huolto",
+          kategoria: arvaaKategoria(`${tilaaH.tyyppi ?? ""} ${tilaaH.kohde ?? ""}`),
+          kuvaus: `Huoltohistoria: ${tilaaH.tyyppi}${tilaaH.kohde ? ` – ${tilaaH.kohde}` : ""}`,
+        } : undefined}
+      />
     </div>
   );
 }
