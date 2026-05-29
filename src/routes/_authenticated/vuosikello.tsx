@@ -10,8 +10,10 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { AlertTriangle, ArrowRight, Check, Circle, MinusCircle, Sparkles } from "lucide-react";
+import { AlertTriangle, ArrowRight, Check, Circle, MinusCircle, Sparkles, Send } from "lucide-react";
 import { toast } from "sonner";
+import { LiidiDialog } from "@/components/liidi-dialog";
+import { arvaaKategoria } from "@/lib/liidit-kategoriat";
 
 export const Route = createFileRoute("/_authenticated/vuosikello")({
   component: VuosikelloPage,
