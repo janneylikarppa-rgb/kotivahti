@@ -12,8 +12,10 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { HuoltoForm } from "@/components/huolto-form";
-import { Paperclip, Pencil, Plus, Trash2 } from "lucide-react";
+import { Paperclip, Pencil, Plus, Send, Trash2 } from "lucide-react";
 import { toast } from "sonner";
+import { LiidiDialog } from "@/components/liidi-dialog";
+import { arvaaKategoria } from "@/lib/liidit-kategoriat";
 
 
 export const Route = createFileRoute("/_authenticated/huoltohistoria")({
