@@ -39,8 +39,8 @@ function VuosikelloPage() {
   const kuitatut: Kuitattu[] = (data?.kuitatut as Kuitattu[]) ?? [];
   const talon = data?.talon_tiedot ?? null;
   const erapaivat = ((ptsData?.rivit as any[]) ?? []).filter((r) => r.huoltoErapaiva);
-  const [kausi, setKausi] = useState<Kausi>(autoKausi());
   const [valittu, setValittu] = useState<string | null>(null);
+  const [liidiNimi, setLiidiNimi] = useState<string | null>(null);
 
   const mut = useMutation({
     mutationFn: (v: any) => kuittaaFn({ data: v }),
