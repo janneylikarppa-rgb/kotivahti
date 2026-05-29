@@ -10,8 +10,10 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { AlertTriangle, ArrowRight, Check, Circle, MinusCircle, Sparkles } from "lucide-react";
+import { AlertTriangle, ArrowRight, Check, Circle, MinusCircle, Sparkles, Send } from "lucide-react";
 import { toast } from "sonner";
+import { LiidiDialog } from "@/components/liidi-dialog";
+import { arvaaKategoria } from "@/lib/liidit-kategoriat";
 
 export const Route = createFileRoute("/_authenticated/vuosikello")({
   component: VuosikelloPage,
@@ -39,6 +41,7 @@ function VuosikelloPage() {
   const erapaivat = ((ptsData?.rivit as any[]) ?? []).filter((r) => r.huoltoErapaiva);
   const [kausi, setKausi] = useState<Kausi>(autoKausi());
   const [valittu, setValittu] = useState<string | null>(null);
+  const [liidiNimi, setLiidiNimi] = useState<string | null>(null);
 
   const mut = useMutation({
     mutationFn: (v: any) => kuittaaFn({ data: v }),
@@ -128,6 +131,7 @@ function VuosikelloPage() {
             nimet={perus}
             statusOf={statusOf}
             onAvaa={(n) => setValittu(n)}
+            onTilaa={(n) => setLiidiNimi(n)}
           />
           {dyn.length > 0 && (
             <HuoltoLista
@@ -136,6 +140,7 @@ function VuosikelloPage() {
               nimet={dyn}
               statusOf={statusOf}
               onAvaa={(n) => setValittu(n)}
+              onTilaa={(n) => setLiidiNimi(n)}
             />
           )}
           {huollot.length === 0 && (
@@ -156,6 +161,16 @@ function VuosikelloPage() {
           )}
         </DialogContent>
       </Dialog>
+
+      <LiidiDialog
+        open={!!liidiNimi}
+        onOpenChange={(o) => !o && setLiidiNimi(null)}
+        esitaytetty={liidiNimi ? {
+          palvelu: "huolto",
+          kategoria: arvaaKategoria(liidiNimi),
+          kuvaus: `Vuosikello: ${liidiNimi}`,
+        } : undefined}
+      />
     </div>
   );
 }
@@ -166,12 +181,14 @@ function HuoltoLista({
   nimet,
   statusOf,
   onAvaa,
+  onTilaa,
 }: {
   otsikko: string;
   ikoni?: React.ReactNode;
   nimet: string[];
   statusOf: (n: string) => Kuitattu | undefined;
   onAvaa: (n: string) => void;
+  onTilaa: (n: string) => void;
 }) {
   return (
     <div>
@@ -197,6 +214,15 @@ function HuoltoLista({
               </span>
               {st?.hinta ? <span className="text-xs font-mono text-muted-foreground">{Number(st.hinta).toFixed(0)} €</span> : null}
               {st?.tekija === "ammattilainen" && <span className="text-[10px] uppercase tracking-wider text-primary">amm.</span>}
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                onClick={() => onTilaa(nimi)}
+                className="h-7 px-2 text-[11px] uppercase tracking-wider text-primary hover:bg-primary/10"
+              >
+                <Send className="mr-1 h-3 w-3" /> Tilaa
+              </Button>
             </li>
           );
         })}
