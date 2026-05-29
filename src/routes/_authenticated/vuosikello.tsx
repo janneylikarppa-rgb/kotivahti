@@ -131,6 +131,7 @@ function VuosikelloPage() {
             nimet={perus}
             statusOf={statusOf}
             onAvaa={(n) => setValittu(n)}
+            onTilaa={(n) => setLiidiNimi(n)}
           />
           {dyn.length > 0 && (
             <HuoltoLista
@@ -139,6 +140,7 @@ function VuosikelloPage() {
               nimet={dyn}
               statusOf={statusOf}
               onAvaa={(n) => setValittu(n)}
+              onTilaa={(n) => setLiidiNimi(n)}
             />
           )}
           {huollot.length === 0 && (
