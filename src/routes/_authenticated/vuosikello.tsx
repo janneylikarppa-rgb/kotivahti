@@ -160,6 +160,8 @@ function VuosikelloPage() {
             />
           )}
         </DialogContent>
+      </Dialog>
+
       <LiidiDialog
         open={!!liidiNimi}
         onOpenChange={(o) => !o && setLiidiNimi(null)}
@@ -171,7 +173,6 @@ function VuosikelloPage() {
       />
     </div>
   );
-}
 }
 
 function HuoltoLista({
