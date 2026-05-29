@@ -34,7 +34,7 @@ function HuoltoPage() {
   const qc = useQueryClient();
   const { data = [], isLoading } = useQuery({ queryKey: ["huollot"], queryFn: () => fetchFn(), staleTime: 30_000 });
   const [open, setOpen] = useState(false);
-  const [editing, setEditing] = useState<any | null>(null);
+  const [tilaaH, setTilaaH] = useState<any | null>(null);
 
   const invalidate = () => {
     qc.invalidateQueries({ queryKey: ["huollot"] });
