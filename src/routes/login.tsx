@@ -181,6 +181,14 @@ function LoginPage() {
             >
               {loading ? "Kirjaudutaan..." : "Kirjaudu sisään"}
             </Button>
+            {needsConfirm && (
+              <div className="rounded-md border border-border/60 bg-muted/20 p-3 text-xs text-muted-foreground space-y-2">
+                <p>Sähköpostiosi ei ole vielä vahvistettu. Lähetimme aiemmin vahvistuslinkin – tarkista postilaatikko ja roskaposti.</p>
+                <Button type="button" variant="ghost" size="sm" onClick={handleResend} className="h-7 px-2 text-xs">
+                  Lähetä vahvistuslinkki uudelleen
+                </Button>
+              </div>
+            )}
           </form>
 
           <div className="relative my-6">
