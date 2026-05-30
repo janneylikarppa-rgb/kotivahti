@@ -9,8 +9,10 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as TietosuojaRouteImport } from './routes/tietosuoja'
 import { Route as RekisteroidyRouteImport } from './routes/rekisteroidy'
 import { Route as LoginRouteImport } from './routes/login'
+import { Route as KayttoehdotRouteImport } from './routes/kayttoehdot'
 import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedVuosikelloRouteImport } from './routes/_authenticated/vuosikello'
@@ -22,6 +24,11 @@ import { Route as AuthenticatedHuoltohistoriaRouteImport } from './routes/_authe
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 
+const TietosuojaRoute = TietosuojaRouteImport.update({
+  id: '/tietosuoja',
+  path: '/tietosuoja',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const RekisteroidyRoute = RekisteroidyRouteImport.update({
   id: '/rekisteroidy',
   path: '/rekisteroidy',
@@ -30,6 +37,11 @@ const RekisteroidyRoute = RekisteroidyRouteImport.update({
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
   path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const KayttoehdotRoute = KayttoehdotRouteImport.update({
+  id: '/kayttoehdot',
+  path: '/kayttoehdot',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedRoute = AuthenticatedRouteImport.update({
@@ -86,8 +98,10 @@ const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/kayttoehdot': typeof KayttoehdotRoute
   '/login': typeof LoginRoute
   '/rekisteroidy': typeof RekisteroidyRoute
+  '/tietosuoja': typeof TietosuojaRoute
   '/admin': typeof AuthenticatedAdminRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/huoltohistoria': typeof AuthenticatedHuoltohistoriaRoute
@@ -99,8 +113,10 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/kayttoehdot': typeof KayttoehdotRoute
   '/login': typeof LoginRoute
   '/rekisteroidy': typeof RekisteroidyRoute
+  '/tietosuoja': typeof TietosuojaRoute
   '/admin': typeof AuthenticatedAdminRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/huoltohistoria': typeof AuthenticatedHuoltohistoriaRoute
@@ -114,8 +130,10 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteWithChildren
+  '/kayttoehdot': typeof KayttoehdotRoute
   '/login': typeof LoginRoute
   '/rekisteroidy': typeof RekisteroidyRoute
+  '/tietosuoja': typeof TietosuojaRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/huoltohistoria': typeof AuthenticatedHuoltohistoriaRoute
@@ -129,8 +147,10 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/kayttoehdot'
     | '/login'
     | '/rekisteroidy'
+    | '/tietosuoja'
     | '/admin'
     | '/dashboard'
     | '/huoltohistoria'
@@ -142,8 +162,10 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/kayttoehdot'
     | '/login'
     | '/rekisteroidy'
+    | '/tietosuoja'
     | '/admin'
     | '/dashboard'
     | '/huoltohistoria'
@@ -156,8 +178,10 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/_authenticated'
+    | '/kayttoehdot'
     | '/login'
     | '/rekisteroidy'
+    | '/tietosuoja'
     | '/_authenticated/admin'
     | '/_authenticated/dashboard'
     | '/_authenticated/huoltohistoria'
@@ -171,12 +195,21 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
+  KayttoehdotRoute: typeof KayttoehdotRoute
   LoginRoute: typeof LoginRoute
   RekisteroidyRoute: typeof RekisteroidyRoute
+  TietosuojaRoute: typeof TietosuojaRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/tietosuoja': {
+      id: '/tietosuoja'
+      path: '/tietosuoja'
+      fullPath: '/tietosuoja'
+      preLoaderRoute: typeof TietosuojaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/rekisteroidy': {
       id: '/rekisteroidy'
       path: '/rekisteroidy'
@@ -189,6 +222,13 @@ declare module '@tanstack/react-router' {
       path: '/login'
       fullPath: '/login'
       preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/kayttoehdot': {
+      id: '/kayttoehdot'
+      path: '/kayttoehdot'
+      fullPath: '/kayttoehdot'
+      preLoaderRoute: typeof KayttoehdotRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated': {
@@ -293,19 +333,11 @@ const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRoute: AuthenticatedRouteWithChildren,
+  KayttoehdotRoute: KayttoehdotRoute,
   LoginRoute: LoginRoute,
   RekisteroidyRoute: RekisteroidyRoute,
+  TietosuojaRoute: TietosuojaRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}

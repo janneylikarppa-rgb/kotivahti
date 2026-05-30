@@ -50,16 +50,35 @@ function LoginPage() {
     return <div className="min-h-screen bg-background" />;
   }
 
+  const [needsConfirm, setNeedsConfirm] = useState(false);
+
   const handleEmailLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     const { error } = await supabase.auth.signInWithPassword({ email, password });
     setLoading(false);
     if (error) {
-      toast.error(error.message);
+      const msg = error.message?.toLowerCase() ?? "";
+      if (msg.includes("not confirmed") || msg.includes("email not confirmed")) {
+        setNeedsConfirm(true);
+        toast.error("Vahvista sähköpostisi ensin – tarkista postilaatikkosi.");
+      } else {
+        toast.error(error.message);
+      }
       return;
     }
     navigate({ to: "/dashboard" });
+  };
+
+  const handleResend = async () => {
+    if (!email) { toast.error("Anna sähköpostiosoite"); return; }
+    const { error } = await supabase.auth.resend({
+      type: "signup",
+      email,
+      options: { emailRedirectTo: window.location.origin },
+    });
+    if (error) toast.error(error.message);
+    else toast.success("Vahvistuslinkki lähetetty uudelleen.");
   };
 
   const handleGoogle = async () => {
@@ -162,6 +181,14 @@ function LoginPage() {
             >
               {loading ? "Kirjaudutaan..." : "Kirjaudu sisään"}
             </Button>
+            {needsConfirm && (
+              <div className="rounded-md border border-border/60 bg-muted/20 p-3 text-xs text-muted-foreground space-y-2">
+                <p>Sähköpostiosi ei ole vielä vahvistettu. Lähetimme aiemmin vahvistuslinkin – tarkista postilaatikko ja roskaposti.</p>
+                <Button type="button" variant="ghost" size="sm" onClick={handleResend} className="h-7 px-2 text-xs">
+                  Lähetä vahvistuslinkki uudelleen
+                </Button>
+              </div>
+            )}
           </form>
 
           <div className="relative my-6">
@@ -182,6 +209,12 @@ function LoginPage() {
             </svg>
             Jatka Googlella
           </Button>
+
+          <p className="mt-8 text-[11px] text-muted-foreground text-center">
+            <Link to="/kayttoehdot" className="hover:text-primary underline-offset-4 hover:underline">Käyttöehdot</Link>
+            {" · "}
+            <Link to="/tietosuoja" className="hover:text-primary underline-offset-4 hover:underline">Tietosuoja</Link>
+          </p>
         </div>
       </div>
     </div>
