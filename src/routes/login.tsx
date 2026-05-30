@@ -209,6 +209,12 @@ function LoginPage() {
             </svg>
             Jatka Googlella
           </Button>
+
+          <p className="mt-8 text-[11px] text-muted-foreground text-center">
+            <Link to="/kayttoehdot" className="hover:text-primary underline-offset-4 hover:underline">Käyttöehdot</Link>
+            {" · "}
+            <Link to="/tietosuoja" className="hover:text-primary underline-offset-4 hover:underline">Tietosuoja</Link>
+          </p>
         </div>
       </div>
     </div>
