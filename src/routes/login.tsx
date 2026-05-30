@@ -50,16 +50,35 @@ function LoginPage() {
     return <div className="min-h-screen bg-background" />;
   }
 
+  const [needsConfirm, setNeedsConfirm] = useState(false);
+
   const handleEmailLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     const { error } = await supabase.auth.signInWithPassword({ email, password });
     setLoading(false);
     if (error) {
-      toast.error(error.message);
+      const msg = error.message?.toLowerCase() ?? "";
+      if (msg.includes("not confirmed") || msg.includes("email not confirmed")) {
+        setNeedsConfirm(true);
+        toast.error("Vahvista sähköpostisi ensin – tarkista postilaatikkosi.");
+      } else {
+        toast.error(error.message);
+      }
       return;
     }
     navigate({ to: "/dashboard" });
+  };
+
+  const handleResend = async () => {
+    if (!email) { toast.error("Anna sähköpostiosoite"); return; }
+    const { error } = await supabase.auth.resend({
+      type: "signup",
+      email,
+      options: { emailRedirectTo: window.location.origin },
+    });
+    if (error) toast.error(error.message);
+    else toast.success("Vahvistuslinkki lähetetty uudelleen.");
   };
 
   const handleGoogle = async () => {
