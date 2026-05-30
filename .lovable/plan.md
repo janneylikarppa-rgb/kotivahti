@@ -1,101 +1,73 @@
-## Yleiskuva
+## Tavoite
 
-Rakennetaan **liidi-j\u00e4rjestelm\u00e4** jossa k\u00e4ytt\u00e4j\u00e4 voi tilata kuntoarvion, huollon tai tarjouspyynn\u00f6n. Liidit tallennetaan kantaan, vahvistuss\u00e4hk\u00f6posti l\u00e4htee asiakkaalle ja kategoria-kohtainen liidi-s\u00e4hk\u00f6posti ammattilaisverkostolle (Resend). Admin hallinnoi ammattilaisia ja liidej\u00e4 erillisess\u00e4 /admin-n\u00e4kym\u00e4ss\u00e4.
+Saadaan rekisteröinti lainmukaiseen kuntoon ennen julkaisua. Kaksi pakollista asiaa:
+1. **Suostumusruksit** rekisteröintilomakkeeseen (käyttöehdot + tietosuojaseloste)
+2. **Sähköpostin vahvistus** päälle ennen kuin tiliä voi käyttää
 
-## 1. Tietokantamuutokset (migraatio)
+Lisäksi tarvitaan minimitoteutus juridisille sivuille, jotta suostumusten linkit toimivat.
 
-**`liidit`** \u2014 asiakkaan l\u00e4hett\u00e4m\u00e4t pyynn\u00f6t
-- `id, kiinteisto_id, user_id, palvelu` (kuntoarvio/huolto/tarjouspyynto)
-- `kategoria, kuvaus, nimi, puhelin, sahkoposti, ajoitus, lisatieto`
-- `rakennus_vuosi, lammitys, osoite` (snapshot talon tiedoista)
-- `pts_kohde` (jos avattu PTS:st\u00e4)
-- `status` (odottaa/lahetetty/kaynnissa/valmis), `lahetetty_at, created_at, updated_at`
-- RLS: k\u00e4ytt\u00e4j\u00e4 n\u00e4kee/luo omat; admin n\u00e4kee kaikki
+---
 
-**`ammattilaiset`** \u2014 verkoston rekisteri
-- `id, kategoria, yritys, sahkoposti, puhelin, aktiivinen, prioriteetti`
-- RLS: vain admin lukee/muokkaa; SECURITY DEFINER -funktio kategorian aktiivisten s\u00e4hk\u00f6postien hakuun palvelinpuolen automaatiota varten
+## Mitä tehdään
 
-**`liidi_asetukset`** \u2014 globaali config (yksi rivi)
-- `id, automaatio_paalla boolean, paivitetty_at`
-- RLS: vain admin
+### 1. Käyttöehdot- ja tietosuojasivut (`/kayttoehdot`, `/tietosuoja`)
 
-**`user_roles`** + `app_role` enum (admin) + `has_role()` SECURITY DEFINER -funktio (oppaan mukainen kuvio)
-- Yksi admin-rivi sy\u00f6tet\u00e4\u00e4n erikseen sen j\u00e4lkeen kun k\u00e4ytt\u00e4j\u00e4 kertoo, kuka on admin
+Luodaan kaksi uutta julkista reittiä:
+- `src/routes/kayttoehdot.tsx`
+- `src/routes/tietosuoja.tsx`
 
-## 2. Server-funktiot (`src/lib/liidit.functions.ts`)
+Sisältönä aiemmin keskustellut tekstit **placeholdereilla merkittyinä** (`[Yrityksen nimi]`, `[Y-tunnus]`, `[Osoite]`, `[sähköposti]`) – täytät ne kun yritystiedot ovat valmiit. Sivuille tulee:
+- Sama header/footer-tyyli kuin muulla sivustolla
+- Selkeä otsikkohierarkia (h1/h2)
+- "Päivitetty" -päivämäärä
+- Linkit ristiin (käyttöehdoista tietosuojaan ja päinvastoin)
+- Linkki takaisin etusivulle / kirjautumiseen
 
-Kaikki `createServerFn` + `requireSupabaseAuth`:
+### 2. Suostumusruksit rekisteröintilomakkeeseen
 
-- `getLiidit()` \u2014 oman k\u00e4ytt\u00e4j\u00e4n pyynn\u00f6t
-- `luoLiidi(input)` \u2014 validoi Zodilla, snapshotoi talon tiedot, INSERT `liidit`, k\u00e4ynnist\u00e4\u00e4 s\u00e4hk\u00f6postit jos `automaatio_paalla=true`
-- `getAdminLiidit()` \u2014 admin: kaikki liidit; tarkistaa `has_role(uid,'admin')`
-- `paivitaLiidinStatus(id, status)` \u2014 admin
-- `getAmmattilaiset()` / `lisaaAmmattilainen` / `paivitaAmmattilainen` / `poistaAmmattilainen` \u2014 admin
-- `getLiidiAsetukset()` / `paivitaLiidiAsetukset(automaatio_paalla)` \u2014 admin
-- `getOmatKiinteistot()` \u2014 dropdownia varten
+Päivitetään `src/routes/rekisteroidy.tsx`:
+- Lisätään **yksi pakollinen checkbox**: "Hyväksyn [käyttöehdot](/kayttoehdot) ja [tietosuojaselosteen](/tietosuoja)"
+  - Yhdistetty yhteen ruksiin koska molemmat pakollisia palvelun käyttöön → ei vapaaehtoinen valinta
+- Lomakkeen lähetys estetään jos checkbox ei valittu (`required` + client-side validaatio)
+- Tallennetaan **suostumuksen aikaleima** Supabasen `auth.users.user_metadata`-kenttään (`tos_accepted_at`, `privacy_accepted_at`) signUp-kutsun `options.data`-kohdassa → todistettavissa myöhemmin
+- Google-kirjautumiseen lisätään lyhyt teksti napin yläpuolelle: "Jatkamalla hyväksyt käyttöehdot ja tietosuojaselosteen" (OAuth-flowssa ei voi vaatia checkboxia ennen redirectia, joten käytetään yleistä alaa kuten Spotify/Notion tekevät)
 
-S\u00e4hk\u00f6postin l\u00e4hetys palvelinpuolella (server-helper, ei edge functionia): `src/lib/email.server.ts` kutsuu Resend-APIa suoraan `RESEND_API_KEY`-secretill\u00e4. L\u00e4hett\u00e4j\u00e4 toistaiseksi `onboarding@resend.dev`; kun k\u00e4ytt\u00e4j\u00e4 vahvistaa oman domainin, vaihdetaan siihen.
+### 3. Sähköpostin vahvistus päälle
 
-## 3. Liidilomake-komponentti (`src/components/liidi-dialog.tsx`)
+- Varmistetaan että Supabase auto-confirm on **OFF** (käyttäjä joutuu klikkaamaan vahvistuslinkkiä ennen sisäänkirjautumista)
+- `src/routes/rekisteroidy.tsx`: lähetyksen jälkeen näytetään selkeämpi viesti ("Lähetimme vahvistuslinkin osoitteeseen X – klikkaa se ennen kirjautumista") ja ohjataan kiitos-näkymään `/login` sijaan
+- `src/routes/login.tsx`: jos kirjautuminen epäonnistuu syyllä "Email not confirmed", näytetään selkokielinen virhe + "Lähetä vahvistuslinkki uudelleen" -nappi (`supabase.auth.resend`)
 
-Yhteinen modaali jota k\u00e4ytt\u00e4v\u00e4t kaikki avauspaikat. Propsit:
-- `open, onOpenChange`
-- `esitaytetty?: { palvelu?, kategoria?, kuvaus?, lukitseKategoria?, lukitsePalvelu?, ptsKohde? }`
+### 4. Linkit footeriin / kirjautumissivulle
 
-Kent\u00e4t spesifikaation mukaan: palvelutyyppi (radio), kategoria (Select \u2014 14 kpl), kuvaus, nimi, puhelin, s\u00e4hk\u00f6posti (esit\u00e4yt. auth-sessionista), kiinteist\u00f6-dropdown (esit\u00e4yt. aktiivinen; jos useita), ajoitus (radio), lis\u00e4tieto. Luottamuselementti ennen l\u00e4hetysnappia.
+- Lisätään linkit käyttöehtoihin ja tietosuojaan myös:
+  - Kirjautumissivun alle
+  - Liidi-dialogin pieneksi disclaimer-tekstiksi ("Lähettämällä pyynnön hyväksyt että tietosi välitetään ammattilaiselle – ks. [tietosuojaseloste](/tietosuoja)")
 
-Onnistunut l\u00e4hetys \u2192 toast + sulje + `qc.invalidateQueries({queryKey:["liidit"]})`.
+---
 
-## 4. Avauspaikat
+## Mitä EI tehdä nyt (jää myöhemmäksi liiketoimintapäätöksinä)
 
-- **`vuosikello.tsx`**: jokaisen huoltorivin oikealle "Tilaa huolto" -nappi. Kategoria p\u00e4\u00e4tell\u00e4\u00e4n huollon nimest\u00e4 yksinkertaisella mapilla (nuohous\u2192Nuohous; kouru/sy\u00f6ksy\u2192Salaojat ja sadevesij; IV\u2192Ilmanvaihto; jne.). Kuvaus = "Vuosikello: [nimi]".
-- **`pts.tsx`**: rivin viereen "Pyyd\u00e4 kuntoarviota". Palvelu+kategoria lukittuna. Kuvaus = "PTS-suunnitelma suosittelee kuntoarviota: [kohde], arvioitu toimenpidevuosi [vuosi]".
-- **`huoltohistoria.tsx`**: "Tilaa ammattilainen" -nappi listan yl\u00e4puolelle.
-- **Navigaatio** (`app-sidebar.tsx`): linkki "Tilaa palvelu" joka avaa tyhj\u00e4n lomakkeen + uusi reitti **`/pyynnot`** k\u00e4ytt\u00e4j\u00e4n omien pyynt\u00f6jen listalle.
+- Resend API-avain / sähköpostiautomaatio
+- Oma sähköpostidomain (notify.kotivahti.fi)
+- Yritystietojen täyttö placeholdereihin
+- Maksullisuus, hinnoittelu, tilausehdot
+- Lakimiehen tarkistus
+- Vastuukatto-euromäärä käyttöehtoihin
+- Custom domain + julkaisu
 
-## 5. Pyynn\u00f6t-sivu (`src/routes/_authenticated/pyynnot.tsx`)
+---
 
-Lista k\u00e4ytt\u00e4j\u00e4n liideist\u00e4: p\u00e4iv\u00e4m\u00e4\u00e4r\u00e4, palvelu+kategoria, status-badge (Odottaa/K\u00e4ynniss\u00e4/Valmis), osoite. Tyhj\u00e4 tila + "Tilaa palvelu" CTA.
+## Tekniset yksityiskohdat
 
-## 6. Admin-paneeli (`src/routes/_authenticated/admin.tsx`)
+- Käytetään olemassa olevia shadcn-komponentteja: `Checkbox`, `Button`, `Label`
+- Reitit ovat julkisia (ei `_authenticated`-alla)
+- Ei tarvita Supabase-migraatiota – suostumusaikaleimat menevät `user_metadata`an
+- Ei tarvita uusia secretsiä
+- `supabase.auth.signUp`-kutsuun säilyy `emailRedirectTo: window.location.origin` jotta vahvistuslinkki ohjaa takaisin sovellukseen
 
-`beforeLoad` heitt\u00e4\u00e4 redirectin /dashboardiin jos ei admin. Kolme v\u00e4lilehte\u00e4 (Tabs):
+---
 
-1. **Liidit** \u2014 taulukko (pvm, asiakas, puhelin, osoite, kategoria, status-dropdown, toiminnot)
-2. **Ammattilaiset** \u2014 kategoriat ryhmiteltyn\u00e4; "Lis\u00e4\u00e4 ammattilainen" per kategoria; muokkaus/poisto-modaalit; aktiivinen-toggle
-3. **Asetukset** \u2014 automaatio-master switch (off = tallennetaan mutta ei l\u00e4het\u00e4 s\u00e4hk\u00f6posteja)
+## Lopputulos hyväksynnän jälkeen
 
-## 7. S\u00e4hk\u00f6postiautomaatio
-
-Server-funktion `luoLiidi` lopussa:
-```
-if (asetukset.automaatio_paalla) {
-  await sendAsiakkaalle(liidi)
-  const vastaanottajat = await haeAmmattilaiset(liidi.kategoria) // aktiiviset
-  if (vastaanottajat.length) await sendAmmattilaisille(liidi, vastaanottajat)
-}
-```
-Molemmat viestit speksin mukaisilla teksteill\u00e4. Virheet logitetaan mutta eiv\u00e4t kaada l\u00e4hetyst\u00e4 (liidi tallentuu silti, status j\u00e4\u00e4 "odottaa").
-
-**Vaaditaan secret**: `RESEND_API_KEY`. Pyyt\u00e4\u00e4n k\u00e4ytt\u00e4j\u00e4lt\u00e4 `add_secret`-ty\u00f6kalulla ennen koodin kirjoittamista.
-
-## 8. Avoimet kohdat (vahvistettava ennen toteutusta)
-
-1. **Admin-k\u00e4ytt\u00e4j\u00e4**: kenen s\u00e4hk\u00f6postin annan admin-roolin? (esim. sinun oman tunnuksesi)
-2. **L\u00e4hett\u00e4j\u00e4n osoite**: aluksi `onboarding@resend.dev` riitt\u00e4\u00e4 testaukseen, vai onko jo verifioitu Resend-domain k\u00e4yt\u00f6ss\u00e4?
-3. **Resend API key**: tarvitaan `add_secret`-pyynt\u00f6n\u00e4 ennen automaation aktivointia. Sopiiko?
-4. Pyynn\u00f6t-listan paikka: oma reitti `/pyynnot` sivupalkissa vai huoltohistorian alle samaan n\u00e4kym\u00e4\u00e4n? (Speksiss\u00e4 ehdotetaan kumpaakin.) Oletan oma reitti = selke\u00e4mpi.
-
-## Verifiointi
-
-A. PTS \u2192 "Pyyd\u00e4 kuntoarviota" \u2192 lomake esit\u00e4ytettyn\u00e4 ja kategoria lukittu \u2192 l\u00e4het\u00e4 \u2192 n\u00e4kyy /pyynnot \u2192 n\u00e4kyy adminissa \u2192 vahvistuss\u00e4hk\u00f6posti saapuu testiosoitteeseen.
-B. Vuosikello "Nuohous" \u2192 "Tilaa huolto" \u2192 kategoria = Nuohous esit\u00e4ytettyn\u00e4 \u2192 sama ketju.
-C. Admin kytkee automaation OFF \u2192 uusi liidi tallentuu mutta s\u00e4hk\u00f6postia ei l\u00e4hde (palvelinlogiin merkint\u00e4 "automaatio off").
-
-## Tekniset huomiot
-
-- Ei k\u00e4ytet\u00e4 Supabase Edge Functioneita; kaikki TanStack server-funktioissa.
-- Resend-kutsut suoraan `fetch`-API:lla (ei SDK:ta) jotta toimii Worker-runtimessa.
-- Liidi-snapshot: tallennetaan osoite/rakennusvuosi/l\u00e4mmitys rivin luonnin yhteydess\u00e4 \u2014 liidi ei muutu jos talon tietoja my\u00f6hemmin p\u00e4ivitet\u00e4\u00e4n.
-- `vuosikello-data.ts`: lis\u00e4t\u00e4\u00e4n `huoltoKategoriaksi(nimi)` -apuri kategorian arvaamiseen.
+Sovellus täyttää GDPR:n suostumusvaatimukset ja tilien luonti vaatii sähköpostin vahvistuksen. Voit lähettää linkin testikäyttäjille, ja kun yritystiedot ja sähköpostidomain ovat valmiit, viimeistellään loput julkaisua varten.
