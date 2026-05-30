@@ -236,6 +236,12 @@ export function LiidiDialog({ open, onOpenChange, esitaytetty }: LiidiDialogProp
             )}
           </div>
 
+          <p className="text-[11px] text-muted-foreground leading-relaxed">
+            Lähettämällä pyynnön hyväksyt, että antamasi tiedot välitetään valitulle
+            ammattilaiselle yhteydenottoa varten. Lisätietoja:{" "}
+            <a href="/tietosuoja" target="_blank" rel="noreferrer" className="text-primary hover:underline">tietosuojaseloste</a>.
+          </p>
+
           <div className="flex justify-end gap-2 pt-2">
             <Button type="button" variant="ghost" onClick={() => onOpenChange(false)}>Peruuta</Button>
             <Button type="submit" disabled={mut.isPending} className="uppercase tracking-wider font-semibold">
