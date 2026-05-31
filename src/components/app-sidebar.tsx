@@ -1,5 +1,7 @@
 import { useEffect } from "react";
 import { Link, useRouterState, useNavigate } from "@tanstack/react-router";
+import { useQuery } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
 import { LayoutDashboard, Home, Wrench, CalendarDays, Wallet, LogOut, ClipboardList, Send, Shield } from "lucide-react";
 import {
   Sidebar,
@@ -15,6 +17,7 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar";
 import { supabase } from "@/integrations/supabase/client";
+import { getUusienLiidienMaara } from "@/lib/liidit.functions";
 
 const items = [
   { title: "Yleiskuva", url: "/dashboard", icon: LayoutDashboard },
