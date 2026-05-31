@@ -35,6 +35,15 @@ export function AppSidebar() {
   const navigate = useNavigate();
   const { isMobile, setOpenMobile } = useSidebar();
 
+  const uusienFn = useServerFn(getUusienLiidienMaara);
+  const { data: uudet } = useQuery({
+    queryKey: ["uusien-liidien-maara"],
+    queryFn: () => uusienFn(),
+    staleTime: 30_000,
+    refetchInterval: 60_000,
+  });
+  const uusiaCount = uudet?.admin ? (uudet.count ?? 0) : 0;
+
   useEffect(() => {
     if (isMobile) setOpenMobile(false);
   }, [path, isMobile, setOpenMobile]);
@@ -65,16 +74,24 @@ export function AppSidebar() {
           <SidebarGroupLabel className="eyebrow">Navigaatio</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
-              {items.map((item) => (
-                <SidebarMenuItem key={item.url}>
-                  <SidebarMenuButton asChild isActive={path === item.url} tooltip={item.title}>
-                    <Link to={item.url} className="flex items-center gap-2" onClick={handleNav}>
-                      <item.icon className="h-4 w-4" />
-                      <span>{item.title}</span>
-                    </Link>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
+              {items.map((item) => {
+                const showBadge = item.url === "/admin" && uusiaCount > 0;
+                return (
+                  <SidebarMenuItem key={item.url}>
+                    <SidebarMenuButton asChild isActive={path === item.url} tooltip={item.title}>
+                      <Link to={item.url} className="flex items-center gap-2" onClick={handleNav}>
+                        <item.icon className="h-4 w-4" />
+                        <span className="flex-1">{item.title}</span>
+                        {showBadge && (
+                          <span className="ml-auto inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-red-500 px-1.5 text-[10px] font-semibold text-white">
+                            {uusiaCount}
+                          </span>
+                        )}
+                      </Link>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                );
+              })}
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
