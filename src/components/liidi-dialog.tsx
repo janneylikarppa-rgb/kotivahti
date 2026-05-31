@@ -13,12 +13,10 @@ import { getOmatKiinteistot, luoLiidi } from "@/lib/liidit.functions";
 import {
   LIIDI_KATEGORIAT,
   LIIDI_PALVELUT,
-  LIIDI_AJOITUKSET,
   type LiidiKategoria,
 } from "@/lib/liidit-kategoriat";
 
 type Palvelu = "kuntoarvio" | "huolto" | "tarjouspyynto";
-type Ajoitus = "asap" | "1_3kk" | "ensi_vuonna";
 
 export type LiidiDialogProps = {
   open: boolean;
@@ -50,10 +48,7 @@ export function LiidiDialog({ open, onOpenChange, esitaytetty }: LiidiDialogProp
   const [puhelin, setPuhelin] = useState("");
   const [sahkoposti, setSahkoposti] = useState("");
   const [kiinteistoId, setKiinteistoId] = useState<string>("");
-  const [ajoitus, setAjoitus] = useState<Ajoitus>("1_3kk");
-  const [lisatieto, setLisatieto] = useState("");
 
-  // Esitäytä yhteystiedot ja kiinteistö profiilista
   useEffect(() => {
     if (!open || !data) return;
     if (data.profile?.nimi && !nimi) setNimi(data.profile.nimi);
@@ -62,7 +57,6 @@ export function LiidiDialog({ open, onOpenChange, esitaytetty }: LiidiDialogProp
     if (!kiinteistoId && data.valittu_id) setKiinteistoId(data.valittu_id);
   }, [open, data]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Esitäytä kun esitaytetty muuttuu / dialogi avautuu
   useEffect(() => {
     if (!open) return;
     if (esitaytetty?.palvelu) setPalvelu(esitaytetty.palvelu);
@@ -70,44 +64,38 @@ export function LiidiDialog({ open, onOpenChange, esitaytetty }: LiidiDialogProp
     if (esitaytetty?.kuvaus) setKuvaus(esitaytetty.kuvaus);
   }, [open, esitaytetty?.palvelu, esitaytetty?.kategoria, esitaytetty?.kuvaus]);
 
-  // Automaattinen lisätieto: kourut/syöksytorvet/nuohous → tuo talon tietoja näkyviin
   const valittuKt: any = useMemo(
     () => data?.kiinteistot?.find((k: any) => k.id === kiinteistoId) ?? null,
     [data, kiinteistoId],
   );
-  const autoLisatieto = useMemo(() => {
-    if (!valittuKt) return "";
-    const rivit: string[] = [];
-    if (kategoria === "Salaojat ja sadevesijärjestelmä") {
-      if (valittuKt.kourun_pituus) rivit.push(`Kourujen pituus: ${valittuKt.kourun_pituus} m`);
-      if (valittuKt.syoksytorvet) rivit.push(`Syöksytorvia: ${valittuKt.syoksytorvet} kpl`);
-    }
-    if (kategoria === "Nuohous ja tulisijat") {
-      if (valittuKt.hormit) rivit.push(`Hormit: ${valittuKt.hormit}`);
-      if (valittuKt.nuohous_pvm) rivit.push(`Edellinen nuohous: ${valittuKt.nuohous_pvm}`);
-    }
-    if (kategoria === "Katto ja räystäät") {
-      if (valittuKt.katto_pinta_ala) rivit.push(`Katon pinta-ala: ${valittuKt.katto_pinta_ala} m²`);
-      if (valittuKt.kattomateriaali) rivit.push(`Katon materiaali: ${valittuKt.kattomateriaali}`);
-    }
-    return rivit.join("\n");
-  }, [valittuKt, kategoria]);
-
-  useEffect(() => {
-    // Esitäytä lisätieto-kenttä automaattisesti kun kategoria/kiinteistö vaihtuu, jos käyttäjä ei ole vielä koskenut
-    if (!open) return;
-    setLisatieto((nyk) => (nyk && nyk !== autoLisatieto ? nyk : autoLisatieto));
-  }, [autoLisatieto, open]);
 
   const mut = useMutation({
     mutationFn: (v: any) => luoFn({ data: v }),
     onSuccess: () => {
-      toast.success("Pyyntö lähetetty");
       qc.invalidateQueries({ queryKey: ["omat-liidit"] });
+      qc.invalidateQueries({ queryKey: ["admin-liidit"] });
+      qc.invalidateQueries({ queryKey: ["uusien-liidien-maara"] });
       onOpenChange(false);
-      // Tyhjennä lomakkeen muuttuvat kentät
+      toast.custom(
+        () => (
+          <div
+            className="flex items-start gap-3 rounded-lg border px-5 py-4 shadow-lg"
+            style={{ backgroundColor: "#0D1F14", borderColor: "#C9A84C", color: "#C9A84C", minWidth: 320 }}
+          >
+            <span style={{ fontSize: 20, lineHeight: 1 }}>✓</span>
+            <div className="space-y-1">
+              <div className="font-serif text-base" style={{ color: "#C9A84C" }}>
+                Pyyntösi on vastaanotettu.
+              </div>
+              <div className="text-sm" style={{ color: "#E8D89A" }}>
+                Olemme sinuun yhteydessä 1–3 arkipäivän sisällä.
+              </div>
+            </div>
+          </div>
+        ),
+        { duration: 5000 },
+      );
       setKuvaus(esitaytetty?.kuvaus ?? "");
-      setLisatieto("");
     },
     onError: (e: any) => toast.error(e?.message ?? "Lähetys epäonnistui"),
   });
@@ -126,8 +114,6 @@ export function LiidiDialog({ open, onOpenChange, esitaytetty }: LiidiDialogProp
       nimi: nimi.trim(),
       puhelin: puhelin.trim(),
       sahkoposti: sahkoposti.trim(),
-      ajoitus,
-      lisatieto: lisatieto.trim() || null,
       pts_kohde: esitaytetty?.pts_kohde ?? null,
     });
   };
@@ -175,8 +161,14 @@ export function LiidiDialog({ open, onOpenChange, esitaytetty }: LiidiDialogProp
           </div>
 
           <div className="space-y-2">
-            <Label>Lyhyt kuvaus</Label>
-            <Textarea value={kuvaus} onChange={(e) => setKuvaus(e.target.value)} rows={2} maxLength={2000} />
+            <Label>Kuvaus</Label>
+            <Textarea
+              value={kuvaus}
+              onChange={(e) => setKuvaus(e.target.value)}
+              rows={3}
+              maxLength={2000}
+              placeholder="Kerro lyhyesti mitä haluat (vapaaehtoinen)"
+            />
           </div>
 
           <div className="grid gap-3 md:grid-cols-2">
@@ -185,10 +177,11 @@ export function LiidiDialog({ open, onOpenChange, esitaytetty }: LiidiDialogProp
               <Input value={nimi} onChange={(e) => setNimi(e.target.value)} required maxLength={150} />
             </div>
             <div className="space-y-2">
-              <Label>Puhelin</Label>
+              <Label>Puhelinnumero</Label>
               <Input value={puhelin} onChange={(e) => setPuhelin(e.target.value)} required maxLength={40} />
             </div>
           </div>
+
           <div className="space-y-2">
             <Label>Sähköposti</Label>
             <Input type="email" value={sahkoposti} onChange={(e) => setSahkoposti(e.target.value)} required maxLength={200} />
@@ -206,32 +199,9 @@ export function LiidiDialog({ open, onOpenChange, esitaytetty }: LiidiDialogProp
                 ))}
               </SelectContent>
             </Select>
-          </div>
-
-          <div className="space-y-2">
-            <Label>Ajoitus</Label>
-            <RadioGroup value={ajoitus} onValueChange={(v) => setAjoitus(v as Ajoitus)} className="grid gap-2">
-              {LIIDI_AJOITUKSET.map((a) => (
-                <label key={a.arvo} className="flex items-center gap-3 rounded-md border border-border/60 p-2 cursor-pointer hover:border-primary/40">
-                  <RadioGroupItem value={a.arvo} />
-                  <span className="text-sm text-cream">{a.nimi}</span>
-                </label>
-              ))}
-            </RadioGroup>
-          </div>
-
-          <div className="space-y-2">
-            <Label>Lisätieto ammattilaiselle</Label>
-            <Textarea
-              value={lisatieto}
-              onChange={(e) => setLisatieto(e.target.value)}
-              rows={4}
-              maxLength={2000}
-              placeholder="Esim. kourujen pituus, syöksytorvien määrä, hormien tyyppi..."
-            />
-            {autoLisatieto && (
+            {valittuKt && (
               <p className="text-[11px] text-muted-foreground">
-                Esitäytetty talon tiedoista – voit muokata vapaasti.
+                {[valittuKt.osoite, valittuKt.kaupunki].filter(Boolean).join(", ")}
               </p>
             )}
           </div>
