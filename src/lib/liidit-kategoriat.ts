@@ -25,18 +25,15 @@ export const LIIDI_PALVELUT = [
   { arvo: "tarjouspyynto", nimi: "Tarjouspyyntö", kuvaus: "Kilpailuta työ useammalta tekijältä" },
 ] as const;
 
-export const LIIDI_AJOITUKSET = [
-  { arvo: "asap", nimi: "Mahdollisimman pian" },
-  { arvo: "1_3kk", nimi: "1–3 kuukauden sisällä" },
-  { arvo: "ensi_vuonna", nimi: "Vasta ensi vuonna / ei kiire" },
+export const LIIDI_STATUKSET = [
+  { arvo: "uusi", nimi: "Uusi", vari: "bg-amber-500/15 text-amber-300 border-amber-500/30" },
+  { arvo: "kasittelyssa", nimi: "Käsittelyssä", vari: "bg-sky-500/15 text-sky-300 border-sky-500/30" },
+  { arvo: "valitetty", nimi: "Välitetty", vari: "bg-blue-500/15 text-blue-300 border-blue-500/30" },
+  { arvo: "valmis", nimi: "Valmis", vari: "bg-emerald-500/15 text-emerald-300 border-emerald-500/30" },
+  { arvo: "peruutettu", nimi: "Peruutettu", vari: "bg-red-500/15 text-red-300 border-red-500/30" },
 ] as const;
 
-export const LIIDI_STATUKSET = [
-  { arvo: "odottaa", nimi: "Odottaa", vari: "bg-amber-500/15 text-amber-300 border-amber-500/30" },
-  { arvo: "lahetetty", nimi: "Lähetetty", vari: "bg-sky-500/15 text-sky-300 border-sky-500/30" },
-  { arvo: "kaynnissa", nimi: "Käynnissä", vari: "bg-blue-500/15 text-blue-300 border-blue-500/30" },
-  { arvo: "valmis", nimi: "Valmis", vari: "bg-emerald-500/15 text-emerald-300 border-emerald-500/30" },
-] as const;
+export type LiidiStatus = (typeof LIIDI_STATUKSET)[number]["arvo"];
 
 /** Päättele kategoria huoltorivin nimestä. */
 export function arvaaKategoria(nimi: string): LiidiKategoria {

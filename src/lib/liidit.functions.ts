@@ -2,10 +2,12 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { LIIDI_KATEGORIAT } from "@/lib/liidit-kategoriat";
-import { asiakkaanVahvistus, ammattilaisenLiidi, lahetaEmail } from "@/lib/email.server";
-import { supabaseAdmin } from "@/integrations/supabase/client.server";
+import { omistajanIlmoitus, lahetaEmail } from "@/lib/email.server";
 
 const kategoriaSchema = z.enum(LIIDI_KATEGORIAT as unknown as [string, ...string[]]);
+
+const STATUS_VALUES = ["uusi", "kasittelyssa", "valitetty", "valmis", "peruutettu"] as const;
+const statusSchema = z.enum(STATUS_VALUES);
 
 const luoLiidiSchema = z.object({
   kiinteisto_id: z.string().uuid(),
@@ -15,7 +17,6 @@ const luoLiidiSchema = z.object({
   nimi: z.string().trim().min(1).max(150),
   puhelin: z.string().trim().min(4).max(40),
   sahkoposti: z.string().trim().email().max(200),
-  ajoitus: z.enum(["asap", "1_3kk", "ensi_vuonna"]),
   lisatieto: z.string().max(2000).optional().nullable(),
   pts_kohde: z.string().max(200).optional().nullable(),
 });
@@ -90,7 +91,7 @@ export const luoLiidi = createServerFn({ method: "POST" })
 
     const osoiteRivi = [kt.osoite, [kt.postinumero, kt.kaupunki].filter(Boolean).join(" ")].filter(Boolean).join(", ") || null;
 
-    const liidiRow = {
+    const liidiRow: any = {
       user_id: userId,
       kiinteisto_id: kt.id,
       palvelu: data.palvelu,
@@ -99,13 +100,13 @@ export const luoLiidi = createServerFn({ method: "POST" })
       nimi: data.nimi,
       puhelin: data.puhelin,
       sahkoposti: data.sahkoposti,
-      ajoitus: data.ajoitus,
       lisatieto: data.lisatieto ?? null,
       osoite: osoiteRivi,
+      kaupunki: kt.kaupunki ?? null,
       rakennus_vuosi: kt.rakennusvuosi ?? null,
       lammitys: tt?.lammitysmuoto ?? null,
       pts_kohde: data.pts_kohde ?? null,
-      status: "odottaa" as const,
+      status: "uusi",
     };
 
     const { data: inserted, error: insErr } = await supabase
@@ -115,37 +116,26 @@ export const luoLiidi = createServerFn({ method: "POST" })
       .single();
     if (insErr) throw insErr;
 
-    // Sähköpostit – luetaan asetukset ja ammattilaiset admin-clientilla (RLS bypass).
-    let automaatioPaalla = false;
-    try {
-      const { data: asetus } = await supabaseAdmin.from("liidi_asetukset").select("automaatio_paalla").limit(1).maybeSingle();
-      if (asetus) automaatioPaalla = !!asetus.automaatio_paalla;
-    } catch {
-      automaatioPaalla = false;
-    }
-
-    if (automaatioPaalla) {
-      // Vahvistus asiakkaalle
-      const v = asiakkaanVahvistus(liidiRow);
-      await lahetaEmail({ to: liidiRow.sahkoposti, subject: v.subject, html: v.html });
-
-      // Ammattilaisille (admin-clientilla – RLS estäisi käyttäjältä)
-      const { data: amm } = await supabaseAdmin
-        .from("ammattilaiset")
-        .select("sahkoposti")
-        .eq("kategoria", liidiRow.kategoria)
-        .eq("aktiivinen", true);
-      const vastaanottajat = (amm ?? []).map((a: any) => a.sahkoposti).filter(Boolean);
-      if (vastaanottajat.length > 0) {
-        const a = ammattilaisenLiidi(liidiRow);
-        for (const to of vastaanottajat) {
-          await lahetaEmail({ to, subject: a.subject, html: a.html });
+    // Lähetä ilmoitus omistajalle välittömästi
+    const ownerEmail = process.env.OWNER_EMAIL;
+    if (ownerEmail) {
+      try {
+        const adminUrl = process.env.PUBLIC_APP_URL
+          ? `${process.env.PUBLIC_APP_URL.replace(/\/$/, "")}/admin`
+          : "/admin";
+        const msg = omistajanIlmoitus(liidiRow, { adminUrl });
+        const tulos = await lahetaEmail({ to: ownerEmail, subject: msg.subject, html: msg.html });
+        if (tulos.ok) {
+          await supabase
+            .from("liidit")
+            .update({ lahetetty_at: new Date().toISOString() })
+            .eq("id", inserted.id);
         }
+      } catch (e) {
+        console.error("Omistajan ilmoituksen lähetys epäonnistui", e);
       }
-
-      await supabase.from("liidit").update({ status: "lahetetty", lahetetty_at: new Date().toISOString() }).eq("id", inserted.id);
     } else {
-      console.log("Liidi tallennettu, mutta automaatio off – sähköpostia ei lähetetty");
+      console.warn("OWNER_EMAIL puuttuu – omistajalle ei lähetetty ilmoitusta");
     }
 
     return { ok: true, id: inserted.id };
@@ -174,11 +164,24 @@ export const getAdminLiidit = createServerFn({ method: "GET" })
     return data ?? [];
   });
 
+export const getUusienLiidienMaara = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const { supabase, userId } = context;
+    const { data: roolit } = await supabase.from("user_roles").select("role").eq("user_id", userId).eq("role", "admin").maybeSingle();
+    if (!roolit) return { count: 0, admin: false };
+    const { count } = await supabase
+      .from("liidit")
+      .select("id", { count: "exact", head: true })
+      .eq("status", "uusi");
+    return { count: count ?? 0, admin: true };
+  });
+
 export const paivitaLiidinStatus = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((i: unknown) => z.object({
     id: z.string().uuid(),
-    status: z.enum(["odottaa", "lahetetty", "kaynnissa", "valmis"]),
+    status: statusSchema,
   }).parse(i))
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;

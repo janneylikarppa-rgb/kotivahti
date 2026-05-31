@@ -283,10 +283,10 @@ export type Database = {
       }
       liidit: {
         Row: {
-          ajoitus: string
           created_at: string
           id: string
           kategoria: string
+          kaupunki: string | null
           kiinteisto_id: string
           kuvaus: string | null
           lahetetty_at: string | null
@@ -304,10 +304,10 @@ export type Database = {
           user_id: string
         }
         Insert: {
-          ajoitus: string
           created_at?: string
           id?: string
           kategoria: string
+          kaupunki?: string | null
           kiinteisto_id: string
           kuvaus?: string | null
           lahetetty_at?: string | null
@@ -325,10 +325,10 @@ export type Database = {
           user_id: string
         }
         Update: {
-          ajoitus?: string
           created_at?: string
           id?: string
           kategoria?: string
+          kaupunki?: string | null
           kiinteisto_id?: string
           kuvaus?: string | null
           lahetetty_at?: string | null

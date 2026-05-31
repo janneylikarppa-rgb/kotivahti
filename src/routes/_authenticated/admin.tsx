@@ -1,7 +1,7 @@
-import { createFileRoute, redirect } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { toast } from "sonner";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -10,7 +10,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogDescription } from "@/components/ui/dialog";
 import { Plus, Trash2 } from "lucide-react";
 import {
   getAdminLiidit,
@@ -23,7 +23,7 @@ import {
   paivitaLiidiAsetukset,
   onkoAdmin,
 } from "@/lib/liidit.functions";
-import { LIIDI_KATEGORIAT, LIIDI_STATUKSET } from "@/lib/liidit-kategoriat";
+import { LIIDI_KATEGORIAT, LIIDI_STATUKSET, LIIDI_PALVELUT } from "@/lib/liidit-kategoriat";
 
 export const Route = createFileRoute("/_authenticated/admin")({
   component: AdminPage,
@@ -65,50 +65,181 @@ function AdminPage() {
   );
 }
 
+function statusBadge(s: string) {
+  const found = LIIDI_STATUKSET.find((x) => x.arvo === s);
+  return (
+    <span className={`rounded-full border px-2 py-0.5 text-[10px] uppercase tracking-wider whitespace-nowrap ${found?.vari ?? "border-border text-muted-foreground"}`}>
+      {found?.nimi ?? s}
+    </span>
+  );
+}
+
+function palveluNimi(p: string) {
+  return LIIDI_PALVELUT.find((x) => x.arvo === p)?.nimi ?? p;
+}
+
+type Filtteri = "kaikki" | "uusi" | "kasittelyssa" | "valitetty" | "valmis";
+
 function LiiditTab() {
   const fetchFn = useServerFn(getAdminLiidit);
   const updFn = useServerFn(paivitaLiidinStatus);
   const qc = useQueryClient();
   const { data = [] } = useQuery({ queryKey: ["admin-liidit"], queryFn: () => fetchFn() });
+  const [filtteri, setFiltteri] = useState<Filtteri>("kaikki");
+  const [avoinId, setAvoinId] = useState<string | null>(null);
+
   const mut = useMutation({
     mutationFn: (v: any) => updFn({ data: v }),
-    onSuccess: () => { toast.success("Päivitetty"); qc.invalidateQueries({ queryKey: ["admin-liidit"] }); },
+    onSuccess: () => {
+      toast.success("Päivitetty");
+      qc.invalidateQueries({ queryKey: ["admin-liidit"] });
+      qc.invalidateQueries({ queryKey: ["uusien-liidien-maara"] });
+    },
     onError: (e: any) => toast.error(e.message),
   });
 
-  if ((data as any[]).length === 0) {
-    return <p className="text-muted-foreground">Ei liidejä.</p>;
-  }
+  const liidit = data as any[];
+  const filteredListSrc = useMemo(() => {
+    if (filtteri === "kaikki") return liidit;
+    return liidit.filter((l) => l.status === filtteri);
+  }, [liidit, filtteri]);
+
+  const counts = useMemo(() => {
+    const c: Record<string, number> = { kaikki: liidit.length };
+    for (const l of liidit) c[l.status] = (c[l.status] ?? 0) + 1;
+    return c;
+  }, [liidit]);
+
+  const avoin = avoinId ? liidit.find((l) => l.id === avoinId) : null;
+
+  const filterPainikkeet: { arvo: Filtteri; nimi: string }[] = [
+    { arvo: "kaikki", nimi: "Kaikki" },
+    { arvo: "uusi", nimi: "Uusi" },
+    { arvo: "kasittelyssa", nimi: "Käsittelyssä" },
+    { arvo: "valitetty", nimi: "Välitetty" },
+    { arvo: "valmis", nimi: "Valmis" },
+  ];
+
   return (
-    <div className="space-y-2">
-      {(data as any[]).map((l) => (
-        <Card key={l.id} className="gold-card">
-          <CardContent className="py-4 space-y-2">
-            <div className="flex flex-wrap items-baseline gap-2">
-              <span className="font-serif text-cream">{l.palvelu}</span>
-              <span className="text-sm text-muted-foreground">· {l.kategoria}</span>
-              <span className="ml-auto text-xs text-muted-foreground">{new Date(l.created_at).toLocaleString("fi-FI")}</span>
-            </div>
-            <div className="grid gap-2 text-sm md:grid-cols-2">
-              <div><span className="text-muted-foreground">Asiakas:</span> <span className="text-cream">{l.nimi}</span></div>
-              <div><span className="text-muted-foreground">Sähköposti:</span> <a className="text-primary" href={`mailto:${l.sahkoposti}`}>{l.sahkoposti}</a></div>
-              <div><span className="text-muted-foreground">Puhelin:</span> <a className="text-primary" href={`tel:${l.puhelin}`}>{l.puhelin}</a></div>
-              <div><span className="text-muted-foreground">Osoite:</span> <span className="text-cream">{l.osoite ?? "—"}</span></div>
-            </div>
-            {l.kuvaus && <p className="text-sm text-muted-foreground">{l.kuvaus}</p>}
-            {l.lisatieto && <pre className="whitespace-pre-wrap text-xs text-muted-foreground rounded border border-border/60 p-2">{l.lisatieto}</pre>}
-            <div className="flex items-center gap-2 pt-2">
-              <Label className="text-xs uppercase tracking-wider">Tila</Label>
-              <Select value={l.status} onValueChange={(v) => mut.mutate({ id: l.id, status: v })}>
-                <SelectTrigger className="w-48"><SelectValue /></SelectTrigger>
-                <SelectContent>
-                  {LIIDI_STATUKSET.map((s) => <SelectItem key={s.arvo} value={s.arvo}>{s.nimi}</SelectItem>)}
-                </SelectContent>
-              </Select>
-            </div>
-          </CardContent>
+    <div className="space-y-4">
+      <div className="flex flex-wrap gap-2">
+        {filterPainikkeet.map((f) => (
+          <button
+            key={f.arvo}
+            type="button"
+            onClick={() => setFiltteri(f.arvo)}
+            className={`rounded-full border px-3 py-1 text-xs uppercase tracking-wider transition ${
+              filtteri === f.arvo
+                ? "border-primary bg-primary/20 text-primary"
+                : "border-border/60 text-muted-foreground hover:border-primary/40 hover:text-cream"
+            }`}
+          >
+            {f.nimi}
+            <span className="ml-2 text-[10px] opacity-70">{counts[f.arvo] ?? 0}</span>
+          </button>
+        ))}
+      </div>
+
+      {filteredListSrc.length === 0 ? (
+        <p className="text-muted-foreground">Ei liidejä valitulla suodattimella.</p>
+      ) : (
+        <Card className="gold-card overflow-hidden">
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead className="bg-background/40 text-[11px] uppercase tracking-wider text-muted-foreground">
+                <tr>
+                  <th className="px-3 py-2 text-left">Aika</th>
+                  <th className="px-3 py-2 text-left">Kategoria</th>
+                  <th className="px-3 py-2 text-left">Palvelu</th>
+                  <th className="px-3 py-2 text-left">Nimi</th>
+                  <th className="px-3 py-2 text-left">Puhelin</th>
+                  <th className="px-3 py-2 text-left">Osoite</th>
+                  <th className="px-3 py-2 text-left">Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                {filteredListSrc.map((l) => (
+                  <tr
+                    key={l.id}
+                    onClick={() => setAvoinId(l.id)}
+                    className="cursor-pointer border-t border-border/40 hover:bg-primary/5"
+                  >
+                    <td className="px-3 py-2 text-xs text-muted-foreground whitespace-nowrap">
+                      {new Date(l.created_at).toLocaleString("fi-FI", { dateStyle: "short", timeStyle: "short" })}
+                    </td>
+                    <td className="px-3 py-2 text-cream">{l.kategoria}</td>
+                    <td className="px-3 py-2 text-muted-foreground">{palveluNimi(l.palvelu)}</td>
+                    <td className="px-3 py-2 text-cream">{l.nimi}</td>
+                    <td className="px-3 py-2 text-muted-foreground whitespace-nowrap">{l.puhelin}</td>
+                    <td className="px-3 py-2 text-muted-foreground">{l.osoite ?? "—"}</td>
+                    <td className="px-3 py-2">{statusBadge(l.status)}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </Card>
-      ))}
+      )}
+
+      <Dialog open={!!avoinId} onOpenChange={(o) => !o && setAvoinId(null)}>
+        <DialogContent className="max-w-xl max-h-[90vh] overflow-y-auto">
+          {avoin && (
+            <>
+              <DialogHeader>
+                <DialogTitle className="font-serif text-2xl">{avoin.kategoria}</DialogTitle>
+                <DialogDescription>
+                  {palveluNimi(avoin.palvelu)} · {new Date(avoin.created_at).toLocaleString("fi-FI")}
+                </DialogDescription>
+              </DialogHeader>
+
+              <div className="space-y-4 pt-2">
+                <section className="space-y-1">
+                  <h3 className="text-[11px] uppercase tracking-wider text-muted-foreground">Asiakas</h3>
+                  <div className="grid gap-1 text-sm">
+                    <div><span className="text-muted-foreground">Nimi:</span> <span className="text-cream">{avoin.nimi}</span></div>
+                    <div><span className="text-muted-foreground">Puhelin:</span> <a className="text-primary" href={`tel:${avoin.puhelin}`}>{avoin.puhelin}</a></div>
+                    <div><span className="text-muted-foreground">Sähköposti:</span> <a className="text-primary" href={`mailto:${avoin.sahkoposti}`}>{avoin.sahkoposti}</a></div>
+                  </div>
+                </section>
+
+                <section className="space-y-1">
+                  <h3 className="text-[11px] uppercase tracking-wider text-muted-foreground">Kiinteistö</h3>
+                  <div className="grid gap-1 text-sm">
+                    <div><span className="text-muted-foreground">Osoite:</span> <span className="text-cream">{avoin.osoite ?? "—"}</span></div>
+                    {avoin.kaupunki && <div><span className="text-muted-foreground">Kaupunki:</span> <span className="text-cream">{avoin.kaupunki}</span></div>}
+                    {avoin.rakennus_vuosi && <div><span className="text-muted-foreground">Rakennusvuosi:</span> <span className="text-cream">{avoin.rakennus_vuosi}</span></div>}
+                    {avoin.lammitys && <div><span className="text-muted-foreground">Lämmitys:</span> <span className="text-cream">{avoin.lammitys}</span></div>}
+                  </div>
+                </section>
+
+                {avoin.kuvaus && (
+                  <section className="space-y-1">
+                    <h3 className="text-[11px] uppercase tracking-wider text-muted-foreground">Asiakkaan kuvaus</h3>
+                    <p className="whitespace-pre-wrap rounded border border-border/60 p-3 text-sm text-cream">{avoin.kuvaus}</p>
+                  </section>
+                )}
+
+                {avoin.lisatieto && (
+                  <section className="space-y-1">
+                    <h3 className="text-[11px] uppercase tracking-wider text-muted-foreground">Lisätieto</h3>
+                    <pre className="whitespace-pre-wrap rounded border border-border/60 p-3 text-xs text-muted-foreground">{avoin.lisatieto}</pre>
+                  </section>
+                )}
+
+                <section className="flex items-center gap-3 pt-2 border-t border-border/40">
+                  <Label className="text-xs uppercase tracking-wider">Tila</Label>
+                  <Select value={avoin.status} onValueChange={(v) => mut.mutate({ id: avoin.id, status: v })}>
+                    <SelectTrigger className="w-56"><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      {LIIDI_STATUKSET.map((s) => <SelectItem key={s.arvo} value={s.arvo}>{s.nimi}</SelectItem>)}
+                    </SelectContent>
+                  </Select>
+                </section>
+              </div>
+            </>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
@@ -229,8 +360,8 @@ function AsetuksetTab() {
       <CardContent className="py-6 space-y-3">
         <div className="flex items-center justify-between gap-4">
           <div>
-            <div className="font-serif text-cream">Sähköpostiautomaatio</div>
-            <p className="text-xs text-muted-foreground">Kun pois päältä, liidit tallennetaan mutta sähköpostia ei lähetetä.</p>
+            <div className="font-serif text-cream">Sähköpostiautomaatio ammattilaisille</div>
+            <p className="text-xs text-muted-foreground">Tämä asetus on varattu tulevaa automaattista välitystä varten. Omistajan ilmoitukset uusista liideistä lähtevät aina automaattisesti.</p>
           </div>
           <Switch checked={paalla} onCheckedChange={(v) => mut.mutate({ automaatio_paalla: v })} />
         </div>
