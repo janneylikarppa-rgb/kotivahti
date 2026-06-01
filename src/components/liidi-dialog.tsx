@@ -184,7 +184,7 @@ export function LiidiDialog({ open, onOpenChange, esitaytetty }: LiidiDialogProp
             <Label>Kuvaus</Label>
             <Textarea
               value={kuvaus}
-              onChange={(e) => setKuvaus(e.target.value)}
+              onChange={(e) => { setKuvaus(e.target.value); setKuvausMuokattu(true); }}
               rows={3}
               maxLength={2000}
               placeholder="Kerro lyhyesti mitä haluat (vapaaehtoinen)"
