@@ -15,6 +15,7 @@ import {
   LIIDI_PALVELUT,
   type LiidiKategoria,
 } from "@/lib/liidit-kategoriat";
+import { rakennaKuvausPohja } from "@/lib/liidi-kuvauspohja";
 
 type Palvelu = "kuntoarvio" | "huolto" | "tarjouspyynto";
 
