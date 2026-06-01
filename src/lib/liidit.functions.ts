@@ -41,6 +41,24 @@ export const getOmatLiidit = createServerFn({ method: "GET" })
     return data ?? [];
   });
 
+const TALON_TIEDOT_KENTAT = [
+  "kiinteisto_id",
+  "lammitysmuoto", "lammitys_asennettu_vuosi",
+  "ilp_merkki", "ilp_malli", "ilp_asennettu_vuosi",
+  "ilmanvaihto", "ilmanvaihto_vuosi", "iv_suodatintyyppi", "iv_suodatin_vaihdettu",
+  "kattotyyppi", "kattomateriaali", "katto_uusittu_vuosi", "katto_pinta_ala",
+  "raystaat_kunnostettu_vuosi", "kattoturvatuotteet",
+  "putkimateriaali", "putket_uusittu_vuosi", "viemarimateriaali", "viemari_asennettu_vuosi",
+  "sahkot_asennettu_vuosi", "paasulun_sijainti",
+  "julkisivumateriaali", "julkisivu_maalattu_vuosi", "julkisivu_asennettu_vuosi",
+  "ikkunat_tyyppi", "ikkunat_uusittu_vuosi",
+  "terassi_materiaali", "terassi_rakennettu_vuosi", "terassi_lasitettu", "terassi_lasitus_vuosi", "terassi_kunnostettu_vuosi", "terassi_pinta_ala",
+  "salaojat", "salaojat_tarkastettu", "kourun_materiaali", "kourun_pituus", "syoksytorvet", "sadevesikaivot",
+  "kiukaan_vuosi", "nuohous_pvm", "hormit",
+  "pihan_tyyppi", "nurmikon_pinta_ala", "tontin_pinta_ala",
+  "pinta_ala",
+].join(", ");
+
 export const getOmatKiinteistot = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
@@ -52,17 +70,21 @@ export const getOmatKiinteistot = createServerFn({ method: "GET" })
       .eq("aktiivinen", true)
       .order("created_at", { ascending: true });
     const ids = (kt ?? []).map((k: any) => k.id);
-    let lammitysByKt: Record<string, string | null> = {};
+    const talotByKt: Record<string, any> = {};
     if (ids.length > 0) {
       const { data: tt } = await supabase
         .from("talon_tiedot")
-        .select("kiinteisto_id, lammitysmuoto")
+        .select(TALON_TIEDOT_KENTAT)
         .in("kiinteisto_id", ids);
-      for (const t of tt ?? []) lammitysByKt[t.kiinteisto_id] = t.lammitysmuoto ?? null;
+      for (const t of tt ?? []) talotByKt[t.kiinteisto_id] = t;
     }
     const { data: prof } = await supabase.from("profiles").select("valittu_kiinteisto_id, nimi, email, puhelin").eq("id", userId).maybeSingle();
     return {
-      kiinteistot: (kt ?? []).map((k: any) => ({ ...k, lammitysmuoto: lammitysByKt[k.id] ?? null })),
+      kiinteistot: (kt ?? []).map((k: any) => ({
+        ...k,
+        lammitysmuoto: talotByKt[k.id]?.lammitysmuoto ?? null,
+        talon_tiedot: talotByKt[k.id] ?? null,
+      })),
       valittu_id: prof?.valittu_kiinteisto_id ?? (kt?.[0]?.id ?? null),
       profile: prof ?? null,
     };
