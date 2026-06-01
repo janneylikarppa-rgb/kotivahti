@@ -1,73 +1,41 @@
 ## Tavoite
 
-Saadaan rekisteröinti lainmukaiseen kuntoon ennen julkaisua. Kaksi pakollista asiaa:
-1. **Suostumusruksit** rekisteröintilomakkeeseen (käyttöehdot + tietosuojaseloste)
-2. **Sähköpostin vahvistus** päälle ennen kuin tiliä voi käyttää
+Kun käyttäjä tilaa palvelun, ammattilainen saa heti yhteyttä ottaessaan pohjatiedot kohteesta — eikä asiakkaan tarvitse itse kirjoittaa, mitä laitetta/materiaalia talossa on.
 
-Lisäksi tarvitaan minimitoteutus juridisille sivuille, jotta suostumusten linkit toimivat.
+## Muutokset
 
----
+### 1. Vuosikellon esitäyttö siistimmäksi
+`src/routes/_authenticated/vuosikello.tsx` — pudotetaan `Vuosikello:`-etuliite. Kuvaukseen pelkkä asian ydin, esim. `Ilmalämpöpumpun vuosihuolto` (oli: `Vuosikello: Ilmalämpöpumpun vuosihuolto`).
 
-## Mitä tehdään
+### 2. Talon tietojen haku LiidiDialogiin
+`src/lib/liidit.functions.ts` — laajennetaan `getOmatKiinteistot`-funktio palauttamaan myös valitun kiinteistön `talon_tiedot`-rivin relevantit kentät (lämmitys, IV, katto, putket, julkisivu, ikkunat, terassi, sähköt, hormit, salaojat jne.).
 
-### 1. Käyttöehdot- ja tietosuojasivut (`/kayttoehdot`, `/tietosuoja`)
+### 3. Kategoriakohtainen kuvauspohja
+Uusi tiedosto `src/lib/liidi-kuvauspohja.ts`:
+- Funktio `rakennaKuvausPohja(kategoria, talonTiedot)` → palauttaa lyhyen, valmiin tekstin, jonka käyttäjä voi muokata.
+- Esim. kategorialla **Lämmitysjärjestelmä** + talossa ILP merkki "Mitsubishi" + vuosi 2018 → 
+  > `Lämmitysjärjestelmä: ilmalämpöpumppu (Mitsubishi, asennettu 2018). Toivon huoltoa / tarjousta.`
+- Kategorialla **Katto ja räystäät** + tiilikatto 2005 →
+  > `Katto: tiilikatto, uusittu 2005. Pinta-ala n. 120 m². Toivon kuntoarviota.`
+- Kategorialla **Ikkunat ja ovet** + 3k-ikkunat 2010 →
+  > `Ikkunat: 3-kertaiset, uusittu 2010. Toivon tarjousta.`
+- Jos tietoja ei ole, lyhyt geneerinen lause kategorian mukaan (esim. `Toivon tarjousta ikkunoiden uusimisesta.`).
 
-Luodaan kaksi uutta julkista reittiä:
-- `src/routes/kayttoehdot.tsx`
-- `src/routes/tietosuoja.tsx`
+Mapping kategoria → talon_tiedot-kentät (kaikki nykyiset 14 kategoriaa katetaan).
 
-Sisältönä aiemmin keskustellut tekstit **placeholdereilla merkittyinä** (`[Yrityksen nimi]`, `[Y-tunnus]`, `[Osoite]`, `[sähköposti]`) – täytät ne kun yritystiedot ovat valmiit. Sivuille tulee:
-- Sama header/footer-tyyli kuin muulla sivustolla
-- Selkeä otsikkohierarkia (h1/h2)
-- "Päivitetty" -päivämäärä
-- Linkit ristiin (käyttöehdoista tietosuojaan ja päinvastoin)
-- Linkki takaisin etusivulle / kirjautumiseen
+### 4. LiidiDialogin logiikka
+`src/components/liidi-dialog.tsx`:
+- Lisätään tila `kuvausMuokattu: boolean` — tosi heti kun käyttäjä koskee Textareaan.
+- Kun `kategoria` tai `kiinteistoId` muuttuu **eikä** käyttäjä ole muokannut kenttää, päivitetään kuvaus pohjatekstillä `rakennaKuvausPohja(kategoria, talonTiedot)`.
+- Vuosikellosta tuleva esitäytetty kuvaus (`liidiNimi`) yhdistetään pohjaan: `${liidiNimi}. ${pohja}` — käyttäjä näkee sekä työn nimen että talotietoihin perustuvan kontekstin.
+- Placeholder pysyy ennallaan tyhjälle kentälle.
 
-### 2. Suostumusruksit rekisteröintilomakkeeseen
+### 5. Sähköpostipohja
+`src/lib/email.server.ts` ei vaadi muutoksia — kuvaus välittyy jo nykyisellään omistajan ilmoitukseen.
 
-Päivitetään `src/routes/rekisteroidy.tsx`:
-- Lisätään **yksi pakollinen checkbox**: "Hyväksyn [käyttöehdot](/kayttoehdot) ja [tietosuojaselosteen](/tietosuoja)"
-  - Yhdistetty yhteen ruksiin koska molemmat pakollisia palvelun käyttöön → ei vapaaehtoinen valinta
-- Lomakkeen lähetys estetään jos checkbox ei valittu (`required` + client-side validaatio)
-- Tallennetaan **suostumuksen aikaleima** Supabasen `auth.users.user_metadata`-kenttään (`tos_accepted_at`, `privacy_accepted_at`) signUp-kutsun `options.data`-kohdassa → todistettavissa myöhemmin
-- Google-kirjautumiseen lisätään lyhyt teksti napin yläpuolelle: "Jatkamalla hyväksyt käyttöehdot ja tietosuojaselosteen" (OAuth-flowssa ei voi vaatia checkboxia ennen redirectia, joten käytetään yleistä alaa kuten Spotify/Notion tekevät)
+## Lopputulos
+- Tyhjästä avattu lomake → kuvaus täydentyy kategoriavalinnan mukaan talon tiedoilla.
+- Vuosikellon kautta avattu → kuvauksessa lukee suoraan työn nimi + talon laitteen tiedot.
+- Käyttäjä voi aina muokata; muokkauksen jälkeen automaattinen päivitys lakkaa, jotta kirjoitettu teksti ei katoa.
 
-### 3. Sähköpostin vahvistus päälle
-
-- Varmistetaan että Supabase auto-confirm on **OFF** (käyttäjä joutuu klikkaamaan vahvistuslinkkiä ennen sisäänkirjautumista)
-- `src/routes/rekisteroidy.tsx`: lähetyksen jälkeen näytetään selkeämpi viesti ("Lähetimme vahvistuslinkin osoitteeseen X – klikkaa se ennen kirjautumista") ja ohjataan kiitos-näkymään `/login` sijaan
-- `src/routes/login.tsx`: jos kirjautuminen epäonnistuu syyllä "Email not confirmed", näytetään selkokielinen virhe + "Lähetä vahvistuslinkki uudelleen" -nappi (`supabase.auth.resend`)
-
-### 4. Linkit footeriin / kirjautumissivulle
-
-- Lisätään linkit käyttöehtoihin ja tietosuojaan myös:
-  - Kirjautumissivun alle
-  - Liidi-dialogin pieneksi disclaimer-tekstiksi ("Lähettämällä pyynnön hyväksyt että tietosi välitetään ammattilaiselle – ks. [tietosuojaseloste](/tietosuoja)")
-
----
-
-## Mitä EI tehdä nyt (jää myöhemmäksi liiketoimintapäätöksinä)
-
-- Resend API-avain / sähköpostiautomaatio
-- Oma sähköpostidomain (notify.kotivahti.fi)
-- Yritystietojen täyttö placeholdereihin
-- Maksullisuus, hinnoittelu, tilausehdot
-- Lakimiehen tarkistus
-- Vastuukatto-euromäärä käyttöehtoihin
-- Custom domain + julkaisu
-
----
-
-## Tekniset yksityiskohdat
-
-- Käytetään olemassa olevia shadcn-komponentteja: `Checkbox`, `Button`, `Label`
-- Reitit ovat julkisia (ei `_authenticated`-alla)
-- Ei tarvita Supabase-migraatiota – suostumusaikaleimat menevät `user_metadata`an
-- Ei tarvita uusia secretsiä
-- `supabase.auth.signUp`-kutsuun säilyy `emailRedirectTo: window.location.origin` jotta vahvistuslinkki ohjaa takaisin sovellukseen
-
----
-
-## Lopputulos hyväksynnän jälkeen
-
-Sovellus täyttää GDPR:n suostumusvaatimukset ja tilien luonti vaatii sähköpostin vahvistuksen. Voit lähettää linkin testikäyttäjille, ja kun yritystiedot ja sähköpostidomain ovat valmiit, viimeistellään loput julkaisua varten.
+Tehdäänkö näin?
