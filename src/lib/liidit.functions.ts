@@ -76,7 +76,7 @@ export const getOmatKiinteistot = createServerFn({ method: "GET" })
         .from("talon_tiedot")
         .select(TALON_TIEDOT_KENTAT)
         .in("kiinteisto_id", ids);
-      for (const t of tt ?? []) talotByKt[t.kiinteisto_id] = t;
+      for (const t of (tt ?? []) as any[]) talotByKt[t.kiinteisto_id] = t;
     }
     const { data: prof } = await supabase.from("profiles").select("valittu_kiinteisto_id, nimi, email, puhelin").eq("id", userId).maybeSingle();
     return {
