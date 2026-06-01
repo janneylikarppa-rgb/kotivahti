@@ -168,7 +168,7 @@ function VuosikelloPage() {
         esitaytetty={liidiNimi ? {
           palvelu: "huolto",
           kategoria: arvaaKategoria(liidiNimi),
-          kuvaus: `Vuosikello: ${liidiNimi}`,
+          kuvaus: liidiNimi,
         } : undefined}
       />
     </div>
