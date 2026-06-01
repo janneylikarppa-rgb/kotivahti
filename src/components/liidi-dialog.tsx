@@ -45,6 +45,7 @@ export function LiidiDialog({ open, onOpenChange, esitaytetty }: LiidiDialogProp
   const [palvelu, setPalvelu] = useState<Palvelu>(esitaytetty?.palvelu ?? "huolto");
   const [kategoria, setKategoria] = useState<LiidiKategoria>(esitaytetty?.kategoria ?? "Muu / yleinen");
   const [kuvaus, setKuvaus] = useState(esitaytetty?.kuvaus ?? "");
+  const [kuvausMuokattu, setKuvausMuokattu] = useState(false);
   const [nimi, setNimi] = useState("");
   const [puhelin, setPuhelin] = useState("");
   const [sahkoposti, setSahkoposti] = useState("");
@@ -62,13 +63,31 @@ export function LiidiDialog({ open, onOpenChange, esitaytetty }: LiidiDialogProp
     if (!open) return;
     if (esitaytetty?.palvelu) setPalvelu(esitaytetty.palvelu);
     if (esitaytetty?.kategoria) setKategoria(esitaytetty.kategoria);
-    if (esitaytetty?.kuvaus) setKuvaus(esitaytetty.kuvaus);
+    if (esitaytetty?.kuvaus) {
+      setKuvaus(esitaytetty.kuvaus);
+      setKuvausMuokattu(false);
+    }
   }, [open, esitaytetty?.palvelu, esitaytetty?.kategoria, esitaytetty?.kuvaus]);
+
+  // Nollaa muokkauslippu kun dialog suljetaan
+  useEffect(() => {
+    if (!open) setKuvausMuokattu(false);
+  }, [open]);
 
   const valittuKt: any = useMemo(
     () => data?.kiinteistot?.find((k: any) => k.id === kiinteistoId) ?? null,
     [data, kiinteistoId],
   );
+
+  // Päivitä kuvaus automaattisesti kategoria + talon_tiedot perusteella,
+  // jos käyttäjä ei ole muokannut kenttää käsin.
+  useEffect(() => {
+    if (!open || kuvausMuokattu) return;
+    const pohja = rakennaKuvausPohja(kategoria, valittuKt?.talon_tiedot ?? null);
+    const ydin = esitaytetty?.kuvaus?.trim();
+    const uusi = ydin && pohja ? `${ydin}. ${pohja}` : (ydin ?? pohja ?? "");
+    setKuvaus(uusi);
+  }, [open, kategoria, valittuKt, kuvausMuokattu, esitaytetty?.kuvaus]);
 
   const mut = useMutation({
     mutationFn: (v: any) => luoFn({ data: v }),
