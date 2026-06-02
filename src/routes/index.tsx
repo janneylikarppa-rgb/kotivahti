@@ -396,7 +396,6 @@ function LandingPage() {
 
       {/* CTA */}
       <section
-        id="ammattilaiset"
         className="px-6 py-24 text-center relative overflow-hidden"
         style={{ background: "#0D1F14" }}
       >
