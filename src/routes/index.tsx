@@ -38,9 +38,6 @@ function LandingPage() {
             <a href="#ominaisuudet" className="text-muted-foreground hover:text-foreground transition">
               Ominaisuudet
             </a>
-            <a href="#ammattilaiset" className="text-muted-foreground hover:text-foreground transition">
-              Ammattilaiset
-            </a>
             <Link to="/rekisteroidy">
               <Button size="sm" className="uppercase tracking-wider font-semibold">
                 Aloita ilmaiseksi
@@ -55,9 +52,6 @@ function LandingPage() {
           <div className="md:hidden bg-background border-t border-border px-6 py-4 flex flex-col gap-4 text-sm">
             <a href="#ominaisuudet" onClick={() => setMenuOpen(false)} className="text-muted-foreground">
               Ominaisuudet
-            </a>
-            <a href="#ammattilaiset" onClick={() => setMenuOpen(false)} className="text-muted-foreground">
-              Ammattilaiset
             </a>
             <Link to="/rekisteroidy" onClick={() => setMenuOpen(false)}>
               <Button size="sm" className="w-full uppercase tracking-wider font-semibold">
