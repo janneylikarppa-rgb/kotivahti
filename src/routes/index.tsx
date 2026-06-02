@@ -442,12 +442,24 @@ function LandingPage() {
         className="px-6 py-7"
         style={{ background: "#0A1A10", borderTop: "1px solid rgba(201,168,76,0.15)" }}
       >
-        <div className="mx-auto max-w-7xl flex flex-col sm:flex-row items-center justify-between gap-3">
-          <Link to="/" className="font-serif text-lg" style={{ color: "rgba(245,237,216,0.5)" }}>
-            Koti<span style={{ color: "rgba(201,168,76,0.6)" }}>vahti</span>
-          </Link>
-          <p className="text-[0.72rem]" style={{ color: "rgba(245,237,216,0.3)" }}>
-            © 2026 Kotivahti · Kuopio · Talosi oma avustaja
+        <div className="mx-auto max-w-7xl flex flex-col gap-3">
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-3">
+            <Link to="/" className="font-serif text-lg" style={{ color: "rgba(245,237,216,0.5)" }}>
+              Koti<span style={{ color: "rgba(201,168,76,0.6)" }}>vahti</span>
+            </Link>
+            <p className="text-[0.72rem]" style={{ color: "rgba(245,237,216,0.3)" }}>
+              © 2026 Kotivahti · Kuopio · Talosi oma avustaja
+            </p>
+          </div>
+          <p className="text-[0.7rem] text-center sm:text-right" style={{ color: "rgba(245,237,216,0.35)" }}>
+            Oletko ammattilainen ja haluat mukaan verkostoon?{" "}
+            <a
+              href="mailto:info@kotivahti.fi"
+              className="underline-offset-2 hover:underline"
+              style={{ color: "rgba(201,168,76,0.7)" }}
+            >
+              info@kotivahti.fi
+            </a>
           </p>
         </div>
       </footer>
