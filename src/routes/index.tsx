@@ -38,9 +38,6 @@ function LandingPage() {
             <a href="#ominaisuudet" className="text-muted-foreground hover:text-foreground transition">
               Ominaisuudet
             </a>
-            <a href="#ammattilaiset" className="text-muted-foreground hover:text-foreground transition">
-              Ammattilaiset
-            </a>
             <Link to="/rekisteroidy">
               <Button size="sm" className="uppercase tracking-wider font-semibold">
                 Aloita ilmaiseksi
@@ -55,9 +52,6 @@ function LandingPage() {
           <div className="md:hidden bg-background border-t border-border px-6 py-4 flex flex-col gap-4 text-sm">
             <a href="#ominaisuudet" onClick={() => setMenuOpen(false)} className="text-muted-foreground">
               Ominaisuudet
-            </a>
-            <a href="#ammattilaiset" onClick={() => setMenuOpen(false)} className="text-muted-foreground">
-              Ammattilaiset
             </a>
             <Link to="/rekisteroidy" onClick={() => setMenuOpen(false)}>
               <Button size="sm" className="w-full uppercase tracking-wider font-semibold">
@@ -131,7 +125,7 @@ function LandingPage() {
             >
               <li>✓ Kaikki ominaisuudet ilmaisia</li>
               <li>✓ Ei luottokorttia eikä sitoumuksia</li>
-              <li>✓ Tarkastetut paikalliset ammattilaiset</li>
+              <li>✓ Käyttöönotto alle minuutissa</li>
             </ul>
           </div>
         </div>
@@ -287,28 +281,91 @@ function LandingPage() {
         </div>
       </section>
 
+      {/* RIBBON - Mikä Kotivahti on */}
+      <section className="px-6 sm:px-12 py-16 relative overflow-hidden" style={{ background: "#0D1F14" }}>
+        <div
+          className="absolute inset-0 pointer-events-none"
+          style={{ background: "radial-gradient(ellipse 70% 60% at 50% 0%, rgba(201,168,76,0.07), transparent 70%)" }}
+        />
+        <div className="relative mx-auto max-w-5xl text-center">
+          <p
+            className="text-[0.7rem] font-semibold tracking-[0.24em] uppercase inline-flex items-center gap-3"
+            style={{ color: "#C9A84C" }}
+          >
+            <span style={{ display: "inline-block", width: 24, height: 1, background: "#C9A84C" }} />
+            Uutta · Ilmainen talokirja
+            <span style={{ display: "inline-block", width: 24, height: 1, background: "#C9A84C" }} />
+          </p>
+          <h2
+            className="font-serif mt-4 leading-tight"
+            style={{ fontSize: "clamp(1.875rem, 4vw, 2.5rem)", color: "#F5EDD8" }}
+          >
+            Yksi sovellus –{" "}
+            <em className="italic" style={{ color: "#C9A84C" }}>
+              koko talon hallinta.
+            </em>
+          </h2>
+          <p
+            className="mt-5 text-sm sm:text-base font-light leading-relaxed mx-auto max-w-2xl"
+            style={{ color: "rgba(245,237,216,0.6)" }}
+          >
+            Talokirja, vuosikello, kulujenseuranta, PTS-suunnitelma ja palveluiden kilpailutus –
+            kaikki samassa paikassa. Aina ilmainen.
+          </p>
+          <div className="mt-8 flex flex-wrap justify-center gap-2.5">
+            {[
+              { icon: "📒", label: "Talokirja" },
+              { icon: "📅", label: "Vuosikello" },
+              { icon: "💰", label: "Kulujenseuranta" },
+              { icon: "📊", label: "PTS-suunnitelma" },
+              { icon: "🛠", label: "Huoltohistoria" },
+              { icon: "🤝", label: "Palveluiden kilpailutus" },
+            ].map((p) => (
+              <span
+                key={p.label}
+                className="inline-flex items-center gap-2 text-[0.8rem]"
+                style={{
+                  background: "rgba(201,168,76,0.08)",
+                  border: "1px solid rgba(201,168,76,0.25)",
+                  color: "#F5EDD8",
+                  borderRadius: 999,
+                  padding: "0.5rem 0.95rem",
+                }}
+              >
+                <span>{p.icon}</span>
+                <span>{p.label}</span>
+              </span>
+            ))}
+          </div>
+          <p className="mt-6 text-[0.75rem]" style={{ color: "rgba(245,237,216,0.4)" }}>
+            + myyntiraportti, muistutukset ja tarkastettujen ammattilaisten verkosto.
+          </p>
+        </div>
+      </section>
+
       {/* OMINAISUUDET */}
       <section id="ominaisuudet" style={{ background: "#F0EBE1" }} className="px-6 sm:px-12 py-20">
         <div className="mx-auto max-w-7xl">
           <div className="grid lg:grid-cols-2 gap-8 lg:gap-16 mb-12">
             <h2 className="font-serif leading-tight" style={{ fontSize: "clamp(1.875rem, 4vw, 2.25rem)", color: "#0D1F14" }}>
-              Kaikki mitä talo
+              Kaikki mitä talo tarvitsee
               <br />
               <em className="italic" style={{ color: "#5C7A30" }}>
-                tarvitsee.
+                — yhdessä.
               </em>
             </h2>
             <p className="text-sm font-light leading-relaxed self-end" style={{ color: "#6B5A42" }}>
-              Kuusi toimintoa jotka tekevät talostasi hyvin hoidetun – automaattisesti ja ilman vaivaa.
+              Seitsemän toimintoa jotka tekevät talostasi hyvin hoidetun – automaattisesti ja ilman vaivaa.
             </p>
           </div>
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
             {[
+              { icon: "📒", title: "Talokirja", desc: "Talon perustiedot, laitteet, materiaalit ja vuosiluvut yhdessä paikassa. Päivitä kerran, käytä aina." },
               { icon: "📅", title: "Vuosikello", desc: "Kausihuollot listattuna. Kuittaa tehdyksi – menee automaattisesti huoltohistoriaan." },
               { icon: "📊", title: "PTS-suunnitelma", desc: "Ennakoi milloin rakennusosat tarvitsevat toimenpiteitä. Ei yllätyksiä." },
               { icon: "💰", title: "Kulujenseuranta", desc: "Sähkö ja vesi kulutuspohjaisesti. Ennakointilaskelma tuleville vuosille." },
-              { icon: "🔧", title: "Huoltohistoria", desc: "Kaikki dokumentoitu. Kuitit, kuvat, tekijät – löydät aina kun tarvitset." },
-              { icon: "👷", title: "Tarkastetut ammattilaiset", desc: "Paikallinen verkosto. Kuntoarvio tai kilpailutus suoraan sovelluksesta." },
+              { icon: "🛠", title: "Huoltohistoria", desc: "Kaikki dokumentoitu. Kuitit, kuvat, tekijät – löydät aina kun tarvitset." },
+              { icon: "🤝", title: "Palveluiden kilpailutus", desc: "Tilaa kuntoarvio, huolto tai tarjouspyyntö suoraan sovelluksesta. Välitetään tarkastetuille paikallisille tekijöille." },
               { icon: "📄", title: "Myyntiraportti", desc: "Tulostettava raportti välittäjälle. Yksi nappi, kaikki tallessa." },
             ].map((f) => (
               <div
@@ -339,7 +396,6 @@ function LandingPage() {
 
       {/* CTA */}
       <section
-        id="ammattilaiset"
         className="px-6 py-24 text-center relative overflow-hidden"
         style={{ background: "#0D1F14" }}
       >
@@ -386,12 +442,24 @@ function LandingPage() {
         className="px-6 py-7"
         style={{ background: "#0A1A10", borderTop: "1px solid rgba(201,168,76,0.15)" }}
       >
-        <div className="mx-auto max-w-7xl flex flex-col sm:flex-row items-center justify-between gap-3">
-          <Link to="/" className="font-serif text-lg" style={{ color: "rgba(245,237,216,0.5)" }}>
-            Koti<span style={{ color: "rgba(201,168,76,0.6)" }}>vahti</span>
-          </Link>
-          <p className="text-[0.72rem]" style={{ color: "rgba(245,237,216,0.3)" }}>
-            © 2026 Kotivahti · Kuopio · Talosi oma avustaja
+        <div className="mx-auto max-w-7xl flex flex-col gap-3">
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-3">
+            <Link to="/" className="font-serif text-lg" style={{ color: "rgba(245,237,216,0.5)" }}>
+              Koti<span style={{ color: "rgba(201,168,76,0.6)" }}>vahti</span>
+            </Link>
+            <p className="text-[0.72rem]" style={{ color: "rgba(245,237,216,0.3)" }}>
+              © 2026 Kotivahti · Kuopio · Talosi oma avustaja
+            </p>
+          </div>
+          <p className="text-[0.7rem] text-center sm:text-right" style={{ color: "rgba(245,237,216,0.35)" }}>
+            Oletko ammattilainen ja haluat mukaan verkostoon?{" "}
+            <a
+              href="mailto:info@kotivahti.fi"
+              className="underline-offset-2 hover:underline"
+              style={{ color: "rgba(201,168,76,0.7)" }}
+            >
+              info@kotivahti.fi
+            </a>
           </p>
         </div>
       </footer>

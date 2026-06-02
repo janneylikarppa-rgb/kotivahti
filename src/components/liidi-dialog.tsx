@@ -44,6 +44,7 @@ export function LiidiDialog({ open, onOpenChange, esitaytetty }: LiidiDialogProp
 
   const [palvelu, setPalvelu] = useState<Palvelu>(esitaytetty?.palvelu ?? "huolto");
   const [kategoria, setKategoria] = useState<LiidiKategoria>(esitaytetty?.kategoria ?? "Muu / yleinen");
+  const [alkuKategoria, setAlkuKategoria] = useState<LiidiKategoria | null>(esitaytetty?.kategoria ?? null);
   const [kuvaus, setKuvaus] = useState(esitaytetty?.kuvaus ?? "");
   const [kuvausMuokattu, setKuvausMuokattu] = useState(false);
   const [nimi, setNimi] = useState("");
@@ -62,7 +63,12 @@ export function LiidiDialog({ open, onOpenChange, esitaytetty }: LiidiDialogProp
   useEffect(() => {
     if (!open) return;
     if (esitaytetty?.palvelu) setPalvelu(esitaytetty.palvelu);
-    if (esitaytetty?.kategoria) setKategoria(esitaytetty.kategoria);
+    if (esitaytetty?.kategoria) {
+      setKategoria(esitaytetty.kategoria);
+      setAlkuKategoria(esitaytetty.kategoria);
+    } else {
+      setAlkuKategoria(null);
+    }
     if (esitaytetty?.kuvaus) {
       setKuvaus(esitaytetty.kuvaus);
       setKuvausMuokattu(false);
@@ -84,10 +90,16 @@ export function LiidiDialog({ open, onOpenChange, esitaytetty }: LiidiDialogProp
   useEffect(() => {
     if (!open || kuvausMuokattu) return;
     const pohja = rakennaKuvausPohja(kategoria, valittuKt?.talon_tiedot ?? null);
-    const ydin = esitaytetty?.kuvaus?.trim();
+    // Vuosikellon ydin (esim. "Nuohouksen tilaus") koskee vain alkuperäistä
+    // kategoriaa. Jos käyttäjä vaihtaa kategorian, pudotetaan ydin ja
+    // käytetään pelkkää kategoriakohtaista pohjaa.
+    const ydin =
+      alkuKategoria && kategoria === alkuKategoria
+        ? esitaytetty?.kuvaus?.trim()
+        : undefined;
     const uusi = ydin && pohja ? `${ydin}. ${pohja}` : (ydin ?? pohja ?? "");
     setKuvaus(uusi);
-  }, [open, kategoria, valittuKt, kuvausMuokattu, esitaytetty?.kuvaus]);
+  }, [open, kategoria, valittuKt, kuvausMuokattu, esitaytetty?.kuvaus, alkuKategoria]);
 
   const mut = useMutation({
     mutationFn: (v: any) => luoFn({ data: v }),
