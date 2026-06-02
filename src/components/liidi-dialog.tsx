@@ -90,10 +90,16 @@ export function LiidiDialog({ open, onOpenChange, esitaytetty }: LiidiDialogProp
   useEffect(() => {
     if (!open || kuvausMuokattu) return;
     const pohja = rakennaKuvausPohja(kategoria, valittuKt?.talon_tiedot ?? null);
-    const ydin = esitaytetty?.kuvaus?.trim();
+    // Vuosikellon ydin (esim. "Nuohouksen tilaus") koskee vain alkuperäistä
+    // kategoriaa. Jos käyttäjä vaihtaa kategorian, pudotetaan ydin ja
+    // käytetään pelkkää kategoriakohtaista pohjaa.
+    const ydin =
+      alkuKategoria && kategoria === alkuKategoria
+        ? esitaytetty?.kuvaus?.trim()
+        : undefined;
     const uusi = ydin && pohja ? `${ydin}. ${pohja}` : (ydin ?? pohja ?? "");
     setKuvaus(uusi);
-  }, [open, kategoria, valittuKt, kuvausMuokattu, esitaytetty?.kuvaus]);
+  }, [open, kategoria, valittuKt, kuvausMuokattu, esitaytetty?.kuvaus, alkuKategoria]);
 
   const mut = useMutation({
     mutationFn: (v: any) => luoFn({ data: v }),
