@@ -1,41 +1,52 @@
-## Tavoite
+## 1. Liidi-dialogin kuvaus vaihtuu kategorian mukaan (bugikorjaus)
 
-Kun käyttäjä tilaa palvelun, ammattilainen saa heti yhteyttä ottaessaan pohjatiedot kohteesta — eikä asiakkaan tarvitse itse kirjoittaa, mitä laitetta/materiaalia talossa on.
+**Ongelma:** Kun "Tilaa nuohous" -napilla avattu lomake esitäyttää kuvaukseen "Nuohouksen tilaus" ja käyttäjä vaihtaa kategorian Lämmitysjärjestelmäksi, kuvauksessa lukee edelleen `Nuohouksen tilaus. Lämmitysmuoto: ...`. Esitäytetty teksti pitäisi kuulua vain alkuperäiseen kategoriaan.
 
-## Muutokset
+**Korjaus `src/components/liidi-dialog.tsx`:**
+- Tallennetaan `alkuKategoria`-ref dialogin avauksen yhteydessä (esitäytetyn kategorian arvo).
+- Kuvauksen automaattipäivityksen logiikka muuttuu:
+  - Jos `kategoria === alkuKategoria` ja `esitaytetty.kuvaus` on annettu → näytetään `${ydin}. ${pohja}` (kuten nyt).
+  - Jos käyttäjä on vaihtanut kategoriaa → näytetään pelkkä `pohja` (kategoriakohtainen talotietoteksti), vuosikellon ydin pudotetaan kokonaan.
+- Tämä toimii edelleen niin, että kun käyttäjä alkaa muokata kenttää käsin (`kuvausMuokattu = true`), automaattipäivitys lakkaa.
 
-### 1. Vuosikellon esitäyttö siistimmäksi
-`src/routes/_authenticated/vuosikello.tsx` — pudotetaan `Vuosikello:`-etuliite. Kuvaukseen pelkkä asian ydin, esim. `Ilmalämpöpumpun vuosihuolto` (oli: `Vuosikello: Ilmalämpöpumpun vuosihuolto`).
+## 2. Etusivun yläpalkki: poistetaan "Ammattilaiset"
 
-### 2. Talon tietojen haku LiidiDialogiin
-`src/lib/liidit.functions.ts` — laajennetaan `getOmatKiinteistot`-funktio palauttamaan myös valitun kiinteistön `talon_tiedot`-rivin relevantit kentät (lämmitys, IV, katto, putket, julkisivu, ikkunat, terassi, sähköt, hormit, salaojat jne.).
+**`src/routes/index.tsx`:**
+- Poistetaan navigaatiosta `Ammattilaiset`-linkki (sekä desktop- että mobiilivalikosta).
+- Footeriin lisätään hienovarainen rivi: `Oletko ammattilainen? Ota yhteyttä: info@kotivahti.fi` (tai vastaava). Tyyli sopusoinnussa muun footerin kanssa, ei korostettu.
+- Hero-osion ✓-listalta poistetaan `Tarkastetut paikalliset ammattilaiset` -rivi, koska se on ristiriidassa uuden viestin kanssa (ammattilaiskulma siirretään footerin sivumainintaan).
+- CTA-osion `id="ammattilaiset"` poistetaan tarpeettomana (oli vain ankkurin kohde).
 
-### 3. Kategoriakohtainen kuvauspohja
-Uusi tiedosto `src/lib/liidi-kuvauspohja.ts`:
-- Funktio `rakennaKuvausPohja(kategoria, talonTiedot)` → palauttaa lyhyen, valmiin tekstin, jonka käyttäjä voi muokata.
-- Esim. kategorialla **Lämmitysjärjestelmä** + talossa ILP merkki "Mitsubishi" + vuosi 2018 → 
-  > `Lämmitysjärjestelmä: ilmalämpöpumppu (Mitsubishi, asennettu 2018). Toivon huoltoa / tarjousta.`
-- Kategorialla **Katto ja räystäät** + tiilikatto 2005 →
-  > `Katto: tiilikatto, uusittu 2005. Pinta-ala n. 120 m². Toivon kuntoarviota.`
-- Kategorialla **Ikkunat ja ovet** + 3k-ikkunat 2010 →
-  > `Ikkunat: 3-kertaiset, uusittu 2010. Toivon tarjousta.`
-- Jos tietoja ei ole, lyhyt geneerinen lause kategorian mukaan (esim. `Toivon tarjousta ikkunoiden uusimisesta.`).
+## 3. Etusivun "huikea päivitys" uusista ominaisuuksista
 
-Mapping kategoria → talon_tiedot-kentät (kaikki nykyiset 14 kategoriaa katetaan).
+Tavoite: kävijä näkee heti yhdellä silmäyksellä, mitä kaikkea ilmainen Kotivahti tarjoaa.
 
-### 4. LiidiDialogin logiikka
-`src/components/liidi-dialog.tsx`:
-- Lisätään tila `kuvausMuokattu: boolean` — tosi heti kun käyttäjä koskee Textareaan.
-- Kun `kategoria` tai `kiinteistoId` muuttuu **eikä** käyttäjä ole muokannut kenttää, päivitetään kuvaus pohjatekstillä `rakennaKuvausPohja(kategoria, talonTiedot)`.
-- Vuosikellosta tuleva esitäytetty kuvaus (`liidiNimi`) yhdistetään pohjaan: `${liidiNimi}. ${pohja}` — käyttäjä näkee sekä työn nimen että talotietoihin perustuvan kontekstin.
-- Placeholder pysyy ennallaan tyhjälle kentälle.
+**Lisätään HERO:n ja nykyisen OMINAISUUDET-osion väliin uusi tiivis "Mikä Kotivahti on" -ribbon** (`src/routes/index.tsx`):
+- Tumma vihreä tausta `#0D1F14`, kultainen yläkulma-merkki: `UUTTA · ILMAINEN TALOKIRJA`.
+- Otsikko: *"Yksi sovellus – koko talon hallinta."*
+- Lyhyt alaotsikko, esim. *"Talokirja, vuosikello, kulujenseuranta, PTS-suunnitelma ja palveluiden kilpailutus – kaikki samassa paikassa. Aina ilmainen."*
+- 6 kompaktia "pillin" muodossa olevaa ominaisuusmerkkiä (rivissä, wrappaa mobiilissa), kullakin ikoni + nimi:
+  - 📒 Talokirja
+  - 📅 Vuosikello
+  - 💰 Kulujenseuranta
+  - 📊 PTS-suunnitelma
+  - 🛠 Huoltohistoria
+  - 🤝 Palveluiden kilpailutus
+- Alle pieni rivi: *"+ myyntiraportti, muistutukset ja tarkastettujen ammattilaisten verkosto."*
 
-### 5. Sähköpostipohja
-`src/lib/email.server.ts` ei vaadi muutoksia — kuvaus välittyy jo nykyisellään omistajan ilmoitukseen.
+**Päivitetään olemassaoleva OMINAISUUDET-grid** vastaamaan tätä uutta sisältöä:
+- Lisätään uusi kortti: **📒 Talokirja** – *"Talon perustiedot, laitteet, materiaalit ja vuosiluvut yhdessä paikassa. Päivitä kerran, käytä aina."*
+- Muutetaan kortti `Tarkastetut ammattilaiset` muotoon **🤝 Palveluiden kilpailutus** – *"Tilaa kuntoarvio, huolto tai tarjouspyyntö suoraan sovelluksesta. Välitetään tarkastetuille paikallisille tekijöille."*
+- Lopputuloksena 7 korttia (talokirja, vuosikello, PTS, kulujenseuranta, huoltohistoria, palveluiden kilpailutus, myyntiraportti). Grid säilyy `lg:grid-cols-3`.
+- Yläotsikko muuttuu muotoon: *"Kaikki mitä talo tarvitsee — yhdessä."*  Alaotsikon "Kuusi toimintoa" → "Seitsemän toimintoa".
 
-## Lopputulos
-- Tyhjästä avattu lomake → kuvaus täydentyy kategoriavalinnan mukaan talon tiedoilla.
-- Vuosikellon kautta avattu → kuvauksessa lukee suoraan työn nimi + talon laitteen tiedot.
-- Käyttäjä voi aina muokata; muokkauksen jälkeen automaattinen päivitys lakkaa, jotta kirjoitettu teksti ei katoa.
+## Tekninen yhteenveto
+
+| Tiedosto | Muutos |
+|---|---|
+| `src/components/liidi-dialog.tsx` | `alkuKategoria`-ref + ehdollinen `ydin`/`pohja` -yhdistely |
+| `src/routes/index.tsx` | Nav-linkin poisto, uusi "Mikä Kotivahti on" -ribbon, ominaisuusgridin päivitys, footerin ammattilaismaininta |
+
+Backend, sähköpostipohjat tai tietokanta eivät muutu.
 
 Tehdäänkö näin?

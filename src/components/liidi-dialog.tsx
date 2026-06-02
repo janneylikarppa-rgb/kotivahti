@@ -44,6 +44,7 @@ export function LiidiDialog({ open, onOpenChange, esitaytetty }: LiidiDialogProp
 
   const [palvelu, setPalvelu] = useState<Palvelu>(esitaytetty?.palvelu ?? "huolto");
   const [kategoria, setKategoria] = useState<LiidiKategoria>(esitaytetty?.kategoria ?? "Muu / yleinen");
+  const [alkuKategoria, setAlkuKategoria] = useState<LiidiKategoria | null>(esitaytetty?.kategoria ?? null);
   const [kuvaus, setKuvaus] = useState(esitaytetty?.kuvaus ?? "");
   const [kuvausMuokattu, setKuvausMuokattu] = useState(false);
   const [nimi, setNimi] = useState("");
