@@ -63,7 +63,12 @@ export function LiidiDialog({ open, onOpenChange, esitaytetty }: LiidiDialogProp
   useEffect(() => {
     if (!open) return;
     if (esitaytetty?.palvelu) setPalvelu(esitaytetty.palvelu);
-    if (esitaytetty?.kategoria) setKategoria(esitaytetty.kategoria);
+    if (esitaytetty?.kategoria) {
+      setKategoria(esitaytetty.kategoria);
+      setAlkuKategoria(esitaytetty.kategoria);
+    } else {
+      setAlkuKategoria(null);
+    }
     if (esitaytetty?.kuvaus) {
       setKuvaus(esitaytetty.kuvaus);
       setKuvausMuokattu(false);
