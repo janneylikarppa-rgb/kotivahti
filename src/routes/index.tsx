@@ -125,7 +125,7 @@ function LandingPage() {
             >
               <li>✓ Kaikki ominaisuudet ilmaisia</li>
               <li>✓ Ei luottokorttia eikä sitoumuksia</li>
-              <li>✓ Tarkastetut paikalliset ammattilaiset</li>
+              <li>✓ Käyttöönotto alle minuutissa</li>
             </ul>
           </div>
         </div>
