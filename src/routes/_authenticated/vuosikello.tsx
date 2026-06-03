@@ -185,7 +185,7 @@ function HuoltoLista({
 }: {
   otsikko: string;
   ikoni?: React.ReactNode;
-  nimet: string[];
+  nimet: HuoltoRivi[];
   statusOf: (n: string) => Kuitattu | undefined;
   onAvaa: (n: string) => void;
   onTilaa: (n: string) => void;
@@ -194,7 +194,8 @@ function HuoltoLista({
     <div>
       <p className="eyebrow mb-3 flex items-center gap-2">{ikoni} {otsikko}</p>
       <ul className="divide-y divide-border/60">
-        {nimet.map((nimi) => {
+        {nimet.map((rivi) => {
+          const nimi = rivi.nimi;
           const st = statusOf(nimi);
           const done = st && st.tekija !== "jatetaan";
           const skipped = st?.tekija === "jatetaan";
@@ -214,15 +215,17 @@ function HuoltoLista({
               </span>
               {st?.hinta ? <span className="text-xs font-mono text-muted-foreground">{Number(st.hinta).toFixed(0)} €</span> : null}
               {st?.tekija === "ammattilainen" && <span className="text-[10px] uppercase tracking-wider text-primary">amm.</span>}
-              <Button
-                type="button"
-                variant="ghost"
-                size="sm"
-                onClick={() => onTilaa(nimi)}
-                className="h-7 px-2 text-[11px] uppercase tracking-wider text-primary hover:bg-primary/10"
-              >
-                <Send className="mr-1 h-3 w-3" /> Tilaa
-              </Button>
+              {rivi.ammattilainen && (
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => onTilaa(nimi)}
+                  className="h-7 px-2 text-[11px] uppercase tracking-wider text-primary hover:bg-primary/10"
+                >
+                  <Send className="mr-1 h-3 w-3" /> Tilaa
+                </Button>
+              )}
             </li>
           );
         })}
@@ -230,6 +233,7 @@ function HuoltoLista({
     </div>
   );
 }
+
 
 function KuittausForm({ nimi, onSubmit, loading }: { nimi: string; onSubmit: (v: any) => void; loading: boolean }) {
   const [tekija, setTekija] = useState<"itse" | "ammattilainen" | "jatetaan">("itse");
