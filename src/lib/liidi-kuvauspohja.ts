@@ -152,6 +152,9 @@ export function rakennaKuvausPohja(kategoria: LiidiKategoria, t: TalonTiedot): s
     case "Kosteus ja sisäilma":
       return "Toivon kosteus- tai sisäilmakartoitusta.";
 
+    case "Siivouspalvelu":
+      return "Toivon siivouspalvelua (esim. ikkunanpesu, suursiivous).";
+
     case "Muu / yleinen":
     default:
       return "";

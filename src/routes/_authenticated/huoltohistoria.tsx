@@ -12,10 +12,8 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { HuoltoForm } from "@/components/huolto-form";
-import { Paperclip, Pencil, Plus, Send, Trash2 } from "lucide-react";
+import { Paperclip, Pencil, Plus, Trash2 } from "lucide-react";
 import { toast } from "sonner";
-import { LiidiDialog } from "@/components/liidi-dialog";
-import { arvaaKategoria } from "@/lib/liidit-kategoriat";
 
 
 export const Route = createFileRoute("/_authenticated/huoltohistoria")({
@@ -35,7 +33,6 @@ function HuoltoPage() {
   const { data = [], isLoading } = useQuery({ queryKey: ["huollot"], queryFn: () => fetchFn(), staleTime: 30_000 });
   const [open, setOpen] = useState(false);
   const [editing, setEditing] = useState<any | null>(null);
-  const [tilaaH, setTilaaH] = useState<any | null>(null);
 
   const invalidate = () => {
     qc.invalidateQueries({ queryKey: ["huollot"] });
@@ -127,7 +124,7 @@ function HuoltoPage() {
                         {Number(h.kustannus).toFixed(0)} €
                       </span>
                     )}
-                    <Button variant="ghost" size="icon" onClick={() => setTilaaH(h)} aria-label="Tilaa ammattilainen" title="Tilaa ammattilainen"><Send className="h-4 w-4 text-primary" /></Button>
+                    
                     <Button variant="ghost" size="icon" onClick={() => setEditing(h)} aria-label="Muokkaa"><Pencil className="h-4 w-4" /></Button>
                     <Button variant="ghost" size="icon" onClick={() => { if (confirm("Poistetaanko huoltomerkintä?")) delM.mutate(h); }} aria-label="Poista"><Trash2 className="h-4 w-4" /></Button>
                   </CardContent>
@@ -152,15 +149,6 @@ function HuoltoPage() {
         </DialogContent>
       </Dialog>
 
-      <LiidiDialog
-        open={!!tilaaH}
-        onOpenChange={(o) => !o && setTilaaH(null)}
-        esitaytetty={tilaaH ? {
-          palvelu: "huolto",
-          kategoria: arvaaKategoria(`${tilaaH.tyyppi ?? ""} ${tilaaH.kohde ?? ""}`),
-          kuvaus: `Huoltohistoria: ${tilaaH.tyyppi}${tilaaH.kohde ? ` – ${tilaaH.kohde}` : ""}`,
-        } : undefined}
-      />
     </div>
   );
 }

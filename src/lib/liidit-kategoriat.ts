@@ -14,6 +14,7 @@ export const LIIDI_KATEGORIAT = [
   "Kosteus ja sisäilma",
   "Nuohous ja tulisijat",
   "Piha ja maanrakennus",
+  "Siivouspalvelu",
   "Muu / yleinen",
 ] as const;
 
@@ -38,7 +39,8 @@ export type LiidiStatus = (typeof LIIDI_STATUKSET)[number]["arvo"];
 /** Päättele kategoria huoltorivin nimestä. */
 export function arvaaKategoria(nimi: string): LiidiKategoria {
   const n = nimi.toLowerCase();
-  if (/(nuohous|hormi|tulisij|kiuk|takka|piipu)/.test(n)) return "Nuohous ja tulisijat";
+  if (/(ikkunoiden pesu|siivou)/.test(n)) return "Siivouspalvelu";
+  if (/(nuohou|hormi|tulisij|kiuk|takka|piipu|savupiip)/.test(n)) return "Nuohous ja tulisijat";
   if (/(kouru|syöksy|sadevesi|salaoj)/.test(n)) return "Salaojat ja sadevesijärjestelmä";
   if (/(katto|räyst|peltikat|huopa)/.test(n)) return "Katto ja räystäät";
   if (/(iv-|ilmanvaiht|lto|suodatin)/.test(n)) return "Ilmanvaihto ja IV-kone";
