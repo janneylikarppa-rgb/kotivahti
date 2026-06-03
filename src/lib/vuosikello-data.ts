@@ -8,70 +8,73 @@ export const KAUDET: { key: Kausi; nimi: string; ikoni: string; kuukaudet: strin
   { key: "ympari_vuoden", nimi: "Ympäri vuoden", ikoni: "🔁", kuukaudet: "" },
 ];
 
-export const PERUSHUOLLOT: Record<Kausi, string[]> = {
+export type HuoltoRivi = { nimi: string; ammattilainen: boolean };
+
+const t = (nimi: string): HuoltoRivi => ({ nimi, ammattilainen: true });
+const f = (nimi: string): HuoltoRivi => ({ nimi, ammattilainen: false });
+
+export const PERUSHUOLLOT: Record<Kausi, HuoltoRivi[]> = {
   kevat: [
-    "IV-suodattimien vaihto / puhdistus",
-    "Katon tarkastus lumen sulamisen jälkeen",
-    "Räystäskourujen ja syöksytorvien puhdistus",
-    "Salaojien tarkastus ja huuhtelu",
-    "Sokkelin ja perustusten tarkastus",
-    "Lattiakaivojen ja hajulukkojen puhdistus",
-    "Ilmalämpöpumpun puhdistus ja suodattimet",
-    "Palovaroittimien testaus ja paristot",
-    "Vikavirtasuojan testaus",
-    "Pyykinpesukoneen ja astianpesukoneen vesiletkujen tarkastus",
-    "Ikkunoiden pesu ja tiivisteiden tarkastus",
-    "Aurinkopaneelien puhdistus",
-    "Nurmikon ja pensasaidan kevätkunnostus",
-    "Lämmityksen kesäasetukset",
-    "Ulkovesipisteen avaus",
+    t("IV-suodattimien vaihto / puhdistus"),
+    t("Katon tarkastus lumen sulamisen jälkeen"),
+    t("Räystäskourujen ja syöksytorvien puhdistus"),
+    t("Salaojien tarkastus ja huuhtelu"),
+    t("Sokkelin ja perustusten tarkastus"),
+    f("Lattiakaivojen ja hajulukkojen puhdistus"),
+    t("Ilmalämpöpumpun puhdistus ja suodattimet"),
+    f("Palovaroittimien testaus ja paristot"),
+    f("Vikavirtasuojan testaus"),
+    f("Pyykinpesukoneen ja astianpesukoneen vesiletkujen tarkastus"),
+    t("Ikkunoiden pesu ja tiivisteiden tarkastus"),
+    f("Aurinkopaneelien puhdistus"),
+    t("Nurmikon ja pensasaidan kevätkunnostus"),
+    f("Lämmityksen kesäasetukset"),
+    f("Ulkovesipisteen avaus"),
   ],
   kesa: [
-    "Julkisivun tarkastus ja pesu",
-    "Terassin hoito ja pintakäsittely",
-    "Pihalaatoituksen tarkastus ja saumaus",
-    "Nuohouksen tilaus / varmistus",
-    "Lämmitysjärjestelmän kesäkäynti",
-    "Ulkovalaistuksen tarkastus ja huolto",
-    "Nurmikon ja istutusten hoito",
-    "Lattiakaivojen puhdistus",
-    "Aurinkopaneelien tuoton seuranta",
+    t("Julkisivun tarkastus ja pesu"),
+    t("Terassin hoito ja pintakäsittely"),
+    t("Pihalaatoituksen tarkastus"),
+    t("Nuohouksen tilaus"),
+    f("Lämmitysjärjestelmän kesäkäynti"),
+    f("Ulkovalaistuksen tarkastus"),
+    f("Nurmikon ja istutusten hoito"),
+    f("Lattiakaivojen puhdistus"),
+    f("Aurinkopaneelien tuoton seuranta"),
   ],
   syksy: [
-    "Lämmityksen käyttöönotto talvikaudeksi",
-    "Ikkunoiden ja ovien tiivisteiden tarkastus",
-    "Salaojien tarkastus ennen routaa",
-    "Räystäskourujen tyhjennys lehdistä",
-    "Nuohouksen tarkistus",
-    "Käsisammuttimen tarkastus",
-    "Palovaroittimien testaus ja paristot",
-    "Vikavirtasuojan testaus",
-    "Pesukoneiden vesiletkujen tarkastus",
-    "Ulkovesipisteen talvisulku ja tyhjennys",
-    "Ilmalämpöpumpun talvivalmistelu",
-    "Öljysäiliön tilan tarkastus",
+    f("Lämmityksen käyttöönotto talvikaudeksi"),
+    t("Ikkunoiden ja ovien tiivisteiden tarkastus"),
+    t("Räystäskourujen tyhjennys lehdistä"),
+    f("Käsisammuttimen tarkastus"),
+    f("Palovaroittimien testaus ja paristot"),
+    f("Vikavirtasuojan testaus"),
+    f("Pesukoneiden vesiletkujen tarkastus"),
+    f("Ulkovesipisteen talvisulku ja tyhjennys"),
+    f("Ilmalämpöpumpun talvivalmistelu"),
+    f("Öljysäiliön tilan tarkastus"),
   ],
   talvi: [
-    "Katon lumikuorman seuranta",
-    "Jääpuikkojen poisto räystäiltä",
-    "Putkien jäätymisriskin seuranta",
-    "IV-suodattimien tarkastus",
-    "Lumikinosten poisto seiniltä ja poistumisteiltä",
-    "Kiukaan ja kiuaskivien tarkastus",
-    "Märkätilojen saumausten tarkastus",
-    "Lattiakaivojen puhdistus",
+    f("Katon lumikuorman seuranta"),
+    f("Jääpuikkojen poisto räystäiltä"),
+    f("Putkien jäätymisriskin seuranta"),
+    f("IV-suodattimien tarkastus"),
+    f("Lumikinosten poisto seiniltä ja poistumisteiltä"),
+    f("Kiukaan ja kiuaskivien tarkastus"),
+    f("Märkätilojen saumausten tarkastus"),
+    f("Lattiakaivojen puhdistus"),
   ],
   ympari_vuoden: [
-    "Palovaroittimien kuukausitesti",
-    "Vikavirtasuojan kuukausitesti",
-    "Ilmalämpöpumpun suodattimien puhdistus",
-    "Energiankulutuksen seuranta (mittarilukemat)",
-    "Vesivuotojen tarkkailu (keittiö, kylpyhuone, kodinhoito)",
-    "Lämminvesivaraajan toiminnan tarkkailu",
-    "Patteriventtiilien toiminnan tarkastus",
-    "Vesijohtoverkon painetason seuranta",
-    "Liesituulettimen rasvasuodattimen puhdistus",
-    "IV-venttiilien puhdistus",
+    f("Palovaroittimien kuukausitesti"),
+    f("Vikavirtasuojan kuukausitesti"),
+    t("Ilmalämpöpumpun suodattimien puhdistus"),
+    f("Energiankulutuksen seuranta (mittarilukemat)"),
+    f("Vesivuotojen tarkkailu (keittiö, kylpyhuone, kodinhoito)"),
+    f("Lämminvesivaraajan toiminnan tarkkailu"),
+    f("Patteriventtiilien toiminnan tarkastus"),
+    f("Vesijohtoverkon painetason seuranta"),
+    f("Liesituulettimen rasvasuodattimen puhdistus"),
+    f("IV-venttiilien puhdistus"),
   ],
 };
 
@@ -86,75 +89,75 @@ export type TalonTiedotLite = {
   julkisivumateriaali?: string | null;
 };
 
-export function dynamicHuollot(t: TalonTiedotLite | null | undefined): Partial<Record<Kausi, string[]>> {
-  const out: Record<Kausi, string[]> = { kevat: [], kesa: [], syksy: [], talvi: [], ympari_vuoden: [] };
-  if (!t) return out;
+export function dynamicHuollot(tt: TalonTiedotLite | null | undefined): Partial<Record<Kausi, HuoltoRivi[]>> {
+  const out: Record<Kausi, HuoltoRivi[]> = { kevat: [], kesa: [], syksy: [], talvi: [], ympari_vuoden: [] };
+  if (!tt) return out;
 
-  switch (t.lammitysmuoto) {
+  switch (tt.lammitysmuoto) {
     case "oljylammitys":
-      out.syksy.push("Öljykattilan vuosihuolto (ammattilainen)");
-      out.kevat.push("Öljysäiliön kunnon silmämääräinen tarkastus");
+      out.syksy.push(t("Öljykattilan vuosihuolto (ammattilainen)"));
+      out.kevat.push(f("Öljysäiliön kunnon silmämääräinen tarkastus"));
       break;
     case "maalampo":
-      out.kevat.push("Maalämpöpumpun määräaikaishuolto (2–3 v välein)");
-      out.syksy.push("Lämmönkeruupiirin paineen tarkastus");
+      out.kevat.push(t("Maalämpöpumpun määräaikaishuolto (2–3 v välein)"));
+      out.syksy.push(f("Lämmönkeruupiirin paineen tarkastus"));
       break;
     case "ilmavesilampo":
-      out.kevat.push("Ilma-vesilämpöpumpun keväthuolto");
-      out.syksy.push("Ilma-vesilämpöpumpun syksyn tarkastus");
+      out.kevat.push(t("Ilma-vesilämpöpumpun keväthuolto"));
+      out.syksy.push(t("Ilma-vesilämpöpumpun syksyn tarkastus"));
       break;
     case "pellettilammitys":
-      out.syksy.push("Pellettikattilan vuosihuolto");
-      out.kesa.push("Pellettivaraston ja syötön puhdistus");
+      out.syksy.push(t("Pellettikattilan vuosihuolto"));
+      out.kesa.push(f("Pellettivaraston ja syötön puhdistus"));
       break;
     case "puulammitys":
-      out.kesa.push("Puukattilan ja savuhormin nuohous / tarkastus");
+      out.kesa.push(t("Puukattilan ja savuhormin nuohous / tarkastus"));
       break;
     case "kaukolampo":
-      out.syksy.push("Lämmönjakokeskuksen tarkastus");
+      out.syksy.push(f("Lämmönjakokeskuksen tarkastus"));
       break;
     case "sahkolammitys":
-      out.kevat.push("Sähkövaraajan vastusten ja anodin tarkastus");
+      out.kevat.push(f("Sähkövaraajan vastusten ja anodin tarkastus"));
       break;
   }
 
-  if (t.ilp_merkki) {
-    out.ympari_vuoden.push("Ilmalämpöpumpun (lisälaite) suodattimien puhdistus");
-    out.kevat.push("Ilmalämpöpumpun (lisälaite) ulkoyksikön puhdistus");
+  if (tt.ilp_merkki) {
+    out.ympari_vuoden.push(t("Ilmalämpöpumpun (lisälaite) suodattimien puhdistus"));
+    out.kevat.push(t("Ilmalämpöpumpun (lisälaite) ulkoyksikön puhdistus"));
   }
 
-  if (t.ilmanvaihto === "Koneellinen tulo- ja poistoilmanvaihto (LTO)") {
-    out.kevat.push("LTO-koneen suodattimien vaihto");
-    out.syksy.push("LTO-koneen suodattimien vaihto");
-    out.ympari_vuoden.push("LTO-koneen lämmöntalteenoton tarkastus");
-  } else if (t.ilmanvaihto === "Koneellinen poisto") {
-    out.kevat.push("Poistoilmapuhaltimen puhdistus");
+  if (tt.ilmanvaihto === "Koneellinen tulo- ja poistoilmanvaihto (LTO)") {
+    out.kevat.push(t("LTO-koneen suodattimien vaihto"));
+    out.syksy.push(t("LTO-koneen suodattimien vaihto"));
+    out.ympari_vuoden.push(t("LTO-koneen lämmöntalteenoton tarkastus"));
+  } else if (tt.ilmanvaihto === "Koneellinen poisto") {
+    out.kevat.push(t("Poistoilmapuhaltimen puhdistus"));
   }
 
-  if (t.kattomateriaali?.toLowerCase().includes("pelti")) {
-    out.kesa.push("Peltikaton ruosteen ja maalipinnan tarkastus");
+  if (tt.kattomateriaali?.toLowerCase().includes("pelti")) {
+    out.kesa.push(t("Peltikaton ruosteen ja maalipinnan tarkastus"));
   }
-  if (t.kattomateriaali?.toLowerCase().includes("huopa")) {
-    out.kesa.push("Huopakaton saumojen ja pintakerroksen tarkastus");
-  }
-
-  if (t.terassi_materiaali?.toLowerCase().includes("puu")) {
-    out.kesa.push("Terassilaudoituksen öljyäminen / käsittely");
+  if (tt.kattomateriaali?.toLowerCase().includes("huopa")) {
+    out.kesa.push(t("Huopakaton saumojen ja pintakerroksen tarkastus"));
   }
 
-  if (t.terassi_lasitettu === true) {
-    out.kevat.push("Terassilasien pesu ja kiskojen puhdistus");
-    out.kesa.push("Terassilasituksen tiivisteiden ja rullien tarkastus");
+  if (tt.terassi_materiaali?.toLowerCase().includes("puu")) {
+    out.kesa.push(t("Terassilaudoituksen öljyäminen / käsittely"));
   }
 
-  if (t.julkisivumateriaali?.toLowerCase().includes("puu")) {
-    out.kesa.push("Puujulkisivun maalipinnan tarkastus");
+  if (tt.terassi_lasitettu === true) {
+    out.kevat.push(t("Terassilasien pesu ja kiskojen puhdistus"));
+    out.kesa.push(t("Terassilasituksen tiivisteiden ja rullien tarkastus"));
+  }
+
+  if (tt.julkisivumateriaali?.toLowerCase().includes("puu")) {
+    out.kesa.push(t("Puujulkisivun maalipinnan tarkastus"));
   }
 
   return out;
 }
 
-export function kaikkiHuollot(kausi: Kausi, t: TalonTiedotLite | null | undefined): string[] {
-  const dyn = dynamicHuollot(t)[kausi] ?? [];
+export function kaikkiHuollot(kausi: Kausi, tt: TalonTiedotLite | null | undefined): HuoltoRivi[] {
+  const dyn = dynamicHuollot(tt)[kausi] ?? [];
   return [...PERUSHUOLLOT[kausi], ...dyn];
 }
