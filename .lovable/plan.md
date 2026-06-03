@@ -1,52 +1,82 @@
-## 1. Liidi-dialogin kuvaus vaihtuu kategorian mukaan (bugikorjaus)
+# Suunnitelma
 
-**Ongelma:** Kun "Tilaa nuohous" -napilla avattu lomake esitäyttää kuvaukseen "Nuohouksen tilaus" ja käyttäjä vaihtaa kategorian Lämmitysjärjestelmäksi, kuvauksessa lukee edelleen `Nuohouksen tilaus. Lämmitysmuoto: ...`. Esitäytetty teksti pitäisi kuulua vain alkuperäiseen kategoriaan.
+## 1. Huoltohistoria: poista "Tilaa ammattilainen" -painike
+`src/routes/_authenticated/huoltohistoria.tsx`:
+- Poista `<Send>`-painike rivien lopusta.
+- Poista `LiidiDialog`-importti ja `tilaaH`-tila.
 
-**Korjaus `src/components/liidi-dialog.tsx`:**
-- Tallennetaan `alkuKategoria`-ref dialogin avauksen yhteydessä (esitäytetyn kategorian arvo).
-- Kuvauksen automaattipäivityksen logiikka muuttuu:
-  - Jos `kategoria === alkuKategoria` ja `esitaytetty.kuvaus` on annettu → näytetään `${ydin}. ${pohja}` (kuten nyt).
-  - Jos käyttäjä on vaihtanut kategoriaa → näytetään pelkkä `pohja` (kategoriakohtainen talotietoteksti), vuosikellon ydin pudotetaan kokonaan.
-- Tämä toimii edelleen niin, että kun käyttäjä alkaa muokata kenttää käsin (`kuvausMuokattu = true`), automaattipäivitys lakkaa.
+## 2. Kategorian arvaus: "Nuohouksen tilaus" → Nuohous ja tulisijat
+`src/lib/liidit-kategoriat.ts`:
+- Muuta regex `nuohous` → `nuohou` (jotta "nuohouksen" osuu).
 
-## 2. Etusivun yläpalkki: poistetaan "Ammattilaiset"
+## 3. Lisätään "Siivouspalvelu" uudeksi kategoriaksi
+`src/lib/liidit-kategoriat.ts`:
+- Lisää `"Siivouspalvelu"` listaan `LIIDI_KATEGORIAT`.
+- `arvaaKategoria`: lisää sääntö `/(ikkunoiden pesu|siivo|pesu)/` → `"Siivouspalvelu"` (ennen muita pesu-osumia, mutta katon/julkisivun pesun jälkeen).
+- Lisää `liidi-kuvauspohja.ts`-tiedostoon pohja siivouspalvelulle.
 
-**`src/routes/index.tsx`:**
-- Poistetaan navigaatiosta `Ammattilaiset`-linkki (sekä desktop- että mobiilivalikosta).
-- Footeriin lisätään hienovarainen rivi: `Oletko ammattilainen? Ota yhteyttä: info@kotivahti.fi` (tai vastaava). Tyyli sopusoinnussa muun footerin kanssa, ei korostettu.
-- Hero-osion ✓-listalta poistetaan `Tarkastetut paikalliset ammattilaiset` -rivi, koska se on ristiriidassa uuden viestin kanssa (ammattilaiskulma siirretään footerin sivumainintaan).
-- CTA-osion `id="ammattilaiset"` poistetaan tarpeettomana (oli vain ankkurin kohde).
+## 4. Vuosikellon "Tilaa"-painikkeen hallinta + tekstimuutokset
+`src/lib/vuosikello-data.ts`:
+- Muutetaan `PERUSHUOLLOT`-tyyppi muotoon `Record<Kausi, { nimi: string; ammattilainen: boolean }[]>`.
+- Muutetaan `dynamicHuollot` palauttamaan sama muoto.
+- Muutetaan `kaikkiHuollot` käyttämään uutta muotoa.
 
-## 3. Etusivun "huikea päivitys" uusista ominaisuuksista
+### Kevät — `ammattilainen: false` näille:
+6 Lattiakaivot, 8 Palovaroittimet, 9 Vikavirtasuoja, 10 Pyykinpesukoneen letkut, 12 Aurinkopaneelien puhdistus, 14 Lämmityksen kesäasetukset, 15 Ulkovesipisteen avaus.
+11 (Ikkunoiden pesu): **säilyy** `ammattilainen: true` (avaa liidin, joka osuu kategoriaan "Siivouspalvelu").
+Loput (1, 2, 3, 4, 5, 7, 13) säilyvät `true`.
 
-Tavoite: kävijä näkee heti yhdellä silmäyksellä, mitä kaikkea ilmainen Kotivahti tarjoaa.
+### Kesä:
+- 18 nimeksi **"Pihalaatoituksen tarkastus"** — `ammattilainen: true` (ei mainittu poistolistalla).
+- 19 nimeksi **"Nuohouksen tilaus"** — `true`.
+- 21 nimeksi **"Ulkovalaistuksen tarkastus"** — `false`.
+- 20 Lämmitysjärjestelmän kesäkäynti — `false`.
+- 22 Nurmikon ja istutusten hoito — `false`.
+- 23 Lattiakaivojen puhdistus — `false`.
+- 24 Aurinkopaneelien tuoton seuranta — `false`.
+- 16, 17 säilyvät `true`.
 
-**Lisätään HERO:n ja nykyisen OMINAISUUDET-osion väliin uusi tiivis "Mikä Kotivahti on" -ribbon** (`src/routes/index.tsx`):
-- Tumma vihreä tausta `#0D1F14`, kultainen yläkulma-merkki: `UUTTA · ILMAINEN TALOKIRJA`.
-- Otsikko: *"Yksi sovellus – koko talon hallinta."*
-- Lyhyt alaotsikko, esim. *"Talokirja, vuosikello, kulujenseuranta, PTS-suunnitelma ja palveluiden kilpailutus – kaikki samassa paikassa. Aina ilmainen."*
-- 6 kompaktia "pillin" muodossa olevaa ominaisuusmerkkiä (rivissä, wrappaa mobiilissa), kullakin ikoni + nimi:
-  - 📒 Talokirja
-  - 📅 Vuosikello
-  - 💰 Kulujenseuranta
-  - 📊 PTS-suunnitelma
-  - 🛠 Huoltohistoria
-  - 🤝 Palveluiden kilpailutus
-- Alle pieni rivi: *"+ myyntiraportti, muistutukset ja tarkastettujen ammattilaisten verkosto."*
+### Syksy:
+- **27 Salaojien tarkastus ennen routaa** — poistetaan kokonaan (jää vain kevään kohta 4 "Salaojien tarkastus ja huuhtelu", joka säilyy `true`).
+- **29 Nuohouksen tarkistus** — poistetaan kokonaan (kesän 19 riittää muistutukseksi).
+- 25 Lämmityksen käyttöönotto — `false`.
+- 30 Käsisammuttimen tarkastus — `false`.
+- 31 Palovaroittimet — `false`.
+- 32 Vikavirtasuoja — `false`.
+- 33 Pesukoneiden letkut — `false`.
+- 34 Ulkovesipisteen talvisulku — `false`.
+- 35 Ilmalämpöpumpun talvivalmistelu — `false`.
+- 36 Öljysäiliön tilan tarkastus — `false`.
+- 26, 28 säilyvät `true`.
 
-**Päivitetään olemassaoleva OMINAISUUDET-grid** vastaamaan tätä uutta sisältöä:
-- Lisätään uusi kortti: **📒 Talokirja** – *"Talon perustiedot, laitteet, materiaalit ja vuosiluvut yhdessä paikassa. Päivitä kerran, käytä aina."*
-- Muutetaan kortti `Tarkastetut ammattilaiset` muotoon **🤝 Palveluiden kilpailutus** – *"Tilaa kuntoarvio, huolto tai tarjouspyyntö suoraan sovelluksesta. Välitetään tarkastetuille paikallisille tekijöille."*
-- Lopputuloksena 7 korttia (talokirja, vuosikello, PTS, kulujenseuranta, huoltohistoria, palveluiden kilpailutus, myyntiraportti). Grid säilyy `lg:grid-cols-3`.
-- Yläotsikko muuttuu muotoon: *"Kaikki mitä talo tarvitsee — yhdessä."*  Alaotsikon "Kuusi toimintoa" → "Seitsemän toimintoa".
+### Talvi: kaikki 37–44 → `false`.
 
-## Tekninen yhteenveto
+### Ympäri vuoden:
+- 45, 46, 48, 49, 50, 51, 52, 53, 54 → `false`.
+- 47 (Ilmalämpöpumpun suodattimet) säilyy `true`.
 
-| Tiedosto | Muutos |
-|---|---|
-| `src/components/liidi-dialog.tsx` | `alkuKategoria`-ref + ehdollinen `ydin`/`pohja` -yhdistely |
-| `src/routes/index.tsx` | Nav-linkin poisto, uusi "Mikä Kotivahti on" -ribbon, ominaisuusgridin päivitys, footerin ammattilaismaininta |
+### Dynaamiset → `false`:
+- 56 Öljysäiliön kunnon silmämääräinen tarkastus
+- 58 Lämmönkeruupiirin paineen tarkastus
+- 62 Pellettivaraston ja syötön puhdistus
+- 64 Lämmönjakokeskuksen tarkastus
+- 65 Sähkövaraajan vastusten ja anodin tarkastus
 
-Backend, sähköpostipohjat tai tietokanta eivät muutu.
+Muut dynaamiset säilyvät `true`.
 
-Tehdäänkö näin?
+## 5. Vuosikello-näkymän päivitys
+`src/routes/_authenticated/vuosikello.tsx`:
+- `HuoltoLista` ottaa nyt `nimet: { nimi: string; ammattilainen: boolean }[]`.
+- Käytä `nimi.nimi` näytössä ja `nimi.ammattilainen`-ehtoa "Tilaa"-painikkeen renderöintiin.
+- `statusOf`, `setLiidiNimi` ja `setValittu` saavat string-arvon `item.nimi`.
+
+## 6. Verifiointi
+- Tarkista että build menee läpi.
+- Avaa vuosikello eri kausilla ja varmista että painike näkyy vain merkityissä kohteissa.
+- Kuittaus toimii edelleen kaikilla riveillä.
+
+## Yhteenveto poistetuista ja muutetuista
+- Poistetut rivit: syksy 27, syksy 29.
+- Uudelleennimetyt: kesä 18, 19, 21.
+- Uusi kategoria: "Siivouspalvelu".
+- "Tilaa"-painike piilotettu n. 30 riviltä, säilyy ammattilaisapua vaativissa töissä (kuten katto, julkisivu, salaojat, lämmityskattilat, IV-suodattimet, nuohous).
