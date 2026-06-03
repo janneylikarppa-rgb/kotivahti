@@ -14,6 +14,7 @@ export const LIIDI_KATEGORIAT = [
   "Kosteus ja sisäilma",
   "Nuohous ja tulisijat",
   "Piha ja maanrakennus",
+  "Siivouspalvelu",
   "Muu / yleinen",
 ] as const;
 
