@@ -124,7 +124,7 @@ function HuoltoPage() {
                         {Number(h.kustannus).toFixed(0)} €
                       </span>
                     )}
-                    <Button variant="ghost" size="icon" onClick={() => setTilaaH(h)} aria-label="Tilaa ammattilainen" title="Tilaa ammattilainen"><Send className="h-4 w-4 text-primary" /></Button>
+                    
                     <Button variant="ghost" size="icon" onClick={() => setEditing(h)} aria-label="Muokkaa"><Pencil className="h-4 w-4" /></Button>
                     <Button variant="ghost" size="icon" onClick={() => { if (confirm("Poistetaanko huoltomerkintä?")) delM.mutate(h); }} aria-label="Poista"><Trash2 className="h-4 w-4" /></Button>
                   </CardContent>
