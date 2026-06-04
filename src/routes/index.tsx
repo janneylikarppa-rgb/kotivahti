@@ -151,15 +151,6 @@ function LandingPage() {
                   Koivutie 12 · Kuopio
                 </div>
               </div>
-              <div
-                className="text-[0.7rem] font-semibold px-2.5 py-1 rounded-full"
-                style={{
-                  background: "rgba(201,168,76,0.15)",
-                  color: "#C9A84C",
-                }}
-              >
-                82 kuntopistettä
-              </div>
             </div>
 
             {/* Card body */}
@@ -222,8 +213,8 @@ function LandingPage() {
                 <div className="grid grid-cols-3 gap-2">
                   {[
                     { v: "2 480€", l: "Sähkö" },
-                    { v: "580€", l: "Vesi" },
-                    { v: "2 340€", l: "Lämpö" },
+                    { v: "380€", l: "Vesi" },
+                    { v: "4 200€", l: "Lämpö" },
                   ].map((c) => (
                     <div
                       key={c.l}
@@ -393,6 +384,130 @@ function LandingPage() {
           </div>
         </div>
       </section>
+
+      {/* PALVELUIDEN KILPAILUTUS */}
+      <section id="kilpailutus" className="px-6 sm:px-12 py-20 relative overflow-hidden" style={{ background: "#0D1F14" }}>
+        <div
+          className="absolute inset-0 pointer-events-none"
+          style={{ background: "radial-gradient(ellipse 60% 70% at 50% 50%, rgba(201,168,76,0.06), transparent 70%)" }}
+        />
+        <div className="relative mx-auto max-w-7xl grid lg:grid-cols-2 gap-10 lg:gap-16">
+          {/* LEFT */}
+          <div>
+            <p className="text-[0.7rem] font-semibold tracking-[0.24em] uppercase inline-flex items-center gap-3" style={{ color: "#C9A84C" }}>
+              <span style={{ display: "inline-block", width: 24, height: 1, background: "#C9A84C" }} />
+              Palveluiden kilpailutus
+            </p>
+            <h2 className="font-serif mt-4 leading-tight" style={{ fontSize: "clamp(1.875rem, 4vw, 2.5rem)", color: "#F5EDD8" }}>
+              Ammattilainen paikalle –{" "}
+              <em className="italic" style={{ color: "#C9A84C" }}>ilman puheluita.</em>
+            </h2>
+            <p className="mt-5 text-sm sm:text-base font-light leading-relaxed" style={{ color: "rgba(245,237,216,0.6)" }}>
+              Tilaa suoraan sovelluksesta. Kotivahti välittää pyyntösi tarkastettuihin paikallisiin yrityksiin ja sinä valitset parhaan tarjouksen.
+            </p>
+            <ol className="mt-8 space-y-5">
+              {[
+                { n: 1, t: "Valitse palvelu", d: "Katto, LVI, sähkö, ikkunat – 14 kategoriaa suoraan sovelluksessa." },
+                { n: 2, t: "Lähetä pyyntö", d: "Talon tiedot täyttyvät automaattisesti talokirjastasi. Yksi nappi." },
+                { n: 3, t: "Saat tarjoukset", d: "Tarkastetut paikalliset yritykset ottavat yhteyttä. Sinä valitset." },
+                { n: 4, t: "Ammattilainen dokumentoi työn", d: "Kuvat, kuitit ja havainnot tallentuvat suoraan huoltokirjaasi automaattisesti." },
+              ].map((s) => (
+                <li key={s.n} className="flex gap-4">
+                  <span
+                    className="flex items-center justify-center shrink-0 font-serif"
+                    style={{
+                      width: 36, height: 36, borderRadius: 999,
+                      border: "1px solid rgba(201,168,76,0.35)",
+                      color: "#C9A84C", fontSize: "0.95rem",
+                    }}
+                  >
+                    {s.n}
+                  </span>
+                  <div>
+                    <div className="font-semibold" style={{ color: "#F5EDD8" }}>{s.t}</div>
+                    <p className="text-sm font-light mt-1" style={{ color: "rgba(245,237,216,0.55)" }}>{s.d}</p>
+                  </div>
+                </li>
+              ))}
+            </ol>
+          </div>
+
+          {/* RIGHT */}
+          <div className="space-y-5">
+            <div>
+              <h3 className="font-serif text-xl" style={{ color: "#F5EDD8" }}>Tilaa palvelu</h3>
+              <p className="text-[0.8rem] mt-1" style={{ color: "rgba(245,237,216,0.5)" }}>
+                Valitse kategoria – loput hoituu automaattisesti
+              </p>
+              <div className="mt-4 grid grid-cols-2 gap-2.5">
+                {[
+                  { i: "🏠", n: "Katto & vesikatto" },
+                  { i: "🔧", n: "LVI & putket" },
+                  { i: "⚡", n: "Sähkötyöt" },
+                  { i: "🌬️", n: "Ilmanvaihto & IV-huolto" },
+                  { i: "🔥", n: "Nuohous & tulisijat" },
+                  { i: "🌿", n: "Piha & salaojat" },
+                ].map((k) => (
+                  <button
+                    key={k.n}
+                    type="button"
+                    className="flex items-center gap-2 text-left text-[0.82rem] transition hover:brightness-125"
+                    style={{
+                      background: "rgba(201,168,76,0.08)",
+                      border: "1px solid rgba(201,168,76,0.25)",
+                      color: "#F5EDD8",
+                      borderRadius: 8,
+                      padding: "0.7rem 0.85rem",
+                    }}
+                  >
+                    <span>{k.i}</span>
+                    <span>{k.n}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div
+              style={{
+                background: "rgba(245,237,216,0.04)",
+                border: "1px solid rgba(201,168,76,0.2)",
+                borderRadius: 10,
+                padding: "1rem 1.1rem",
+              }}
+            >
+              <div className="text-[0.65rem] font-semibold tracking-[0.18em] uppercase" style={{ color: "#C9A84C" }}>
+                Paikalliset tarjoukset – Kuopio
+              </div>
+              <ul className="mt-3 space-y-2">
+                {[
+                  { name: "Yritys 1", stars: "★★★★★", price: "1 200€" },
+                  { name: "Yritys 2", stars: "★★★★☆", price: "1 450€" },
+                  { name: "Yritys 3", stars: "★★★★★", price: "980€" },
+                ].map((o) => (
+                  <li
+                    key={o.name}
+                    className="flex items-center justify-between"
+                    style={{
+                      background: "rgba(13,31,20,0.55)",
+                      border: "1px solid rgba(201,168,76,0.15)",
+                      borderRadius: 8,
+                      padding: "0.7rem 0.9rem",
+                    }}
+                  >
+                    <div>
+                      <div className="text-[0.85rem] font-semibold" style={{ color: "#F5EDD8" }}>{o.name}</div>
+                      <div className="text-[0.7rem]" style={{ color: "#C9A84C" }}>{o.stars}</div>
+                    </div>
+                    <div className="font-serif text-[0.95rem]" style={{ color: "#F5EDD8" }}>{o.price}</div>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+        </div>
+      </section>
+
+
 
       {/* CTA */}
       <section
