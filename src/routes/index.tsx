@@ -151,15 +151,6 @@ function LandingPage() {
                   Koivutie 12 · Kuopio
                 </div>
               </div>
-              <div
-                className="text-[0.7rem] font-semibold px-2.5 py-1 rounded-full"
-                style={{
-                  background: "rgba(201,168,76,0.15)",
-                  color: "#C9A84C",
-                }}
-              >
-                82 kuntopistettä
-              </div>
             </div>
 
             {/* Card body */}
@@ -222,8 +213,8 @@ function LandingPage() {
                 <div className="grid grid-cols-3 gap-2">
                   {[
                     { v: "2 480€", l: "Sähkö" },
-                    { v: "580€", l: "Vesi" },
-                    { v: "2 340€", l: "Lämpö" },
+                    { v: "380€", l: "Vesi" },
+                    { v: "4 200€", l: "Lämpö" },
                   ].map((c) => (
                     <div
                       key={c.l}
