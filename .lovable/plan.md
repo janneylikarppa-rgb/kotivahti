@@ -1,82 +1,40 @@
-# Suunnitelma
+# Etusivun uudistus
 
-## 1. Huoltohistoria: poista "Tilaa ammattilainen" -painike
-`src/routes/_authenticated/huoltohistoria.tsx`:
-- Poista `<Send>`-painike rivien lopusta.
-- Poista `LiidiDialog`-importti ja `tilaaH`-tila.
+Korvataan `src/routes/index.tsx` kokonaan uudella suomenkielisellä landing-page-rakenteella annetun promptin mukaisesti. Säilytetään olemassa oleva `beforeLoad`-redirect kirjautuneille käyttäjille (`/dashboard`).
 
-## 2. Kategorian arvaus: "Nuohouksen tilaus" → Nuohous ja tulisijat
-`src/lib/liidit-kategoriat.ts`:
-- Muuta regex `nuohous` → `nuohou` (jotta "nuohouksen" osuu).
+## Tyyli ja design
 
-## 3. Lisätään "Siivouspalvelu" uudeksi kategoriaksi
-`src/lib/liidit-kategoriat.ts`:
-- Lisää `"Siivouspalvelu"` listaan `LIIDI_KATEGORIAT`.
-- `arvaaKategoria`: lisää sääntö `/(ikkunoiden pesu|siivo|pesu)/` → `"Siivouspalvelu"` (ennen muita pesu-osumia, mutta katon/julkisivun pesun jälkeen).
-- Lisää `liidi-kuvauspohja.ts`-tiedostoon pohja siivouspalvelulle.
+- Värit inline-tyyleinä (kuten nykyisessä tiedostossa): `#1e3a2f` (tummavihreä), `#152a22` (hero-tausta), `#c8973a` (kulta), `#e4b96a` (kulta-vaalea), `#f5f0e8` (kerma), `#ece5d6` (kerma-dark).
+- Fontit: Playfair Display (otsikot, kursiivi-aksentti kullassa) ja DM Sans (leipäteksti). Lisätään Google Fonts -linkki `index.html`:n head-osaan tai `__root.tsx`:n `head()`-funktioon — käytännössä lisätään `<link>` `__root.tsx`:n head-arrayyn jotta SSR toimii. (Playfair on jo käytössä `styles.css`-fonttistackissa; lisätään DM Sans erikseen ja sovelletaan inline-tyylinä otsikoihin/leipätekstiin promptin mukaan.)
+- Pyöristys 12–16px, pehmeät varjot (`shadow-lg/xl`), pieni hover-nosto napeille (`translateY(-1px)`).
+- Tailwind-luokat layoutiin (grid, flex, spacing). Värit inline `style={{...}}`-attribuutteina koska ne ovat tämän sivun erikoispaletti, ei globaaleja tokeneita.
 
-## 4. Vuosikellon "Tilaa"-painikkeen hallinta + tekstimuutokset
-`src/lib/vuosikello-data.ts`:
-- Muutetaan `PERUSHUOLLOT`-tyyppi muotoon `Record<Kausi, { nimi: string; ammattilainen: boolean }[]>`.
-- Muutetaan `dynamicHuollot` palauttamaan sama muoto.
-- Muutetaan `kaikkiHuollot` käyttämään uutta muotoa.
+## Sivun osiot (järjestys)
 
-### Kevät — `ammattilainen: false` näille:
-6 Lattiakaivot, 8 Palovaroittimet, 9 Vikavirtasuoja, 10 Pyykinpesukoneen letkut, 12 Aurinkopaneelien puhdistus, 14 Lämmityksen kesäasetukset, 15 Ulkovesipisteen avaus.
-11 (Ikkunoiden pesu): **säilyy** `ammattilainen: true` (avaa liidin, joka osuu kategoriaan "Siivouspalvelu").
-Loput (1, 2, 3, 4, 5, 7, 13) säilyvät `true`.
+1. **Sticky-navi**: logo "Koti"+"vahti", linkit (Ominaisuudet, Kilpailutus = hash-anchorit `#ominaisuudet`, `#kilpailutus`), CTA-nappi `/rekisteroidy`. Tausta kerma + blur, vahvistuu scrollatessa. Mobiilivalikko hampurilainen.
+2. **Hero** (`#152a22`, min-h-screen, 2-sarakkeinen): vasemmalla badge "✦ UUTTA · ILMAINEN TALOKIRJA", H1 Playfair (kursiivi rivi kullassa: *"koko talon hallinta"*), alaotsikko, kulta-CTA "Avaa talokirja ilmaiseksi →" → `/rekisteroidy`, luottamusrivi (3 kohtaa). Oikealla glassmorphism-mock-dashboard (Kotivahti / Koivutie 12, Kuopio · kevään tehtävät 2 ✓ + 2 ○ · vuosikulut 2 480 / 380 / 4 200 · PTS-toimenpide IV-kone · "Tilaa kuntoarvio" -kultanappi). EI kuntopiste-badgea.
+3. **Luottamuskaista** (`#ece5d6`): 4 ikoni+teksti-kohtaa rivissä.
+4. **Ominaisuudet** (`#f5f0e8`, `id="ominaisuudet"`): eyebrow "OMINAISUUDET", H2 "Kaikki mitä talo tarvitsee – yhdessä.", alaotsikko, 7 korttia 3-saraketta:lle (kortti 3 "Palveluiden kilpailutus" korostettu tummavihreällä taustalla + kulta-badge "Suosittu"). Tekstit promptin mukaan. Kortti 7 menee yksin tai täyttää viimeisen rivin.
+5. **Palveluiden kilpailutus** (`#1e3a2f`, `id="kilpailutus"`, 2-sarakkeinen): vasemmalla eyebrow + H2 "Ammattilainen paikalle – ilman puheluita." + 4 numeroitua askelta (ympyrässä kulta-numero). Oikealla glassmorphism-mock "Tilaa palvelu" -kortti: 6 kategoriapainikketta 2 sarakkeessa (ensimmäinen aktiivinen kulta-reunuksella), erotinviiva, tuloskortti "PAIKALLISET TARJOUKSET – KUOPIO" (Yritys 1/2/3, tähdet, hinnat 1 200€ / 1 450€ / 980€).
+6. **Miksi Kotivahti** (`#ece5d6`): eyebrow + H2 + 4 tilastokorttia (7+, 0€, 14+, 1min) valkoisilla taustoilla, isot luvut Playfairilla.
+7. **CTA-osio** (`#1e3a2f`, keskitetty): eyebrow "ALOITA TÄNÄÄN", H2 "Avaa talokirja. Ilmaiseksi.", kuvaus, 3 checkmark-riviä, kulta-CTA → `/rekisteroidy`.
+8. **Footer** (tumma `#152a22`, minimalistinen): "© 2026 Kotivahti · Talosi oma avustaja · Kuopio, Suomi".
 
-### Kesä:
-- 18 nimeksi **"Pihalaatoituksen tarkastus"** — `ammattilainen: true` (ei mainittu poistolistalla).
-- 19 nimeksi **"Nuohouksen tilaus"** — `true`.
-- 21 nimeksi **"Ulkovalaistuksen tarkastus"** — `false`.
-- 20 Lämmitysjärjestelmän kesäkäynti — `false`.
-- 22 Nurmikon ja istutusten hoito — `false`.
-- 23 Lattiakaivojen puhdistus — `false`.
-- 24 Aurinkopaneelien tuoton seuranta — `false`.
-- 16, 17 säilyvät `true`.
+## Tekniset yksityiskohdat
 
-### Syksy:
-- **27 Salaojien tarkastus ennen routaa** — poistetaan kokonaan (jää vain kevään kohta 4 "Salaojien tarkastus ja huuhtelu", joka säilyy `true`).
-- **29 Nuohouksen tarkistus** — poistetaan kokonaan (kesän 19 riittää muistutukseksi).
-- 25 Lämmityksen käyttöönotto — `false`.
-- 30 Käsisammuttimen tarkastus — `false`.
-- 31 Palovaroittimet — `false`.
-- 32 Vikavirtasuoja — `false`.
-- 33 Pesukoneiden letkut — `false`.
-- 34 Ulkovesipisteen talvisulku — `false`.
-- 35 Ilmalämpöpumpun talvivalmistelu — `false`.
-- 36 Öljysäiliön tilan tarkastus — `false`.
-- 26, 28 säilyvät `true`.
+- Säilytetään `Route` + `beforeLoad`-redirect ja olemassa olevat importit (`Link`, `Button`, `lucide-react`-ikonit). Lisätään tarvittavat ikonit: `Check`, `ArrowRight`, `Menu`, `X`, plus mahdollisesti `Shield`, `Bell`, `FileText`, `Sparkles` luottamuskaistaan (tai käytetään emoji-merkkejä kuten promptissa).
+- Mobiili: gridit putoavat 1 sarakkeeseen alle `md` breakpointin.
+- Scroll-animaatiot: käytetään olemassa olevaa `animate-fade-in`-utilityä osioiden otsikoille. (Ei lisätä IntersectionObserveria — kevyt CSS-ratkaisu riittää.)
+- Hover-tila napeille: Tailwind `transition` + inline `onMouseEnter/Leave` tai utility-luokka. Yksinkertaisinta on tehdä pieni `<a>`/`<button>` -komponentti CTA:lle tämän tiedoston sisällä.
+- Hash-linkit (`#ominaisuudet`, `#kilpailutus`) toimivat tavallisilla `<a href>`-tageilla, koska sivu on yksisivuinen landing.
+- Pidetään tiedosto itsenäisenä — ei lohkota uusiin komponentteihin tässä vaiheessa.
 
-### Talvi: kaikki 37–44 → `false`.
+## Muutettavat tiedostot
 
-### Ympäri vuoden:
-- 45, 46, 48, 49, 50, 51, 52, 53, 54 → `false`.
-- 47 (Ilmalämpöpumpun suodattimet) säilyy `true`.
+- `src/routes/index.tsx` — kirjoitetaan uusi sisältö (korvaa nykyiset ~583 riviä).
+- `src/routes/__root.tsx` — lisätään `<link>` Google Fonts -DM Sans -fonttiin (Playfair on jo `styles.css`:ssä). Jos sopiva paikka löytyy `head()`-arrayssa, lisätään sinne; muuten ohitetaan ja luotetaan `styles.css`-fonttilataukseen (Playfair riittää otsikoihin; leipäteksti käyttää Outfit-fonttia, joka on visuaalisesti riittävän lähellä DM Sansia). Tarkistetaan toteutuksen aikana.
 
-### Dynaamiset → `false`:
-- 56 Öljysäiliön kunnon silmämääräinen tarkastus
-- 58 Lämmönkeruupiirin paineen tarkastus
-- 62 Pellettivaraston ja syötön puhdistus
-- 64 Lämmönjakokeskuksen tarkastus
-- 65 Sähkövaraajan vastusten ja anodin tarkastus
+## Mitä EI muuteta
 
-Muut dynaamiset säilyvät `true`.
-
-## 5. Vuosikello-näkymän päivitys
-`src/routes/_authenticated/vuosikello.tsx`:
-- `HuoltoLista` ottaa nyt `nimet: { nimi: string; ammattilainen: boolean }[]`.
-- Käytä `nimi.nimi` näytössä ja `nimi.ammattilainen`-ehtoa "Tilaa"-painikkeen renderöintiin.
-- `statusOf`, `setLiidiNimi` ja `setValittu` saavat string-arvon `item.nimi`.
-
-## 6. Verifiointi
-- Tarkista että build menee läpi.
-- Avaa vuosikello eri kausilla ja varmista että painike näkyy vain merkityissä kohteissa.
-- Kuittaus toimii edelleen kaikilla riveillä.
-
-## Yhteenveto poistetuista ja muutetuista
-- Poistetut rivit: syksy 27, syksy 29.
-- Uudelleennimetyt: kesä 18, 19, 21.
-- Uusi kategoria: "Siivouspalvelu".
-- "Tilaa"-painike piilotettu n. 30 riviltä, säilyy ammattilaisapua vaativissa töissä (kuten katto, julkisivu, salaojat, lämmityskattilat, IV-suodattimet, nuohous).
+- Reititystä, autentikaatiota, dashboardia, kirjautumis-/rekisteröitymissivuja, sisäisiä reittejä tai dataa.
+- `styles.css`:n teema-tokeneita.
