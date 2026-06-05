@@ -140,8 +140,8 @@ function LandingPage() {
     },
     {
       n: 4,
-      otsikko: "Ammattilainen dokumentoi",
-      kuvaus: "Tehty työ, kuvat ja kuitti tallentuvat automaattisesti suoraan huoltokirjaasi.",
+      otsikko: "Dokumentoi työt",
+      kuvaus: "Työn jälkeen syötät itse työn tiedot, kuvat ja kuitit huoltokirjaan. Kaikki tallessa yhdessä paikassa.",
     },
   ];
 
