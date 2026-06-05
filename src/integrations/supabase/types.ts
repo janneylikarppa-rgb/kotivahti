@@ -23,6 +23,7 @@ export type Database = {
           prioriteetti: number
           puhelin: string | null
           sahkoposti: string
+          toimialueet: string[]
           updated_at: string
           yritys: string
         }
@@ -34,6 +35,7 @@ export type Database = {
           prioriteetti?: number
           puhelin?: string | null
           sahkoposti: string
+          toimialueet?: string[]
           updated_at?: string
           yritys: string
         }
@@ -45,6 +47,7 @@ export type Database = {
           prioriteetti?: number
           puhelin?: string | null
           sahkoposti?: string
+          toimialueet?: string[]
           updated_at?: string
           yritys?: string
         }
@@ -292,6 +295,7 @@ export type Database = {
           lahetetty_at: string | null
           lammitys: string | null
           lisatieto: string | null
+          maakunta: string | null
           nimi: string
           osoite: string | null
           palvelu: string
@@ -313,6 +317,7 @@ export type Database = {
           lahetetty_at?: string | null
           lammitys?: string | null
           lisatieto?: string | null
+          maakunta?: string | null
           nimi: string
           osoite?: string | null
           palvelu: string
@@ -334,6 +339,7 @@ export type Database = {
           lahetetty_at?: string | null
           lammitys?: string | null
           lisatieto?: string | null
+          maakunta?: string | null
           nimi?: string
           osoite?: string | null
           palvelu?: string
