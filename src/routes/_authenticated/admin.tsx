@@ -156,6 +156,7 @@ function LiiditTab() {
                   <th className="px-3 py-2 text-left">Nimi</th>
                   <th className="px-3 py-2 text-left">Puhelin</th>
                   <th className="px-3 py-2 text-left">Osoite</th>
+                  <th className="px-3 py-2 text-left">Maakunta</th>
                   <th className="px-3 py-2 text-left">Status</th>
                 </tr>
               </thead>
@@ -174,6 +175,7 @@ function LiiditTab() {
                     <td className="px-3 py-2 text-cream">{l.nimi}</td>
                     <td className="px-3 py-2 text-muted-foreground whitespace-nowrap">{l.puhelin}</td>
                     <td className="px-3 py-2 text-muted-foreground">{l.osoite ?? "—"}</td>
+                    <td className="px-3 py-2 text-muted-foreground whitespace-nowrap">{l.maakunta ?? "—"}</td>
                     <td className="px-3 py-2">{statusBadge(l.status)}</td>
                   </tr>
                 ))}
