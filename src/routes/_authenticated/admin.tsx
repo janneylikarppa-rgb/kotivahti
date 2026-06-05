@@ -211,6 +211,7 @@ function LiiditTab() {
                   <div className="grid gap-1 text-sm">
                     <div><span className="text-muted-foreground">Osoite:</span> <span className="text-cream">{avoin.osoite ?? "—"}</span></div>
                     {avoin.kaupunki && <div><span className="text-muted-foreground">Kaupunki:</span> <span className="text-cream">{avoin.kaupunki}</span></div>}
+                    {avoin.maakunta && <div><span className="text-muted-foreground">Maakunta:</span> <span className="text-cream">{avoin.maakunta}</span></div>}
                     {avoin.rakennus_vuosi && <div><span className="text-muted-foreground">Rakennusvuosi:</span> <span className="text-cream">{avoin.rakennus_vuosi}</span></div>}
                     {avoin.lammitys && <div><span className="text-muted-foreground">Lämmitys:</span> <span className="text-cream">{avoin.lammitys}</span></div>}
                   </div>
