@@ -140,8 +140,8 @@ function LandingPage() {
     },
     {
       n: 4,
-      otsikko: "Ammattilainen dokumentoi",
-      kuvaus: "Tehty työ, kuvat ja kuitti tallentuvat automaattisesti suoraan huoltokirjaasi.",
+      otsikko: "Dokumentoi työt",
+      kuvaus: "Työn jälkeen syötät itse työn tiedot, kuvat ja kuitit huoltokirjaan. Kaikki tallessa yhdessä paikassa.",
     },
   ];
 
@@ -423,7 +423,7 @@ function LandingPage() {
             <h2 className="text-3xl md:text-5xl font-bold mb-5 text-white" style={{ fontFamily: SERIF }}>
               Ammattilainen paikalle –{" "}
               <span className="italic" style={{ color: C.goldLight }}>
-                ilman puheluita.
+                yhdellä pyynnöllä.
               </span>
             </h2>
             <p className="text-lg mb-10 max-w-xl" style={{ color: "#a8b0aa" }}>
