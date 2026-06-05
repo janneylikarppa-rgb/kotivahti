@@ -253,6 +253,7 @@ const ammSchema = z.object({
   puhelin: z.string().trim().max(40).optional().nullable(),
   aktiivinen: z.boolean().default(true),
   prioriteetti: z.number().int().min(1).max(99).default(1),
+  toimialueet: z.array(maakuntaSchema).max(MAAKUNNAT.length).default([]),
 });
 
 export const getAmmattilaiset = createServerFn({ method: "GET" })
