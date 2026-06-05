@@ -324,12 +324,26 @@ function AmmattilainenForm({ onSubmit, loading }: { onSubmit: (v: any) => void; 
   const [puhelin, setPuhelin] = useState("");
   const [kategoria, setKategoria] = useState<string>(LIIDI_KATEGORIAT[0]);
   const [prioriteetti, setPrioriteetti] = useState(1);
+  const [toimialueet, setToimialueet] = useState<string[]>([]);
+
+  const toggleAlue = (m: string) => {
+    setToimialueet((prev) => prev.includes(m) ? prev.filter((x) => x !== m) : [...prev, m]);
+  };
+
   return (
     <form
-      className="space-y-4"
+      className="space-y-4 max-h-[70vh] overflow-y-auto pr-1"
       onSubmit={(e) => {
         e.preventDefault();
-        onSubmit({ yritys: yritys.trim(), sahkoposti: sahkoposti.trim(), puhelin: puhelin.trim() || null, kategoria, prioriteetti, aktiivinen: true });
+        onSubmit({
+          yritys: yritys.trim(),
+          sahkoposti: sahkoposti.trim(),
+          puhelin: puhelin.trim() || null,
+          kategoria,
+          prioriteetti,
+          aktiivinen: true,
+          toimialueet,
+        });
       }}
     >
       <div className="space-y-2"><Label>Yritys</Label><Input value={yritys} onChange={(e) => setYritys(e.target.value)} required /></div>
@@ -345,6 +359,23 @@ function AmmattilainenForm({ onSubmit, loading }: { onSubmit: (v: any) => void; 
         </Select>
       </div>
       <div className="space-y-2"><Label>Prioriteetti (1 = ylin)</Label><Input type="number" min={1} max={99} value={prioriteetti} onChange={(e) => setPrioriteetti(Number(e.target.value))} /></div>
+
+      <div className="space-y-2">
+        <Label>Toimialue (valitse yksi tai useampi)</Label>
+        <p className="text-xs text-muted-foreground">Tyhjä = koko Suomi. Liidi reititetään vain valituille alueille.</p>
+        <div className="grid grid-cols-2 gap-2 rounded border border-border/60 p-3">
+          {MAAKUNNAT.map((m) => (
+            <label key={m} className="flex items-center gap-2 text-sm text-cream cursor-pointer">
+              <Checkbox
+                checked={toimialueet.includes(m)}
+                onCheckedChange={() => toggleAlue(m)}
+              />
+              <span>{m}</span>
+            </label>
+          ))}
+        </div>
+      </div>
+
       <Button type="submit" disabled={loading} className="w-full uppercase tracking-wider font-semibold">
         {loading ? "Tallennetaan..." : "Tallenna"}
       </Button>
