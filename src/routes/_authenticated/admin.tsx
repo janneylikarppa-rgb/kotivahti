@@ -24,6 +24,8 @@ import {
   onkoAdmin,
 } from "@/lib/liidit.functions";
 import { LIIDI_KATEGORIAT, LIIDI_STATUKSET, LIIDI_PALVELUT } from "@/lib/liidit-kategoriat";
+import { MAAKUNNAT } from "@/lib/maakunnat";
+import { Checkbox } from "@/components/ui/checkbox";
 
 export const Route = createFileRoute("/_authenticated/admin")({
   component: AdminPage,
