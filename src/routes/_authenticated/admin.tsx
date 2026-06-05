@@ -24,6 +24,8 @@ import {
   onkoAdmin,
 } from "@/lib/liidit.functions";
 import { LIIDI_KATEGORIAT, LIIDI_STATUKSET, LIIDI_PALVELUT } from "@/lib/liidit-kategoriat";
+import { MAAKUNNAT } from "@/lib/maakunnat";
+import { Checkbox } from "@/components/ui/checkbox";
 
 export const Route = createFileRoute("/_authenticated/admin")({
   component: AdminPage,
@@ -154,6 +156,7 @@ function LiiditTab() {
                   <th className="px-3 py-2 text-left">Nimi</th>
                   <th className="px-3 py-2 text-left">Puhelin</th>
                   <th className="px-3 py-2 text-left">Osoite</th>
+                  <th className="px-3 py-2 text-left">Maakunta</th>
                   <th className="px-3 py-2 text-left">Status</th>
                 </tr>
               </thead>
@@ -172,6 +175,7 @@ function LiiditTab() {
                     <td className="px-3 py-2 text-cream">{l.nimi}</td>
                     <td className="px-3 py-2 text-muted-foreground whitespace-nowrap">{l.puhelin}</td>
                     <td className="px-3 py-2 text-muted-foreground">{l.osoite ?? "—"}</td>
+                    <td className="px-3 py-2 text-muted-foreground whitespace-nowrap">{l.maakunta ?? "—"}</td>
                     <td className="px-3 py-2">{statusBadge(l.status)}</td>
                   </tr>
                 ))}
@@ -207,6 +211,7 @@ function LiiditTab() {
                   <div className="grid gap-1 text-sm">
                     <div><span className="text-muted-foreground">Osoite:</span> <span className="text-cream">{avoin.osoite ?? "—"}</span></div>
                     {avoin.kaupunki && <div><span className="text-muted-foreground">Kaupunki:</span> <span className="text-cream">{avoin.kaupunki}</span></div>}
+                    {avoin.maakunta && <div><span className="text-muted-foreground">Maakunta:</span> <span className="text-cream">{avoin.maakunta}</span></div>}
                     {avoin.rakennus_vuosi && <div><span className="text-muted-foreground">Rakennusvuosi:</span> <span className="text-cream">{avoin.rakennus_vuosi}</span></div>}
                     {avoin.lammitys && <div><span className="text-muted-foreground">Lämmitys:</span> <span className="text-cream">{avoin.lammitys}</span></div>}
                   </div>
@@ -293,6 +298,9 @@ function AmmattilaisetTab() {
                 <div className="flex-1 min-w-0">
                   <div className="font-serif text-cream">{a.yritys}</div>
                   <div className="text-xs text-muted-foreground">{a.kategoria} · {a.sahkoposti}{a.puhelin ? ` · ${a.puhelin}` : ""}</div>
+                  <div className="text-xs text-muted-foreground mt-1">
+                    Toimialueet: {Array.isArray(a.toimialueet) && a.toimialueet.length > 0 ? a.toimialueet.join(", ") : "Koko Suomi"}
+                  </div>
                 </div>
                 <label className="flex items-center gap-2 text-xs text-muted-foreground">
                   Aktiivinen
@@ -316,12 +324,26 @@ function AmmattilainenForm({ onSubmit, loading }: { onSubmit: (v: any) => void; 
   const [puhelin, setPuhelin] = useState("");
   const [kategoria, setKategoria] = useState<string>(LIIDI_KATEGORIAT[0]);
   const [prioriteetti, setPrioriteetti] = useState(1);
+  const [toimialueet, setToimialueet] = useState<string[]>([]);
+
+  const toggleAlue = (m: string) => {
+    setToimialueet((prev) => prev.includes(m) ? prev.filter((x) => x !== m) : [...prev, m]);
+  };
+
   return (
     <form
-      className="space-y-4"
+      className="space-y-4 max-h-[70vh] overflow-y-auto pr-1"
       onSubmit={(e) => {
         e.preventDefault();
-        onSubmit({ yritys: yritys.trim(), sahkoposti: sahkoposti.trim(), puhelin: puhelin.trim() || null, kategoria, prioriteetti, aktiivinen: true });
+        onSubmit({
+          yritys: yritys.trim(),
+          sahkoposti: sahkoposti.trim(),
+          puhelin: puhelin.trim() || null,
+          kategoria,
+          prioriteetti,
+          aktiivinen: true,
+          toimialueet,
+        });
       }}
     >
       <div className="space-y-2"><Label>Yritys</Label><Input value={yritys} onChange={(e) => setYritys(e.target.value)} required /></div>
@@ -337,6 +359,23 @@ function AmmattilainenForm({ onSubmit, loading }: { onSubmit: (v: any) => void; 
         </Select>
       </div>
       <div className="space-y-2"><Label>Prioriteetti (1 = ylin)</Label><Input type="number" min={1} max={99} value={prioriteetti} onChange={(e) => setPrioriteetti(Number(e.target.value))} /></div>
+
+      <div className="space-y-2">
+        <Label>Toimialue (valitse yksi tai useampi)</Label>
+        <p className="text-xs text-muted-foreground">Tyhjä = koko Suomi. Liidi reititetään vain valituille alueille.</p>
+        <div className="grid grid-cols-2 gap-2 rounded border border-border/60 p-3">
+          {MAAKUNNAT.map((m) => (
+            <label key={m} className="flex items-center gap-2 text-sm text-cream cursor-pointer">
+              <Checkbox
+                checked={toimialueet.includes(m)}
+                onCheckedChange={() => toggleAlue(m)}
+              />
+              <span>{m}</span>
+            </label>
+          ))}
+        </div>
+      </div>
+
       <Button type="submit" disabled={loading} className="w-full uppercase tracking-wider font-semibold">
         {loading ? "Tallennetaan..." : "Tallenna"}
       </Button>
