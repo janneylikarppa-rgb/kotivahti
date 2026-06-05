@@ -3,8 +3,10 @@ import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { LIIDI_KATEGORIAT } from "@/lib/liidit-kategoriat";
 import { omistajanIlmoitus, lahetaEmail } from "@/lib/email.server";
+import { paateleMaakunta, MAAKUNNAT } from "@/lib/maakunnat";
 
 const kategoriaSchema = z.enum(LIIDI_KATEGORIAT as unknown as [string, ...string[]]);
+const maakuntaSchema = z.enum(MAAKUNNAT as unknown as [string, ...string[]]);
 
 const STATUS_VALUES = ["uusi", "kasittelyssa", "valitetty", "valmis", "peruutettu"] as const;
 const statusSchema = z.enum(STATUS_VALUES);
