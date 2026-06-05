@@ -423,7 +423,7 @@ function LandingPage() {
             <h2 className="text-3xl md:text-5xl font-bold mb-5 text-white" style={{ fontFamily: SERIF }}>
               Ammattilainen paikalle –{" "}
               <span className="italic" style={{ color: C.goldLight }}>
-                ilman puheluita.
+                yhdellä pyynnöllä.
               </span>
             </h2>
             <p className="text-lg mb-10 max-w-xl" style={{ color: "#a8b0aa" }}>
