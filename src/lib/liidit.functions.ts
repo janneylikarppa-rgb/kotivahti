@@ -114,6 +114,7 @@ export const luoLiidi = createServerFn({ method: "POST" })
       .maybeSingle();
 
     const osoiteRivi = [kt.osoite, [kt.postinumero, kt.kaupunki].filter(Boolean).join(" ")].filter(Boolean).join(", ") || null;
+    const maakunta = paateleMaakunta(kt.kaupunki);
 
     const liidiRow: any = {
       user_id: userId,
@@ -127,6 +128,7 @@ export const luoLiidi = createServerFn({ method: "POST" })
       lisatieto: data.lisatieto ?? null,
       osoite: osoiteRivi,
       kaupunki: kt.kaupunki ?? null,
+      maakunta,
       rakennus_vuosi: kt.rakennusvuosi ?? null,
       lammitys: tt?.lammitysmuoto ?? null,
       pts_kohde: data.pts_kohde ?? null,
@@ -140,21 +142,41 @@ export const luoLiidi = createServerFn({ method: "POST" })
       .single();
     if (insErr) throw insErr;
 
-    // Lähetä ilmoitus omistajalle välittömästi
+    // Etsi sopivat ammattilaiset (sama kategoria, aktiivinen, maakunta täsmää tai toimialueet tyhjä)
+    const { data: ammLista } = await supabase
+      .from("ammattilaiset")
+      .select("yritys, sahkoposti, kategoria, toimialueet, aktiivinen, prioriteetti")
+      .eq("kategoria", data.kategoria)
+      .eq("aktiivinen", true);
+
+    const sopivat = ((ammLista ?? []) as any[]).filter((a) => {
+      const alueet: string[] = Array.isArray(a.toimialueet) ? a.toimialueet : [];
+      if (alueet.length === 0) return true; // koko Suomi
+      if (!maakunta) return false;
+      return alueet.includes(maakunta);
+    });
+
+    const adminUrl = process.env.PUBLIC_APP_URL
+      ? `${process.env.PUBLIC_APP_URL.replace(/\/$/, "")}/admin`
+      : "/admin";
+    const msg = omistajanIlmoitus(liidiRow, { adminUrl });
+
+    let lahetetty = false;
+    for (const amm of sopivat) {
+      try {
+        const tulos = await lahetaEmail({ to: amm.sahkoposti, subject: msg.subject, html: msg.html });
+        if (tulos.ok) lahetetty = true;
+      } catch (e) {
+        console.error("Ammattilaisen ilmoituksen lähetys epäonnistui", amm.sahkoposti, e);
+      }
+    }
+
+    // Lähetä aina myös omistajalle (jos ei sopivia → manuaalinen käsittely)
     const ownerEmail = process.env.OWNER_EMAIL;
     if (ownerEmail) {
       try {
-        const adminUrl = process.env.PUBLIC_APP_URL
-          ? `${process.env.PUBLIC_APP_URL.replace(/\/$/, "")}/admin`
-          : "/admin";
-        const msg = omistajanIlmoitus(liidiRow, { adminUrl });
         const tulos = await lahetaEmail({ to: ownerEmail, subject: msg.subject, html: msg.html });
-        if (tulos.ok) {
-          await supabase
-            .from("liidit")
-            .update({ lahetetty_at: new Date().toISOString() })
-            .eq("id", inserted.id);
-        }
+        if (tulos.ok) lahetetty = true;
       } catch (e) {
         console.error("Omistajan ilmoituksen lähetys epäonnistui", e);
       }
@@ -162,7 +184,14 @@ export const luoLiidi = createServerFn({ method: "POST" })
       console.warn("OWNER_EMAIL puuttuu – omistajalle ei lähetetty ilmoitusta");
     }
 
-    return { ok: true, id: inserted.id };
+    if (lahetetty) {
+      await supabase
+        .from("liidit")
+        .update({ lahetetty_at: new Date().toISOString() })
+        .eq("id", inserted.id);
+    }
+
+    return { ok: true, id: inserted.id, ammattilaisia: sopivat.length };
   });
 
 // -------------------- Admin: liidit --------------------
