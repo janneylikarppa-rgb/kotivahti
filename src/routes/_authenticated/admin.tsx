@@ -298,6 +298,9 @@ function AmmattilaisetTab() {
                 <div className="flex-1 min-w-0">
                   <div className="font-serif text-cream">{a.yritys}</div>
                   <div className="text-xs text-muted-foreground">{a.kategoria} · {a.sahkoposti}{a.puhelin ? ` · ${a.puhelin}` : ""}</div>
+                  <div className="text-xs text-muted-foreground mt-1">
+                    Toimialueet: {Array.isArray(a.toimialueet) && a.toimialueet.length > 0 ? a.toimialueet.join(", ") : "Koko Suomi"}
+                  </div>
                 </div>
                 <label className="flex items-center gap-2 text-xs text-muted-foreground">
                   Aktiivinen
