@@ -61,7 +61,7 @@ export const PERUSHUOLLOT: Record<Kausi, HuoltoRivi[]> = {
     f("IV-suodattimien tarkastus"),
     f("Lumikinosten poisto seiniltä ja poistumisteiltä"),
     f("Kiukaan ja kiuaskivien tarkastus"),
-    f("Märkätilojen saumausten tarkastus"),
+    f("Märkätilojen silikonien tarkastus"),
     f("Lattiakaivojen puhdistus"),
   ],
   ympari_vuoden: [
