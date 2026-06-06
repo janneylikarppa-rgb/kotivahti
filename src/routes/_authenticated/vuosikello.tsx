@@ -210,9 +210,14 @@ function HuoltoLista({
                   <Circle className="h-6 w-6 text-muted-foreground hover:text-primary transition" />
                 )}
               </button>
-              <span className={`flex-1 ${done ? "text-muted-foreground line-through" : skipped ? "text-muted-foreground italic" : "text-cream"}`}>
-                {nimi}
-              </span>
+              <div className="flex-1">
+                <span className={`${done ? "text-muted-foreground line-through" : skipped ? "text-muted-foreground italic" : "text-cream"}`}>
+                  {nimi}
+                </span>
+                {rivi.kuvaus && (
+                  <p className="mt-1 text-xs text-muted-foreground leading-relaxed">{rivi.kuvaus}</p>
+                )}
+              </div>
               {st?.hinta ? <span className="text-xs font-mono text-muted-foreground">{Number(st.hinta).toFixed(0)} €</span> : null}
               {st?.tekija === "ammattilainen" && <span className="text-[10px] uppercase tracking-wider text-primary">amm.</span>}
               {rivi.ammattilainen && (
