@@ -1,514 +1,373 @@
 import { createFileRoute, Link, redirect } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { getReadySession } from "@/lib/auth-session";
-import { Menu, X, Check, ArrowRight, Shield, Bell, Users, FileText, Sparkles } from "lucide-react";
 
 export const Route = createFileRoute("/")({
   beforeLoad: async () => {
+    if (typeof window === "undefined") return;
     const session = await getReadySession();
     if (session) throw redirect({ to: "/dashboard" });
   },
   component: LandingPage,
 });
 
-// Värit
-const C = {
-  green: "#1e3a2f",
-  greenDark: "#152a22",
-  gold: "#c8973a",
-  goldLight: "#e4b96a",
-  cream: "#f5f0e8",
-  creamDark: "#ece5d6",
-};
-
-const SERIF = "'Playfair Display', Georgia, serif";
-const SANS = "'DM Sans', system-ui, sans-serif";
-
-function GoldButton({
-  children,
-  to,
-  href,
-  size = "md",
-  className = "",
-}: {
-  children: React.ReactNode;
-  to?: string;
-  href?: string;
-  size?: "md" | "lg";
-  className?: string;
-}) {
-  const pad = size === "lg" ? "px-7 py-4 text-base" : "px-5 py-3 text-sm";
-  const base = `inline-flex items-center justify-center gap-2 rounded-xl font-semibold uppercase tracking-wider transition-all duration-200 shadow-md hover:shadow-lg hover:-translate-y-px ${pad} ${className}`;
-  const style: React.CSSProperties = {
-    background: C.gold,
-    color: C.greenDark,
-    fontFamily: SANS,
-  };
-  if (to) {
-    return (
-      <Link to={to} className={base} style={style}>
-        {children}
-      </Link>
-    );
-  }
-  return (
-    <a href={href} className={base} style={style}>
-      {children}
-    </a>
-  );
+const STYLES = `
+:root {
+  --vihrea: #1e3a2f;
+  --vihrea-dark: #152a22;
+  --kulta: #c8973a;
+  --kulta-light: #e4b96a;
+  --kerma: #f5f0e8;
+  --kerma-dark: #ece5d6;
+  --teksti: #1a1a1a;
+  --harmaa: #6b6b6b;
+  --valkoinen: #ffffff;
 }
+.kv-page * { margin: 0; padding: 0; box-sizing: border-box; }
+.kv-page { font-family: 'DM Sans', sans-serif; background: var(--kerma); color: var(--teksti); overflow-x: hidden; min-height: 100vh; }
 
-function Eyebrow({ children, light = false }: { children: React.ReactNode; light?: boolean }) {
-  return (
-    <div
-      className="flex items-center gap-3 text-xs font-semibold uppercase tracking-[0.25em]"
-      style={{ color: light ? C.goldLight : C.gold, fontFamily: SANS }}
-    >
-      <span className="h-px w-8" style={{ background: light ? C.goldLight : C.gold, opacity: 0.6 }} />
-      {children}
-      <span className="h-px w-8" style={{ background: light ? C.goldLight : C.gold, opacity: 0.6 }} />
-    </div>
-  );
+.kv-nav { position: fixed; top: 0; left: 0; right: 0; z-index: 100; display: flex; align-items: center; justify-content: space-between; padding: 1.1rem 3rem; background: rgba(245,240,232,0.92); backdrop-filter: blur(12px); border-bottom: 1px solid rgba(200,151,58,0.15); }
+.nav-logo { font-family: 'Playfair Display', serif; font-size: 1.5rem; color: var(--vihrea); letter-spacing: -0.5px; }
+.nav-logo span { color: var(--kulta); }
+.nav-links { display: flex; align-items: center; gap: 2rem; }
+.nav-links a { text-decoration: none; color: var(--harmaa); font-size: 0.9rem; font-weight: 500; transition: color 0.2s; }
+.nav-links a:hover { color: var(--vihrea); }
+.nav-cta { background: var(--kulta); color: var(--valkoinen) !important; padding: 0.55rem 1.4rem; border-radius: 6px; font-weight: 600 !important; font-size: 0.88rem !important; letter-spacing: 0.02em; transition: background 0.2s !important; }
+.nav-cta:hover { background: #b8842e !important; color: #fff !important; }
+
+.hero { min-height: 100vh; background: var(--vihrea-dark); display: flex; align-items: center; position: relative; overflow: hidden; padding: 7rem 3rem 5rem; }
+.hero::before { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse 70% 60% at 60% 40%, rgba(200,151,58,0.08) 0%, transparent 70%); }
+.hero-inner { max-width: 1200px; margin: 0 auto; width: 100%; display: grid; grid-template-columns: 1fr 1fr; gap: 5rem; align-items: center; position: relative; }
+.hero-badge { display: inline-flex; align-items: center; gap: 0.5rem; background: rgba(200,151,58,0.15); border: 1px solid rgba(200,151,58,0.3); color: var(--kulta-light); font-size: 0.75rem; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; padding: 0.4rem 1rem; border-radius: 20px; margin-bottom: 1.8rem; animation: fadeUp 0.6s ease both; }
+.hero-badge::before { content: '✦'; font-size: 0.6rem; }
+.hero h1 { font-family: 'Playfair Display', serif; font-size: clamp(2.8rem, 5vw, 4.2rem); line-height: 1.1; color: var(--valkoinen); margin-bottom: 0.5rem; animation: fadeUp 0.6s 0.1s ease both; }
+.hero h1 em { font-style: italic; color: var(--kulta); display: block; }
+.hero-sub { font-size: 1.05rem; line-height: 1.7; color: rgba(255,255,255,0.65); margin: 1.5rem 0 2.5rem; animation: fadeUp 0.6s 0.2s ease both; }
+.hero-actions { display: flex; flex-direction: column; gap: 1rem; animation: fadeUp 0.6s 0.3s ease both; }
+.btn-primary { display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; background: var(--kulta); color: var(--valkoinen); padding: 1rem 2.2rem; border-radius: 8px; border: none; cursor: pointer; font-family: 'DM Sans', sans-serif; font-size: 1rem; font-weight: 600; letter-spacing: 0.01em; text-decoration: none; transition: all 0.2s; box-shadow: 0 4px 20px rgba(200,151,58,0.35); width: fit-content; }
+.btn-primary:hover { background: #b8842e; transform: translateY(-1px); box-shadow: 0 6px 28px rgba(200,151,58,0.45); color: var(--valkoinen); }
+.hero-trust { display: flex; gap: 1.5rem; flex-wrap: wrap; }
+.trust-item { display: flex; align-items: center; gap: 0.4rem; color: rgba(255,255,255,0.55); font-size: 0.82rem; }
+.trust-item span { color: var(--kulta-light); }
+
+.hero-visual { animation: fadeUp 0.7s 0.2s ease both; }
+.mock-card { background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; padding: 1.5rem; backdrop-filter: blur(10px); }
+.mock-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.2rem; }
+.mock-title { font-family: 'Playfair Display', serif; color: var(--valkoinen); font-size: 1rem; }
+.mock-address { color: rgba(255,255,255,0.45); font-size: 0.8rem; margin-bottom: 1.5rem; }
+.mock-tasks { display: flex; flex-direction: column; gap: 0.6rem; margin-bottom: 1.5rem; }
+.mock-task { display: flex; align-items: center; gap: 0.7rem; background: rgba(255,255,255,0.04); border-radius: 8px; padding: 0.65rem 0.9rem; font-size: 0.83rem; color: rgba(255,255,255,0.7); }
+.mock-task.done { opacity: 0.5; text-decoration: line-through; }
+.check-done { color: #4ade80; font-size: 1rem; }
+.check-todo { width: 16px; height: 16px; border: 1.5px solid rgba(255,255,255,0.25); border-radius: 50%; flex-shrink: 0; }
+.mock-costs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.6rem; margin-bottom: 1.2rem; }
+.mock-cost { background: rgba(255,255,255,0.06); border-radius: 8px; padding: 0.7rem; text-align: center; }
+.mock-cost-val { color: var(--valkoinen); font-size: 0.95rem; font-weight: 600; }
+.mock-cost-label { color: rgba(255,255,255,0.4); font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.08em; margin-top: 0.15rem; }
+.mock-pts { background: rgba(200,151,58,0.12); border: 1px solid rgba(200,151,58,0.25); border-radius: 10px; padding: 0.9rem; }
+.mock-pts-label { color: var(--kulta-light); font-size: 0.65rem; letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 0.4rem; }
+.mock-pts-title { color: var(--valkoinen); font-size: 0.9rem; font-weight: 500; }
+.mock-pts-sub { color: rgba(255,255,255,0.45); font-size: 0.75rem; margin-top: 0.2rem; }
+.mock-pts-btn { margin-top: 0.8rem; background: var(--kulta); color: #fff; border: none; border-radius: 6px; padding: 0.45rem 1rem; font-size: 0.78rem; font-weight: 600; cursor: pointer; font-family: 'DM Sans', sans-serif; }
+
+.features-strip { background: var(--kerma-dark); padding: 1.2rem 3rem; border-bottom: 1px solid rgba(0,0,0,0.07); }
+.features-strip-inner { max-width: 1200px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem; }
+.strip-item { display: flex; align-items: center; gap: 0.5rem; font-size: 0.83rem; color: var(--harmaa); }
+.strip-item strong { color: var(--vihrea); }
+.strip-dot { color: var(--kulta); font-size: 1.2rem; line-height: 1; }
+
+.section-label { display: flex; align-items: center; gap: 0.8rem; color: var(--kulta); font-size: 0.72rem; letter-spacing: 0.14em; text-transform: uppercase; font-weight: 600; margin-bottom: 1rem; }
+.section-label::before, .section-label::after { content: ''; flex: 0 0 2rem; height: 1px; background: var(--kulta); opacity: 0.4; }
+.section-h2 { font-family: 'Playfair Display', serif; font-size: clamp(2rem, 3.5vw, 3rem); line-height: 1.15; color: var(--vihrea); margin-bottom: 1rem; }
+.section-h2 em { font-style: italic; color: var(--kulta); }
+.section-lead { font-size: 1rem; color: var(--harmaa); line-height: 1.7; max-width: 520px; }
+
+.features { padding: 6rem 3rem; background: var(--kerma); }
+.features-inner { max-width: 1200px; margin: 0 auto; }
+.features-head { text-align: center; margin-bottom: 4rem; }
+.features-head .section-label { justify-content: center; }
+.features-head .section-lead { margin: 0 auto; }
+.features-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; }
+.feat-card { background: var(--valkoinen); border: 1px solid rgba(0,0,0,0.06); border-radius: 14px; padding: 1.8rem; transition: all 0.25s; position: relative; overflow: hidden; }
+.feat-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: var(--kulta); opacity: 0; transition: opacity 0.25s; }
+.feat-card:hover { transform: translateY(-4px); box-shadow: 0 12px 40px rgba(0,0,0,0.1); }
+.feat-card:hover::before { opacity: 1; }
+.feat-icon { font-size: 1.8rem; margin-bottom: 1rem; }
+.feat-title { font-size: 1.05rem; font-weight: 600; color: var(--vihrea); margin-bottom: 0.5rem; }
+.feat-desc { font-size: 0.875rem; color: var(--harmaa); line-height: 1.6; }
+.feat-card.highlight { background: var(--vihrea); border-color: var(--vihrea); }
+.feat-card.highlight::before { opacity: 1; }
+.feat-card.highlight .feat-title { color: var(--valkoinen); }
+.feat-card.highlight .feat-desc { color: rgba(255,255,255,0.65); }
+.feat-card.highlight .feat-tag { display: inline-block; background: rgba(200,151,58,0.25); color: var(--kulta-light); font-size: 0.68rem; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; padding: 0.2rem 0.6rem; border-radius: 4px; margin-bottom: 0.7rem; }
+
+.kilpailutus { padding: 6rem 3rem; background: var(--vihrea-dark); position: relative; overflow: hidden; }
+.kilpailutus::before { content: ''; position: absolute; top: -30%; right: -10%; width: 50%; height: 130%; background: radial-gradient(ellipse, rgba(200,151,58,0.07) 0%, transparent 70%); }
+.kilpailutus-inner { max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1fr; gap: 5rem; align-items: center; position: relative; }
+.kilpailutus .section-h2 { color: var(--valkoinen); }
+.kilpailutus .section-lead { color: rgba(255,255,255,0.6); }
+.kil-steps { margin-top: 2.5rem; display: flex; flex-direction: column; gap: 1.2rem; }
+.kil-step { display: flex; gap: 1.2rem; align-items: flex-start; }
+.kil-num { flex-shrink: 0; width: 36px; height: 36px; background: rgba(200,151,58,0.2); border: 1px solid rgba(200,151,58,0.35); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: var(--kulta-light); font-size: 0.8rem; font-weight: 700; }
+.kil-step-title { color: var(--valkoinen); font-weight: 600; font-size: 0.95rem; margin-bottom: 0.2rem; }
+.kil-step-desc { color: rgba(255,255,255,0.5); font-size: 0.83rem; line-height: 1.5; }
+
+.kil-mock { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; padding: 2rem; }
+.kil-mock-title { font-family: 'Playfair Display', serif; color: var(--valkoinen); font-size: 1.1rem; margin-bottom: 0.4rem; }
+.kil-mock-sub { color: rgba(255,255,255,0.4); font-size: 0.8rem; margin-bottom: 1.5rem; }
+.kil-cats { display: grid; grid-template-columns: 1fr 1fr; gap: 0.6rem; margin-bottom: 1.5rem; }
+.kil-cat { background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; padding: 0.7rem 0.9rem; color: rgba(255,255,255,0.65); font-size: 0.82rem; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; gap: 0.5rem; }
+.kil-cat.active { background: rgba(200,151,58,0.2); border-color: rgba(200,151,58,0.5); color: var(--kulta-light); }
+.kil-divider { border: none; border-top: 1px solid rgba(255,255,255,0.08); margin: 1.2rem 0; }
+.kil-result { background: rgba(200,151,58,0.1); border: 1px solid rgba(200,151,58,0.25); border-radius: 10px; padding: 1rem; }
+.kil-result-label { color: var(--kulta-light); font-size: 0.68rem; letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 0.5rem; }
+.kil-offers { display: flex; flex-direction: column; gap: 0.5rem; }
+.kil-offer { display: flex; justify-content: space-between; align-items: center; background: rgba(255,255,255,0.05); border-radius: 6px; padding: 0.6rem 0.8rem; }
+.kil-offer-name { color: rgba(255,255,255,0.7); font-size: 0.82rem; }
+.kil-offer-price { color: var(--valkoinen); font-size: 0.88rem; font-weight: 600; }
+.kil-offer-stars { color: var(--kulta); font-size: 0.7rem; }
+
+.proof { padding: 5rem 3rem; background: var(--kerma-dark); }
+.proof-inner { max-width: 1200px; margin: 0 auto; }
+.proof-head { text-align: center; margin-bottom: 3.5rem; }
+.proof-head .section-label { justify-content: center; }
+.stats-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.5rem; margin-bottom: 0; }
+.stat-box { background: var(--valkoinen); border-radius: 12px; padding: 2rem 1.5rem; text-align: center; border: 1px solid rgba(0,0,0,0.06); }
+.stat-val { font-family: 'Playfair Display', serif; font-size: 2.5rem; color: var(--vihrea); font-weight: 700; line-height: 1; margin-bottom: 0.4rem; }
+.stat-val span { color: var(--kulta); }
+.stat-label { font-size: 0.82rem; color: var(--harmaa); }
+
+.cta-section { padding: 7rem 3rem; background: var(--vihrea); text-align: center; position: relative; overflow: hidden; }
+.cta-section::before { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse 60% 80% at 50% 50%, rgba(200,151,58,0.1) 0%, transparent 70%); }
+.cta-section-inner { max-width: 700px; margin: 0 auto; position: relative; }
+.cta-section .section-label { justify-content: center; margin-bottom: 1.5rem; }
+.cta-section h2 { font-family: 'Playfair Display', serif; font-size: clamp(2.2rem, 4vw, 3.5rem); color: var(--valkoinen); line-height: 1.1; margin-bottom: 1rem; }
+.cta-section h2 em { color: var(--kulta); font-style: italic; }
+.cta-section p { color: rgba(255,255,255,0.6); font-size: 1rem; margin-bottom: 2.5rem; line-height: 1.6; }
+.cta-checks { display: flex; justify-content: center; gap: 2rem; flex-wrap: wrap; margin-bottom: 2.5rem; }
+.cta-check { display: flex; align-items: center; gap: 0.4rem; color: rgba(255,255,255,0.7); font-size: 0.85rem; }
+.cta-check::before { content: '✓'; color: var(--kulta-light); font-weight: 700; }
+
+.kv-footer { background: var(--vihrea-dark); padding: 2rem 3rem; text-align: center; color: rgba(255,255,255,0.3); font-size: 0.8rem; border-top: 1px solid rgba(255,255,255,0.06); }
+.kv-footer span { color: var(--kulta); opacity: 0.7; }
+
+@keyframes fadeUp { from { opacity: 0; transform: translateY(24px); } to { opacity: 1; transform: translateY(0); } }
+.animate-on-scroll { opacity: 0; transform: translateY(20px); transition: opacity 0.5s ease, transform 0.5s ease; }
+.animate-on-scroll.visible { opacity: 1; transform: translateY(0); }
+
+@media (max-width: 900px) {
+  .kv-nav { padding: 1rem 1.5rem; }
+  .hero-inner, .kilpailutus-inner { grid-template-columns: 1fr; gap: 3rem; }
+  .hero { padding: 6rem 1.5rem 4rem; }
+  .features { padding: 4rem 1.5rem; }
+  .features-grid { grid-template-columns: 1fr 1fr; }
+  .kilpailutus { padding: 4rem 1.5rem; }
+  .proof { padding: 4rem 1.5rem; }
+  .stats-row { grid-template-columns: repeat(2, 1fr); }
+  .cta-section { padding: 5rem 1.5rem; }
+  .features-strip { padding: 1rem 1.5rem; }
 }
+@media (max-width: 600px) {
+  .features-grid { grid-template-columns: 1fr; }
+  .kil-cats { grid-template-columns: 1fr; }
+  .nav-links a:not(.nav-cta) { display: none; }
+}
+`;
+
+const FEATURES = [
+  { icon: "📋", title: "Talokirja", desc: "Talon perustiedot, laitteet, materiaalit ja vuosiluvut yhdessä paikassa. Päivitä kerran, käytä aina." },
+  { icon: "📅", title: "Vuosikello", desc: "Kausihuollot listattuna. Kuittaa tehdyksi – menee automaattisesti huoltohistoriaan." },
+  { icon: "🤝", title: "Palveluiden kilpailutus", desc: "Tilaa kuntoarvio, huolto tai tarjouspyyntö suoraan sovelluksesta. Välitetään tarkastettuille paikallisille tekijöille – sinä valitset parhaan.", highlight: true, tag: "⭐ Suosittu" },
+  { icon: "📊", title: "PTS-suunnitelma", desc: "Ennakoi milloin rakennusosat tarvitsevat toimenpiteitä. Ei yllätyksiä." },
+  { icon: "💰", title: "Kulujenseuranta", desc: "Sähkö ja vesi kulutuspohjaisesti. Ennakointilaskelma tuleville vuosille." },
+  { icon: "🔧", title: "Huoltohistoria", desc: "Kaikki dokumentoitu. Kuitit, kuvat, tekijät – löydät aina kun tarvitset." },
+  { icon: "📄", title: "Myyntiraportti", desc: "Tulostettava raportti välittäjälle. Yksi nappi, kaikki tallessa." },
+];
+
+const STEPS = [
+  { n: 1, title: "Valitse palvelu", desc: "Katto, LVI, sähkö, ilmanvaihto, nuohous – 14 kategoriaa suoraan sovelluksessa." },
+  { n: 2, title: "Lähetä pyyntö", desc: "Talon tiedot täyttyvät automaattisesti talokirjastasi. Yksi nappi." },
+  { n: 3, title: "Saat tarjoukset", desc: "Tarkastetut paikalliset yritykset ottavat yhteyttä. Sinä valitset." },
+  { n: 4, title: "Ammattilainen dokumentoi", desc: "Tehty työ, kuvat ja kuitti tallentuvat automaattisesti suoraan huoltokirjaasi." },
+];
+
+const CATS = [
+  "🏠 Katto & vesikatto",
+  "🔧 LVI & putket",
+  "⚡ Sähkötyöt",
+  "🌬️ Ilmanvaihto & IV-huolto",
+  "🔥 Nuohous & tulisijat",
+  "🌿 Piha & salaojat",
+];
+
+const OFFERS = [
+  { name: "Yritys 1", stars: "★★★★★", price: "1 200€" },
+  { name: "Yritys 2", stars: "★★★★☆", price: "1 450€" },
+  { name: "Yritys 3", stars: "★★★★★", price: "980€" },
+];
 
 function LandingPage() {
-  const [scrolled, setScrolled] = useState(false);
-  const [menuOpen, setMenuOpen] = useState(false);
-  const [aktiivinenKategoria, setAktiivinenKategoria] = useState(0);
-
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 20);
-    window.addEventListener("scroll", onScroll);
-    return () => window.removeEventListener("scroll", onScroll);
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry, i) => {
+          if (entry.isIntersecting) {
+            setTimeout(() => entry.target.classList.add("visible"), i * 80);
+            observer.unobserve(entry.target);
+          }
+        });
+      },
+      { threshold: 0.1 },
+    );
+    document.querySelectorAll(".animate-on-scroll").forEach((el) => observer.observe(el));
+
+    const cats = document.querySelectorAll<HTMLDivElement>(".kil-cat");
+    const handler = (e: Event) => {
+      cats.forEach((c) => c.classList.remove("active"));
+      (e.currentTarget as HTMLElement).classList.add("active");
+    };
+    cats.forEach((c) => c.addEventListener("click", handler));
+    return () => {
+      observer.disconnect();
+      cats.forEach((c) => c.removeEventListener("click", handler));
+    };
   }, []);
 
-  const ominaisuudet = [
-    {
-      ikoni: "📋",
-      otsikko: "Talokirja",
-      kuvaus: "Talon perustiedot, laitteet, materiaalit ja vuosiluvut yhdessä paikassa. Päivitä kerran, käytä aina.",
-    },
-    {
-      ikoni: "📅",
-      otsikko: "Vuosikello",
-      kuvaus: "Kausihuollot listattuna. Kuittaa tehdyksi – menee automaattisesti huoltohistoriaan.",
-    },
-    {
-      ikoni: "🤝",
-      otsikko: "Palveluiden kilpailutus",
-      kuvaus:
-        "Tilaa kuntoarvio, huolto tai tarjouspyyntö suoraan sovelluksesta. Välitetään tarkastetuille paikallisille tekijöille – sinä valitset parhaan.",
-      korostettu: true,
-    },
-    {
-      ikoni: "📊",
-      otsikko: "PTS-suunnitelma",
-      kuvaus: "Ennakoi milloin rakennusosat tarvitsevat toimenpiteitä. Ei yllätyksiä.",
-    },
-    {
-      ikoni: "💰",
-      otsikko: "Kulujenseuranta",
-      kuvaus: "Sähkö ja vesi kulutuspohjaisesti. Ennakointilaskelma tuleville vuosille.",
-    },
-    {
-      ikoni: "🔧",
-      otsikko: "Huoltohistoria",
-      kuvaus: "Kaikki dokumentoitu. Kuitit, kuvat, tekijät – löydät aina kun tarvitset.",
-    },
-    {
-      ikoni: "📄",
-      otsikko: "Myyntiraportti",
-      kuvaus: "Tulostettava raportti välittäjälle. Yksi nappi, kaikki tallessa.",
-    },
-  ];
-
-  const askeleet = [
-    {
-      n: 1,
-      otsikko: "Valitse palvelu",
-      kuvaus: "Katto, LVI, sähkö, ilmanvaihto, nuohous – 14 kategoriaa suoraan sovelluksessa.",
-    },
-    {
-      n: 2,
-      otsikko: "Lähetä pyyntö",
-      kuvaus: "Talon tiedot täyttyvät automaattisesti talokirjastasi. Yksi nappi.",
-    },
-    {
-      n: 3,
-      otsikko: "Saat tarjoukset",
-      kuvaus: "Tarkastetut paikalliset yritykset ottavat yhteyttä. Sinä valitset.",
-    },
-    {
-      n: 4,
-      otsikko: "Dokumentoi työt",
-      kuvaus: "Työn jälkeen syötät itse työn tiedot, kuvat ja kuitit huoltokirjaan. Kaikki tallessa yhdessä paikassa.",
-    },
-  ];
-
-  const kategoriat = [
-    "🏠 Katto & vesikatto",
-    "🔧 LVI & putket",
-    "⚡ Sähkötyöt",
-    "🌬️ Ilmanvaihto & IV-huolto",
-    "🔥 Nuohous & tulisijat",
-    "🌿 Piha & salaojat",
-  ];
-
-  const tilastot = [
-    { luku: "7+", teksti: "toimintoa yhdessä sovelluksessa" },
-    { luku: "0€", teksti: "kaikki ominaisuudet ilmaiseksi" },
-    { luku: "14+", teksti: "ammattilaiskategoriaa kilpailutuksessa" },
-    { luku: "1min", teksti: "käyttöönotto alle minuutissa" },
-  ];
-
-  const luottamus = [
-    { ikoni: <Sparkles className="h-4 w-4" />, teksti: "Ilmainen kaikille ominaisuuksille" },
-    { ikoni: <Shield className="h-4 w-4" />, teksti: "Tarkastettu ammattilaisten verkosto" },
-    { ikoni: <Bell className="h-4 w-4" />, teksti: "Automaattiset muistutukset huolloista" },
-    { ikoni: <FileText className="h-4 w-4" />, teksti: "Myyntiraportti yhdellä napilla" },
-  ];
-
   return (
-    <div className="min-h-screen" style={{ background: C.cream, color: C.greenDark, fontFamily: SANS, scrollBehavior: "smooth" }}>
-      {/* NAVIGAATIO */}
-      <nav
-        className="fixed top-0 inset-x-0 z-50 transition-all duration-300"
-        style={{
-          background: scrolled ? "rgba(245,240,232,0.92)" : "rgba(245,240,232,0.6)",
-          backdropFilter: "blur(12px)",
-          WebkitBackdropFilter: "blur(12px)",
-          borderBottom: scrolled ? `1px solid ${C.green}1f` : "1px solid transparent",
-        }}
-      >
-        <div className="mx-auto max-w-7xl px-6 h-16 flex items-center justify-between">
-          <Link to="/" className="text-2xl font-bold" style={{ fontFamily: SERIF, color: C.green }}>
-            Koti<span style={{ color: C.gold }}>vahti</span>
-          </Link>
-          <div className="hidden md:flex items-center gap-8 text-sm">
-            <a href="#ominaisuudet" className="transition hover:opacity-70" style={{ color: C.green }}>
-              Ominaisuudet
-            </a>
-            <a href="#kilpailutus" className="transition hover:opacity-70" style={{ color: C.green }}>
-              Kilpailutus
-            </a>
-            <GoldButton to="/rekisteroidy">Aloita ilmaiseksi</GoldButton>
-          </div>
-          <button className="md:hidden" onClick={() => setMenuOpen((v) => !v)} aria-label="Valikko" style={{ color: C.green }}>
-            {menuOpen ? <X /> : <Menu />}
-          </button>
+    <div className="kv-page">
+      <style>{STYLES}</style>
+
+      <nav className="kv-nav">
+        <div className="nav-logo">Koti<span>vahti</span></div>
+        <div className="nav-links">
+          <a href="#ominaisuudet">Ominaisuudet</a>
+          <a href="#kilpailutus">Kilpailutus</a>
+          <Link to="/rekisteroidy" className="nav-cta">Aloita ilmaiseksi</Link>
         </div>
-        {menuOpen && (
-          <div className="md:hidden border-t px-6 py-4 flex flex-col gap-3" style={{ background: C.cream, borderColor: `${C.green}20` }}>
-            <a href="#ominaisuudet" onClick={() => setMenuOpen(false)} style={{ color: C.green }}>
-              Ominaisuudet
-            </a>
-            <a href="#kilpailutus" onClick={() => setMenuOpen(false)} style={{ color: C.green }}>
-              Kilpailutus
-            </a>
-            <GoldButton to="/rekisteroidy">Aloita ilmaiseksi</GoldButton>
-          </div>
-        )}
       </nav>
 
-      {/* HERO */}
-      <section
-        className="relative min-h-screen flex items-center pt-24 pb-16"
-        style={{
-          background: `radial-gradient(circle at 80% 20%, ${C.green} 0%, ${C.greenDark} 60%)`,
-        }}
-      >
-        <div className="mx-auto max-w-7xl px-6 grid md:grid-cols-2 gap-12 items-center w-full">
-          {/* Vasen */}
-          <div className="animate-fade-in">
-            <div
-              className="inline-flex items-center gap-2 rounded-full px-4 py-1.5 text-xs font-semibold uppercase tracking-wider mb-6"
-              style={{ background: `${C.gold}1f`, color: C.goldLight, border: `1px solid ${C.gold}40` }}
-            >
-              <span>✦</span> Uutta · Ilmainen talokirja
-            </div>
-            <h1
-              className="text-4xl md:text-6xl font-bold leading-[1.05] mb-6 text-white"
-              style={{ fontFamily: SERIF }}
-            >
-              Yksi sovellus –{" "}
-              <span className="italic block" style={{ color: C.goldLight }}>
-                koko talon hallinta.
-              </span>
-            </h1>
-            <p className="text-lg md:text-xl mb-8 max-w-xl" style={{ color: "#cdd3cf" }}>
-              Talokirja, vuosikello, kulujenseuranta, PTS-suunnitelma ja palveluiden kilpailutus – kaikki samassa
-              paikassa. Aina ilmainen.
-            </p>
-            <GoldButton to="/rekisteroidy" size="lg">
-              Avaa talokirja ilmaiseksi <ArrowRight className="h-4 w-4" />
-            </GoldButton>
-            <div className="flex flex-wrap items-center gap-x-6 gap-y-2 mt-6 text-sm" style={{ color: "#a8b0aa" }}>
-              <span>
-                <span style={{ color: C.goldLight }}>✓</span> Tarkastetut ammattilaiset
-              </span>
-              <span>
-                <span style={{ color: C.goldLight }}>🔒</span> Tietosi suojattu
-              </span>
-              <span>
-                <span style={{ color: C.goldLight }}>✦</span> Ei luottokorttia
-              </span>
-            </div>
-          </div>
-
-          {/* Oikea: mock dashboard */}
-          <div
-            className="rounded-2xl p-6 md:p-7 shadow-2xl backdrop-blur"
-            style={{
-              background: "rgba(255,255,255,0.04)",
-              border: `1px solid ${C.gold}30`,
-            }}
-          >
-            <div className="flex items-center justify-between mb-5 pb-4 border-b" style={{ borderColor: `${C.gold}25` }}>
-              <div>
-                <div className="text-lg font-bold text-white" style={{ fontFamily: SERIF }}>
-                  Kotivahti
-                </div>
-                <div className="text-xs" style={{ color: "#a8b0aa" }}>
-                  Koivutie 12 · Kuopio
-                </div>
-              </div>
-              <div className="h-9 w-9 rounded-full flex items-center justify-center" style={{ background: `${C.gold}20` }}>
-                🏡
-              </div>
-            </div>
-
-            <div className="mb-5">
-              <div className="text-[10px] font-semibold uppercase tracking-widest mb-3" style={{ color: C.goldLight }}>
-                Kevään tehtävät
-              </div>
-              <ul className="space-y-2 text-sm">
-                <li className="flex items-center gap-2 line-through opacity-50" style={{ color: "#cdd3cf" }}>
-                  <Check className="h-4 w-4" style={{ color: C.goldLight }} /> IV-suodattimet
-                </li>
-                <li className="flex items-center gap-2 line-through opacity-50" style={{ color: "#cdd3cf" }}>
-                  <Check className="h-4 w-4" style={{ color: C.goldLight }} /> Räystäskourut puhdistettu
-                </li>
-                <li className="flex items-center gap-2" style={{ color: "#e6eae6" }}>
-                  <span className="h-4 w-4 rounded-full border" style={{ borderColor: C.goldLight }} /> Katon tarkastus
-                </li>
-                <li className="flex items-center gap-2" style={{ color: "#e6eae6" }}>
-                  <span className="h-4 w-4 rounded-full border" style={{ borderColor: C.goldLight }} /> Vikavirtasuojan testaus
-                </li>
-              </ul>
-            </div>
-
-            <div className="mb-5">
-              <div className="text-[10px] font-semibold uppercase tracking-widest mb-3" style={{ color: C.goldLight }}>
-                Vuosikulut 2026
-              </div>
-              <div className="grid grid-cols-3 gap-3">
-                {[
-                  { hinta: "2 480€", label: "Sähkö" },
-                  { hinta: "380€", label: "Vesi" },
-                  { hinta: "4 200€", label: "Lämpö" },
-                ].map((k) => (
-                  <div key={k.label} className="rounded-xl p-3" style={{ background: "rgba(255,255,255,0.05)" }}>
-                    <div className="text-lg font-bold text-white" style={{ fontFamily: SERIF }}>
-                      {k.hinta}
-                    </div>
-                    <div className="text-[10px] uppercase tracking-wider" style={{ color: "#a8b0aa" }}>
-                      {k.label}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            <div
-              className="rounded-xl p-4 mb-4"
-              style={{ background: `${C.gold}12`, border: `1px solid ${C.gold}30` }}
-            >
-              <div className="text-[10px] font-semibold uppercase tracking-widest mb-1" style={{ color: C.goldLight }}>
-                ⚠ Seuraava PTS-toimenpide
-              </div>
-              <div className="text-sm font-semibold text-white">Ilmanvaihtokone – huolto</div>
-              <div className="text-xs mt-1" style={{ color: "#a8b0aa" }}>
-                Suositellaan 2027 · Asennettu 2005, kanavat puhdistamatta 12v
-              </div>
-            </div>
-
-            <button
-              className="w-full rounded-xl py-2.5 text-sm font-semibold uppercase tracking-wider transition hover:-translate-y-px"
-              style={{ background: C.gold, color: C.greenDark, fontFamily: SANS }}
-            >
-              Tilaa kuntoarvio
-            </button>
-          </div>
-        </div>
-      </section>
-
-      {/* LUOTTAMUSKAISTA */}
-      <section className="py-6 border-y" style={{ background: C.creamDark, borderColor: `${C.green}15` }}>
-        <div className="mx-auto max-w-7xl px-6 grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
-          {luottamus.map((l, i) => (
-            <div key={i} className="flex items-center gap-2" style={{ color: C.green }}>
-              <span style={{ color: C.gold }}>{l.ikoni}</span>
-              <span className="font-medium">{l.teksti}</span>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* OMINAISUUDET */}
-      <section id="ominaisuudet" className="py-24" style={{ background: C.cream }}>
-        <div className="mx-auto max-w-7xl px-6">
-          <div className="text-center mb-14 animate-fade-in">
-            <div className="flex justify-center mb-4">
-              <Eyebrow>Ominaisuudet</Eyebrow>
-            </div>
-            <h2 className="text-3xl md:text-5xl font-bold mb-4" style={{ fontFamily: SERIF, color: C.green }}>
-              Kaikki mitä talo tarvitsee – yhdessä.
-            </h2>
-            <p className="text-lg max-w-2xl mx-auto" style={{ color: `${C.green}b3` }}>
-              Seitsemän toimintoa jotka tekevät talostasi hyvin hoidetun – automaattisesti ja ilman vaivaa.
-            </p>
-          </div>
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
-            {ominaisuudet.map((o, i) => {
-              const korostettu = o.korostettu;
-              return (
-                <div
-                  key={i}
-                  className="group relative rounded-2xl p-6 transition-all duration-300 hover:-translate-y-1"
-                  style={{
-                    background: korostettu ? C.green : "#ffffff",
-                    color: korostettu ? "#ffffff" : C.green,
-                    border: korostettu ? `1px solid ${C.gold}60` : `1px solid ${C.green}15`,
-                    boxShadow: korostettu
-                      ? `0 12px 32px ${C.green}40`
-                      : "0 4px 14px rgba(30,58,47,0.06)",
-                  }}
-                >
-                  <div
-                    className="absolute inset-x-6 top-0 h-0.5 rounded-full opacity-0 group-hover:opacity-100 transition"
-                    style={{ background: C.gold }}
-                  />
-                  {korostettu && (
-                    <div
-                      className="absolute -top-3 left-6 rounded-full px-3 py-1 text-[10px] font-bold uppercase tracking-widest"
-                      style={{ background: C.gold, color: C.greenDark }}
-                    >
-                      ⭐ Suosittu
-                    </div>
-                  )}
-                  <div className="text-3xl mb-3">{o.ikoni}</div>
-                  <h3
-                    className="text-xl font-bold mb-2"
-                    style={{ fontFamily: SERIF, color: korostettu ? "#ffffff" : C.green }}
-                  >
-                    {o.otsikko}
-                  </h3>
-                  <p className="text-sm leading-relaxed" style={{ color: korostettu ? "#cdd3cf" : `${C.green}b3` }}>
-                    {o.kuvaus}
-                  </p>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-      </section>
-
-      {/* KILPAILUTUS */}
-      <section id="kilpailutus" className="py-24" style={{ background: C.green }}>
-        <div className="mx-auto max-w-7xl px-6 grid lg:grid-cols-2 gap-12 items-start">
+      <section className="hero">
+        <div className="hero-inner">
           <div>
-            <div className="mb-4">
-              <Eyebrow light>Palveluiden kilpailutus</Eyebrow>
-            </div>
-            <h2 className="text-3xl md:text-5xl font-bold mb-5 text-white" style={{ fontFamily: SERIF }}>
-              Ammattilainen paikalle –{" "}
-              <span className="italic" style={{ color: C.goldLight }}>
-                yhdellä pyynnöllä.
-              </span>
-            </h2>
-            <p className="text-lg mb-10 max-w-xl" style={{ color: "#a8b0aa" }}>
-              Tilaa suoraan sovelluksesta. Kotivahti välittää pyyntösi tarkastettuihin paikallisiin yrityksiin ja sinä
-              valitset parhaan tarjouksen.
+            <div className="hero-badge">Uutta · Ilmainen talokirja</div>
+            <h1>
+              Yksi sovellus –
+              <em>koko talon hallinta.</em>
+            </h1>
+            <p className="hero-sub">
+              Talokirja, vuosikello, kulujenseuranta, PTS-suunnitelma ja palveluiden kilpailutus – kaikki samassa paikassa. Aina ilmainen.
             </p>
-            <div className="space-y-6">
-              {askeleet.map((a) => (
-                <div key={a.n} className="flex gap-4">
-                  <div
-                    className="h-10 w-10 shrink-0 rounded-full flex items-center justify-center font-bold"
-                    style={{
-                      background: `${C.gold}15`,
-                      border: `1px solid ${C.gold}60`,
-                      color: C.goldLight,
-                      fontFamily: SERIF,
-                    }}
-                  >
-                    {a.n}
-                  </div>
+            <div className="hero-actions">
+              <Link to="/rekisteroidy" className="btn-primary">
+                Avaa talokirja ilmaiseksi →
+              </Link>
+              <div className="hero-trust">
+                <div className="trust-item"><span>✓</span> Tarkastetut ammattilaiset</div>
+                <div className="trust-item"><span>🔒</span> Tietosi suojattu</div>
+                <div className="trust-item"><span>✦</span> Ei luottokorttia</div>
+              </div>
+            </div>
+          </div>
+
+          <div className="hero-visual">
+            <div className="mock-card">
+              <div className="mock-header">
+                <div>
+                  <div className="mock-title">Kotivahti</div>
+                  <div className="mock-address">Koivutie 12 · Kuopio</div>
+                </div>
+              </div>
+              <div className="mock-tasks">
+                <div className="mock-task done"><span className="check-done">✓</span> IV-suodattimet</div>
+                <div className="mock-task done"><span className="check-done">✓</span> Räystäskourut puhdistettu</div>
+                <div className="mock-task"><div className="check-todo" /> Katon tarkastus</div>
+                <div className="mock-task"><div className="check-todo" /> Vikavirtasuojan testaus</div>
+              </div>
+              <div className="mock-costs">
+                <div className="mock-cost"><div className="mock-cost-val">2 480€</div><div className="mock-cost-label">Sähkö</div></div>
+                <div className="mock-cost"><div className="mock-cost-val">380€</div><div className="mock-cost-label">Vesi</div></div>
+                <div className="mock-cost"><div className="mock-cost-val">4 200€</div><div className="mock-cost-label">Lämpö</div></div>
+              </div>
+              <div className="mock-pts">
+                <div className="mock-pts-label">⚠ Seuraava PTS-toimenpide</div>
+                <div className="mock-pts-title">Ilmanvaihtokone – huolto</div>
+                <div className="mock-pts-sub">Suositellaan 2027 · Asennettu 2005, kanavat puhdistamatta 12v</div>
+                <button className="mock-pts-btn">Tilaa kuntoarvio</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <div className="features-strip">
+        <div className="features-strip-inner">
+          <div className="strip-item"><span className="strip-dot">✦</span> <strong>Ilmainen</strong> kaikille ominaisuuksille</div>
+          <div className="strip-item"><span className="strip-dot">✦</span> <strong>Tarkastettu</strong> ammattilaisten verkosto</div>
+          <div className="strip-item"><span className="strip-dot">✦</span> <strong>Automaattiset</strong> muistutukset huolloista</div>
+          <div className="strip-item"><span className="strip-dot">✦</span> <strong>Myyntiraportti</strong> yksi nappi</div>
+        </div>
+      </div>
+
+      <section className="features" id="ominaisuudet">
+        <div className="features-inner">
+          <div className="features-head animate-on-scroll">
+            <div className="section-label">Ominaisuudet</div>
+            <h2 className="section-h2">Kaikki mitä talo tarvitsee<br /><em>– yhdessä.</em></h2>
+            <p className="section-lead">Seitsemän toimintoa jotka tekevät talostasi hyvin hoidetun – automaattisesti ja ilman vaivaa.</p>
+          </div>
+          <div className="features-grid">
+            {FEATURES.map((f) => (
+              <div key={f.title} className={`feat-card animate-on-scroll${f.highlight ? " highlight" : ""}`}>
+                {f.tag && <div className="feat-tag">{f.tag}</div>}
+                <div className="feat-icon">{f.icon}</div>
+                <div className="feat-title">{f.title}</div>
+                <div className="feat-desc">{f.desc}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="kilpailutus" id="kilpailutus">
+        <div className="kilpailutus-inner">
+          <div>
+            <div className="section-label" style={{ color: "var(--kulta-light)" }}>
+              Palveluiden kilpailutus
+            </div>
+            <h2 className="section-h2">Ammattilainen paikalle –<br /><em>ilman puheluita.</em></h2>
+            <p className="section-lead">Tilaa suoraan sovelluksesta. Kotivahti välittää pyyntösi tarkastettuihin paikallisiin yrityksiin ja sinä valitset parhaan tarjouksen.</p>
+            <div className="kil-steps">
+              {STEPS.map((s) => (
+                <div className="kil-step" key={s.n}>
+                  <div className="kil-num">{s.n}</div>
                   <div>
-                    <h3 className="text-lg font-bold text-white mb-1" style={{ fontFamily: SERIF }}>
-                      {a.otsikko}
-                    </h3>
-                    <p className="text-sm" style={{ color: "#a8b0aa" }}>
-                      {a.kuvaus}
-                    </p>
+                    <div className="kil-step-title">{s.title}</div>
+                    <div className="kil-step-desc">{s.desc}</div>
                   </div>
                 </div>
               ))}
             </div>
           </div>
 
-          {/* Mock kortti */}
-          <div
-            className="rounded-2xl p-6 md:p-7 backdrop-blur shadow-2xl"
-            style={{ background: "rgba(255,255,255,0.04)", border: `1px solid ${C.gold}30` }}
-          >
-            <div className="mb-5">
-              <h3 className="text-xl font-bold text-white" style={{ fontFamily: SERIF }}>
-                Tilaa palvelu
-              </h3>
-              <p className="text-xs mt-1" style={{ color: "#a8b0aa" }}>
-                Valitse kategoria – loput hoituu automaattisesti
-              </p>
+          <div className="kil-mock animate-on-scroll">
+            <div className="kil-mock-title">Tilaa palvelu</div>
+            <div className="kil-mock-sub">Valitse kategoria – loput hoituu automaattisesti</div>
+            <div className="kil-cats">
+              {CATS.map((c, i) => (
+                <div key={c} className={`kil-cat${i === 0 ? " active" : ""}`}>{c}</div>
+              ))}
             </div>
-            <div className="grid grid-cols-2 gap-2.5 mb-5">
-              {kategoriat.map((k, i) => {
-                const aktiivi = i === aktiivinenKategoria;
-                return (
-                  <button
-                    key={k}
-                    onClick={() => setAktiivinenKategoria(i)}
-                    className="rounded-xl px-3 py-3 text-xs font-medium text-left transition"
-                    style={{
-                      background: aktiivi ? `${C.gold}18` : "rgba(255,255,255,0.04)",
-                      border: aktiivi ? `1px solid ${C.gold}` : `1px solid rgba(255,255,255,0.08)`,
-                      color: aktiivi ? C.goldLight : "#cdd3cf",
-                    }}
-                  >
-                    {k}
-                  </button>
-                );
-              })}
-            </div>
-            <div className="h-px mb-5" style={{ background: `${C.gold}25` }} />
-            <div
-              className="rounded-xl p-4"
-              style={{ background: `${C.gold}10`, border: `1px solid ${C.gold}40` }}
-            >
-              <div className="text-[10px] font-semibold uppercase tracking-widest mb-3" style={{ color: C.goldLight }}>
-                Paikalliset tarjoukset – Kuopio
-              </div>
-              <div className="space-y-2.5 text-sm">
-                {[
-                  { nimi: "Yritys 1", tahdet: "★★★★★", hinta: "1 200€" },
-                  { nimi: "Yritys 2", tahdet: "★★★★☆", hinta: "1 450€" },
-                  { nimi: "Yritys 3", tahdet: "★★★★★", hinta: "980€" },
-                ].map((y) => (
-                  <div key={y.nimi} className="flex items-center justify-between text-white">
-                    <span className="font-medium">{y.nimi}</span>
-                    <span style={{ color: C.goldLight }}>{y.tahdet}</span>
-                    <span className="font-bold" style={{ fontFamily: SERIF }}>
-                      {y.hinta}
-                    </span>
+            <hr className="kil-divider" />
+            <div className="kil-result">
+              <div className="kil-result-label">Paikalliset tarjoukset – Kuopio</div>
+              <div className="kil-offers">
+                {OFFERS.map((o) => (
+                  <div className="kil-offer" key={o.name}>
+                    <div>
+                      <div className="kil-offer-name">{o.name}</div>
+                      <div className="kil-offer-stars">{o.stars}</div>
+                    </div>
+                    <div className="kil-offer-price">{o.price}</div>
                   </div>
                 ))}
               </div>
@@ -517,77 +376,40 @@ function LandingPage() {
         </div>
       </section>
 
-      {/* MIKSI KOTIVAHTI */}
-      <section className="py-24" style={{ background: C.creamDark }}>
-        <div className="mx-auto max-w-7xl px-6">
-          <div className="text-center mb-12">
-            <div className="flex justify-center mb-4">
-              <Eyebrow>Miksi Kotivahti</Eyebrow>
-            </div>
-            <h2 className="text-3xl md:text-5xl font-bold" style={{ fontFamily: SERIF, color: C.green }}>
-              Talosi tiedot vihdoin järjestyksessä.
-            </h2>
+      <section className="proof">
+        <div className="proof-inner">
+          <div className="proof-head animate-on-scroll">
+            <div className="section-label">Miksi Kotivahti</div>
+            <h2 className="section-h2">Talosi tiedot vihdoin<br /><em>järjestyksessä.</em></h2>
           </div>
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-            {tilastot.map((t, i) => (
-              <div
-                key={i}
-                className="rounded-2xl p-6 text-center"
-                style={{ background: "#ffffff", border: `1px solid ${C.green}15`, boxShadow: "0 4px 14px rgba(30,58,47,0.05)" }}
-              >
-                <div className="text-4xl md:text-5xl font-bold mb-2" style={{ fontFamily: SERIF, color: C.gold }}>
-                  {t.luku}
-                </div>
-                <div className="text-sm" style={{ color: `${C.green}b3` }}>
-                  {t.teksti}
-                </div>
-              </div>
-            ))}
+          <div className="stats-row">
+            <div className="stat-box animate-on-scroll"><div className="stat-val">7<span>+</span></div><div className="stat-label">toimintoa yhdessä sovelluksessa</div></div>
+            <div className="stat-box animate-on-scroll"><div className="stat-val">0<span>€</span></div><div className="stat-label">kaikki ominaisuudet ilmaiseksi</div></div>
+            <div className="stat-box animate-on-scroll"><div className="stat-val">14<span>+</span></div><div className="stat-label">ammattilaiskategoriaa kilpailutuksessa</div></div>
+            <div className="stat-box animate-on-scroll"><div className="stat-val">1<span>min</span></div><div className="stat-label">käyttöönotto alle minuutissa</div></div>
           </div>
         </div>
       </section>
 
-      {/* CTA */}
-      <section className="py-24" style={{ background: C.green }}>
-        <div className="mx-auto max-w-3xl px-6 text-center">
-          <div className="flex justify-center mb-5">
-            <Eyebrow light>Aloita tänään</Eyebrow>
+      <section className="cta-section" id="aloita">
+        <div className="cta-section-inner">
+          <div className="section-label">Aloita tänään</div>
+          <h2>Avaa talokirja.<br /><em>Ilmaiseksi.</em></h2>
+          <p>Kaikki ominaisuudet heti käytössä. Ei luottokorttia eikä sitoumuksia.</p>
+          <div className="cta-checks">
+            <div className="cta-check">Kaikki ominaisuudet ilmaisia</div>
+            <div className="cta-check">Ei luottokorttia eikä sitoumuksia</div>
+            <div className="cta-check">Käyttöönotto alle minuutissa</div>
           </div>
-          <h2 className="text-4xl md:text-6xl font-bold mb-5 text-white" style={{ fontFamily: SERIF }}>
-            Avaa talokirja.{" "}
-            <span className="italic" style={{ color: C.goldLight }}>
-              Ilmaiseksi.
-            </span>
-          </h2>
-          <p className="text-lg mb-8" style={{ color: "#a8b0aa" }}>
-            Kaikki ominaisuudet heti käytössä. Ei luottokorttia eikä sitoumuksia.
-          </p>
-          <ul className="flex flex-col sm:flex-row sm:justify-center gap-3 sm:gap-6 mb-9 text-sm">
-            {[
-              "Kaikki ominaisuudet ilmaisia",
-              "Ei luottokorttia eikä sitoumuksia",
-              "Käyttöönotto alle minuutissa",
-            ].map((t) => (
-              <li key={t} className="flex items-center justify-center gap-2" style={{ color: "#cdd3cf" }}>
-                <Check className="h-4 w-4" style={{ color: C.goldLight }} /> {t}
-              </li>
-            ))}
-          </ul>
-          <GoldButton to="/rekisteroidy" size="lg">
-            Aloita nyt – ilmaiseksi <ArrowRight className="h-4 w-4" />
-          </GoldButton>
+          <Link to="/rekisteroidy" className="btn-primary" style={{ margin: "0 auto", fontSize: "1.1rem", padding: "1.1rem 2.8rem" }}>
+            Aloita nyt – ilmaiseksi →
+          </Link>
         </div>
       </section>
 
-      {/* FOOTER */}
-      <footer className="py-8 text-center text-sm" style={{ background: C.greenDark, color: "#7e857f" }}>
-        © 2026 Kotivahti · Talosi oma avustaja · Kuopio, Suomi
+      <footer className="kv-footer">
+        <p>© 2026 <span>Kotivahti</span> · Talosi oma avustaja · Kuopio, Suomi</p>
       </footer>
-
-      {/* Käyttämättömät iconit estoa varten */}
-      <span className="hidden">
-        <Users />
-      </span>
     </div>
   );
 }
