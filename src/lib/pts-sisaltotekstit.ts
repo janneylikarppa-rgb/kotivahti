@@ -129,9 +129,9 @@ const TEKSTIT: Record<string, Viestit> = {
     "Käyttöikä ylitetty: ikkunoiden uusiminen on yleensä kannattavaa sekä energian että viihtyvyyden takia.",
   ],
   "Kylpyhuone / märkätila": [
-    "Kylpyhuoneen pintojen käyttöikä on noin 25 vuotta. Vedeneristyksen kunto on kriittisin asia. Suositellaan myös tarkastamaan silikonisaumat sekä laattojen saumat säännöllisesti – haljennut silikoni tai irtoava sauma päästää vettä rakenteisiin pitkään huomaamatta.",
-    "Vanhentunut vedeneristys vuotaa hiljalleen. Vakuutus ei korvaa vauriota, jos rakenne on ylittänyt iän selvästi. Tarkasta erityisesti suihkunurkan, kylpyammeen reunan ja lattiakaivon silikonit sekä saumat – uusi tarvittaessa.",
-    "Käyttöikä ylitetty: kosteusvaurion riski on suuri. Märkätilaremontti kannattaa suunnitella pian – piilevä vaurio on kallein. Halkeilleet silikonit ja saumat ovat usein ensimmäinen merkki alkavasta vauriosta.",
+    "Kylpyhuoneen silikonisaumat kannattaa uusia 3–5 vuoden välein – se on edullisin tapa pidentää märkätilan käyttöikää ja estää kosteus rakenteisiin. Silikonin vanhetessa vesitiiveys ja homesuojaus heikkenevät huomaamattomasti. Tarkastus kerran vuodessa, uusiminen säännöllisesti.",
+    "Kylpyhuoneesi silikonisaumojen huolto on ajankohtainen. Ikääntynyt silikoni menettää elastisuutensa – kosteus pääsee rakenteisiin ennen kuin se näkyy pinnassa. Silikonien säännöllinen uusiminen on kustannustehokkain tapa estää kosteusvaurio ja pidentää kylpyhuoneen käyttöikää merkittävästi.",
+    "Kylpyhuoneesi on iässä jolloin vedeneristyksen kunto kannattaa selvittää kosteuskartoituksella. Pitkäaikaisesta kosteusvauriosta johtuva remontti maksaa tyypillisesti 15 000–40 000 euroa – ajoissa tehty kartoitus ja silikonien uusiminen murto-osan tästä. Vakuutus ei korvaa laiminlyötyä kunnossapitoa.",
   ],
   "Terassi (puu)": [
     "Puuterassin käyttöikä on noin 20 vuotta. Öljyäminen joka 2–3 vuosi pidentää käyttöikää huomattavasti.",

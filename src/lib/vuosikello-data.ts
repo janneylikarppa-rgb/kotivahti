@@ -8,10 +8,10 @@ export const KAUDET: { key: Kausi; nimi: string; ikoni: string; kuukaudet: strin
   { key: "ympari_vuoden", nimi: "Ympäri vuoden", ikoni: "🔁", kuukaudet: "" },
 ];
 
-export type HuoltoRivi = { nimi: string; ammattilainen: boolean };
+export type HuoltoRivi = { nimi: string; ammattilainen: boolean; kuvaus?: string };
 
-const t = (nimi: string): HuoltoRivi => ({ nimi, ammattilainen: true });
-const f = (nimi: string): HuoltoRivi => ({ nimi, ammattilainen: false });
+const t = (nimi: string, kuvaus?: string): HuoltoRivi => ({ nimi, ammattilainen: true, kuvaus });
+const f = (nimi: string, kuvaus?: string): HuoltoRivi => ({ nimi, ammattilainen: false, kuvaus });
 
 export const PERUSHUOLLOT: Record<Kausi, HuoltoRivi[]> = {
   kevat: [
@@ -61,7 +61,7 @@ export const PERUSHUOLLOT: Record<Kausi, HuoltoRivi[]> = {
     f("IV-suodattimien tarkastus"),
     f("Lumikinosten poisto seiniltä ja poistumisteiltä"),
     f("Kiukaan ja kiuaskivien tarkastus"),
-    f("Märkätilojen saumausten tarkastus"),
+    f("Märkätilojen silikonien tarkastus", "Tarkasta: Suihkun, kylpyammen ja pesualtaan silikonisaumat silmämääräisesti – halkeamat, tummentuminen tai irtoaminen ovat merkkejä uusimisen tarpeesta. Toimenpide: Pienehkö halkeama voidaan tilkitä itse. Laajempi vaurio tai epävarmuus vedeneristyksen kunnosta → tilaa ammattilainen. Silikonisaumojen suositeltu vaihtoväli on 3–5 vuotta käytöstä riippuen."),
     f("Lattiakaivojen puhdistus"),
   ],
   ympari_vuoden: [

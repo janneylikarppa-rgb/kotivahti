@@ -92,7 +92,7 @@ export const PTS_KOHTEET: PtsKohde[] = [
   { avain: "ikkuna", nimi: "Ikkunat", kategoria: "Rakenne", kayttoika: 30, huoltovali: 10,
     lahdeVuosi: (t) => i(t?.ikkunat_uusittu_vuosi) ?? rakV(t) },
   // Sisä
-  { avain: "kylpyhuone", nimi: "Kylpyhuone / märkätila", kategoria: "Sisätilat", kayttoika: 25, huoltovali: 10,
+  { avain: "kylpyhuone", nimi: "Kylpyhuone / märkätila", kategoria: "Sisätilat", kayttoika: 25, huoltovali: 5,
     lahdeVuosi: (t) => rakV(t) },
   // Piha
   { avain: "terassi_puu", nimi: "Terassi (puu)", kategoria: "Piha", kayttoika: 20, huoltovali: 3,
