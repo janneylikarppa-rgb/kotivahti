@@ -9,6 +9,8 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as VaihdaSalasanaRouteImport } from './routes/vaihda-salasana'
+import { Route as UnohtunutSalasanaRouteImport } from './routes/unohtunut-salasana'
 import { Route as TietosuojaRouteImport } from './routes/tietosuoja'
 import { Route as RekisteroidyRouteImport } from './routes/rekisteroidy'
 import { Route as LoginRouteImport } from './routes/login'
@@ -24,6 +26,16 @@ import { Route as AuthenticatedHuoltohistoriaRouteImport } from './routes/_authe
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 
+const VaihdaSalasanaRoute = VaihdaSalasanaRouteImport.update({
+  id: '/vaihda-salasana',
+  path: '/vaihda-salasana',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const UnohtunutSalasanaRoute = UnohtunutSalasanaRouteImport.update({
+  id: '/unohtunut-salasana',
+  path: '/unohtunut-salasana',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const TietosuojaRoute = TietosuojaRouteImport.update({
   id: '/tietosuoja',
   path: '/tietosuoja',
@@ -102,6 +114,8 @@ export interface FileRoutesByFullPath {
   '/login': typeof LoginRoute
   '/rekisteroidy': typeof RekisteroidyRoute
   '/tietosuoja': typeof TietosuojaRoute
+  '/unohtunut-salasana': typeof UnohtunutSalasanaRoute
+  '/vaihda-salasana': typeof VaihdaSalasanaRoute
   '/admin': typeof AuthenticatedAdminRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/huoltohistoria': typeof AuthenticatedHuoltohistoriaRoute
@@ -117,6 +131,8 @@ export interface FileRoutesByTo {
   '/login': typeof LoginRoute
   '/rekisteroidy': typeof RekisteroidyRoute
   '/tietosuoja': typeof TietosuojaRoute
+  '/unohtunut-salasana': typeof UnohtunutSalasanaRoute
+  '/vaihda-salasana': typeof VaihdaSalasanaRoute
   '/admin': typeof AuthenticatedAdminRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/huoltohistoria': typeof AuthenticatedHuoltohistoriaRoute
@@ -134,6 +150,8 @@ export interface FileRoutesById {
   '/login': typeof LoginRoute
   '/rekisteroidy': typeof RekisteroidyRoute
   '/tietosuoja': typeof TietosuojaRoute
+  '/unohtunut-salasana': typeof UnohtunutSalasanaRoute
+  '/vaihda-salasana': typeof VaihdaSalasanaRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/huoltohistoria': typeof AuthenticatedHuoltohistoriaRoute
@@ -151,6 +169,8 @@ export interface FileRouteTypes {
     | '/login'
     | '/rekisteroidy'
     | '/tietosuoja'
+    | '/unohtunut-salasana'
+    | '/vaihda-salasana'
     | '/admin'
     | '/dashboard'
     | '/huoltohistoria'
@@ -166,6 +186,8 @@ export interface FileRouteTypes {
     | '/login'
     | '/rekisteroidy'
     | '/tietosuoja'
+    | '/unohtunut-salasana'
+    | '/vaihda-salasana'
     | '/admin'
     | '/dashboard'
     | '/huoltohistoria'
@@ -182,6 +204,8 @@ export interface FileRouteTypes {
     | '/login'
     | '/rekisteroidy'
     | '/tietosuoja'
+    | '/unohtunut-salasana'
+    | '/vaihda-salasana'
     | '/_authenticated/admin'
     | '/_authenticated/dashboard'
     | '/_authenticated/huoltohistoria'
@@ -199,10 +223,26 @@ export interface RootRouteChildren {
   LoginRoute: typeof LoginRoute
   RekisteroidyRoute: typeof RekisteroidyRoute
   TietosuojaRoute: typeof TietosuojaRoute
+  UnohtunutSalasanaRoute: typeof UnohtunutSalasanaRoute
+  VaihdaSalasanaRoute: typeof VaihdaSalasanaRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/vaihda-salasana': {
+      id: '/vaihda-salasana'
+      path: '/vaihda-salasana'
+      fullPath: '/vaihda-salasana'
+      preLoaderRoute: typeof VaihdaSalasanaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/unohtunut-salasana': {
+      id: '/unohtunut-salasana'
+      path: '/unohtunut-salasana'
+      fullPath: '/unohtunut-salasana'
+      preLoaderRoute: typeof UnohtunutSalasanaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/tietosuoja': {
       id: '/tietosuoja'
       path: '/tietosuoja'
@@ -337,7 +377,19 @@ const rootRouteChildren: RootRouteChildren = {
   LoginRoute: LoginRoute,
   RekisteroidyRoute: RekisteroidyRoute,
   TietosuojaRoute: TietosuojaRoute,
+  UnohtunutSalasanaRoute: UnohtunutSalasanaRoute,
+  VaihdaSalasanaRoute: VaihdaSalasanaRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
