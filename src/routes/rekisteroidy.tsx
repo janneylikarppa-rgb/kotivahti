@@ -53,13 +53,17 @@ function SignupPage() {
   const [nimi, setNimi] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [passwordError, setPasswordError] = useState<string | null>(null);
   const [accepted, setAccepted] = useState(false);
   const [loading, setLoading] = useState(false);
   const [sentTo, setSentTo] = useState<string | null>(null);
 
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (password.length < 6) { toast.error("Salasanan tulee olla vähintään 6 merkkiä"); return; }
+    setPasswordError(null);
+    if (password.length < 8) { setPasswordError("Salasanan tulee olla vähintään 8 merkkiä"); return; }
+    if (password !== confirmPassword) { setPasswordError("Salasanat eivät täsmää"); return; }
     if (!accepted) { toast.error("Hyväksy käyttöehdot ja tietosuojaseloste"); return; }
     setLoading(true);
     const now = new Date().toISOString();
@@ -128,8 +132,16 @@ function SignupPage() {
                   </div>
                   <div className="auth-field">
                     <label htmlFor="password">Salasana</label>
-                    <input id="password" type="password" required minLength={6} value={password} onChange={(e) => setPassword(e.target.value)} />
+                    <input id="password" type="password" required minLength={8} value={password} onChange={(e) => setPassword(e.target.value)} />
+                    <span style={{ fontSize: "0.72rem", color: "rgba(30,58,47,0.55)" }}>Vähintään 8 merkkiä</span>
                   </div>
+                  <div className="auth-field">
+                    <label htmlFor="confirmPassword">Vahvista salasana</label>
+                    <input id="confirmPassword" type="password" required minLength={8} value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} />
+                  </div>
+                  {passwordError && (
+                    <div style={{ fontSize: "0.78rem", color: "#b54a3a", marginBottom: "0.8rem" }}>{passwordError}</div>
+                  )}
 
                   <div className="auth-check">
                     <input id="accept" type="checkbox" checked={accepted} onChange={(e) => setAccepted(e.target.checked)} />
