@@ -334,7 +334,7 @@ function LandingPage() {
             <div className="section-label" style={{ color: "var(--kulta-light)" }}>
               Palveluiden kilpailutus
             </div>
-            <h2 className="section-h2">Ammattilainen paikalle –<br /><em>ilman puheluita.</em></h2>
+            <h2 className="section-h2">Ammattilainen paikalle –<br /><em>helposti ja nopeasti.</em></h2>
             <p className="section-lead">Tilaa suoraan sovelluksesta. Kotivahti välittää pyyntösi tarkastettuihin paikallisiin yrityksiin ja sinä valitset parhaan tarjouksen.</p>
             <div className="kil-steps">
               {STEPS.map((s) => (
