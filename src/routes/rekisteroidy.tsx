@@ -53,13 +53,17 @@ function SignupPage() {
   const [nimi, setNimi] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [passwordError, setPasswordError] = useState<string | null>(null);
   const [accepted, setAccepted] = useState(false);
   const [loading, setLoading] = useState(false);
   const [sentTo, setSentTo] = useState<string | null>(null);
 
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (password.length < 6) { toast.error("Salasanan tulee olla vähintään 6 merkkiä"); return; }
+    setPasswordError(null);
+    if (password.length < 8) { setPasswordError("Salasanan tulee olla vähintään 8 merkkiä"); return; }
+    if (password !== confirmPassword) { setPasswordError("Salasanat eivät täsmää"); return; }
     if (!accepted) { toast.error("Hyväksy käyttöehdot ja tietosuojaseloste"); return; }
     setLoading(true);
     const now = new Date().toISOString();
