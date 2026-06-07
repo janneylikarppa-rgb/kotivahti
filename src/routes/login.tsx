@@ -8,9 +8,6 @@ import {
   subscribeToSession,
 } from "@/lib/auth-session";
 import { lovable } from "@/integrations/lovable";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/login")({
@@ -24,6 +21,41 @@ export const Route = createFileRoute("/login")({
   component: LoginPage,
 });
 
+const PAGE_STYLES = `
+  .auth-page { min-height: 100vh; background: #f5f0e8; font-family: 'DM Sans', system-ui, sans-serif; color: #1e3a2f; display: flex; flex-direction: column; }
+  .auth-nav { padding: 1.5rem 2rem; }
+  .auth-logo { display: inline-flex; align-items: center; gap: 0.6rem; text-decoration: none; }
+  .auth-logo-mark { width: 36px; height: 36px; display: grid; place-items: center; background: #1e3a2f; color: #f5f0e8; border-radius: 8px; font-family: 'Playfair Display', serif; font-size: 1.1rem; font-weight: 600; }
+  .auth-logo-name { font-family: 'Playfair Display', serif; font-size: 1.25rem; color: #1e3a2f; }
+  .auth-logo-name .dot { color: #c8973a; }
+  .auth-main { flex: 1; display: flex; align-items: center; justify-content: center; padding: 1rem 1.5rem 3rem; }
+  .auth-card { width: 100%; max-width: 440px; background: #ffffff; border: 1px solid rgba(30,58,47,0.1); border-radius: 16px; padding: 2.25rem 2rem; box-shadow: 0 20px 60px -30px rgba(30,58,47,0.25); }
+  .auth-eyebrow { font-size: 0.7rem; letter-spacing: 0.18em; text-transform: uppercase; color: #c8973a; font-weight: 600; margin-bottom: 0.75rem; }
+  .auth-title { font-family: 'Playfair Display', serif; font-size: 2rem; line-height: 1.15; color: #1e3a2f; margin: 0 0 0.5rem; font-weight: 600; }
+  .auth-title em { color: #c8973a; font-style: italic; }
+  .auth-sub { font-size: 0.9rem; color: rgba(30,58,47,0.65); margin: 0 0 1.75rem; }
+  .auth-sub a { color: #1e3a2f; font-weight: 600; text-decoration: underline; text-underline-offset: 3px; text-decoration-color: #c8973a; }
+  .auth-field { display: flex; flex-direction: column; gap: 0.4rem; margin-bottom: 1rem; }
+  .auth-field label { font-size: 0.78rem; font-weight: 600; color: #1e3a2f; letter-spacing: 0.02em; }
+  .auth-field input { width: 100%; padding: 0.7rem 0.85rem; border: 1px solid rgba(30,58,47,0.18); border-radius: 8px; background: #faf7f1; color: #1e3a2f; font-size: 0.95rem; font-family: inherit; transition: border-color .15s, background .15s; }
+  .auth-field input:focus { outline: none; border-color: #c8973a; background: #ffffff; }
+  .auth-btn { width: 100%; padding: 0.85rem 1rem; border-radius: 9px; border: none; background: #c8973a; color: #1e3a2f; font-family: inherit; font-size: 0.85rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; cursor: pointer; transition: transform .12s, background .15s; }
+  .auth-btn:hover { background: #b8862e; transform: translateY(-1px); }
+  .auth-btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+  .auth-btn-ghost { background: #ffffff; color: #1e3a2f; border: 1px solid rgba(30,58,47,0.2); display: inline-flex; align-items: center; justify-content: center; gap: 0.6rem; }
+  .auth-btn-ghost:hover { background: #faf7f1; }
+  .auth-divider { display: flex; align-items: center; gap: 0.8rem; margin: 1.4rem 0; }
+  .auth-divider::before, .auth-divider::after { content: ""; flex: 1; height: 1px; background: rgba(30,58,47,0.15); }
+  .auth-divider span { font-size: 0.7rem; letter-spacing: 0.18em; text-transform: uppercase; color: rgba(30,58,47,0.5); }
+  .auth-fineprint { margin-top: 1.25rem; font-size: 0.72rem; line-height: 1.55; color: rgba(30,58,47,0.55); text-align: center; }
+  .auth-fineprint a { color: #1e3a2f; text-decoration: underline; }
+  .auth-back { display: inline-flex; align-items: center; gap: 0.4rem; font-size: 0.78rem; color: rgba(30,58,47,0.6); text-decoration: none; margin-bottom: 1rem; }
+  .auth-back:hover { color: #c8973a; }
+  .auth-notice { margin-top: 1rem; padding: 0.75rem 0.9rem; border: 1px solid rgba(200,151,58,0.4); background: rgba(200,151,58,0.08); border-radius: 8px; font-size: 0.78rem; color: rgba(30,58,47,0.8); line-height: 1.5; }
+  .auth-notice button { margin-top: 0.5rem; background: none; border: 1px solid rgba(30,58,47,0.2); padding: 0.4rem 0.7rem; border-radius: 6px; font-size: 0.72rem; cursor: pointer; color: #1e3a2f; font-family: inherit; }
+  .auth-notice button:hover { background: rgba(30,58,47,0.05); }
+`;
+
 function LoginPage() {
   const navigate = useNavigate();
   const [session, setSession] = useState(() => getCachedSession() ?? null);
@@ -33,6 +65,7 @@ function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
+  const [needsConfirm, setNeedsConfirm] = useState(false);
 
   useEffect(() => {
     const unsubscribe = subscribeToSession((nextSession) => {
@@ -47,10 +80,8 @@ function LoginPage() {
   }, []);
 
   if (session || waitingForStoredSession) {
-    return <div className="min-h-screen bg-background" />;
+    return <div style={{ minHeight: "100vh", background: "#f5f0e8" }} />;
   }
-
-  const [needsConfirm, setNeedsConfirm] = useState(false);
 
   const handleEmailLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -82,141 +113,65 @@ function LoginPage() {
   };
 
   const handleGoogle = async () => {
-    const result = await lovable.auth.signInWithOAuth("google", {
-      redirect_uri: window.location.origin,
-    });
-    if (result.error) {
-      toast.error(result.error.message ?? "Kirjautuminen epäonnistui");
-      return;
-    }
+    const result = await lovable.auth.signInWithOAuth("google", { redirect_uri: window.location.origin });
+    if (result.error) { toast.error(result.error.message ?? "Kirjautuminen epäonnistui"); return; }
     if (result.redirected) return;
     navigate({ to: "/dashboard" });
   };
 
   return (
-    <div className="min-h-screen grid lg:grid-cols-2">
-      {/* Vasen: brändi */}
-      <div className="relative hidden lg:flex flex-col justify-between p-12 bg-[oklch(0.18_0.025_150)] overflow-hidden">
-        <div
-          className="absolute inset-0 pointer-events-none"
-          style={{
-            background:
-              "radial-gradient(ellipse 60% 80% at 30% 50%, color-mix(in oklab, var(--gold) 8%, transparent), transparent 70%)",
-          }}
-        />
-        <div className="relative flex items-center gap-2">
-          <div className="grid h-9 w-9 place-items-center rounded-md bg-primary text-primary-foreground font-serif text-lg">
-            K
-          </div>
-          <span className="font-serif text-xl text-cream">
-            Kotivahti<span className="text-primary">.</span>
-          </span>
-        </div>
-        <div className="relative">
-          <p className="eyebrow mb-6 flex items-center gap-3">
-            <span className="block h-px w-8 bg-primary" /> Omakotitalon huoltokirja
-          </p>
-          <h1 className="font-serif text-5xl leading-tight text-cream">
-            Pidä talosi <em className="not-italic text-primary italic">arvossa</em> –
-            <br />
-            vuodesta toiseen.
-          </h1>
-          <p className="mt-6 max-w-md text-muted-foreground leading-relaxed">
-            Tallenna huollot, seuraa sähkö- ja vesikulutusta ja kuittaa vuosikellon työt. Yksi
-            paikka koko talon tiedoille.
-          </p>
-        </div>
-        <div className="relative text-xs text-muted-foreground/70 uppercase tracking-wider">
-          © {new Date().getFullYear()} Kotivahti
-        </div>
-      </div>
-
-      {/* Oikea: lomake */}
-      <div className="flex items-center justify-center p-6 sm:p-12">
-        <div className="w-full max-w-md">
-          <Link
-            to="/"
-            className="inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-primary mb-6"
-          >
-            ← Etusivulle
+    <>
+      <style>{PAGE_STYLES}</style>
+      <div className="auth-page">
+        <nav className="auth-nav">
+          <Link to="/" className="auth-logo">
+            <span className="auth-logo-mark">K</span>
+            <span className="auth-logo-name">Kotivahti<span className="dot">.</span></span>
           </Link>
-          <p className="eyebrow mb-3">Kirjaudu</p>
-          <h2 className="font-serif text-3xl text-cream mb-2">Tervetuloa takaisin</h2>
-          <p className="text-sm text-muted-foreground mb-8">
-            Ei vielä tiliä?{" "}
-            <Link
-              to="/rekisteroidy"
-              className="text-primary hover:text-[color:var(--gold-2)] underline-offset-4 hover:underline"
-            >
-              Luo tili
-            </Link>
-          </p>
+        </nav>
+        <main className="auth-main">
+          <div className="auth-card">
+            <Link to="/" className="auth-back">← Etusivulle</Link>
+            <p className="auth-eyebrow">Kirjaudu</p>
+            <h1 className="auth-title">Tervetuloa <em>takaisin</em></h1>
+            <p className="auth-sub">
+              Ei vielä tiliä? <Link to="/rekisteroidy">Luo tili</Link>
+            </p>
 
-
-          <form onSubmit={handleEmailLogin} className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="email">Sähköposti</Label>
-              <Input
-                id="email"
-                type="email"
-                required
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="password">Salasana</Label>
-              <Input
-                id="password"
-                type="password"
-                required
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-              />
-            </div>
-            <Button
-              type="submit"
-              disabled={loading}
-              className="w-full uppercase tracking-wider font-semibold"
-            >
-              {loading ? "Kirjaudutaan..." : "Kirjaudu sisään"}
-            </Button>
-            {needsConfirm && (
-              <div className="rounded-md border border-border/60 bg-muted/20 p-3 text-xs text-muted-foreground space-y-2">
-                <p>Sähköpostiosi ei ole vielä vahvistettu. Lähetimme aiemmin vahvistuslinkin – tarkista postilaatikko ja roskaposti.</p>
-                <Button type="button" variant="ghost" size="sm" onClick={handleResend} className="h-7 px-2 text-xs">
-                  Lähetä vahvistuslinkki uudelleen
-                </Button>
+            <form onSubmit={handleEmailLogin}>
+              <div className="auth-field">
+                <label htmlFor="email">Sähköposti</label>
+                <input id="email" type="email" required value={email} onChange={(e) => setEmail(e.target.value)} />
               </div>
-            )}
-          </form>
+              <div className="auth-field">
+                <label htmlFor="password">Salasana</label>
+                <input id="password" type="password" required value={password} onChange={(e) => setPassword(e.target.value)} />
+              </div>
+              <button type="submit" disabled={loading} className="auth-btn">
+                {loading ? "Kirjaudutaan..." : "Kirjaudu sisään"}
+              </button>
+              {needsConfirm && (
+                <div className="auth-notice">
+                  Sähköpostiosi ei ole vielä vahvistettu. Tarkista postilaatikko ja roskaposti.
+                  <br />
+                  <button type="button" onClick={handleResend}>Lähetä vahvistuslinkki uudelleen</button>
+                </div>
+              )}
+            </form>
 
-          <div className="relative my-6">
-            <div className="absolute inset-0 flex items-center">
-              <span className="w-full border-t border-border/60" />
-            </div>
-            <div className="relative flex justify-center text-xs uppercase tracking-wider">
-              <span className="bg-background px-3 text-muted-foreground">tai</span>
-            </div>
+            <div className="auth-divider"><span>tai</span></div>
+
+            <button type="button" onClick={handleGoogle} className="auth-btn auth-btn-ghost">
+              <svg width="16" height="16" viewBox="0 0 24 24"><path fill="#1e3a2f" d="M21.35 11.1h-9.18v2.92h5.27c-.23 1.46-1.71 4.28-5.27 4.28-3.17 0-5.76-2.62-5.76-5.85s2.59-5.85 5.76-5.85c1.81 0 3.02.77 3.71 1.43l2.53-2.44C16.83 3.93 14.7 3 12.17 3 6.96 3 2.75 7.21 2.75 12.45S6.96 21.9 12.17 21.9c7.02 0 9.34-4.93 9.34-7.46 0-.5-.05-.88-.16-1.34Z"/></svg>
+              Jatka Googlella
+            </button>
+
+            <p className="auth-fineprint">
+              <Link to="/kayttoehdot">Käyttöehdot</Link> · <Link to="/tietosuoja">Tietosuoja</Link>
+            </p>
           </div>
-
-          <Button type="button" variant="outline" onClick={handleGoogle} className="w-full">
-            <svg className="mr-2 h-4 w-4" viewBox="0 0 24 24">
-              <path
-                fill="currentColor"
-                d="M21.35 11.1h-9.18v2.92h5.27c-.23 1.46-1.71 4.28-5.27 4.28-3.17 0-5.76-2.62-5.76-5.85s2.59-5.85 5.76-5.85c1.81 0 3.02.77 3.71 1.43l2.53-2.44C16.83 3.93 14.7 3 12.17 3 6.96 3 2.75 7.21 2.75 12.45S6.96 21.9 12.17 21.9c7.02 0 9.34-4.93 9.34-7.46 0-.5-.05-.88-.16-1.34Z"
-              />
-            </svg>
-            Jatka Googlella
-          </Button>
-
-          <p className="mt-8 text-[11px] text-muted-foreground text-center">
-            <Link to="/kayttoehdot" className="hover:text-primary underline-offset-4 hover:underline">Käyttöehdot</Link>
-            {" · "}
-            <Link to="/tietosuoja" className="hover:text-primary underline-offset-4 hover:underline">Tietosuoja</Link>
-          </p>
-        </div>
+        </main>
       </div>
-    </div>
+    </>
   );
 }
