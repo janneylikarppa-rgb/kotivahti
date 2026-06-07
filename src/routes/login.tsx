@@ -146,6 +146,9 @@ function LoginPage() {
               <div className="auth-field">
                 <label htmlFor="password">Salasana</label>
                 <input id="password" type="password" required value={password} onChange={(e) => setPassword(e.target.value)} />
+                <Link to="/unohtunut-salasana" style={{ fontSize: "0.75rem", color: "rgba(30,58,47,0.6)", textDecoration: "underline", textUnderlineOffset: "2px", marginTop: "0.25rem", alignSelf: "flex-end" }}>
+                  Unohditko salasanan?
+                </Link>
               </div>
               <button type="submit" disabled={loading} className="auth-btn">
                 {loading ? "Kirjaudutaan..." : "Kirjaudu sisään"}
