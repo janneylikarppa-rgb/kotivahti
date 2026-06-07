@@ -132,8 +132,16 @@ function SignupPage() {
                   </div>
                   <div className="auth-field">
                     <label htmlFor="password">Salasana</label>
-                    <input id="password" type="password" required minLength={6} value={password} onChange={(e) => setPassword(e.target.value)} />
+                    <input id="password" type="password" required minLength={8} value={password} onChange={(e) => setPassword(e.target.value)} />
+                    <span style={{ fontSize: "0.72rem", color: "rgba(30,58,47,0.55)" }}>Vähintään 8 merkkiä</span>
                   </div>
+                  <div className="auth-field">
+                    <label htmlFor="confirmPassword">Vahvista salasana</label>
+                    <input id="confirmPassword" type="password" required minLength={8} value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} />
+                  </div>
+                  {passwordError && (
+                    <div style={{ fontSize: "0.78rem", color: "#b54a3a", marginBottom: "0.8rem" }}>{passwordError}</div>
+                  )}
 
                   <div className="auth-check">
                     <input id="accept" type="checkbox" checked={accepted} onChange={(e) => setAccepted(e.target.checked)} />
