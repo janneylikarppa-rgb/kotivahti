@@ -188,7 +188,7 @@ const STEPS = [
   { n: 1, title: "Valitse palvelu", desc: "Katto, LVI, sähkö, ilmanvaihto, nuohous – 14 kategoriaa suoraan sovelluksessa." },
   { n: 2, title: "Lähetä pyyntö", desc: "Talon tiedot täyttyvät automaattisesti talokirjastasi. Yksi nappi." },
   { n: 3, title: "Saat tarjoukset", desc: "Tarkastetut paikalliset yritykset ottavat yhteyttä. Sinä valitset." },
-  { n: 4, title: "Ammattilainen dokumentoi", desc: "Tehty työ, kuvat ja kuitti tallentuvat automaattisesti suoraan huoltokirjaasi." },
+  { n: 4, title: "Tallenna huoltokirjaan", desc: "Työn jälkeen syötät tehdyn työn tiedot ja dokumentit itse huoltokirjaan – kaikki tallessa yhdessä paikassa." },
 ];
 
 const CATS = [
