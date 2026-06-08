@@ -50,7 +50,6 @@ const PAGE_STYLES = `
 
 function SignupPage() {
   const navigate = useNavigate();
-  const [nimi, setNimi] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
