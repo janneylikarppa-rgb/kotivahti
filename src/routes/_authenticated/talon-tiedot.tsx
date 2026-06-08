@@ -102,18 +102,19 @@ function TaloTiedotPage() {
   const [p, setP] = useState<any>({});
   const [valmiit, setValmiit] = useState<string[]>([]);
   const hydrated = useRef(false);
-  
+  const initDone = useRef(false);
+
   const [autoStatus, setAutoStatus] = useState<"idle" | "saving" | "saved">("idle");
 
   useEffect(() => {
-    if (data?.kiinteisto) setK(data.kiinteisto);
-    if (data?.profile) setP(data.profile);
-    if (data?.talo) {
-      setT(data.talo);
-      setValmiit(Array.isArray(data.talo.valmiit_osiot) ? data.talo.valmiit_osiot as string[] : []);
-    }
-    if (data) {
-      // Merkitään hydratoiduksi seuraavan tickin jälkeen ettei autosave laukea heti
+    if (data && !initDone.current) {
+      if (data.kiinteisto) setK(data.kiinteisto);
+      if (data.profile) setP(data.profile);
+      if (data.talo) {
+        setT(data.talo);
+        setValmiit(Array.isArray(data.talo.valmiit_osiot) ? data.talo.valmiit_osiot as string[] : []);
+      }
+      initDone.current = true;
       const id = setTimeout(() => { hydrated.current = true; }, 50);
       return () => clearTimeout(id);
     }
@@ -186,7 +187,7 @@ function TaloTiedotPage() {
       return opts;
     },
     onSuccess: (opts) => {
-      qc.invalidateQueries({ queryKey: ["talo"] });
+      qc.invalidateQueries({ queryKey: ["talo"], refetchType: "inactive" });
       qc.invalidateQueries({ queryKey: ["dashboard"] });
       if (opts?.silent) {
         setAutoStatus("saved");
@@ -201,16 +202,24 @@ function TaloTiedotPage() {
     },
   });
 
-  // Autosave (debounced)
+  // Autosave: gentle background save every 60 s
   useEffect(() => {
     if (!hydrated.current) return;
-    setAutoStatus("saving");
-    const id = setTimeout(() => {
+    const id = setInterval(() => {
+      setAutoStatus("saving");
       save.mutate({ silent: true });
-    }, 1500);
-    return () => clearTimeout(id);
+    }, 60000);
+    return () => clearInterval(id);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [k, t, p]);
+  }, []);
+
+  const handleBlurSave = (e: React.FocusEvent<HTMLDivElement>) => {
+    const target = e.target as HTMLElement;
+    if (target.tagName === "INPUT" || target.tagName === "TEXTAREA") {
+      setAutoStatus("saving");
+      save.mutate({ silent: true });
+    }
+  };
 
 
   if (isLoading) return <p className="text-muted-foreground">Ladataan...</p>;
@@ -253,7 +262,7 @@ function TaloTiedotPage() {
       </div>
 
       <Card className="gold-card">
-        <CardContent className="pt-6 space-y-5">
+        <CardContent className="pt-6 space-y-5" onBlur={handleBlurSave}>
           {active === 0 && (<>
             <h3 className="font-serif text-xl text-cream">1. Perustiedot</h3>
             <p className="text-xs text-muted-foreground">Aloitetaan perusteista. Näiden tietojen perusteella rakennamme henkilökohtaisen huoltosuunnitelman.</p>
