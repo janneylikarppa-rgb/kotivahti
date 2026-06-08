@@ -126,10 +126,6 @@ function SignupPage() {
                     <input id="email" type="email" required value={email} onChange={(e) => setEmail(e.target.value)} />
                   </div>
                   <div className="auth-field">
-                    <label htmlFor="email">Sähköposti</label>
-                    <input id="email" type="email" required value={email} onChange={(e) => setEmail(e.target.value)} />
-                  </div>
-                  <div className="auth-field">
                     <label htmlFor="password">Salasana</label>
                     <input id="password" type="password" required minLength={8} value={password} onChange={(e) => setPassword(e.target.value)} />
                     <span style={{ fontSize: "0.72rem", color: "rgba(30,58,47,0.55)" }}>Vähintään 8 merkkiä</span>
