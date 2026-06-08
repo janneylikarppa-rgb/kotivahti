@@ -68,7 +68,9 @@ const STYLES = `
 .mock-pts-label { color: var(--kulta-light); font-size: 0.65rem; letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 0.4rem; }
 .mock-pts-title { color: var(--valkoinen); font-size: 0.9rem; font-weight: 500; }
 .mock-pts-sub { color: rgba(255,255,255,0.45); font-size: 0.75rem; margin-top: 0.2rem; }
-.mock-pts-btn { margin-top: 0.8rem; background: var(--kulta); color: #fff; border: none; border-radius: 6px; padding: 0.45rem 1rem; font-size: 0.78rem; font-weight: 600; cursor: pointer; font-family: 'DM Sans', sans-serif; }
+.mock-pts-btns { margin-top: 0.8rem; display: flex; flex-wrap: wrap; gap: 0.5rem; }
+.mock-pts-btn { background: var(--kulta); color: #fff; border: none; border-radius: 6px; padding: 0.45rem 1rem; font-size: 0.78rem; font-weight: 600; cursor: pointer; font-family: 'DM Sans', sans-serif; }
+.mock-pts-btn-ghost { background: transparent; color: var(--kulta-light); border: 1px solid rgba(200,151,58,0.45); border-radius: 6px; padding: 0.45rem 1rem; font-size: 0.78rem; font-weight: 600; cursor: pointer; font-family: 'DM Sans', sans-serif; }
 
 .features-strip { background: var(--kerma-dark); padding: 1.2rem 3rem; border-bottom: 1px solid rgba(0,0,0,0.07); }
 .features-strip-inner { max-width: 1200px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem; }
@@ -292,7 +294,10 @@ function LandingPage() {
                 <div className="mock-pts-label">⚠ Seuraava PTS-toimenpide</div>
                 <div className="mock-pts-title">Ilmanvaihtokone – huolto</div>
                 <div className="mock-pts-sub">Suositellaan 2027 · Asennettu 2005, kanavat puhdistamatta 12v</div>
-                <button className="mock-pts-btn">Tilaa kuntoarvio</button>
+                <div className="mock-pts-btns">
+                  <button className="mock-pts-btn">Tilaa kuntoarvio</button>
+                  <button className="mock-pts-btn-ghost">Tarjouspyyntö: IV-kanavien puhdistus</button>
+                </div>
               </div>
             </div>
           </div>

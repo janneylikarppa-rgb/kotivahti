@@ -50,7 +50,6 @@ const PAGE_STYLES = `
 
 function SignupPage() {
   const navigate = useNavigate();
-  const [nimi, setNimi] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -71,7 +70,7 @@ function SignupPage() {
       email,
       password,
       options: {
-        data: { nimi, tos_accepted_at: now, privacy_accepted_at: now, tos_version: "2026-05" },
+        data: { tos_accepted_at: now, privacy_accepted_at: now, tos_version: "2026-05" },
         emailRedirectTo: window.location.origin,
       },
     });
@@ -122,10 +121,6 @@ function SignupPage() {
                 </p>
 
                 <form onSubmit={handleSignup}>
-                  <div className="auth-field">
-                    <label htmlFor="nimi">Nimi</label>
-                    <input id="nimi" required value={nimi} onChange={(e) => setNimi(e.target.value)} />
-                  </div>
                   <div className="auth-field">
                     <label htmlFor="email">Sähköposti</label>
                     <input id="email" type="email" required value={email} onChange={(e) => setEmail(e.target.value)} />
