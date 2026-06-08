@@ -187,7 +187,7 @@ function TaloTiedotPage() {
       return opts;
     },
     onSuccess: (opts) => {
-      qc.invalidateQueries({ queryKey: ["talo"] });
+      qc.invalidateQueries({ queryKey: ["talo"], refetchType: "inactive" });
       qc.invalidateQueries({ queryKey: ["dashboard"] });
       if (opts?.silent) {
         setAutoStatus("saved");
@@ -202,16 +202,24 @@ function TaloTiedotPage() {
     },
   });
 
-  // Autosave (debounced)
+  // Autosave: gentle background save every 60 s
   useEffect(() => {
     if (!hydrated.current) return;
-    setAutoStatus("saving");
-    const id = setTimeout(() => {
+    const id = setInterval(() => {
+      setAutoStatus("saving");
       save.mutate({ silent: true });
-    }, 1500);
-    return () => clearTimeout(id);
+    }, 60000);
+    return () => clearInterval(id);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [k, t, p]);
+  }, []);
+
+  const handleBlurSave = (e: React.FocusEvent<HTMLDivElement>) => {
+    const target = e.target as HTMLElement;
+    if (target.tagName === "INPUT" || target.tagName === "TEXTAREA") {
+      setAutoStatus("saving");
+      save.mutate({ silent: true });
+    }
+  };
 
 
   if (isLoading) return <p className="text-muted-foreground">Ladataan...</p>;
