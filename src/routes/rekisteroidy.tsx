@@ -122,8 +122,8 @@ function SignupPage() {
 
                 <form onSubmit={handleSignup}>
                   <div className="auth-field">
-                    <label htmlFor="nimi">Nimi</label>
-                    <input id="nimi" required value={nimi} onChange={(e) => setNimi(e.target.value)} />
+                    <label htmlFor="email">Sähköposti</label>
+                    <input id="email" type="email" required value={email} onChange={(e) => setEmail(e.target.value)} />
                   </div>
                   <div className="auth-field">
                     <label htmlFor="email">Sähköposti</label>
