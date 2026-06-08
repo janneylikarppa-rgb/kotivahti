@@ -262,7 +262,7 @@ function TaloTiedotPage() {
       </div>
 
       <Card className="gold-card">
-        <CardContent className="pt-6 space-y-5">
+        <CardContent className="pt-6 space-y-5" onBlur={handleBlurSave}>
           {active === 0 && (<>
             <h3 className="font-serif text-xl text-cream">1. Perustiedot</h3>
             <p className="text-xs text-muted-foreground">Aloitetaan perusteista. Näiden tietojen perusteella rakennamme henkilökohtaisen huoltosuunnitelman.</p>
