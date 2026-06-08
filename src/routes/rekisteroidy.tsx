@@ -70,7 +70,7 @@ function SignupPage() {
       email,
       password,
       options: {
-        data: { nimi, tos_accepted_at: now, privacy_accepted_at: now, tos_version: "2026-05" },
+        data: { tos_accepted_at: now, privacy_accepted_at: now, tos_version: "2026-05" },
         emailRedirectTo: window.location.origin,
       },
     });
