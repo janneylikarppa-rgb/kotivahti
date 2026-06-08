@@ -102,18 +102,19 @@ function TaloTiedotPage() {
   const [p, setP] = useState<any>({});
   const [valmiit, setValmiit] = useState<string[]>([]);
   const hydrated = useRef(false);
-  
+  const initDone = useRef(false);
+
   const [autoStatus, setAutoStatus] = useState<"idle" | "saving" | "saved">("idle");
 
   useEffect(() => {
-    if (data?.kiinteisto) setK(data.kiinteisto);
-    if (data?.profile) setP(data.profile);
-    if (data?.talo) {
-      setT(data.talo);
-      setValmiit(Array.isArray(data.talo.valmiit_osiot) ? data.talo.valmiit_osiot as string[] : []);
-    }
-    if (data) {
-      // Merkitään hydratoiduksi seuraavan tickin jälkeen ettei autosave laukea heti
+    if (data && !initDone.current) {
+      if (data.kiinteisto) setK(data.kiinteisto);
+      if (data.profile) setP(data.profile);
+      if (data.talo) {
+        setT(data.talo);
+        setValmiit(Array.isArray(data.talo.valmiit_osiot) ? data.talo.valmiit_osiot as string[] : []);
+      }
+      initDone.current = true;
       const id = setTimeout(() => { hydrated.current = true; }, 50);
       return () => clearTimeout(id);
     }
