@@ -294,7 +294,10 @@ function LandingPage() {
                 <div className="mock-pts-label">⚠ Seuraava PTS-toimenpide</div>
                 <div className="mock-pts-title">Ilmanvaihtokone – huolto</div>
                 <div className="mock-pts-sub">Suositellaan 2027 · Asennettu 2005, kanavat puhdistamatta 12v</div>
-                <button className="mock-pts-btn">Tilaa kuntoarvio</button>
+                <div className="mock-pts-btns">
+                  <button className="mock-pts-btn">Tilaa kuntoarvio</button>
+                  <button className="mock-pts-btn-ghost">Tarjouspyyntö: IV-kanavien puhdistus</button>
+                </div>
               </div>
             </div>
           </div>
