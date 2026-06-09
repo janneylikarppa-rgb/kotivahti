@@ -115,6 +115,57 @@ export type Database = {
           },
         ]
       }
+      kayttaja_metriikat: {
+        Row: {
+          huoltoja_kirjattu: number
+          id: string
+          kausikirje_suostumus: boolean
+          kirjautumisia: number
+          liideja_lahetetty: number
+          nps_annettu_at: string | null
+          nps_pisteet: number | null
+          paivitetty_at: string
+          pts_avattu: boolean
+          rekisteroity_at: string
+          talon_tiedot_taytetty: boolean
+          user_id: string
+          viimeisin_kirjautuminen: string | null
+          vuosikelloa_kuitattu: number
+        }
+        Insert: {
+          huoltoja_kirjattu?: number
+          id?: string
+          kausikirje_suostumus?: boolean
+          kirjautumisia?: number
+          liideja_lahetetty?: number
+          nps_annettu_at?: string | null
+          nps_pisteet?: number | null
+          paivitetty_at?: string
+          pts_avattu?: boolean
+          rekisteroity_at?: string
+          talon_tiedot_taytetty?: boolean
+          user_id: string
+          viimeisin_kirjautuminen?: string | null
+          vuosikelloa_kuitattu?: number
+        }
+        Update: {
+          huoltoja_kirjattu?: number
+          id?: string
+          kausikirje_suostumus?: boolean
+          kirjautumisia?: number
+          liideja_lahetetty?: number
+          nps_annettu_at?: string | null
+          nps_pisteet?: number | null
+          paivitetty_at?: string
+          pts_avattu?: boolean
+          rekisteroity_at?: string
+          talon_tiedot_taytetty?: boolean
+          user_id?: string
+          viimeisin_kirjautuminen?: string | null
+          vuosikelloa_kuitattu?: number
+        }
+        Relationships: []
+      }
       kiinteistot: {
         Row: {
           aktiivinen: boolean
@@ -350,6 +401,48 @@ export type Database = {
           status?: string
           updated_at?: string
           user_id?: string
+        }
+        Relationships: []
+      }
+      palaute_kyselyt: {
+        Row: {
+          created_at: string
+          id: string
+          lahetetty_at: string
+          token: string
+          token_voimassa: string
+          trigger_id: string | null
+          tyyppi: string
+          updated_at: string
+          user_id: string | null
+          vastattu_at: string | null
+          vastaukset: Json | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          lahetetty_at?: string
+          token?: string
+          token_voimassa?: string
+          trigger_id?: string | null
+          tyyppi: string
+          updated_at?: string
+          user_id?: string | null
+          vastattu_at?: string | null
+          vastaukset?: Json | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          lahetetty_at?: string
+          token?: string
+          token_voimassa?: string
+          trigger_id?: string | null
+          tyyppi?: string
+          updated_at?: string
+          user_id?: string | null
+          vastattu_at?: string | null
+          vastaukset?: Json | null
         }
         Relationships: []
       }
@@ -774,6 +867,10 @@ export type Database = {
           _user_id: string
         }
         Returns: boolean
+      }
+      inkrementoi_metriikka: {
+        Args: { _kentta: string; _maara?: number; _user_id: string }
+        Returns: undefined
       }
       omistaa_kiinteiston: {
         Args: { _kiinteisto_id: string }
