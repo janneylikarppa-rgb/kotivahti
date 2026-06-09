@@ -50,7 +50,7 @@ export const haeAktiivinenKysely = createServerFn({ method: "GET" })
     // Onko jo avoin (lähetetty mutta ei vastattu) → palauta se
     const avoin = lista.find((k: any) => !k.vastattu_at && !String(k.tyyppi).startsWith("kausikirje_"));
     if (avoin) {
-      return { id: avoin.id, tyyppi: avoin.tyyppi, trigger_id: avoin.trigger_id ?? null };
+      return { id: avoin.id, tyyppi: avoin.tyyppi as KyselyTyyppi, trigger_id: avoin.trigger_id ?? null };
     }
 
     const onkoLahetetty = (tyyppi: KyselyTyyppi, trigger_id?: string | null, paivaaSitten = 99999) =>
