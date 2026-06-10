@@ -420,3 +420,166 @@ function AsetuksetTab() {
     </Card>
   );
 }
+
+// ============================ PALAUTE-TAB ============================
+function PalauteTab() {
+  const yhFn = useServerFn(getPalauteYhteenveto);
+  const kpFn = useServerFn(getKonversioputki);
+  const segFn = useServerFn(getKayttajaSegmentit);
+  const vastFn = useServerFn(getPalauteVastaukset);
+  const arvFn = useServerFn(getAmmattilaisarviot);
+  const kkFn = useServerFn(getKausikirjeTilastot);
+  const testiFn = useServerFn(lahetaTestiKausikirje);
+
+  const yh = useQuery({ queryKey: ["palaute-yhteenveto"], queryFn: () => yhFn() });
+  const kp = useQuery({ queryKey: ["palaute-konversio"], queryFn: () => kpFn() });
+  const seg = useQuery({ queryKey: ["palaute-segmentit"], queryFn: () => segFn() });
+  const vast = useQuery({ queryKey: ["palaute-vastaukset"], queryFn: () => vastFn() });
+  const arv = useQuery({ queryKey: ["palaute-amm-arviot"], queryFn: () => arvFn() });
+  const kk = useQuery({ queryKey: ["palaute-kausikirje"], queryFn: () => kkFn() });
+
+  const [kausi, setKausi] = useState<"kevat" | "kesa" | "syksy" | "talvi">("kevat");
+  const testi = useMutation({
+    mutationFn: () => testiFn({ data: { kausi } }),
+    onSuccess: (r: any) => r?.ok ? toast.success("Testikirje lähetetty") : toast.error(r?.error ?? "Lähetys epäonnistui"),
+    onError: (e: any) => toast.error(e.message),
+  });
+
+  const maxLkm = Math.max(1, ...((kp.data as any[] | undefined)?.map((v) => v.lkm) ?? [1]));
+
+  return (
+    <div className="space-y-6">
+      {/* Yhteenvetokortit */}
+      <div className="grid gap-3 md:grid-cols-4">
+        <Yhteenveto otsikko="NPS" arvo={yh.data?.nps != null ? String(yh.data.nps) : "—"} />
+        <Yhteenveto otsikko="Kausikirje vastaus-%" arvo={yh.data?.kausiPros != null ? `${yh.data.kausiPros}%` : "—"} />
+        <Yhteenveto otsikko="Liidi-tyytyväisyys" arvo={yh.data?.liidiPros != null ? `${yh.data.liidiPros}%` : "—"} />
+        <Yhteenveto otsikko="Reagoimattomat (7pv)" arvo={String(yh.data?.reagoimattomat ?? 0)} korosta={!!yh.data?.reagoimattomat && yh.data.reagoimattomat > 0} />
+      </div>
+
+      {/* Konversioputki */}
+      <Card className="gold-card">
+        <CardContent className="py-5 space-y-3">
+          <h3 className="font-serif text-lg text-cream">Konversioputki</h3>
+          <div className="space-y-2">
+            {((kp.data as any[]) ?? []).map((v) => (
+              <div key={v.vaihe} className="space-y-1">
+                <div className="flex justify-between text-xs"><span className="text-muted-foreground">{v.vaihe}</span><span className="font-mono text-cream">{v.lkm}</span></div>
+                <div className="h-2 rounded bg-background/40 overflow-hidden">
+                  <div className="h-full bg-primary" style={{ width: `${(v.lkm / maxLkm) * 100}%` }} />
+                </div>
+              </div>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Käyttäjäsegmentit */}
+      <div className="grid gap-3 md:grid-cols-4">
+        <Yhteenveto otsikko="Aktiiviset" arvo={String(seg.data?.aktiiviset ?? 0)} />
+        <Yhteenveto otsikko="Passiiviset" arvo={String(seg.data?.passiiviset ?? 0)} />
+        <Yhteenveto otsikko="Liidiasiakkaat" arvo={String(seg.data?.liidiasiakkaat ?? 0)} />
+        <Yhteenveto otsikko="Yhteensä" arvo={String(seg.data?.yhteensa ?? 0)} />
+      </div>
+
+      {/* Kausikirje */}
+      <Card className="gold-card">
+        <CardContent className="py-5 space-y-3">
+          <h3 className="font-serif text-lg text-cream">Kausikirje</h3>
+          <div className="grid gap-3 md:grid-cols-3 text-sm">
+            <div><div className="text-xs text-muted-foreground">Lähetetty</div><div className="font-mono text-cream">{kk.data?.lahetetty ?? 0}</div></div>
+            <div><div className="text-xs text-muted-foreground">Vastausprosentti</div><div className="font-mono text-cream">{kk.data?.vastausProsentti ?? 0}%</div></div>
+            <div><div className="text-xs text-muted-foreground">Vastattuja</div><div className="font-mono text-cream">{kk.data?.vastattu ?? 0}</div></div>
+          </div>
+          {kk.data?.jakauma && Object.keys(kk.data.jakauma).length > 0 && (
+            <div className="space-y-1 pt-2">
+              {Object.entries(kk.data.jakauma).map(([v, n]) => (
+                <div key={v} className="flex items-center gap-3 text-xs">
+                  <span className="w-32 text-muted-foreground">{v}</span>
+                  <div className="flex-1 h-1.5 rounded bg-background/40 overflow-hidden">
+                    <div className="h-full bg-primary" style={{ width: `${((n as number) / (kk.data?.lahetetty || 1)) * 100}%` }} />
+                  </div>
+                  <span className="font-mono text-cream w-8 text-right">{String(n)}</span>
+                </div>
+              ))}
+            </div>
+          )}
+          <div className="flex items-end gap-3 pt-3 border-t border-border/40">
+            <div className="space-y-1">
+              <Label className="text-xs uppercase tracking-wider">Testikirje</Label>
+              <Select value={kausi} onValueChange={(v: any) => setKausi(v)}>
+                <SelectTrigger className="w-40"><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="kevat">Kevät</SelectItem>
+                  <SelectItem value="kesa">Kesä</SelectItem>
+                  <SelectItem value="syksy">Syksy</SelectItem>
+                  <SelectItem value="talvi">Talvi</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <Button onClick={() => testi.mutate()} disabled={testi.isPending} className="uppercase tracking-wider font-semibold">
+              {testi.isPending ? "Lähetetään..." : "Lähetä omaan sähköpostiin"}
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Ammattilaisten arviot */}
+      <Card className="gold-card">
+        <CardContent className="py-5 space-y-3">
+          <h3 className="font-serif text-lg text-cream">Ammattilaisten arviot</h3>
+          {((arv.data as any[]) ?? []).length === 0 ? (
+            <p className="text-sm text-muted-foreground">Ei vielä arvioita.</p>
+          ) : (
+            <div className="space-y-1.5">
+              {((arv.data as any[]) ?? []).map((a) => (
+                <div key={a.nimi} className="flex items-center justify-between text-sm border-b border-border/30 pb-1.5">
+                  <span className="text-cream">{a.nimi}</span>
+                  <span className="text-primary font-mono">★ {a.keskiarvo.toFixed(1)} <span className="text-muted-foreground">({a.lkm})</span></span>
+                </div>
+              ))}
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
+      {/* Vastaukset */}
+      <Card className="gold-card">
+        <CardContent className="py-5 space-y-3">
+          <h3 className="font-serif text-lg text-cream">Viimeisimmät vastaukset</h3>
+          {((vast.data as any[]) ?? []).length === 0 ? (
+            <p className="text-sm text-muted-foreground">Ei vielä vastauksia.</p>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead className="text-[11px] uppercase tracking-wider text-muted-foreground">
+                  <tr><th className="px-2 py-1 text-left">Aika</th><th className="px-2 py-1 text-left">Tyyppi</th><th className="px-2 py-1 text-left">Vastaus</th></tr>
+                </thead>
+                <tbody>
+                  {((vast.data as any[]) ?? []).slice(0, 50).map((v) => (
+                    <tr key={v.id} className="border-t border-border/30">
+                      <td className="px-2 py-1 text-xs text-muted-foreground whitespace-nowrap">{new Date(v.vastattu_at).toLocaleString("fi-FI", { dateStyle: "short", timeStyle: "short" })}</td>
+                      <td className="px-2 py-1 text-cream whitespace-nowrap">{v.tyyppi}</td>
+                      <td className="px-2 py-1 text-muted-foreground"><code className="text-xs">{JSON.stringify(v.vastaukset)}</code></td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+    </div>
+  );
+}
+
+function Yhteenveto({ otsikko, arvo, korosta }: { otsikko: string; arvo: string; korosta?: boolean }) {
+  return (
+    <Card className={`gold-card ${korosta ? "border-orange-500/60" : ""}`}>
+      <CardContent className="py-4">
+        <div className="text-xs uppercase tracking-wider text-muted-foreground">{otsikko}</div>
+        <div className={`font-serif text-2xl mt-1 ${korosta ? "text-orange-400" : "text-cream"}`}>{arvo}</div>
+      </CardContent>
+    </Card>
+  );
+}
