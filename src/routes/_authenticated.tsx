@@ -8,6 +8,8 @@ import { AppSidebar } from "@/components/app-sidebar";
 import { PropertySwitcher } from "@/components/property-switcher";
 import { useRealtimeSync } from "@/hooks/use-realtime-sync";
 import { listKiinteistot } from "@/lib/kotivahti.functions";
+import { PalauteKortti } from "@/components/palaute-kortti";
+import { paivitaKirjautuminen } from "@/lib/palaute.functions";
 
 export const Route = createFileRoute("/_authenticated")({
   beforeLoad: async ({ location }) => {
@@ -49,12 +51,23 @@ function AuthenticatedLayout() {
 
 function AuthenticatedShell() {
   const listFn = useServerFn(listKiinteistot);
+  const loginFn = useServerFn(paivitaKirjautuminen);
   const { data } = useQuery({
     queryKey: ["kiinteistot-list"],
     queryFn: () => listFn({}),
     staleTime: 30_000,
   });
   useRealtimeSync(data?.valittuId ?? null);
+
+  // Päivitä viimeisin kirjautuminen kerran per päivä per sessio
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const avain = "kotivahti_login_pvm";
+    const tanaan = new Date().toISOString().slice(0, 10);
+    if (localStorage.getItem(avain) === tanaan) return;
+    localStorage.setItem(avain, tanaan);
+    loginFn().catch(() => {});
+  }, [loginFn]);
 
   return (
     <SidebarProvider>
@@ -68,6 +81,7 @@ function AuthenticatedShell() {
         <main className="flex-1 px-4 py-8 md:px-8 lg:px-12">
           <Outlet />
         </main>
+        <PalauteKortti />
       </SidebarInset>
     </SidebarProvider>
   );

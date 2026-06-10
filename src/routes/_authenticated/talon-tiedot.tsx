@@ -13,6 +13,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Progress } from "@/components/ui/progress";
 import { Check, Trash2, FileText, Download, Upload } from "lucide-react";
 import { toast } from "sonner";
+import { KausikirjeToggle } from "@/components/kausikirje-toggle";
 
 export const Route = createFileRoute("/_authenticated/talon-tiedot")({
   loader: ({ context }) => {
@@ -537,6 +538,8 @@ function TaloTiedotPage() {
           </div>
         </CardContent>
       </Card>
+
+      <KausikirjeToggle />
     </div>
   );
 }
