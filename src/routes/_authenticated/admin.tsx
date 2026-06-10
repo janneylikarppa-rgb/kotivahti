@@ -23,6 +23,16 @@ import {
   paivitaLiidiAsetukset,
   onkoAdmin,
 } from "@/lib/liidit.functions";
+import {
+  getPalauteYhteenveto,
+  getKonversioputki,
+  getKayttajaSegmentit,
+  getPalauteVastaukset,
+  getLiidiPalautteet,
+  getAmmattilaisarviot,
+  getKausikirjeTilastot,
+  lahetaTestiKausikirje,
+} from "@/lib/palaute.functions";
 import { LIIDI_KATEGORIAT, LIIDI_STATUKSET, LIIDI_PALVELUT } from "@/lib/liidit-kategoriat";
 import { MAAKUNNAT } from "@/lib/maakunnat";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -56,10 +66,12 @@ function AdminPage() {
       <Tabs defaultValue="liidit">
         <TabsList>
           <TabsTrigger value="liidit">Liidit</TabsTrigger>
+          <TabsTrigger value="palaute">Palaute</TabsTrigger>
           <TabsTrigger value="ammattilaiset">Ammattilaiset</TabsTrigger>
           <TabsTrigger value="asetukset">Asetukset</TabsTrigger>
         </TabsList>
         <TabsContent value="liidit" className="mt-6"><LiiditTab /></TabsContent>
+        <TabsContent value="palaute" className="mt-6"><PalauteTab /></TabsContent>
         <TabsContent value="ammattilaiset" className="mt-6"><AmmattilaisetTab /></TabsContent>
         <TabsContent value="asetukset" className="mt-6"><AsetuksetTab /></TabsContent>
       </Tabs>
