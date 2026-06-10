@@ -66,12 +66,13 @@ export const Route = createFileRoute("/api/public/hooks/laheta-kausikirje")({
           if (ktIds.length > 0) {
             const { data: pts } = await supabaseAdmin
               .from("pts_suunnitelma")
-              .select("kohde, vuosi, kuvaus")
+              .select("kohde_nimi, toimenpide_vuosi, kuvaus, kiireellisyys")
               .in("kiinteisto_id", ktIds)
-              .order("vuosi", { ascending: true })
+              .in("kiireellisyys", ["kiireellinen", "lahivuosina"])
+              .order("toimenpide_vuosi", { ascending: true })
               .limit(1);
             if (pts && pts.length > 0) {
-              ptsHuomio = { kohde: pts[0].kohde, teksti: pts[0].kuvaus ?? `aikataulutettu vuodelle ${pts[0].vuosi}` };
+              ptsHuomio = { kohde: pts[0].kohde_nimi, teksti: pts[0].kuvaus ?? `aikataulutettu vuodelle ${pts[0].toimenpide_vuosi}` };
             }
           }
 
