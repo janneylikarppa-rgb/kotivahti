@@ -13,6 +13,7 @@ import { Route as VaihdaSalasanaRouteImport } from './routes/vaihda-salasana'
 import { Route as UnohtunutSalasanaRouteImport } from './routes/unohtunut-salasana'
 import { Route as TietosuojaRouteImport } from './routes/tietosuoja'
 import { Route as RekisteroidyRouteImport } from './routes/rekisteroidy'
+import { Route as PalauteRouteImport } from './routes/palaute'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as KayttoehdotRouteImport } from './routes/kayttoehdot'
 import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
@@ -25,6 +26,8 @@ import { Route as AuthenticatedKulutRouteImport } from './routes/_authenticated/
 import { Route as AuthenticatedHuoltohistoriaRouteImport } from './routes/_authenticated/huoltohistoria'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
+import { Route as ApiPublicPalauteRouteImport } from './routes/api/public/palaute'
+import { Route as ApiPublicHooksLahetaKausikirjeRouteImport } from './routes/api/public/hooks/laheta-kausikirje'
 
 const VaihdaSalasanaRoute = VaihdaSalasanaRouteImport.update({
   id: '/vaihda-salasana',
@@ -44,6 +47,11 @@ const TietosuojaRoute = TietosuojaRouteImport.update({
 const RekisteroidyRoute = RekisteroidyRouteImport.update({
   id: '/rekisteroidy',
   path: '/rekisteroidy',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PalauteRoute = PalauteRouteImport.update({
+  id: '/palaute',
+  path: '/palaute',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LoginRoute = LoginRouteImport.update({
@@ -107,11 +115,23 @@ const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
   path: '/admin',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
+const ApiPublicPalauteRoute = ApiPublicPalauteRouteImport.update({
+  id: '/api/public/palaute',
+  path: '/api/public/palaute',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPublicHooksLahetaKausikirjeRoute =
+  ApiPublicHooksLahetaKausikirjeRouteImport.update({
+    id: '/api/public/hooks/laheta-kausikirje',
+    path: '/api/public/hooks/laheta-kausikirje',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/kayttoehdot': typeof KayttoehdotRoute
   '/login': typeof LoginRoute
+  '/palaute': typeof PalauteRoute
   '/rekisteroidy': typeof RekisteroidyRoute
   '/tietosuoja': typeof TietosuojaRoute
   '/unohtunut-salasana': typeof UnohtunutSalasanaRoute
@@ -124,11 +144,14 @@ export interface FileRoutesByFullPath {
   '/pyynnot': typeof AuthenticatedPyynnotRoute
   '/talon-tiedot': typeof AuthenticatedTalonTiedotRoute
   '/vuosikello': typeof AuthenticatedVuosikelloRoute
+  '/api/public/palaute': typeof ApiPublicPalauteRoute
+  '/api/public/hooks/laheta-kausikirje': typeof ApiPublicHooksLahetaKausikirjeRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/kayttoehdot': typeof KayttoehdotRoute
   '/login': typeof LoginRoute
+  '/palaute': typeof PalauteRoute
   '/rekisteroidy': typeof RekisteroidyRoute
   '/tietosuoja': typeof TietosuojaRoute
   '/unohtunut-salasana': typeof UnohtunutSalasanaRoute
@@ -141,6 +164,8 @@ export interface FileRoutesByTo {
   '/pyynnot': typeof AuthenticatedPyynnotRoute
   '/talon-tiedot': typeof AuthenticatedTalonTiedotRoute
   '/vuosikello': typeof AuthenticatedVuosikelloRoute
+  '/api/public/palaute': typeof ApiPublicPalauteRoute
+  '/api/public/hooks/laheta-kausikirje': typeof ApiPublicHooksLahetaKausikirjeRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -148,6 +173,7 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteWithChildren
   '/kayttoehdot': typeof KayttoehdotRoute
   '/login': typeof LoginRoute
+  '/palaute': typeof PalauteRoute
   '/rekisteroidy': typeof RekisteroidyRoute
   '/tietosuoja': typeof TietosuojaRoute
   '/unohtunut-salasana': typeof UnohtunutSalasanaRoute
@@ -160,6 +186,8 @@ export interface FileRoutesById {
   '/_authenticated/pyynnot': typeof AuthenticatedPyynnotRoute
   '/_authenticated/talon-tiedot': typeof AuthenticatedTalonTiedotRoute
   '/_authenticated/vuosikello': typeof AuthenticatedVuosikelloRoute
+  '/api/public/palaute': typeof ApiPublicPalauteRoute
+  '/api/public/hooks/laheta-kausikirje': typeof ApiPublicHooksLahetaKausikirjeRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -167,6 +195,7 @@ export interface FileRouteTypes {
     | '/'
     | '/kayttoehdot'
     | '/login'
+    | '/palaute'
     | '/rekisteroidy'
     | '/tietosuoja'
     | '/unohtunut-salasana'
@@ -179,11 +208,14 @@ export interface FileRouteTypes {
     | '/pyynnot'
     | '/talon-tiedot'
     | '/vuosikello'
+    | '/api/public/palaute'
+    | '/api/public/hooks/laheta-kausikirje'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/kayttoehdot'
     | '/login'
+    | '/palaute'
     | '/rekisteroidy'
     | '/tietosuoja'
     | '/unohtunut-salasana'
@@ -196,12 +228,15 @@ export interface FileRouteTypes {
     | '/pyynnot'
     | '/talon-tiedot'
     | '/vuosikello'
+    | '/api/public/palaute'
+    | '/api/public/hooks/laheta-kausikirje'
   id:
     | '__root__'
     | '/'
     | '/_authenticated'
     | '/kayttoehdot'
     | '/login'
+    | '/palaute'
     | '/rekisteroidy'
     | '/tietosuoja'
     | '/unohtunut-salasana'
@@ -214,6 +249,8 @@ export interface FileRouteTypes {
     | '/_authenticated/pyynnot'
     | '/_authenticated/talon-tiedot'
     | '/_authenticated/vuosikello'
+    | '/api/public/palaute'
+    | '/api/public/hooks/laheta-kausikirje'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -221,10 +258,13 @@ export interface RootRouteChildren {
   AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
   KayttoehdotRoute: typeof KayttoehdotRoute
   LoginRoute: typeof LoginRoute
+  PalauteRoute: typeof PalauteRoute
   RekisteroidyRoute: typeof RekisteroidyRoute
   TietosuojaRoute: typeof TietosuojaRoute
   UnohtunutSalasanaRoute: typeof UnohtunutSalasanaRoute
   VaihdaSalasanaRoute: typeof VaihdaSalasanaRoute
+  ApiPublicPalauteRoute: typeof ApiPublicPalauteRoute
+  ApiPublicHooksLahetaKausikirjeRoute: typeof ApiPublicHooksLahetaKausikirjeRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -255,6 +295,13 @@ declare module '@tanstack/react-router' {
       path: '/rekisteroidy'
       fullPath: '/rekisteroidy'
       preLoaderRoute: typeof RekisteroidyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/palaute': {
+      id: '/palaute'
+      path: '/palaute'
+      fullPath: '/palaute'
+      preLoaderRoute: typeof PalauteRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/login': {
@@ -341,6 +388,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/api/public/palaute': {
+      id: '/api/public/palaute'
+      path: '/api/public/palaute'
+      fullPath: '/api/public/palaute'
+      preLoaderRoute: typeof ApiPublicPalauteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/hooks/laheta-kausikirje': {
+      id: '/api/public/hooks/laheta-kausikirje'
+      path: '/api/public/hooks/laheta-kausikirje'
+      fullPath: '/api/public/hooks/laheta-kausikirje'
+      preLoaderRoute: typeof ApiPublicHooksLahetaKausikirjeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -375,21 +436,14 @@ const rootRouteChildren: RootRouteChildren = {
   AuthenticatedRoute: AuthenticatedRouteWithChildren,
   KayttoehdotRoute: KayttoehdotRoute,
   LoginRoute: LoginRoute,
+  PalauteRoute: PalauteRoute,
   RekisteroidyRoute: RekisteroidyRoute,
   TietosuojaRoute: TietosuojaRoute,
   UnohtunutSalasanaRoute: UnohtunutSalasanaRoute,
   VaihdaSalasanaRoute: VaihdaSalasanaRoute,
+  ApiPublicPalauteRoute: ApiPublicPalauteRoute,
+  ApiPublicHooksLahetaKausikirjeRoute: ApiPublicHooksLahetaKausikirjeRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
