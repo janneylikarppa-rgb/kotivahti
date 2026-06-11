@@ -135,6 +135,7 @@ function VuosikelloPage() {
             statusOf={statusOf}
             onAvaa={(n) => setValittu(n)}
             onTilaa={(n) => setLiidiNimi(n)}
+            onInfo={(n) => setInfoNimi(n)}
           />
           {dyn.length > 0 && (
             <HuoltoLista
@@ -144,6 +145,7 @@ function VuosikelloPage() {
               statusOf={statusOf}
               onAvaa={(n) => setValittu(n)}
               onTilaa={(n) => setLiidiNimi(n)}
+              onInfo={(n) => setInfoNimi(n)}
             />
           )}
           {huollot.length === 0 && (
