@@ -222,6 +222,7 @@ function HuoltoLista({
   statusOf,
   onAvaa,
   onTilaa,
+  onInfo,
 }: {
   otsikko: string;
   ikoni?: React.ReactNode;
@@ -229,6 +230,7 @@ function HuoltoLista({
   statusOf: (n: string) => Kuitattu | undefined;
   onAvaa: (n: string) => void;
   onTilaa: (n: string) => void;
+  onInfo: (n: string) => void;
 }) {
   return (
     <div>
@@ -239,6 +241,7 @@ function HuoltoLista({
           const st = statusOf(nimi);
           const done = st && st.tekija !== "jatetaan";
           const skipped = st?.tekija === "jatetaan";
+          const onkoInfo = !!haeHuoltoInfo(nimi);
           return (
             <li key={nimi} className="flex items-center gap-3 py-3">
               <button onClick={() => onAvaa(nimi)} className="shrink-0" aria-label="Kuittaa">
@@ -254,6 +257,16 @@ function HuoltoLista({
                 <span className={`${done ? "text-muted-foreground line-through" : skipped ? "text-muted-foreground italic" : "text-cream"}`}>
                   {nimi}
                 </span>
+                {onkoInfo && (
+                  <button
+                    type="button"
+                    onClick={() => onInfo(nimi)}
+                    className="ml-2 inline-flex items-center gap-1 text-[11px] uppercase tracking-wider text-primary hover:underline align-middle"
+                    aria-label="Avaa infopaketti"
+                  >
+                    <Info className="h-3 w-3" /> Info
+                  </button>
+                )}
                 {rivi.kuvaus && (
                   <p className="mt-1 text-xs text-muted-foreground leading-relaxed">{rivi.kuvaus}</p>
                 )}
