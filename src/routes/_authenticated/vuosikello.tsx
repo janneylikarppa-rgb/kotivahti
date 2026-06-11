@@ -176,6 +176,41 @@ function VuosikelloPage() {
           kuvaus: liidiNimi,
         } : undefined}
       />
+
+      <Dialog open={!!infoNimi} onOpenChange={(o) => !o && setInfoNimi(null)}>
+        <DialogContent className="max-w-lg">
+          <DialogHeader>
+            <DialogTitle className="font-serif text-xl">{infoNimi}</DialogTitle>
+          </DialogHeader>
+          {infoData ? (
+            <div className="space-y-4 text-sm">
+              <div>
+                <p className="eyebrow mb-1 text-primary">Miksi tämä tehdään</p>
+                <p className="text-muted-foreground leading-relaxed">{infoData.miksi}</p>
+              </div>
+              {infoData.miten && (
+                <div>
+                  <p className="eyebrow mb-1 text-primary">Miten toimit</p>
+                  <p className="text-muted-foreground leading-relaxed">{infoData.miten}</p>
+                </div>
+              )}
+              {infoData.milloinAmmattilainen && (
+                <div>
+                  <p className="eyebrow mb-1 text-primary">Milloin tilaa ammattilainen</p>
+                  <p className="text-muted-foreground leading-relaxed">{infoData.milloinAmmattilainen}</p>
+                </div>
+              )}
+              {infoData.vinkki && (
+                <div className="rounded-md border border-primary/30 bg-primary/5 p-3">
+                  <p className="text-xs text-cream"><span className="text-primary font-semibold">Vinkki: </span>{infoData.vinkki}</p>
+                </div>
+              )}
+            </div>
+          ) : (
+            <p className="text-sm text-muted-foreground">Tälle toimenpiteelle ei ole vielä tarkempaa infopakettia. Lisäämme niitä jatkuvasti.</p>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
