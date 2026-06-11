@@ -43,6 +43,8 @@ function VuosikelloPage() {
   const [kausi, setKausi] = useState<Kausi>(autoKausi());
   const [valittu, setValittu] = useState<string | null>(null);
   const [liidiNimi, setLiidiNimi] = useState<string | null>(null);
+  const [infoNimi, setInfoNimi] = useState<string | null>(null);
+  const infoData: HuoltoInfo | null = infoNimi ? haeHuoltoInfo(infoNimi) : null;
 
   const mut = useMutation({
     mutationFn: (v: any) => kuittaaFn({ data: v }),
