@@ -45,7 +45,8 @@ export function arvaaKategoria(nimi: string): LiidiKategoria {
   if (/(kouru|syöksy|sadevesi|salaoj)/.test(n)) return "Salaojat ja sadevesijärjestelmä";
   if (/(katto|räyst|peltikat|huopa)/.test(n)) return "Katto ja räystäät";
   if (/(iv-|ilmanvaiht|lto|suodatin)/.test(n)) return "Ilmanvaihto ja IV-kone";
-  if (/(öljy|maaläm|kattil|lämmit|patteri|varaaja|kaukoläm|pelletti)/.test(n)) return "Lämmitysjärjestelmä";
+  if (/(ilmaläm|ilmalämpöpump|ilp\b)/.test(n)) return "Ilmalämpöpumppu";
+  if (/(öljy|maaläm|kattil|lämmit|patteri|varaaja|kaukoläm|pelletti|lämpöpump)/.test(n)) return "Lämmitysjärjestelmä";
   if (/(putk|viemär|vesi|lattiakaivo|hajulukko|painet)/.test(n)) return "LVI ja putket";
   if (/(sähk|vikavirta|sulak)/.test(n)) return "Sähköjärjestelmä";
   if (/(märkätil|kylpy|saumau)/.test(n)) return "Kylpyhuone ja märkätilat";
