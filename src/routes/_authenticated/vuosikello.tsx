@@ -10,10 +10,11 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { AlertTriangle, ArrowRight, Check, Circle, MinusCircle, Sparkles, Send } from "lucide-react";
+import { AlertTriangle, ArrowRight, Check, Circle, Info, MinusCircle, Sparkles, Send } from "lucide-react";
 import { toast } from "sonner";
 import { LiidiDialog } from "@/components/liidi-dialog";
 import { arvaaKategoria } from "@/lib/liidit-kategoriat";
+import { haeHuoltoInfo, type HuoltoInfo } from "@/lib/huolto-infot";
 
 export const Route = createFileRoute("/_authenticated/vuosikello")({
   component: VuosikelloPage,
@@ -42,6 +43,8 @@ function VuosikelloPage() {
   const [kausi, setKausi] = useState<Kausi>(autoKausi());
   const [valittu, setValittu] = useState<string | null>(null);
   const [liidiNimi, setLiidiNimi] = useState<string | null>(null);
+  const [infoNimi, setInfoNimi] = useState<string | null>(null);
+  const infoData: HuoltoInfo | null = infoNimi ? haeHuoltoInfo(infoNimi) : null;
 
   const mut = useMutation({
     mutationFn: (v: any) => kuittaaFn({ data: v }),
@@ -132,6 +135,7 @@ function VuosikelloPage() {
             statusOf={statusOf}
             onAvaa={(n) => setValittu(n)}
             onTilaa={(n) => setLiidiNimi(n)}
+            onInfo={(n) => setInfoNimi(n)}
           />
           {dyn.length > 0 && (
             <HuoltoLista
@@ -141,6 +145,7 @@ function VuosikelloPage() {
               statusOf={statusOf}
               onAvaa={(n) => setValittu(n)}
               onTilaa={(n) => setLiidiNimi(n)}
+              onInfo={(n) => setInfoNimi(n)}
             />
           )}
           {huollot.length === 0 && (
@@ -171,6 +176,41 @@ function VuosikelloPage() {
           kuvaus: liidiNimi,
         } : undefined}
       />
+
+      <Dialog open={!!infoNimi} onOpenChange={(o) => !o && setInfoNimi(null)}>
+        <DialogContent className="max-w-lg">
+          <DialogHeader>
+            <DialogTitle className="font-serif text-xl">{infoNimi}</DialogTitle>
+          </DialogHeader>
+          {infoData ? (
+            <div className="space-y-4 text-sm">
+              <div>
+                <p className="eyebrow mb-1 text-primary">Miksi tämä tehdään</p>
+                <p className="text-muted-foreground leading-relaxed">{infoData.miksi}</p>
+              </div>
+              {infoData.miten && (
+                <div>
+                  <p className="eyebrow mb-1 text-primary">Miten toimit</p>
+                  <p className="text-muted-foreground leading-relaxed">{infoData.miten}</p>
+                </div>
+              )}
+              {infoData.milloinAmmattilainen && (
+                <div>
+                  <p className="eyebrow mb-1 text-primary">Milloin tilaa ammattilainen</p>
+                  <p className="text-muted-foreground leading-relaxed">{infoData.milloinAmmattilainen}</p>
+                </div>
+              )}
+              {infoData.vinkki && (
+                <div className="rounded-md border border-primary/30 bg-primary/5 p-3">
+                  <p className="text-xs text-cream"><span className="text-primary font-semibold">Vinkki: </span>{infoData.vinkki}</p>
+                </div>
+              )}
+            </div>
+          ) : (
+            <p className="text-sm text-muted-foreground">Tälle toimenpiteelle ei ole vielä tarkempaa infopakettia. Lisäämme niitä jatkuvasti.</p>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
@@ -182,6 +222,7 @@ function HuoltoLista({
   statusOf,
   onAvaa,
   onTilaa,
+  onInfo,
 }: {
   otsikko: string;
   ikoni?: React.ReactNode;
@@ -189,6 +230,7 @@ function HuoltoLista({
   statusOf: (n: string) => Kuitattu | undefined;
   onAvaa: (n: string) => void;
   onTilaa: (n: string) => void;
+  onInfo: (n: string) => void;
 }) {
   return (
     <div>
@@ -199,6 +241,7 @@ function HuoltoLista({
           const st = statusOf(nimi);
           const done = st && st.tekija !== "jatetaan";
           const skipped = st?.tekija === "jatetaan";
+          const onkoInfo = !!haeHuoltoInfo(nimi);
           return (
             <li key={nimi} className="flex items-center gap-3 py-3">
               <button onClick={() => onAvaa(nimi)} className="shrink-0" aria-label="Kuittaa">
@@ -214,6 +257,16 @@ function HuoltoLista({
                 <span className={`${done ? "text-muted-foreground line-through" : skipped ? "text-muted-foreground italic" : "text-cream"}`}>
                   {nimi}
                 </span>
+                {onkoInfo && (
+                  <button
+                    type="button"
+                    onClick={() => onInfo(nimi)}
+                    className="ml-2 inline-flex items-center gap-1 text-[11px] uppercase tracking-wider text-primary hover:underline align-middle"
+                    aria-label="Avaa infopaketti"
+                  >
+                    <Info className="h-3 w-3" /> Info
+                  </button>
+                )}
                 {rivi.kuvaus && (
                   <p className="mt-1 text-xs text-muted-foreground leading-relaxed">{rivi.kuvaus}</p>
                 )}

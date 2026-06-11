@@ -127,13 +127,6 @@ function DashboardPage() {
           </CardContent>
         </Card>
 
-        <Card className="gold-card">
-          <CardHeader className="pb-3"><CardTitle className="text-base font-serif">PTS tulossa</CardTitle></CardHeader>
-          <CardContent>
-            <p className="text-sm text-muted-foreground">Pitkän tähtäimen suunnitelma rakennetaan seuraavassa vaiheessa: 10–20 vuoden ennuste budjettineen.</p>
-            <p className="eyebrow mt-4 text-muted-foreground">Pian saatavilla</p>
-          </CardContent>
-        </Card>
       </div>
     </div>
   );
