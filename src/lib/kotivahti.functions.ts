@@ -295,6 +295,11 @@ export const saveTaloTiedot = createServerFn({ method: "POST" })
     if (kErr) throw kErr;
     const { error: tErr } = await supabase.from("talon_tiedot").update(data.talo).eq("kiinteisto_id", k.id);
     if (tErr) throw tErr;
+    // Päivitä PTS-autorivit talon tietojen mukaisiksi
+    const { data: taloRaw } = await supabase.from("talon_tiedot").select("*").eq("kiinteisto_id", k.id).maybeSingle();
+    const { data: kRow } = await supabase.from("kiinteistot").select("rakennusvuosi").eq("id", k.id).maybeSingle();
+    const talo = taloRaw ? { ...taloRaw, rakennusvuosi: (kRow as any)?.rakennusvuosi } : null;
+    await synkronoiPts(supabase, k.id, talo);
     return { ok: true };
   });
 
