@@ -156,6 +156,18 @@ export function dynamicHuollot(tt: TalonTiedotLite | null | undefined): Partial<
     out.kesa.push(t("Puujulkisivun maalipinnan tarkastus"));
   }
 
+  // Nuohous vain jos talossa on oikeasti nuohottava hormi:
+  // puukiuas, polttoaineperustainen lämmitys tai tiili/teräs-hormi
+  const tarvitseeNuohouksen =
+    tt.kiuas_tyyppi === "puu" ||
+    tt.lammitysmuoto === "puulammitys" ||
+    tt.lammitysmuoto === "pellettilammitys" ||
+    tt.lammitysmuoto === "oljylammitys" ||
+    (tt.hormityyppi != null && tt.hormityyppi !== "Ei hormia");
+  if (tarvitseeNuohouksen) {
+    out.kesa.push(t("Nuohouksen tilaus"));
+  }
+
   return out;
 }
 
