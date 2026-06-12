@@ -173,7 +173,9 @@ function VuosikelloPage() {
         esitaytetty={liidiNimi ? {
           palvelu: "huolto",
           kategoria: arvaaKategoria(liidiNimi),
-          kuvaus: liidiNimi,
+          kuvaus: liidiNimi.toLowerCase().includes("nuohou") && (talon as any)?.hormien_maara
+            ? `${liidiNimi}, hormeja ${(talon as any).hormien_maara} kpl${(talon as any)?.hormityyppi ? ` (${(talon as any).hormityyppi})` : ""}`
+            : liidiNimi,
         } : undefined}
       />
 
