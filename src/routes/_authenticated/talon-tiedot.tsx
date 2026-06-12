@@ -370,7 +370,6 @@ function TaloTiedotPage() {
               <Field label="Katon asennusvuosi"><Input type="number" value={t.katto_uusittu_vuosi ?? ""} onChange={(e) => setT({ ...t, katto_uusittu_vuosi: e.target.value })} placeholder="Jätä tyhjäksi jos alkuperäinen" /></Field>
             </Row>
             <Row>
-            <Row>
               <Field label="Hormityyppi">
                 <Select value={t.hormityyppi ?? ""} onValueChange={(v) => setT({ ...t, hormityyppi: v })}>
                   <SelectTrigger><SelectValue placeholder="Valitse" /></SelectTrigger>
@@ -393,7 +392,7 @@ function TaloTiedotPage() {
             </Row>
             <Row>
               <Field label="Syöksytorvet (kpl)"><Input type="number" value={t.syoksytorvet ?? ""} onChange={(e) => setT({ ...t, syoksytorvet: e.target.value })} /></Field>
-              <Field label="Räystäät kunnostettu (vuosi)"><Input type="number" value={t.raystaat_kunnostettu_vuosi ?? ""} onChange={(e) => setT({ ...t, raystaat_kunnostettu_vuosi: e.target.value })} /></Field>
+              <Field label="Räystäät asennettu (vuosi)"><Input type="number" value={t.raystaat_kunnostettu_vuosi ?? ""} onChange={(e) => setT({ ...t, raystaat_kunnostettu_vuosi: e.target.value })} placeholder="Jätä tyhjäksi jos alkuperäiset" /></Field>
             </Row>
           </>)}
 
