@@ -35,7 +35,7 @@ export const PERUSHUOLLOT: Record<Kausi, HuoltoRivi[]> = {
     t("Julkisivun tarkastus ja pesu"),
     t("Terassin hoito ja pintakäsittely"),
     t("Pihalaatoituksen tarkastus"),
-    t("Nuohouksen tilaus"),
+    
     f("Lämmitysjärjestelmän kesäkäynti"),
     f("Ulkovalaistuksen tarkastus"),
     f("Nurmikon ja istutusten hoito"),
@@ -61,7 +61,7 @@ export const PERUSHUOLLOT: Record<Kausi, HuoltoRivi[]> = {
     f("IV-suodattimien tarkastus"),
     f("Lumikinosten poisto seiniltä ja poistumisteiltä"),
     f("Kiukaan ja kiuaskivien tarkastus"),
-    f("Märkätilojen silikonien tarkastus", "Tarkasta: Suihkun, kylpyammen ja pesualtaan silikonisaumat silmämääräisesti – halkeamat, tummentuminen tai irtoaminen ovat merkkejä uusimisen tarpeesta. Toimenpide: Pienehkö halkeama voidaan tilkitä itse. Laajempi vaurio tai epävarmuus vedeneristyksen kunnosta → tilaa ammattilainen. Silikonisaumojen suositeltu vaihtoväli on 3–5 vuotta käytöstä riippuen."),
+    f("Märkätilojen silikonien tarkastus"),
     f("Lattiakaivojen puhdistus"),
   ],
   ympari_vuoden: [
@@ -87,6 +87,8 @@ export type TalonTiedotLite = {
   terassi_materiaali?: string | null;
   terassi_lasitettu?: boolean | null;
   julkisivumateriaali?: string | null;
+  kiuas_tyyppi?: string | null;
+  hormityyppi?: string | null;
 };
 
 export function dynamicHuollot(tt: TalonTiedotLite | null | undefined): Partial<Record<Kausi, HuoltoRivi[]>> {
@@ -152,6 +154,18 @@ export function dynamicHuollot(tt: TalonTiedotLite | null | undefined): Partial<
 
   if (tt.julkisivumateriaali?.toLowerCase().includes("puu")) {
     out.kesa.push(t("Puujulkisivun maalipinnan tarkastus"));
+  }
+
+  // Nuohous vain jos talossa on oikeasti nuohottava hormi:
+  // puukiuas, polttoaineperustainen lämmitys tai tiili/teräs-hormi
+  const tarvitseeNuohouksen =
+    tt.kiuas_tyyppi === "puu" ||
+    tt.lammitysmuoto === "puulammitys" ||
+    tt.lammitysmuoto === "pellettilammitys" ||
+    tt.lammitysmuoto === "oljylammitys" ||
+    (tt.hormityyppi != null && tt.hormityyppi !== "Ei hormia");
+  if (tarvitseeNuohouksen) {
+    out.kesa.push(t("Nuohouksen tilaus"));
   }
 
   return out;

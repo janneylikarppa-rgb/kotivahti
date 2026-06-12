@@ -51,6 +51,11 @@ const PERUSTUKSET = ["Betonivalu (maanvarainen laatta)", "Harkkoperustus", "Tuul
 const ERISTEET = ["Mineraalivilla", "Lasivilla", "Selluvilla (puhallusvilla)", "Polyuretaani (PUR/PIR)", "EPS-styrox", "Sahanpuru", "Ekovilla", "Hamppu"];
 const KATTOTYYPIT = ["Harjakatto", "Pulpettikatto", "Aumakatto", "Mansardikatto", "Tasakatto", "Kaarikatto"];
 const KATTOMATERIAALIT = ["Konesaumattu peltikatto", "Profiilipeltikatto", "Tiilikatto (savitiili)", "Betonitiili", "Huopakatto", "Kumibitumikermi", "Pärekatto"];
+const HORMITYYPIT = ["Ei hormia", "Tiilihormi", "Teräs-/moduulihormi", "Muu"];
+const KIUAS_TYYPIT: { key: string; nimi: string }[] = [
+  { key: "puu", nimi: "Puukiuas" },
+  { key: "sahko", nimi: "Sähkökiuas" },
+];
 const KOURUN_MATERIAALIT = ["Maalattu teräs", "Sinkitty teräs", "Kupari", "Alumiini", "Muovi"];
 const LAMMITYS = [
   { key: "maalampo", nimi: "Maalämpö" },
@@ -146,7 +151,7 @@ function TaloTiedotPage() {
         katto_uusittu_vuosi: num(t.katto_uusittu_vuosi),
         katto_pinta_ala: num(t.katto_pinta_ala),
         raystaat_kunnostettu_vuosi: num(t.raystaat_kunnostettu_vuosi),
-        hormit: str(t.hormit), kattoturvatuotteet: str(t.kattoturvatuotteet),
+        hormit: str(t.hormit), hormityyppi: str(t.hormityyppi), hormien_maara: num(t.hormien_maara), kiuas_tyyppi: str(t.kiuas_tyyppi), kattoturvatuotteet: str(t.kattoturvatuotteet),
         kourun_pituus: num(t.kourun_pituus), kourun_materiaali: str(t.kourun_materiaali),
         syoksytorvet: num(t.syoksytorvet),
         lammitysmuoto: str(t.lammitysmuoto), lammitys_asennettu_vuosi: num(t.lammitys_asennettu_vuosi),
@@ -190,6 +195,7 @@ function TaloTiedotPage() {
     onSuccess: (opts) => {
       qc.invalidateQueries({ queryKey: ["talo"], refetchType: "inactive" });
       qc.invalidateQueries({ queryKey: ["dashboard"] });
+      qc.invalidateQueries({ queryKey: ["pts"] });
       if (opts?.silent) {
         setAutoStatus("saved");
         setTimeout(() => setAutoStatus("idle"), 1500);
@@ -364,8 +370,17 @@ function TaloTiedotPage() {
               <Field label="Katon asennusvuosi"><Input type="number" value={t.katto_uusittu_vuosi ?? ""} onChange={(e) => setT({ ...t, katto_uusittu_vuosi: e.target.value })} placeholder="Jätä tyhjäksi jos alkuperäinen" /></Field>
             </Row>
             <Row>
-              <Field label="Hormit"><Input value={t.hormit ?? ""} onChange={(e) => setT({ ...t, hormit: e.target.value })} placeholder="Esim. tiilihormi" /></Field>
+              <Field label="Hormityyppi">
+                <Select value={t.hormityyppi ?? ""} onValueChange={(v) => setT({ ...t, hormityyppi: v })}>
+                  <SelectTrigger><SelectValue placeholder="Valitse" /></SelectTrigger>
+                  <SelectContent>{HORMITYYPIT.map((h) => <SelectItem key={h} value={h}>{h}</SelectItem>)}</SelectContent>
+                </Select>
+              </Field>
+              <Field label="Hormeja (kpl)"><Input type="number" min="0" value={t.hormien_maara ?? ""} onChange={(e) => setT({ ...t, hormien_maara: e.target.value })} disabled={t.hormityyppi === "Ei hormia"} /></Field>
+            </Row>
+            <Row>
               <Field label="Kattoturvatuotteet"><Input value={t.kattoturvatuotteet ?? ""} onChange={(e) => setT({ ...t, kattoturvatuotteet: e.target.value })} placeholder="Esim. lumiesteet, kattosillat" /></Field>
+              <div />
             </Row>
 
             <p className="eyebrow text-primary pt-4">Räystäskourut</p>
@@ -377,7 +392,7 @@ function TaloTiedotPage() {
             </Row>
             <Row>
               <Field label="Syöksytorvet (kpl)"><Input type="number" value={t.syoksytorvet ?? ""} onChange={(e) => setT({ ...t, syoksytorvet: e.target.value })} /></Field>
-              <Field label="Räystäät kunnostettu (vuosi)"><Input type="number" value={t.raystaat_kunnostettu_vuosi ?? ""} onChange={(e) => setT({ ...t, raystaat_kunnostettu_vuosi: e.target.value })} /></Field>
+              <Field label="Räystäät asennettu (vuosi)"><Input type="number" value={t.raystaat_kunnostettu_vuosi ?? ""} onChange={(e) => setT({ ...t, raystaat_kunnostettu_vuosi: e.target.value })} placeholder="Jätä tyhjäksi jos alkuperäiset" /></Field>
             </Row>
           </>)}
 
@@ -407,7 +422,7 @@ function TaloTiedotPage() {
               </div>
             )}
 
-            <p className="eyebrow text-primary pt-2">Lämpöpumppu (lisälaite)</p>
+            <p className="eyebrow text-primary pt-2">Ilmalämpöpumppu (lisälaite)</p>
             <Row>
               <Field label="Merkki">
                 <SelectOrOther value={t.ilp_merkki} options={ILP_MERKIT} onChange={(v) => setT({ ...t, ilp_merkki: v })} />
@@ -421,7 +436,7 @@ function TaloTiedotPage() {
               <Field label="IV-tyyppi">
                 <SelectOrOther value={t.ilmanvaihto} options={ILMANVAIHDOT} onChange={(v) => setT({ ...t, ilmanvaihto: v })} />
               </Field>
-              <Field label="IV-koneen asennusvuosi"><Input type="number" value={t.ilmanvaihto_vuosi ?? ""} onChange={(e) => setT({ ...t, ilmanvaihto_vuosi: e.target.value })} /></Field>
+              <Field label="IV-koneen asennusvuosi"><Input type="number" value={t.ilmanvaihto_vuosi ?? ""} onChange={(e) => setT({ ...t, ilmanvaihto_vuosi: e.target.value })} placeholder="Jätä tyhjäksi jos alkuperäinen" /></Field>
             </Row>
             <Row>
               <Field label="Suodatintyyppi">
@@ -460,8 +475,14 @@ function TaloTiedotPage() {
             </Row>
             <Row>
               <Field label="Kiukaan asennusvuosi"><Input type="number" value={t.kiukaan_vuosi ?? ""} onChange={(e) => setT({ ...t, kiukaan_vuosi: e.target.value })} /></Field>
-              <Field label="Nuohous viimeksi"><Input type="date" value={t.nuohous_pvm ?? ""} onChange={(e) => setT({ ...t, nuohous_pvm: e.target.value })} /></Field>
+              <Field label="Kiuastyyppi">
+                <Select value={t.kiuas_tyyppi ?? ""} onValueChange={(v) => setT({ ...t, kiuas_tyyppi: v })}>
+                  <SelectTrigger><SelectValue placeholder="Valitse" /></SelectTrigger>
+                  <SelectContent>{KIUAS_TYYPIT.map((k) => <SelectItem key={k.key} value={k.key}>{k.nimi}</SelectItem>)}</SelectContent>
+                </Select>
+              </Field>
             </Row>
+            <Field label="Nuohous viimeksi"><Input type="date" value={t.nuohous_pvm ?? ""} onChange={(e) => setT({ ...t, nuohous_pvm: e.target.value })} /></Field>
             <Field label="Sähköjärjestelmän asennusvuosi"><Input type="number" value={t.sahkot_asennettu_vuosi ?? ""} onChange={(e) => setT({ ...t, sahkot_asennettu_vuosi: e.target.value })} placeholder="Jätä tyhjäksi jos alkuperäinen" /></Field>
           </>)}
 

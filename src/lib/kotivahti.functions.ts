@@ -50,19 +50,64 @@ async function paivitaPts(
   await supabase.from("pts_suunnitelma").update(patch).eq("id", rivi.id);
 }
 
-// Seedaa puuttuvat autorivit pts_suunnitelmaan talon_tiedot-pohjalta
-async function seedPts(supabase: any, kiinteistoId: string, talo: any) {
+// Synkronoi pts_suunnitelman autorivit talon_tiedot-pohjaisten sääntöjen kanssa.
+// - Poistaa autorivit, jotka eivät enää koske taloa (esim. kattomateriaali vaihtunut),
+//   paitsi jos rivillä on huoltohistoriaa (silloin säilytetään ettei kirjattu data katoa).
+// - Päivittää lahde_vuosi / kayttoika / huoltovali / toimenpide_vuosi / kuvaus jos talon
+//   tiedot tai PTS_KOHTEET-säännöt ovat muuttuneet, paitsi jos käyttäjä on siirtänyt rivin
+//   manuaalisesti (kuvauksessa "[Siirretty").
+// - Lisää puuttuvat autorivit.
+async function synkronoiPts(supabase: any, kiinteistoId: string, talo: any) {
   if (!talo) return;
   const { data: olemassa } = await supabase
     .from("pts_suunnitelma")
-    .select("kohde_avain")
+    .select("*")
     .eq("kiinteisto_id", kiinteistoId)
     .eq("oma_rivi", false);
-  const olemassaSet = new Set((olemassa ?? []).map((r: any) => r.kohde_avain));
   const nyt = new Date().getFullYear();
+  const olemassaMap = new Map<string, any>();
+  for (const r of (olemassa ?? [])) olemassaMap.set(r.kohde_avain as string, r);
+
+  // 1) Poista ja päivitä olemassa olevat
+  for (const rivi of (olemassa ?? [])) {
+    const kohde = PTS_KOHTEET.find((k) => k.avain === rivi.kohde_avain);
+    const onHistoriaa = rivi.viimeisin_huolto_vuosi != null || rivi.viimeisin_uusiminen_vuosi != null;
+    const koskeeEdelleen = kohde && (!kohde.koskee || kohde.koskee(talo));
+    const lahde = kohde?.lahdeVuosi(talo) ?? null;
+
+    if (!kohde || (!koskeeEdelleen && !onHistoriaa) || (lahde == null && !onHistoriaa)) {
+      if (!onHistoriaa) {
+        await supabase.from("pts_suunnitelma").delete().eq("id", rivi.id);
+      }
+      continue;
+    }
+    if (!kohde) continue;
+
+    const lykatty = typeof rivi.kuvaus === "string" && rivi.kuvaus.includes("[Siirretty");
+    const patch: any = {};
+    if (lahde != null && rivi.lahde_vuosi !== lahde) patch.lahde_vuosi = lahde;
+    if (rivi.kayttoika !== kohde.kayttoika) patch.kayttoika = kohde.kayttoika;
+    if (rivi.huoltovali !== kohde.huoltovali) patch.huoltovali = kohde.huoltovali;
+    if (kohde.kuvaus && !rivi.kuvaus) patch.kuvaus = kohde.kuvaus;
+
+    if (!lykatty && lahde != null) {
+      const pohja = rivi.viimeisin_uusiminen_vuosi ?? lahde;
+      const toimenpide = Math.max(nyt, pohja + Math.max(kohde.kayttoika - 2, 1));
+      if (rivi.toimenpide_vuosi !== toimenpide) {
+        patch.toimenpide_vuosi = toimenpide;
+        patch.kiireellisyys = laskeKiireellisyys(toimenpide - nyt);
+      }
+    }
+    if (Object.keys(patch).length > 0) {
+      patch.paivitetty_at = new Date().toISOString();
+      await supabase.from("pts_suunnitelma").update(patch).eq("id", rivi.id);
+    }
+  }
+
+  // 2) Lisää puuttuvat
   const lisattavat: any[] = [];
   for (const kohde of PTS_KOHTEET) {
-    if (olemassaSet.has(kohde.avain)) continue;
+    if (olemassaMap.has(kohde.avain)) continue;
     if (kohde.koskee && !kohde.koskee(talo)) continue;
     const lahde = kohde.lahdeVuosi(talo);
     if (lahde == null) continue;
@@ -77,6 +122,7 @@ async function seedPts(supabase: any, kiinteistoId: string, talo: any) {
       lahde_vuosi: lahde,
       toimenpide_vuosi: toimenpide,
       kiireellisyys: laskeKiireellisyys(toimenpide - nyt),
+      kuvaus: kohde.kuvaus ?? null,
       oma_rivi: false,
     });
   }
@@ -84,6 +130,9 @@ async function seedPts(supabase: any, kiinteistoId: string, talo: any) {
     await supabase.from("pts_suunnitelma").insert(lisattavat);
   }
 }
+
+// Yhteensopivuusalias
+const seedPts = synkronoiPts;
 
 // ---------- Active kiinteistö ----------
 async function getActiveKiinteisto(supabase: any, userId: string) {
@@ -190,6 +239,9 @@ const taloSchema = z.object({
     katto_pinta_ala: z.number().optional().nullable(),
     raystaat_kunnostettu_vuosi: z.number().int().optional().nullable(),
     hormit: z.string().optional().nullable(),
+    hormityyppi: z.string().optional().nullable(),
+    hormien_maara: z.number().int().optional().nullable(),
+    kiuas_tyyppi: z.string().optional().nullable(),
     kattoturvatuotteet: z.string().optional().nullable(),
     kourun_pituus: z.number().optional().nullable(),
     kourun_materiaali: z.string().optional().nullable(),
@@ -246,6 +298,11 @@ export const saveTaloTiedot = createServerFn({ method: "POST" })
     if (kErr) throw kErr;
     const { error: tErr } = await supabase.from("talon_tiedot").update(data.talo).eq("kiinteisto_id", k.id);
     if (tErr) throw tErr;
+    // Päivitä PTS-autorivit talon tietojen mukaisiksi
+    const { data: taloRaw } = await supabase.from("talon_tiedot").select("*").eq("kiinteisto_id", k.id).maybeSingle();
+    const { data: kRow } = await supabase.from("kiinteistot").select("rakennusvuosi").eq("id", k.id).maybeSingle();
+    const talo = taloRaw ? { ...taloRaw, rakennusvuosi: (kRow as any)?.rakennusvuosi } : null;
+    await synkronoiPts(supabase, k.id, talo);
     return { ok: true };
   });
 

@@ -173,7 +173,9 @@ function VuosikelloPage() {
         esitaytetty={liidiNimi ? {
           palvelu: "huolto",
           kategoria: arvaaKategoria(liidiNimi),
-          kuvaus: liidiNimi,
+          kuvaus: liidiNimi.toLowerCase().includes("nuohou") && (talon as any)?.hormien_maara
+            ? `${liidiNimi}, hormeja ${(talon as any).hormien_maara} kpl${(talon as any)?.hormityyppi ? ` (${(talon as any).hormityyppi})` : ""}`
+            : liidiNimi,
         } : undefined}
       />
 
@@ -271,8 +273,6 @@ function HuoltoLista({
                   <p className="mt-1 text-xs text-muted-foreground leading-relaxed">{rivi.kuvaus}</p>
                 )}
               </div>
-              {st?.hinta ? <span className="text-xs font-mono text-muted-foreground">{Number(st.hinta).toFixed(0)} €</span> : null}
-              {st?.tekija === "ammattilainen" && <span className="text-[10px] uppercase tracking-wider text-primary">amm.</span>}
               {rivi.ammattilainen && (
                 <Button
                   type="button"
