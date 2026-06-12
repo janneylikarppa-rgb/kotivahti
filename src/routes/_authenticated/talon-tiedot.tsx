@@ -51,6 +51,11 @@ const PERUSTUKSET = ["Betonivalu (maanvarainen laatta)", "Harkkoperustus", "Tuul
 const ERISTEET = ["Mineraalivilla", "Lasivilla", "Selluvilla (puhallusvilla)", "Polyuretaani (PUR/PIR)", "EPS-styrox", "Sahanpuru", "Ekovilla", "Hamppu"];
 const KATTOTYYPIT = ["Harjakatto", "Pulpettikatto", "Aumakatto", "Mansardikatto", "Tasakatto", "Kaarikatto"];
 const KATTOMATERIAALIT = ["Konesaumattu peltikatto", "Profiilipeltikatto", "Tiilikatto (savitiili)", "Betonitiili", "Huopakatto", "Kumibitumikermi", "Pärekatto"];
+const HORMITYYPIT = ["Ei hormia", "Tiilihormi", "Teräs-/moduulihormi", "Muu"];
+const KIUAS_TYYPIT: { key: string; nimi: string }[] = [
+  { key: "puu", nimi: "Puukiuas" },
+  { key: "sahko", nimi: "Sähkökiuas" },
+];
 const KOURUN_MATERIAALIT = ["Maalattu teräs", "Sinkitty teräs", "Kupari", "Alumiini", "Muovi"];
 const LAMMITYS = [
   { key: "maalampo", nimi: "Maalämpö" },
