@@ -35,7 +35,7 @@ export const PERUSHUOLLOT: Record<Kausi, HuoltoRivi[]> = {
     t("Julkisivun tarkastus ja pesu"),
     t("Terassin hoito ja pintakäsittely"),
     t("Pihalaatoituksen tarkastus"),
-    t("Nuohouksen tilaus"),
+    
     f("Lämmitysjärjestelmän kesäkäynti"),
     f("Ulkovalaistuksen tarkastus"),
     f("Nurmikon ja istutusten hoito"),
@@ -87,6 +87,8 @@ export type TalonTiedotLite = {
   terassi_materiaali?: string | null;
   terassi_lasitettu?: boolean | null;
   julkisivumateriaali?: string | null;
+  kiuas_tyyppi?: string | null;
+  hormityyppi?: string | null;
 };
 
 export function dynamicHuollot(tt: TalonTiedotLite | null | undefined): Partial<Record<Kausi, HuoltoRivi[]>> {
