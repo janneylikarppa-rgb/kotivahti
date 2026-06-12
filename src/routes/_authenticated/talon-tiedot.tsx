@@ -146,7 +146,7 @@ function TaloTiedotPage() {
         katto_uusittu_vuosi: num(t.katto_uusittu_vuosi),
         katto_pinta_ala: num(t.katto_pinta_ala),
         raystaat_kunnostettu_vuosi: num(t.raystaat_kunnostettu_vuosi),
-        hormit: str(t.hormit), kattoturvatuotteet: str(t.kattoturvatuotteet),
+        hormit: str(t.hormit), hormityyppi: str(t.hormityyppi), hormien_maara: num(t.hormien_maara), kiuas_tyyppi: str(t.kiuas_tyyppi), kattoturvatuotteet: str(t.kattoturvatuotteet),
         kourun_pituus: num(t.kourun_pituus), kourun_materiaali: str(t.kourun_materiaali),
         syoksytorvet: num(t.syoksytorvet),
         lammitysmuoto: str(t.lammitysmuoto), lammitys_asennettu_vuosi: num(t.lammitys_asennettu_vuosi),
@@ -190,6 +190,7 @@ function TaloTiedotPage() {
     onSuccess: (opts) => {
       qc.invalidateQueries({ queryKey: ["talo"], refetchType: "inactive" });
       qc.invalidateQueries({ queryKey: ["dashboard"] });
+      qc.invalidateQueries({ queryKey: ["pts"] });
       if (opts?.silent) {
         setAutoStatus("saved");
         setTimeout(() => setAutoStatus("idle"), 1500);
