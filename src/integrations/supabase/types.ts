@@ -581,7 +581,9 @@ export type Database = {
           created_at: string
           data: Json | null
           eriste: string | null
+          hormien_maara: number | null
           hormit: string | null
+          hormityyppi: string | null
           id: string
           ikkunat_tyyppi: string | null
           ikkunat_uusittu_vuosi: number | null
@@ -602,6 +604,7 @@ export type Database = {
           kattotyyppi: string | null
           kerroksia: number | null
           kiinteisto_id: string
+          kiuas_tyyppi: string | null
           kiukaan_vuosi: number | null
           kokonaispinta_ala: number | null
           kourun_materiaali: string | null
@@ -646,7 +649,9 @@ export type Database = {
           created_at?: string
           data?: Json | null
           eriste?: string | null
+          hormien_maara?: number | null
           hormit?: string | null
+          hormityyppi?: string | null
           id?: string
           ikkunat_tyyppi?: string | null
           ikkunat_uusittu_vuosi?: number | null
@@ -667,6 +672,7 @@ export type Database = {
           kattotyyppi?: string | null
           kerroksia?: number | null
           kiinteisto_id: string
+          kiuas_tyyppi?: string | null
           kiukaan_vuosi?: number | null
           kokonaispinta_ala?: number | null
           kourun_materiaali?: string | null
@@ -711,7 +717,9 @@ export type Database = {
           created_at?: string
           data?: Json | null
           eriste?: string | null
+          hormien_maara?: number | null
           hormit?: string | null
+          hormityyppi?: string | null
           id?: string
           ikkunat_tyyppi?: string | null
           ikkunat_uusittu_vuosi?: number | null
@@ -732,6 +740,7 @@ export type Database = {
           kattotyyppi?: string | null
           kerroksia?: number | null
           kiinteisto_id?: string
+          kiuas_tyyppi?: string | null
           kiukaan_vuosi?: number | null
           kokonaispinta_ala?: number | null
           kourun_materiaali?: string | null
