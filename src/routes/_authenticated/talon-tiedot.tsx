@@ -370,8 +370,18 @@ function TaloTiedotPage() {
               <Field label="Katon asennusvuosi"><Input type="number" value={t.katto_uusittu_vuosi ?? ""} onChange={(e) => setT({ ...t, katto_uusittu_vuosi: e.target.value })} placeholder="Jätä tyhjäksi jos alkuperäinen" /></Field>
             </Row>
             <Row>
-              <Field label="Hormit"><Input value={t.hormit ?? ""} onChange={(e) => setT({ ...t, hormit: e.target.value })} placeholder="Esim. tiilihormi" /></Field>
+            <Row>
+              <Field label="Hormityyppi">
+                <Select value={t.hormityyppi ?? ""} onValueChange={(v) => setT({ ...t, hormityyppi: v })}>
+                  <SelectTrigger><SelectValue placeholder="Valitse" /></SelectTrigger>
+                  <SelectContent>{HORMITYYPIT.map((h) => <SelectItem key={h} value={h}>{h}</SelectItem>)}</SelectContent>
+                </Select>
+              </Field>
+              <Field label="Hormeja (kpl)"><Input type="number" min="0" value={t.hormien_maara ?? ""} onChange={(e) => setT({ ...t, hormien_maara: e.target.value })} disabled={t.hormityyppi === "Ei hormia"} /></Field>
+            </Row>
+            <Row>
               <Field label="Kattoturvatuotteet"><Input value={t.kattoturvatuotteet ?? ""} onChange={(e) => setT({ ...t, kattoturvatuotteet: e.target.value })} placeholder="Esim. lumiesteet, kattosillat" /></Field>
+              <div />
             </Row>
 
             <p className="eyebrow text-primary pt-4">Räystäskourut</p>
