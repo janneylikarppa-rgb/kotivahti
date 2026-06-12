@@ -9,6 +9,7 @@ export type PtsKohde = {
   huoltovali: number;
   lahdeVuosi: (talo: any) => number | null;
   koskee?: (talo: any) => boolean;
+  kuvaus?: string;
 };
 
 const i = (v: any): number | null => {
@@ -42,8 +43,9 @@ export const PTS_KOHTEET: PtsKohde[] = [
     lahdeVuosi: lammV, koskee: (t) => onLamm(t, "sähkökattila", "sahkokattila") },
   { avain: "lammitys_sahkopatterit", nimi: "Sähköpatterit", kategoria: "Lämmitys", kayttoika: 30, huoltovali: 5,
     lahdeVuosi: lammV, koskee: (t) => onLamm(t, "sähköpatter", "sahkopatter", "suora sähkö", "suora sahko") },
-  { avain: "ilp", nimi: "Ilmalämpöpumppu", kategoria: "Lämmitys", kayttoika: 14, huoltovali: 1,
-    lahdeVuosi: (t) => i(t?.ilp_asennettu_vuosi), koskee: (t) => i(t?.ilp_asennettu_vuosi) != null },
+  { avain: "ilp", nimi: "Ilmalämpöpumppu", kategoria: "Lämmitys", kayttoika: 15, huoltovali: 1,
+    lahdeVuosi: (t) => i(t?.ilp_asennettu_vuosi), koskee: (t) => i(t?.ilp_asennettu_vuosi) != null,
+    kuvaus: "Vuosittain: puhdista sisäyksikön suodattimet ja imuroi ulkoyksikön lamellit. Laitteen sisälle, kennoille, puhallinrullaan ja kondenssialtaaseen kertyy ajan mittaan likaa, pölyä ja mikrobeja, joita pelkkä imurointi ei tavoita – tämä näkyy heikentyneenä viilennystehona, korkeampana sähkölaskuna ja huonompana sisäilmana. Tilaa ammattilaisen pesu noin 3–5 vuoden välein. Laitteen suositeltu uusimisikä on n. 15 vuotta." },
   // Talotekniikka
   { avain: "iv_kone", nimi: "Ilmanvaihtokone", kategoria: "Talotekniikka", kayttoika: 20, huoltovali: 5,
     lahdeVuosi: (t) => i(t?.ilmanvaihto_vuosi),
