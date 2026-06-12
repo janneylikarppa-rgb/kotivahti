@@ -61,7 +61,7 @@ export const PERUSHUOLLOT: Record<Kausi, HuoltoRivi[]> = {
     f("IV-suodattimien tarkastus"),
     f("Lumikinosten poisto seiniltä ja poistumisteiltä"),
     f("Kiukaan ja kiuaskivien tarkastus"),
-    f("Märkätilojen silikonien tarkastus", "Tarkasta: Suihkun, kylpyammen ja pesualtaan silikonisaumat silmämääräisesti – halkeamat, tummentuminen tai irtoaminen ovat merkkejä uusimisen tarpeesta. Toimenpide: Pienehkö halkeama voidaan tilkitä itse. Laajempi vaurio tai epävarmuus vedeneristyksen kunnosta → tilaa ammattilainen. Silikonisaumojen suositeltu vaihtoväli on 3–5 vuotta käytöstä riippuen."),
+    f("Märkätilojen silikonien tarkastus"),
     f("Lattiakaivojen puhdistus"),
   ],
   ympari_vuoden: [
