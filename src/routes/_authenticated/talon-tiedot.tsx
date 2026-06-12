@@ -422,7 +422,7 @@ function TaloTiedotPage() {
               </div>
             )}
 
-            <p className="eyebrow text-primary pt-2">Lämpöpumppu (lisälaite)</p>
+            <p className="eyebrow text-primary pt-2">Ilmalämpöpumppu (lisälaite)</p>
             <Row>
               <Field label="Merkki">
                 <SelectOrOther value={t.ilp_merkki} options={ILP_MERKIT} onChange={(v) => setT({ ...t, ilp_merkki: v })} />
@@ -436,7 +436,7 @@ function TaloTiedotPage() {
               <Field label="IV-tyyppi">
                 <SelectOrOther value={t.ilmanvaihto} options={ILMANVAIHDOT} onChange={(v) => setT({ ...t, ilmanvaihto: v })} />
               </Field>
-              <Field label="IV-koneen asennusvuosi"><Input type="number" value={t.ilmanvaihto_vuosi ?? ""} onChange={(e) => setT({ ...t, ilmanvaihto_vuosi: e.target.value })} /></Field>
+              <Field label="IV-koneen asennusvuosi"><Input type="number" value={t.ilmanvaihto_vuosi ?? ""} onChange={(e) => setT({ ...t, ilmanvaihto_vuosi: e.target.value })} placeholder="Jätä tyhjäksi jos alkuperäinen" /></Field>
             </Row>
             <Row>
               <Field label="Suodatintyyppi">
@@ -475,8 +475,14 @@ function TaloTiedotPage() {
             </Row>
             <Row>
               <Field label="Kiukaan asennusvuosi"><Input type="number" value={t.kiukaan_vuosi ?? ""} onChange={(e) => setT({ ...t, kiukaan_vuosi: e.target.value })} /></Field>
-              <Field label="Nuohous viimeksi"><Input type="date" value={t.nuohous_pvm ?? ""} onChange={(e) => setT({ ...t, nuohous_pvm: e.target.value })} /></Field>
+              <Field label="Kiuastyyppi">
+                <Select value={t.kiuas_tyyppi ?? ""} onValueChange={(v) => setT({ ...t, kiuas_tyyppi: v })}>
+                  <SelectTrigger><SelectValue placeholder="Valitse" /></SelectTrigger>
+                  <SelectContent>{KIUAS_TYYPIT.map((k) => <SelectItem key={k.key} value={k.key}>{k.nimi}</SelectItem>)}</SelectContent>
+                </Select>
+              </Field>
             </Row>
+            <Field label="Nuohous viimeksi"><Input type="date" value={t.nuohous_pvm ?? ""} onChange={(e) => setT({ ...t, nuohous_pvm: e.target.value })} /></Field>
             <Field label="Sähköjärjestelmän asennusvuosi"><Input type="number" value={t.sahkot_asennettu_vuosi ?? ""} onChange={(e) => setT({ ...t, sahkot_asennettu_vuosi: e.target.value })} placeholder="Jätä tyhjäksi jos alkuperäinen" /></Field>
           </>)}
 
