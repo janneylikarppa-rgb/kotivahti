@@ -27,9 +27,13 @@ export const Route = createFileRoute("/_authenticated")({
 function AuthenticatedLayout() {
   const navigate = useNavigate();
   const [session, setSession] = useState(() => getCachedSession());
+  const [previewReady, setPreviewReady] = useState(false);
 
   useEffect(() => {
-    if (AUTH_BYPASS_ENABLED) return;
+    if (AUTH_BYPASS_ENABLED) {
+      setPreviewReady(true);
+      return;
+    }
     const unsubscribe = subscribeToSession(setSession);
     getReadySession().then((nextSession) => {
       setSession(nextSession);
@@ -44,6 +48,10 @@ function AuthenticatedLayout() {
     });
     return unsubscribe;
   }, [navigate]);
+
+  if (AUTH_BYPASS_ENABLED && !previewReady) {
+    return <div className="min-h-screen bg-background" />;
+  }
 
   if (!session && !AUTH_BYPASS_ENABLED) {
     return <div className="min-h-screen bg-background" />;
