@@ -54,7 +54,7 @@ export const requirePreviewOrSupabaseAuth = createMiddleware({ type: "function" 
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const userId = await getPreviewUserId(supabaseAdmin);
     const now = Math.floor(Date.now() / 1000);
-    const claims = {
+    const claims: any = {
       iss: "preview",
       sub: userId,
       aud: "authenticated",
@@ -65,6 +65,6 @@ export const requirePreviewOrSupabaseAuth = createMiddleware({ type: "function" 
       session_id: "preview",
       preview: true,
     };
-    return next({ context: { supabase: supabaseAdmin, userId, claims } });
+    return next({ context: { supabase: supabaseAdmin as any, userId, claims } });
   },
 );
