@@ -1,7 +1,7 @@
 // Palaute- ja mittausjärjestelmän server-funktiot.
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
-import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { requirePreviewOrSupabaseAuth as requireSupabaseAuth } from "@/lib/preview-auth";
 
 // ----- Tyypit -----
 export type KyselyTyyppi =
