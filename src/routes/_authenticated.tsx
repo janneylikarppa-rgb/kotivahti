@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { getCachedSession, getReadySession, subscribeToSession } from "@/lib/auth-session";
-import { AUTH_BYPASS_ENABLED } from "@/lib/preview-auth";
+import { AUTH_BYPASS_ENABLED } from "@/lib/preview-flag";
 import { SidebarProvider, SidebarTrigger, SidebarInset } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/app-sidebar";
 import { PropertySwitcher } from "@/components/property-switcher";

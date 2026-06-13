@@ -3,8 +3,6 @@ import { getRequest } from "@tanstack/react-start/server";
 import { createClient } from "@supabase/supabase-js";
 import type { Database } from "@/integrations/supabase/types";
 
-export const AUTH_BYPASS_ENABLED = import.meta.env.DEV;
-
 async function getPreviewUserId(supabase: any) {
   const { data: kiinteisto } = await supabase
     .from("kiinteistot")
