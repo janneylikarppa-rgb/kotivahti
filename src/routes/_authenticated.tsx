@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { getCachedSession, getReadySession, subscribeToSession } from "@/lib/auth-session";
+import { AUTH_BYPASS_ENABLED } from "@/lib/preview-auth";
 import { SidebarProvider, SidebarTrigger, SidebarInset } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/app-sidebar";
 import { PropertySwitcher } from "@/components/property-switcher";
@@ -14,6 +15,7 @@ import { paivitaKirjautuminen } from "@/lib/palaute.functions";
 export const Route = createFileRoute("/_authenticated")({
   beforeLoad: async ({ location }) => {
     if (typeof window === "undefined") return;
+    if (AUTH_BYPASS_ENABLED) return;
     const session = await getReadySession();
     if (!session) {
       throw redirect({ to: "/login", search: { redirect: location.href } });
@@ -27,6 +29,7 @@ function AuthenticatedLayout() {
   const [session, setSession] = useState(() => getCachedSession());
 
   useEffect(() => {
+    if (AUTH_BYPASS_ENABLED) return;
     const unsubscribe = subscribeToSession(setSession);
     getReadySession().then((nextSession) => {
       setSession(nextSession);
@@ -42,7 +45,7 @@ function AuthenticatedLayout() {
     return unsubscribe;
   }, [navigate]);
 
-  if (!session) {
+  if (!session && !AUTH_BYPASS_ENABLED) {
     return <div className="min-h-screen bg-background" />;
   }
 
