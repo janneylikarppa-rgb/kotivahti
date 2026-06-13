@@ -1,6 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
-import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { requirePreviewOrSupabaseAuth as requireSupabaseAuth } from "@/lib/preview-auth";
 import { LIIDI_KATEGORIAT } from "@/lib/liidit-kategoriat";
 import { omistajanIlmoitus, lahetaEmail } from "@/lib/email.server";
 import { paateleMaakunta, MAAKUNNAT } from "@/lib/maakunnat";

@@ -1,6 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
-import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { requirePreviewOrSupabaseAuth as requireSupabaseAuth } from "@/lib/preview-auth";
 import { PTS_KOHTEET, ptsKohdeAvaimella, paatteleKohdeAvain, laskeKiireellisyys } from "./pts-kohteet";
 import { rakennaTaloPatch, tukeeLaitePaivitysta } from "./laite-paivitys";
 

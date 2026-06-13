@@ -87,7 +87,7 @@ export function PropertySwitcher() {
 
   const kiinteistot = data?.kiinteistot ?? [];
   const valittuId = data?.valittuId ?? null;
-  const valittu = kiinteistot.find((k) => k.id === valittuId) ?? kiinteistot[0];
+  const valittu = kiinteistot.find((k: any) => k.id === valittuId) ?? kiinteistot[0];
 
   return (
     <>
@@ -107,7 +107,7 @@ export function PropertySwitcher() {
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="w-64">
           <DropdownMenuLabel className="eyebrow">Kiinteistöt</DropdownMenuLabel>
-          {kiinteistot.map((k) => (
+          {kiinteistot.map((k: any) => (
             <DropdownMenuItem
               key={k.id}
               onClick={() => k.id !== valittuId && vaihdaMut.mutate(k.id)}

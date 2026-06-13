@@ -1,0 +1,1 @@
+export const AUTH_BYPASS_ENABLED = import.meta.env.DEV || process.env.NODE_ENV !== "production";
