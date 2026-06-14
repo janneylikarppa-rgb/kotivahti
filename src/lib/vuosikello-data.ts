@@ -56,7 +56,6 @@ export const PERUSHUOLLOT: Record<Kausi, HuoltoRivi[]> = {
   ],
   talvi: [
     f("Katon lumikuorman seuranta"),
-    f("Jääpuikkojen poisto räystäiltä"),
     f("Putkien jäätymisriskin seuranta"),
     f("IV-suodattimien tarkastus"),
     f("Lumikinosten poisto seiniltä ja poistumisteiltä"),
