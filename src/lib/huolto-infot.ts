@@ -65,8 +65,8 @@ const SAANTOJA: { avain: RegExp; info: HuoltoInfo }[] = [
     avain: /rästäs|räyst|kourujen tyhj|kourujen puhdist|syöksy/,
     info: {
       miksi: "Tukkeutuneet kourut ja syöksyt ohjaavat sadeveden seinärakenteisiin ja perustuksiin. Tämä on yksi yleisimmistä kosteusvaurioiden syistä.",
-      miten: "Käytä tukevia tikkaita ja varovaisuutta. Poista lehdet, neulaset ja muu liete kouruista käsin tai pienellä lapiolla. Huuhtele lopuksi vedellä – veden pitää virrata vapaasti syöksytorvesta ulos.",
-      milloinAmmattilainen: "Korkeissa tai monikerroksisissa taloissa kannattaa tilata ammattilainen turvallisuussyistä.",
+      miten: "Käytä tukevia tikkaita ja varovaisuutta. Poista lehdet, neulaset ja muu liete kouruista työhön tarkoitetuilla välineillä. Huuhtele lopuksi vedellä – veden pitää virrata vapaasti syöksytorvesta ulos.",
+      milloinAmmattilainen: "Ammattilainen tekee työn turvallisesti ja puhdistukseen tarkoitetuilla välineillä yleensä suoraan maasta käsin. Työ on nopea toimenpide, joten mikäli et ole varma mitä teet niin ammattilaisen apu on hyvä vaihtoehto.",
     },
   },
   {
@@ -105,9 +105,9 @@ const SAANTOJA: { avain: RegExp; info: HuoltoInfo }[] = [
   {
     avain: /katto.*tarkast|peltikat|huopakat|tarkasta katto/,
     info: {
-      miksi: "Lumi, jää ja tuuli aiheuttavat vuosittain vahinkoja kattomateriaaleihin. Pienet viat huomataan helposti, jos katto tarkastetaan säännöllisesti.",
-      miten: "Tarkista kiikareilla maasta: irronneet pellit/tiilet, ruoste, halkeamat tai sammalkasvustot. Tarkista myös läpiviennit ja jiirit.",
-      milloinAmmattilainen: "Jyrkkä tai liukas katto on aina ammattilaisen työ – turvallisuussyistä ja vakuutusehtojen takia.",
+      miksi: "Olosuhteet ja ikä aiheuttavat vuosittain vahinkoja kattomateriaaleihin. Pienet viat huomataan helposti, jos katto tarkastetaan säännöllisesti.",
+      miten: "Tarkista: irronneet pellit/tiilet, ruoste, halkeamat tai sammalkasvustot. Tarkista myös läpiviennit ja yläpohja mahdollisten vuotojen varalta.",
+      milloinAmmattilainen: "Jyrkkä tai liukas katto on aina ammattilaisen työ – yleisesti on suositeltavaa antaa ammattilaisen tarkastaa katto ja siihen liittyvät rakenteet. Tarkastuksessa saat selkeän kuvan kattosi tilanteesta.",
     },
   },
   {
@@ -147,6 +147,7 @@ const SAANTOJA: { avain: RegExp; info: HuoltoInfo }[] = [
     info: {
       miksi: "Vanhentuneet tiivisteet päästävät vetoa ja nostavat lämmityskustannuksia. Niiden vaihto on pieni mutta tuntuva energiansäästötoimi.",
       miten: "Tarkasta tiivisteet kosketuksella: kovettuneet, halkeilleet tai litistyneet tiivisteet vaihdetaan. Vaihtotiivisteet löytyvät rautakaupasta.",
+      milloinAmmattilainen: "Ammattilainen tarkastaa ja arvioi ikkunoiden ja ovien kunnon, saat selkeän kuvan kunnosta ja huoltotarpeesta.",
       vinkki: "Tarkasta erityisesti pohjoispuolen ja merituulen puoleiset ikkunat.",
     },
   },
