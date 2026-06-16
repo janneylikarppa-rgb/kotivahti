@@ -1,32 +1,40 @@
-# Korjaus: kirjautuminen ei toimi puhelimella
+# Talon tiedot omaksi (muokattavaksi) osioksi liidi-dialogiin
 
-## Oire
-Puhelimella "Jatka Googlella" käy Google-vahvistuksen ja palaa sovellukseen, mutta käyttäjä päätyy aina etusivulle eikä pääse sisään. Työpöydällä toimii.
+## Tavoite
+Tilaa palvelu -dialogiin lisätään kuvauksen yläpuolelle oma "Talon tiedot" -kenttä, joka esitäytetään valitun kategorian tiedoilla talovahdista. Käyttäjä voi myös muokata tietoja käsin ennen lähetystä. Kuvaus-kenttä on puhtaasti käyttäjän vapaa pyyntö siitä, mitä hän haluaa tai tarvitsee.
 
-## Juurisyy
-`src/routes/login.tsx` ja `src/routes/rekisteroidy.tsx` käyttävät:
-```ts
-lovable.auth.signInWithOAuth("google", { redirect_uri: window.location.origin })
-```
-- Työpöydällä broker palauttaa tokenit suoraan saman sivun JS-koodille (lovable-moduuli on jo ladattu /login-sivulla) → sessio asetetaan, `navigate({ to: "/dashboard" })` ajetaan.
-- Mobiilissa kulku menee full-page redirectillä takaisin `redirect_uri`:iin eli `/`. Etusivu ei importoi `@/integrations/lovable`-moduulia, joten broker ei käsittele URL:n tokeneita → sessio jää syntymättä → `beforeLoad` ei ohjaa dashboardille, käyttäjä näkee landingin.
+## Muutos: `src/components/liidi-dialog.tsx`
 
-## Korjaus
-Ohjataan callback aina sellaiselle reitille, joka lataa lovable-moduulin ja jonka `beforeLoad` osaa siirtää sisäänkirjautuneen käyttäjän eteenpäin.
+### 1) Uusi "Talon tiedot" -kenttä (kuvauksen yläpuolelle)
+- Uusi state `talonTiedot` + lippu `talonTiedotMuokattu`.
+- `useEffect` täyttää `talonTiedot` arvolla `rakennaKuvausPohja(kategoria, valittuKt?.talon_tiedot)` aina kun kategoria tai kiinteistö vaihtuu — mutta vain jos käyttäjä ei ole vielä muokannut kenttää (`talonTiedotMuokattu === false`).
+- Renderöidään `Textarea` (rows=3, maxLength 2000), label "Talon tiedot (kategorian mukaan)", apuviesti: "Esitäytetty talovahdistasi — voit muokata vapaasti."
+- `onChange` asettaa lipun true, jotta automaattinen päivitys ei ylikirjoita.
+- Kun dialog suljetaan, lippu nollautuu (yhdessä muiden olemassa olevien resettien kanssa).
+- Jos talovahdissa ei ole kategorian tietoja, kenttä jää tyhjäksi ja placeholder ohjaa: "Lisää tai täydennä talon tietoja /talon-tiedot -sivulla."
 
-### Muutos 1 — `src/routes/login.tsx` `handleGoogle`
-```ts
-redirect_uri: `${window.location.origin}/login`
-```
-Login-sivun `beforeLoad` tarkistaa session ja heittää `redirect({ to: search.redirect || "/dashboard" })`, joten sisäänkirjautunut käyttäjä siirtyy automaattisesti dashboardille (tai alkuperäiselle suojatulle reitille).
+### 2) Kuvaus-kenttä → puhtaasti käyttäjän syöte
+- Poistetaan nykyinen automaatti, joka täyttää kuvauksen `rakennaKuvausPohja`-tekstillä, sekä `kuvausMuokattu`-lippu.
+- Alkuarvo: `esitaytetty?.kuvaus ?? ""` (vuosikellon "ydin", esim. "Nuohouksen tilaus", säilyy alkuvinkkinä; muutoin tyhjä).
+- Placeholder: "Kerro mitä haluat tai tarvitset".
 
-### Muutos 2 — `src/routes/rekisteroidy.tsx` Google-painike
-Sama korjaus: `redirect_uri: ${window.location.origin}/login`.
+### 3) Lähetettävä `kuvaus`
+- Yhdistetään lähetyksessä:
+  ```
+  [talonTiedot, käyttäjän kuvaus]
+    .map(s => s?.trim())
+    .filter(Boolean)
+    .join("\n\n— Asiakkaan pyyntö —\n")
+  ```
+- Jos kumpikaan ei ole tyhjä, käytetään yhdistettyä tekstiä; jos molemmat tyhjät → `null`.
+- Backend, admin-näkymä ja sähköpostit pysyvät ennallaan, koska data kulkee yhden `kuvaus`-kentän kautta.
+
+## Mitä EI muuteta
+- `liidi-kuvauspohja.ts`, server-funktiot, tietokantarakenne, admin-näkymä tai vuosikello.
+- Muut dialogin kentät (palvelu, kategoria, yhteystiedot, kiinteistö) ennallaan.
 
 ## Tarkistus
-1. Avaa preview puhelimella, paina "Jatka Googlella" → palaa `/login`-osoitteeseen, joka ohjaa dashboardille.
-2. Työpöydällä toiminta ennallaan (pop-up flow toimii edelleen, koska se ei käytä redirect_uri:a samalla tavalla).
-3. Tarkista että `auth_logs` näyttää onnistuneen kirjautumisen ja että dashboard latautuu mobiilissa.
-
-## Pieni huomio
-Konsolissa näkyy myös hydration mismatch `__gcrremoteframetoken` — tulee Google-selainlaajennuksesta (Chrome Remote Frame), ei sovelluskoodista. Ei vaadi korjausta.
+1. Vuosikellon "Tilaa palvelu" → talon tiedot -kenttä esitäytyy, kuvaus näyttää vuosikellon ytimen (esim. "Nuohouksen tilaus").
+2. Kategorian tai kiinteistön vaihto päivittää talon tiedot -kentän — mutta vain jos käyttäjä ei ole muokannut sitä.
+3. Käyttäjä muokkaa talon tietoja → muokkaukset säilyvät, vaikka kategoriaa vaihtaa.
+4. Lähetys: admin näkee sekä esitäytetyt/muokatut tiedot että käyttäjän pyynnön erotettuna otsikolla "— Asiakkaan pyyntö —".
