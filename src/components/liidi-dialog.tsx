@@ -130,11 +130,16 @@ export function LiidiDialog({ open, onOpenChange, esitaytetty }: LiidiDialogProp
       toast.error("Valitse kiinteistö");
       return;
     }
+    const tt = talonTiedot.trim();
+    const ku = kuvaus.trim();
+    const yhdistetty = [tt, ku ? `— Asiakkaan pyyntö —\n${ku}` : ""]
+      .filter(Boolean)
+      .join("\n\n");
     mut.mutate({
       kiinteisto_id: kiinteistoId,
       palvelu,
       kategoria,
-      kuvaus: kuvaus.trim() || null,
+      kuvaus: yhdistetty || null,
       nimi: nimi.trim(),
       puhelin: puhelin.trim(),
       sahkoposti: sahkoposti.trim(),
