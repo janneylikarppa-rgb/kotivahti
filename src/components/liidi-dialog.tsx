@@ -190,13 +190,27 @@ export function LiidiDialog({ open, onOpenChange, esitaytetty }: LiidiDialogProp
           </div>
 
           <div className="space-y-2">
+            <Label>Talon tiedot (kategorian mukaan)</Label>
+            <Textarea
+              value={talonTiedot}
+              onChange={(e) => { setTalonTiedot(e.target.value); setTalonTiedotMuokattu(true); }}
+              rows={3}
+              maxLength={2000}
+              placeholder="Esitäytetään talovahdistasi — voit muokata vapaasti. Täydennä talon tietoja sivulla /talon-tiedot."
+            />
+            <p className="text-[11px] text-muted-foreground">
+              Esitäytetty talovahdistasi — voit muokata vapaasti.
+            </p>
+          </div>
+
+          <div className="space-y-2">
             <Label>Kuvaus</Label>
             <Textarea
               value={kuvaus}
-              onChange={(e) => { setKuvaus(e.target.value); setKuvausMuokattu(true); }}
+              onChange={(e) => setKuvaus(e.target.value)}
               rows={3}
               maxLength={2000}
-              placeholder="Kerro lyhyesti mitä haluat (vapaaehtoinen)"
+              placeholder="Kerro mitä haluat tai tarvitset"
             />
           </div>
 
