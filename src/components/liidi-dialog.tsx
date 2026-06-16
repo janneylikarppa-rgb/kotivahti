@@ -46,7 +46,8 @@ export function LiidiDialog({ open, onOpenChange, esitaytetty }: LiidiDialogProp
   const [kategoria, setKategoria] = useState<LiidiKategoria>(esitaytetty?.kategoria ?? "Muu / yleinen");
   const [alkuKategoria, setAlkuKategoria] = useState<LiidiKategoria | null>(esitaytetty?.kategoria ?? null);
   const [kuvaus, setKuvaus] = useState(esitaytetty?.kuvaus ?? "");
-  const [kuvausMuokattu, setKuvausMuokattu] = useState(false);
+  const [talonTiedot, setTalonTiedot] = useState("");
+  const [talonTiedotMuokattu, setTalonTiedotMuokattu] = useState(false);
   const [nimi, setNimi] = useState("");
   const [puhelin, setPuhelin] = useState("");
   const [sahkoposti, setSahkoposti] = useState("");
@@ -69,15 +70,14 @@ export function LiidiDialog({ open, onOpenChange, esitaytetty }: LiidiDialogProp
     } else {
       setAlkuKategoria(null);
     }
-    if (esitaytetty?.kuvaus) {
-      setKuvaus(esitaytetty.kuvaus);
-      setKuvausMuokattu(false);
+    if (esitaytetty?.kuvaus !== undefined) {
+      setKuvaus(esitaytetty.kuvaus ?? "");
     }
   }, [open, esitaytetty?.palvelu, esitaytetty?.kategoria, esitaytetty?.kuvaus]);
 
-  // Nollaa muokkauslippu kun dialog suljetaan
+  // Nollaa talon tietojen muokkauslippu kun dialog suljetaan
   useEffect(() => {
-    if (!open) setKuvausMuokattu(false);
+    if (!open) setTalonTiedotMuokattu(false);
   }, [open]);
 
   const valittuKt: any = useMemo(
@@ -85,21 +85,13 @@ export function LiidiDialog({ open, onOpenChange, esitaytetty }: LiidiDialogProp
     [data, kiinteistoId],
   );
 
-  // Päivitä kuvaus automaattisesti kategoria + talon_tiedot perusteella,
+  // Esitäytä talon tiedot -kenttä kategorian + kiinteistön perusteella,
   // jos käyttäjä ei ole muokannut kenttää käsin.
   useEffect(() => {
-    if (!open || kuvausMuokattu) return;
+    if (!open || talonTiedotMuokattu) return;
     const pohja = rakennaKuvausPohja(kategoria, valittuKt?.talon_tiedot ?? null);
-    // Vuosikellon ydin (esim. "Nuohouksen tilaus") koskee vain alkuperäistä
-    // kategoriaa. Jos käyttäjä vaihtaa kategorian, pudotetaan ydin ja
-    // käytetään pelkkää kategoriakohtaista pohjaa.
-    const ydin =
-      alkuKategoria && kategoria === alkuKategoria
-        ? esitaytetty?.kuvaus?.trim()
-        : undefined;
-    const uusi = ydin && pohja ? `${ydin}. ${pohja}` : (ydin ?? pohja ?? "");
-    setKuvaus(uusi);
-  }, [open, kategoria, valittuKt, kuvausMuokattu, esitaytetty?.kuvaus, alkuKategoria]);
+    setTalonTiedot(pohja ?? "");
+  }, [open, kategoria, valittuKt, talonTiedotMuokattu]);
 
   const mut = useMutation({
     mutationFn: (v: any) => luoFn({ data: v }),
@@ -138,11 +130,16 @@ export function LiidiDialog({ open, onOpenChange, esitaytetty }: LiidiDialogProp
       toast.error("Valitse kiinteistö");
       return;
     }
+    const tt = talonTiedot.trim();
+    const ku = kuvaus.trim();
+    const yhdistetty = [tt, ku ? `— Asiakkaan pyyntö —\n${ku}` : ""]
+      .filter(Boolean)
+      .join("\n\n");
     mut.mutate({
       kiinteisto_id: kiinteistoId,
       palvelu,
       kategoria,
-      kuvaus: kuvaus.trim() || null,
+      kuvaus: yhdistetty || null,
       nimi: nimi.trim(),
       puhelin: puhelin.trim(),
       sahkoposti: sahkoposti.trim(),
@@ -193,13 +190,27 @@ export function LiidiDialog({ open, onOpenChange, esitaytetty }: LiidiDialogProp
           </div>
 
           <div className="space-y-2">
+            <Label>Talon tiedot (kategorian mukaan)</Label>
+            <Textarea
+              value={talonTiedot}
+              onChange={(e) => { setTalonTiedot(e.target.value); setTalonTiedotMuokattu(true); }}
+              rows={3}
+              maxLength={2000}
+              placeholder="Esitäytetään talovahdistasi — voit muokata vapaasti. Täydennä talon tietoja sivulla /talon-tiedot."
+            />
+            <p className="text-[11px] text-muted-foreground">
+              Esitäytetty talovahdistasi — voit muokata vapaasti.
+            </p>
+          </div>
+
+          <div className="space-y-2">
             <Label>Kuvaus</Label>
             <Textarea
               value={kuvaus}
-              onChange={(e) => { setKuvaus(e.target.value); setKuvausMuokattu(true); }}
+              onChange={(e) => setKuvaus(e.target.value)}
               rows={3}
               maxLength={2000}
-              placeholder="Kerro lyhyesti mitä haluat (vapaaehtoinen)"
+              placeholder="Kerro mitä haluat tai tarvitset"
             />
           </div>
 
