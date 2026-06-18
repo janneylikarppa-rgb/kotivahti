@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as VaihdaSalasanaRouteImport } from './routes/vaihda-salasana'
 import { Route as UnohtunutSalasanaRouteImport } from './routes/unohtunut-salasana'
+import { Route as UkkRouteImport } from './routes/ukk'
 import { Route as TietosuojaRouteImport } from './routes/tietosuoja'
 import { Route as RekisteroidyRouteImport } from './routes/rekisteroidy'
 import { Route as PalauteRouteImport } from './routes/palaute'
@@ -38,6 +39,11 @@ const VaihdaSalasanaRoute = VaihdaSalasanaRouteImport.update({
 const UnohtunutSalasanaRoute = UnohtunutSalasanaRouteImport.update({
   id: '/unohtunut-salasana',
   path: '/unohtunut-salasana',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const UkkRoute = UkkRouteImport.update({
+  id: '/ukk',
+  path: '/ukk',
   getParentRoute: () => rootRouteImport,
 } as any)
 const TietosuojaRoute = TietosuojaRouteImport.update({
@@ -141,6 +147,7 @@ export interface FileRoutesByFullPath {
   '/palaute': typeof PalauteRoute
   '/rekisteroidy': typeof RekisteroidyRoute
   '/tietosuoja': typeof TietosuojaRoute
+  '/ukk': typeof UkkRoute
   '/unohtunut-salasana': typeof UnohtunutSalasanaRoute
   '/vaihda-salasana': typeof VaihdaSalasanaRoute
   '/admin': typeof AuthenticatedAdminRoute
@@ -162,6 +169,7 @@ export interface FileRoutesByTo {
   '/palaute': typeof PalauteRoute
   '/rekisteroidy': typeof RekisteroidyRoute
   '/tietosuoja': typeof TietosuojaRoute
+  '/ukk': typeof UkkRoute
   '/unohtunut-salasana': typeof UnohtunutSalasanaRoute
   '/vaihda-salasana': typeof VaihdaSalasanaRoute
   '/admin': typeof AuthenticatedAdminRoute
@@ -185,6 +193,7 @@ export interface FileRoutesById {
   '/palaute': typeof PalauteRoute
   '/rekisteroidy': typeof RekisteroidyRoute
   '/tietosuoja': typeof TietosuojaRoute
+  '/ukk': typeof UkkRoute
   '/unohtunut-salasana': typeof UnohtunutSalasanaRoute
   '/vaihda-salasana': typeof VaihdaSalasanaRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRoute
@@ -208,6 +217,7 @@ export interface FileRouteTypes {
     | '/palaute'
     | '/rekisteroidy'
     | '/tietosuoja'
+    | '/ukk'
     | '/unohtunut-salasana'
     | '/vaihda-salasana'
     | '/admin'
@@ -229,6 +239,7 @@ export interface FileRouteTypes {
     | '/palaute'
     | '/rekisteroidy'
     | '/tietosuoja'
+    | '/ukk'
     | '/unohtunut-salasana'
     | '/vaihda-salasana'
     | '/admin'
@@ -251,6 +262,7 @@ export interface FileRouteTypes {
     | '/palaute'
     | '/rekisteroidy'
     | '/tietosuoja'
+    | '/ukk'
     | '/unohtunut-salasana'
     | '/vaihda-salasana'
     | '/_authenticated/admin'
@@ -274,6 +286,7 @@ export interface RootRouteChildren {
   PalauteRoute: typeof PalauteRoute
   RekisteroidyRoute: typeof RekisteroidyRoute
   TietosuojaRoute: typeof TietosuojaRoute
+  UkkRoute: typeof UkkRoute
   UnohtunutSalasanaRoute: typeof UnohtunutSalasanaRoute
   VaihdaSalasanaRoute: typeof VaihdaSalasanaRoute
   ApiPublicPalauteRoute: typeof ApiPublicPalauteRoute
@@ -295,6 +308,13 @@ declare module '@tanstack/react-router' {
       path: '/unohtunut-salasana'
       fullPath: '/unohtunut-salasana'
       preLoaderRoute: typeof UnohtunutSalasanaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/ukk': {
+      id: '/ukk'
+      path: '/ukk'
+      fullPath: '/ukk'
+      preLoaderRoute: typeof UkkRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/tietosuoja': {
@@ -460,6 +480,7 @@ const rootRouteChildren: RootRouteChildren = {
   PalauteRoute: PalauteRoute,
   RekisteroidyRoute: RekisteroidyRoute,
   TietosuojaRoute: TietosuojaRoute,
+  UkkRoute: UkkRoute,
   UnohtunutSalasanaRoute: UnohtunutSalasanaRoute,
   VaihdaSalasanaRoute: VaihdaSalasanaRoute,
   ApiPublicPalauteRoute: ApiPublicPalauteRoute,
