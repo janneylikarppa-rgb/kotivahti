@@ -13,6 +13,7 @@ import { Route as VaihdaSalasanaRouteImport } from './routes/vaihda-salasana'
 import { Route as UnohtunutSalasanaRouteImport } from './routes/unohtunut-salasana'
 import { Route as UkkRouteImport } from './routes/ukk'
 import { Route as TietosuojaRouteImport } from './routes/tietosuoja'
+import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as RekisteroidyRouteImport } from './routes/rekisteroidy'
 import { Route as PalauteRouteImport } from './routes/palaute'
 import { Route as LoginRouteImport } from './routes/login'
@@ -53,6 +54,11 @@ const UkkRoute = UkkRouteImport.update({
 const TietosuojaRoute = TietosuojaRouteImport.update({
   id: '/tietosuoja',
   path: '/tietosuoja',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
+  id: '/sitemap.xml',
+  path: '/sitemap.xml',
   getParentRoute: () => rootRouteImport,
 } as any)
 const RekisteroidyRoute = RekisteroidyRouteImport.update({
@@ -170,6 +176,7 @@ export interface FileRoutesByFullPath {
   '/login': typeof LoginRoute
   '/palaute': typeof PalauteRoute
   '/rekisteroidy': typeof RekisteroidyRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/tietosuoja': typeof TietosuojaRoute
   '/ukk': typeof UkkRoute
   '/unohtunut-salasana': typeof UnohtunutSalasanaRoute
@@ -196,6 +203,7 @@ export interface FileRoutesByTo {
   '/login': typeof LoginRoute
   '/palaute': typeof PalauteRoute
   '/rekisteroidy': typeof RekisteroidyRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/tietosuoja': typeof TietosuojaRoute
   '/ukk': typeof UkkRoute
   '/unohtunut-salasana': typeof UnohtunutSalasanaRoute
@@ -224,6 +232,7 @@ export interface FileRoutesById {
   '/login': typeof LoginRoute
   '/palaute': typeof PalauteRoute
   '/rekisteroidy': typeof RekisteroidyRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/tietosuoja': typeof TietosuojaRoute
   '/ukk': typeof UkkRoute
   '/unohtunut-salasana': typeof UnohtunutSalasanaRoute
@@ -252,6 +261,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/palaute'
     | '/rekisteroidy'
+    | '/sitemap.xml'
     | '/tietosuoja'
     | '/ukk'
     | '/unohtunut-salasana'
@@ -278,6 +288,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/palaute'
     | '/rekisteroidy'
+    | '/sitemap.xml'
     | '/tietosuoja'
     | '/ukk'
     | '/unohtunut-salasana'
@@ -305,6 +316,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/palaute'
     | '/rekisteroidy'
+    | '/sitemap.xml'
     | '/tietosuoja'
     | '/ukk'
     | '/unohtunut-salasana'
@@ -333,6 +345,7 @@ export interface RootRouteChildren {
   LoginRoute: typeof LoginRoute
   PalauteRoute: typeof PalauteRoute
   RekisteroidyRoute: typeof RekisteroidyRoute
+  SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   TietosuojaRoute: typeof TietosuojaRoute
   UkkRoute: typeof UkkRoute
   UnohtunutSalasanaRoute: typeof UnohtunutSalasanaRoute
@@ -374,6 +387,13 @@ declare module '@tanstack/react-router' {
       path: '/tietosuoja'
       fullPath: '/tietosuoja'
       preLoaderRoute: typeof TietosuojaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sitemap.xml': {
+      id: '/sitemap.xml'
+      path: '/sitemap.xml'
+      fullPath: '/sitemap.xml'
+      preLoaderRoute: typeof SitemapDotxmlRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/rekisteroidy': {
@@ -559,6 +579,7 @@ const rootRouteChildren: RootRouteChildren = {
   LoginRoute: LoginRoute,
   PalauteRoute: PalauteRoute,
   RekisteroidyRoute: RekisteroidyRoute,
+  SitemapDotxmlRoute: SitemapDotxmlRoute,
   TietosuojaRoute: TietosuojaRoute,
   UkkRoute: UkkRoute,
   UnohtunutSalasanaRoute: UnohtunutSalasanaRoute,
