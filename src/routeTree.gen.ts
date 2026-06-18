@@ -21,6 +21,7 @@ import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as OpasIndexRouteImport } from './routes/opas/index'
 import { Route as OpasNuohousHintaRouteImport } from './routes/opas/nuohous-hinta'
+import { Route as OpasKatonTarkastusRouteImport } from './routes/opas/katon-tarkastus'
 import { Route as OpasIvPuhdistusRouteImport } from './routes/opas/iv-puhdistus'
 import { Route as AuthenticatedVuosikelloRouteImport } from './routes/_authenticated/vuosikello'
 import { Route as AuthenticatedTalonTiedotRouteImport } from './routes/_authenticated/talon-tiedot'
@@ -91,6 +92,11 @@ const OpasIndexRoute = OpasIndexRouteImport.update({
 const OpasNuohousHintaRoute = OpasNuohousHintaRouteImport.update({
   id: '/opas/nuohous-hinta',
   path: '/opas/nuohous-hinta',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const OpasKatonTarkastusRoute = OpasKatonTarkastusRouteImport.update({
+  id: '/opas/katon-tarkastus',
+  path: '/opas/katon-tarkastus',
   getParentRoute: () => rootRouteImport,
 } as any)
 const OpasIvPuhdistusRoute = OpasIvPuhdistusRouteImport.update({
@@ -177,6 +183,7 @@ export interface FileRoutesByFullPath {
   '/talon-tiedot': typeof AuthenticatedTalonTiedotRoute
   '/vuosikello': typeof AuthenticatedVuosikelloRoute
   '/opas/iv-puhdistus': typeof OpasIvPuhdistusRoute
+  '/opas/katon-tarkastus': typeof OpasKatonTarkastusRoute
   '/opas/nuohous-hinta': typeof OpasNuohousHintaRoute
   '/opas/': typeof OpasIndexRoute
   '/api/public/palaute': typeof ApiPublicPalauteRoute
@@ -202,6 +209,7 @@ export interface FileRoutesByTo {
   '/talon-tiedot': typeof AuthenticatedTalonTiedotRoute
   '/vuosikello': typeof AuthenticatedVuosikelloRoute
   '/opas/iv-puhdistus': typeof OpasIvPuhdistusRoute
+  '/opas/katon-tarkastus': typeof OpasKatonTarkastusRoute
   '/opas/nuohous-hinta': typeof OpasNuohousHintaRoute
   '/opas': typeof OpasIndexRoute
   '/api/public/palaute': typeof ApiPublicPalauteRoute
@@ -229,6 +237,7 @@ export interface FileRoutesById {
   '/_authenticated/talon-tiedot': typeof AuthenticatedTalonTiedotRoute
   '/_authenticated/vuosikello': typeof AuthenticatedVuosikelloRoute
   '/opas/iv-puhdistus': typeof OpasIvPuhdistusRoute
+  '/opas/katon-tarkastus': typeof OpasKatonTarkastusRoute
   '/opas/nuohous-hinta': typeof OpasNuohousHintaRoute
   '/opas/': typeof OpasIndexRoute
   '/api/public/palaute': typeof ApiPublicPalauteRoute
@@ -256,6 +265,7 @@ export interface FileRouteTypes {
     | '/talon-tiedot'
     | '/vuosikello'
     | '/opas/iv-puhdistus'
+    | '/opas/katon-tarkastus'
     | '/opas/nuohous-hinta'
     | '/opas/'
     | '/api/public/palaute'
@@ -281,6 +291,7 @@ export interface FileRouteTypes {
     | '/talon-tiedot'
     | '/vuosikello'
     | '/opas/iv-puhdistus'
+    | '/opas/katon-tarkastus'
     | '/opas/nuohous-hinta'
     | '/opas'
     | '/api/public/palaute'
@@ -307,6 +318,7 @@ export interface FileRouteTypes {
     | '/_authenticated/talon-tiedot'
     | '/_authenticated/vuosikello'
     | '/opas/iv-puhdistus'
+    | '/opas/katon-tarkastus'
     | '/opas/nuohous-hinta'
     | '/opas/'
     | '/api/public/palaute'
@@ -326,6 +338,7 @@ export interface RootRouteChildren {
   UnohtunutSalasanaRoute: typeof UnohtunutSalasanaRoute
   VaihdaSalasanaRoute: typeof VaihdaSalasanaRoute
   OpasIvPuhdistusRoute: typeof OpasIvPuhdistusRoute
+  OpasKatonTarkastusRoute: typeof OpasKatonTarkastusRoute
   OpasNuohousHintaRoute: typeof OpasNuohousHintaRoute
   OpasIndexRoute: typeof OpasIndexRoute
   ApiPublicPalauteRoute: typeof ApiPublicPalauteRoute
@@ -417,6 +430,13 @@ declare module '@tanstack/react-router' {
       path: '/opas/nuohous-hinta'
       fullPath: '/opas/nuohous-hinta'
       preLoaderRoute: typeof OpasNuohousHintaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/opas/katon-tarkastus': {
+      id: '/opas/katon-tarkastus'
+      path: '/opas/katon-tarkastus'
+      fullPath: '/opas/katon-tarkastus'
+      preLoaderRoute: typeof OpasKatonTarkastusRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/opas/iv-puhdistus': {
@@ -544,6 +564,7 @@ const rootRouteChildren: RootRouteChildren = {
   UnohtunutSalasanaRoute: UnohtunutSalasanaRoute,
   VaihdaSalasanaRoute: VaihdaSalasanaRoute,
   OpasIvPuhdistusRoute: OpasIvPuhdistusRoute,
+  OpasKatonTarkastusRoute: OpasKatonTarkastusRoute,
   OpasNuohousHintaRoute: OpasNuohousHintaRoute,
   OpasIndexRoute: OpasIndexRoute,
   ApiPublicPalauteRoute: ApiPublicPalauteRoute,
