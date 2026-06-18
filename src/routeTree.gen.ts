@@ -20,6 +20,7 @@ import { Route as KayttoehdotRouteImport } from './routes/kayttoehdot'
 import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as OpasIndexRouteImport } from './routes/opas/index'
+import { Route as OpasNuohousHintaRouteImport } from './routes/opas/nuohous-hinta'
 import { Route as AuthenticatedVuosikelloRouteImport } from './routes/_authenticated/vuosikello'
 import { Route as AuthenticatedTalonTiedotRouteImport } from './routes/_authenticated/talon-tiedot'
 import { Route as AuthenticatedPyynnotRouteImport } from './routes/_authenticated/pyynnot'
@@ -84,6 +85,11 @@ const IndexRoute = IndexRouteImport.update({
 const OpasIndexRoute = OpasIndexRouteImport.update({
   id: '/opas/',
   path: '/opas/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const OpasNuohousHintaRoute = OpasNuohousHintaRouteImport.update({
+  id: '/opas/nuohous-hinta',
+  path: '/opas/nuohous-hinta',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedVuosikelloRoute = AuthenticatedVuosikelloRouteImport.update({
@@ -164,6 +170,7 @@ export interface FileRoutesByFullPath {
   '/pyynnot': typeof AuthenticatedPyynnotRoute
   '/talon-tiedot': typeof AuthenticatedTalonTiedotRoute
   '/vuosikello': typeof AuthenticatedVuosikelloRoute
+  '/opas/nuohous-hinta': typeof OpasNuohousHintaRoute
   '/opas/': typeof OpasIndexRoute
   '/api/public/palaute': typeof ApiPublicPalauteRoute
   '/api/public/hooks/laheta-kausikirje': typeof ApiPublicHooksLahetaKausikirjeRoute
@@ -187,6 +194,7 @@ export interface FileRoutesByTo {
   '/pyynnot': typeof AuthenticatedPyynnotRoute
   '/talon-tiedot': typeof AuthenticatedTalonTiedotRoute
   '/vuosikello': typeof AuthenticatedVuosikelloRoute
+  '/opas/nuohous-hinta': typeof OpasNuohousHintaRoute
   '/opas': typeof OpasIndexRoute
   '/api/public/palaute': typeof ApiPublicPalauteRoute
   '/api/public/hooks/laheta-kausikirje': typeof ApiPublicHooksLahetaKausikirjeRoute
@@ -212,6 +220,7 @@ export interface FileRoutesById {
   '/_authenticated/pyynnot': typeof AuthenticatedPyynnotRoute
   '/_authenticated/talon-tiedot': typeof AuthenticatedTalonTiedotRoute
   '/_authenticated/vuosikello': typeof AuthenticatedVuosikelloRoute
+  '/opas/nuohous-hinta': typeof OpasNuohousHintaRoute
   '/opas/': typeof OpasIndexRoute
   '/api/public/palaute': typeof ApiPublicPalauteRoute
   '/api/public/hooks/laheta-kausikirje': typeof ApiPublicHooksLahetaKausikirjeRoute
@@ -237,6 +246,7 @@ export interface FileRouteTypes {
     | '/pyynnot'
     | '/talon-tiedot'
     | '/vuosikello'
+    | '/opas/nuohous-hinta'
     | '/opas/'
     | '/api/public/palaute'
     | '/api/public/hooks/laheta-kausikirje'
@@ -260,6 +270,7 @@ export interface FileRouteTypes {
     | '/pyynnot'
     | '/talon-tiedot'
     | '/vuosikello'
+    | '/opas/nuohous-hinta'
     | '/opas'
     | '/api/public/palaute'
     | '/api/public/hooks/laheta-kausikirje'
@@ -284,6 +295,7 @@ export interface FileRouteTypes {
     | '/_authenticated/pyynnot'
     | '/_authenticated/talon-tiedot'
     | '/_authenticated/vuosikello'
+    | '/opas/nuohous-hinta'
     | '/opas/'
     | '/api/public/palaute'
     | '/api/public/hooks/laheta-kausikirje'
@@ -301,6 +313,7 @@ export interface RootRouteChildren {
   UkkRoute: typeof UkkRoute
   UnohtunutSalasanaRoute: typeof UnohtunutSalasanaRoute
   VaihdaSalasanaRoute: typeof VaihdaSalasanaRoute
+  OpasNuohousHintaRoute: typeof OpasNuohousHintaRoute
   OpasIndexRoute: typeof OpasIndexRoute
   ApiPublicPalauteRoute: typeof ApiPublicPalauteRoute
   ApiPublicHooksLahetaKausikirjeRoute: typeof ApiPublicHooksLahetaKausikirjeRoute
@@ -384,6 +397,13 @@ declare module '@tanstack/react-router' {
       path: '/opas'
       fullPath: '/opas/'
       preLoaderRoute: typeof OpasIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/opas/nuohous-hinta': {
+      id: '/opas/nuohous-hinta'
+      path: '/opas/nuohous-hinta'
+      fullPath: '/opas/nuohous-hinta'
+      preLoaderRoute: typeof OpasNuohousHintaRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated/vuosikello': {
@@ -503,6 +523,7 @@ const rootRouteChildren: RootRouteChildren = {
   UkkRoute: UkkRoute,
   UnohtunutSalasanaRoute: UnohtunutSalasanaRoute,
   VaihdaSalasanaRoute: VaihdaSalasanaRoute,
+  OpasNuohousHintaRoute: OpasNuohousHintaRoute,
   OpasIndexRoute: OpasIndexRoute,
   ApiPublicPalauteRoute: ApiPublicPalauteRoute,
   ApiPublicHooksLahetaKausikirjeRoute: ApiPublicHooksLahetaKausikirjeRoute,
