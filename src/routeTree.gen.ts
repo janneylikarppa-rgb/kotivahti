@@ -27,6 +27,7 @@ import { Route as AuthenticatedHuoltohistoriaRouteImport } from './routes/_authe
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 import { Route as ApiPublicPalauteRouteImport } from './routes/api/public/palaute'
+import { Route as ApiPublicHooksNuohousMuistutusRouteImport } from './routes/api/public/hooks/nuohous-muistutus'
 import { Route as ApiPublicHooksLahetaKausikirjeRouteImport } from './routes/api/public/hooks/laheta-kausikirje'
 
 const VaihdaSalasanaRoute = VaihdaSalasanaRouteImport.update({
@@ -120,6 +121,12 @@ const ApiPublicPalauteRoute = ApiPublicPalauteRouteImport.update({
   path: '/api/public/palaute',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicHooksNuohousMuistutusRoute =
+  ApiPublicHooksNuohousMuistutusRouteImport.update({
+    id: '/api/public/hooks/nuohous-muistutus',
+    path: '/api/public/hooks/nuohous-muistutus',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiPublicHooksLahetaKausikirjeRoute =
   ApiPublicHooksLahetaKausikirjeRouteImport.update({
     id: '/api/public/hooks/laheta-kausikirje',
@@ -146,6 +153,7 @@ export interface FileRoutesByFullPath {
   '/vuosikello': typeof AuthenticatedVuosikelloRoute
   '/api/public/palaute': typeof ApiPublicPalauteRoute
   '/api/public/hooks/laheta-kausikirje': typeof ApiPublicHooksLahetaKausikirjeRoute
+  '/api/public/hooks/nuohous-muistutus': typeof ApiPublicHooksNuohousMuistutusRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -166,6 +174,7 @@ export interface FileRoutesByTo {
   '/vuosikello': typeof AuthenticatedVuosikelloRoute
   '/api/public/palaute': typeof ApiPublicPalauteRoute
   '/api/public/hooks/laheta-kausikirje': typeof ApiPublicHooksLahetaKausikirjeRoute
+  '/api/public/hooks/nuohous-muistutus': typeof ApiPublicHooksNuohousMuistutusRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -188,6 +197,7 @@ export interface FileRoutesById {
   '/_authenticated/vuosikello': typeof AuthenticatedVuosikelloRoute
   '/api/public/palaute': typeof ApiPublicPalauteRoute
   '/api/public/hooks/laheta-kausikirje': typeof ApiPublicHooksLahetaKausikirjeRoute
+  '/api/public/hooks/nuohous-muistutus': typeof ApiPublicHooksNuohousMuistutusRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -210,6 +220,7 @@ export interface FileRouteTypes {
     | '/vuosikello'
     | '/api/public/palaute'
     | '/api/public/hooks/laheta-kausikirje'
+    | '/api/public/hooks/nuohous-muistutus'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -230,6 +241,7 @@ export interface FileRouteTypes {
     | '/vuosikello'
     | '/api/public/palaute'
     | '/api/public/hooks/laheta-kausikirje'
+    | '/api/public/hooks/nuohous-muistutus'
   id:
     | '__root__'
     | '/'
@@ -251,6 +263,7 @@ export interface FileRouteTypes {
     | '/_authenticated/vuosikello'
     | '/api/public/palaute'
     | '/api/public/hooks/laheta-kausikirje'
+    | '/api/public/hooks/nuohous-muistutus'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -265,6 +278,7 @@ export interface RootRouteChildren {
   VaihdaSalasanaRoute: typeof VaihdaSalasanaRoute
   ApiPublicPalauteRoute: typeof ApiPublicPalauteRoute
   ApiPublicHooksLahetaKausikirjeRoute: typeof ApiPublicHooksLahetaKausikirjeRoute
+  ApiPublicHooksNuohousMuistutusRoute: typeof ApiPublicHooksNuohousMuistutusRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -395,6 +409,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicPalauteRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/hooks/nuohous-muistutus': {
+      id: '/api/public/hooks/nuohous-muistutus'
+      path: '/api/public/hooks/nuohous-muistutus'
+      fullPath: '/api/public/hooks/nuohous-muistutus'
+      preLoaderRoute: typeof ApiPublicHooksNuohousMuistutusRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/hooks/laheta-kausikirje': {
       id: '/api/public/hooks/laheta-kausikirje'
       path: '/api/public/hooks/laheta-kausikirje'
@@ -443,6 +464,7 @@ const rootRouteChildren: RootRouteChildren = {
   VaihdaSalasanaRoute: VaihdaSalasanaRoute,
   ApiPublicPalauteRoute: ApiPublicPalauteRoute,
   ApiPublicHooksLahetaKausikirjeRoute: ApiPublicHooksLahetaKausikirjeRoute,
+  ApiPublicHooksNuohousMuistutusRoute: ApiPublicHooksNuohousMuistutusRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
