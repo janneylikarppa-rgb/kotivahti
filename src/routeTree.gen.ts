@@ -11,13 +11,19 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as VaihdaSalasanaRouteImport } from './routes/vaihda-salasana'
 import { Route as UnohtunutSalasanaRouteImport } from './routes/unohtunut-salasana'
+import { Route as UkkRouteImport } from './routes/ukk'
 import { Route as TietosuojaRouteImport } from './routes/tietosuoja'
+import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as RekisteroidyRouteImport } from './routes/rekisteroidy'
 import { Route as PalauteRouteImport } from './routes/palaute'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as KayttoehdotRouteImport } from './routes/kayttoehdot'
 import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as OpasIndexRouteImport } from './routes/opas/index'
+import { Route as OpasNuohousHintaRouteImport } from './routes/opas/nuohous-hinta'
+import { Route as OpasKatonTarkastusRouteImport } from './routes/opas/katon-tarkastus'
+import { Route as OpasIvPuhdistusRouteImport } from './routes/opas/iv-puhdistus'
 import { Route as AuthenticatedVuosikelloRouteImport } from './routes/_authenticated/vuosikello'
 import { Route as AuthenticatedTalonTiedotRouteImport } from './routes/_authenticated/talon-tiedot'
 import { Route as AuthenticatedPyynnotRouteImport } from './routes/_authenticated/pyynnot'
@@ -27,6 +33,7 @@ import { Route as AuthenticatedHuoltohistoriaRouteImport } from './routes/_authe
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 import { Route as ApiPublicPalauteRouteImport } from './routes/api/public/palaute'
+import { Route as ApiPublicHooksNuohousMuistutusRouteImport } from './routes/api/public/hooks/nuohous-muistutus'
 import { Route as ApiPublicHooksLahetaKausikirjeRouteImport } from './routes/api/public/hooks/laheta-kausikirje'
 
 const VaihdaSalasanaRoute = VaihdaSalasanaRouteImport.update({
@@ -39,9 +46,19 @@ const UnohtunutSalasanaRoute = UnohtunutSalasanaRouteImport.update({
   path: '/unohtunut-salasana',
   getParentRoute: () => rootRouteImport,
 } as any)
+const UkkRoute = UkkRouteImport.update({
+  id: '/ukk',
+  path: '/ukk',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const TietosuojaRoute = TietosuojaRouteImport.update({
   id: '/tietosuoja',
   path: '/tietosuoja',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
+  id: '/sitemap.xml',
+  path: '/sitemap.xml',
   getParentRoute: () => rootRouteImport,
 } as any)
 const RekisteroidyRoute = RekisteroidyRouteImport.update({
@@ -71,6 +88,26 @@ const AuthenticatedRoute = AuthenticatedRouteImport.update({
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const OpasIndexRoute = OpasIndexRouteImport.update({
+  id: '/opas/',
+  path: '/opas/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const OpasNuohousHintaRoute = OpasNuohousHintaRouteImport.update({
+  id: '/opas/nuohous-hinta',
+  path: '/opas/nuohous-hinta',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const OpasKatonTarkastusRoute = OpasKatonTarkastusRouteImport.update({
+  id: '/opas/katon-tarkastus',
+  path: '/opas/katon-tarkastus',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const OpasIvPuhdistusRoute = OpasIvPuhdistusRouteImport.update({
+  id: '/opas/iv-puhdistus',
+  path: '/opas/iv-puhdistus',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedVuosikelloRoute = AuthenticatedVuosikelloRouteImport.update({
@@ -120,6 +157,12 @@ const ApiPublicPalauteRoute = ApiPublicPalauteRouteImport.update({
   path: '/api/public/palaute',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicHooksNuohousMuistutusRoute =
+  ApiPublicHooksNuohousMuistutusRouteImport.update({
+    id: '/api/public/hooks/nuohous-muistutus',
+    path: '/api/public/hooks/nuohous-muistutus',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiPublicHooksLahetaKausikirjeRoute =
   ApiPublicHooksLahetaKausikirjeRouteImport.update({
     id: '/api/public/hooks/laheta-kausikirje',
@@ -133,7 +176,9 @@ export interface FileRoutesByFullPath {
   '/login': typeof LoginRoute
   '/palaute': typeof PalauteRoute
   '/rekisteroidy': typeof RekisteroidyRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/tietosuoja': typeof TietosuojaRoute
+  '/ukk': typeof UkkRoute
   '/unohtunut-salasana': typeof UnohtunutSalasanaRoute
   '/vaihda-salasana': typeof VaihdaSalasanaRoute
   '/admin': typeof AuthenticatedAdminRoute
@@ -144,8 +189,13 @@ export interface FileRoutesByFullPath {
   '/pyynnot': typeof AuthenticatedPyynnotRoute
   '/talon-tiedot': typeof AuthenticatedTalonTiedotRoute
   '/vuosikello': typeof AuthenticatedVuosikelloRoute
+  '/opas/iv-puhdistus': typeof OpasIvPuhdistusRoute
+  '/opas/katon-tarkastus': typeof OpasKatonTarkastusRoute
+  '/opas/nuohous-hinta': typeof OpasNuohousHintaRoute
+  '/opas/': typeof OpasIndexRoute
   '/api/public/palaute': typeof ApiPublicPalauteRoute
   '/api/public/hooks/laheta-kausikirje': typeof ApiPublicHooksLahetaKausikirjeRoute
+  '/api/public/hooks/nuohous-muistutus': typeof ApiPublicHooksNuohousMuistutusRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -153,7 +203,9 @@ export interface FileRoutesByTo {
   '/login': typeof LoginRoute
   '/palaute': typeof PalauteRoute
   '/rekisteroidy': typeof RekisteroidyRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/tietosuoja': typeof TietosuojaRoute
+  '/ukk': typeof UkkRoute
   '/unohtunut-salasana': typeof UnohtunutSalasanaRoute
   '/vaihda-salasana': typeof VaihdaSalasanaRoute
   '/admin': typeof AuthenticatedAdminRoute
@@ -164,8 +216,13 @@ export interface FileRoutesByTo {
   '/pyynnot': typeof AuthenticatedPyynnotRoute
   '/talon-tiedot': typeof AuthenticatedTalonTiedotRoute
   '/vuosikello': typeof AuthenticatedVuosikelloRoute
+  '/opas/iv-puhdistus': typeof OpasIvPuhdistusRoute
+  '/opas/katon-tarkastus': typeof OpasKatonTarkastusRoute
+  '/opas/nuohous-hinta': typeof OpasNuohousHintaRoute
+  '/opas': typeof OpasIndexRoute
   '/api/public/palaute': typeof ApiPublicPalauteRoute
   '/api/public/hooks/laheta-kausikirje': typeof ApiPublicHooksLahetaKausikirjeRoute
+  '/api/public/hooks/nuohous-muistutus': typeof ApiPublicHooksNuohousMuistutusRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -175,7 +232,9 @@ export interface FileRoutesById {
   '/login': typeof LoginRoute
   '/palaute': typeof PalauteRoute
   '/rekisteroidy': typeof RekisteroidyRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/tietosuoja': typeof TietosuojaRoute
+  '/ukk': typeof UkkRoute
   '/unohtunut-salasana': typeof UnohtunutSalasanaRoute
   '/vaihda-salasana': typeof VaihdaSalasanaRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRoute
@@ -186,8 +245,13 @@ export interface FileRoutesById {
   '/_authenticated/pyynnot': typeof AuthenticatedPyynnotRoute
   '/_authenticated/talon-tiedot': typeof AuthenticatedTalonTiedotRoute
   '/_authenticated/vuosikello': typeof AuthenticatedVuosikelloRoute
+  '/opas/iv-puhdistus': typeof OpasIvPuhdistusRoute
+  '/opas/katon-tarkastus': typeof OpasKatonTarkastusRoute
+  '/opas/nuohous-hinta': typeof OpasNuohousHintaRoute
+  '/opas/': typeof OpasIndexRoute
   '/api/public/palaute': typeof ApiPublicPalauteRoute
   '/api/public/hooks/laheta-kausikirje': typeof ApiPublicHooksLahetaKausikirjeRoute
+  '/api/public/hooks/nuohous-muistutus': typeof ApiPublicHooksNuohousMuistutusRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -197,7 +261,9 @@ export interface FileRouteTypes {
     | '/login'
     | '/palaute'
     | '/rekisteroidy'
+    | '/sitemap.xml'
     | '/tietosuoja'
+    | '/ukk'
     | '/unohtunut-salasana'
     | '/vaihda-salasana'
     | '/admin'
@@ -208,8 +274,13 @@ export interface FileRouteTypes {
     | '/pyynnot'
     | '/talon-tiedot'
     | '/vuosikello'
+    | '/opas/iv-puhdistus'
+    | '/opas/katon-tarkastus'
+    | '/opas/nuohous-hinta'
+    | '/opas/'
     | '/api/public/palaute'
     | '/api/public/hooks/laheta-kausikirje'
+    | '/api/public/hooks/nuohous-muistutus'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -217,7 +288,9 @@ export interface FileRouteTypes {
     | '/login'
     | '/palaute'
     | '/rekisteroidy'
+    | '/sitemap.xml'
     | '/tietosuoja'
+    | '/ukk'
     | '/unohtunut-salasana'
     | '/vaihda-salasana'
     | '/admin'
@@ -228,8 +301,13 @@ export interface FileRouteTypes {
     | '/pyynnot'
     | '/talon-tiedot'
     | '/vuosikello'
+    | '/opas/iv-puhdistus'
+    | '/opas/katon-tarkastus'
+    | '/opas/nuohous-hinta'
+    | '/opas'
     | '/api/public/palaute'
     | '/api/public/hooks/laheta-kausikirje'
+    | '/api/public/hooks/nuohous-muistutus'
   id:
     | '__root__'
     | '/'
@@ -238,7 +316,9 @@ export interface FileRouteTypes {
     | '/login'
     | '/palaute'
     | '/rekisteroidy'
+    | '/sitemap.xml'
     | '/tietosuoja'
+    | '/ukk'
     | '/unohtunut-salasana'
     | '/vaihda-salasana'
     | '/_authenticated/admin'
@@ -249,8 +329,13 @@ export interface FileRouteTypes {
     | '/_authenticated/pyynnot'
     | '/_authenticated/talon-tiedot'
     | '/_authenticated/vuosikello'
+    | '/opas/iv-puhdistus'
+    | '/opas/katon-tarkastus'
+    | '/opas/nuohous-hinta'
+    | '/opas/'
     | '/api/public/palaute'
     | '/api/public/hooks/laheta-kausikirje'
+    | '/api/public/hooks/nuohous-muistutus'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -260,11 +345,18 @@ export interface RootRouteChildren {
   LoginRoute: typeof LoginRoute
   PalauteRoute: typeof PalauteRoute
   RekisteroidyRoute: typeof RekisteroidyRoute
+  SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   TietosuojaRoute: typeof TietosuojaRoute
+  UkkRoute: typeof UkkRoute
   UnohtunutSalasanaRoute: typeof UnohtunutSalasanaRoute
   VaihdaSalasanaRoute: typeof VaihdaSalasanaRoute
+  OpasIvPuhdistusRoute: typeof OpasIvPuhdistusRoute
+  OpasKatonTarkastusRoute: typeof OpasKatonTarkastusRoute
+  OpasNuohousHintaRoute: typeof OpasNuohousHintaRoute
+  OpasIndexRoute: typeof OpasIndexRoute
   ApiPublicPalauteRoute: typeof ApiPublicPalauteRoute
   ApiPublicHooksLahetaKausikirjeRoute: typeof ApiPublicHooksLahetaKausikirjeRoute
+  ApiPublicHooksNuohousMuistutusRoute: typeof ApiPublicHooksNuohousMuistutusRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -283,11 +375,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof UnohtunutSalasanaRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/ukk': {
+      id: '/ukk'
+      path: '/ukk'
+      fullPath: '/ukk'
+      preLoaderRoute: typeof UkkRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/tietosuoja': {
       id: '/tietosuoja'
       path: '/tietosuoja'
       fullPath: '/tietosuoja'
       preLoaderRoute: typeof TietosuojaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sitemap.xml': {
+      id: '/sitemap.xml'
+      path: '/sitemap.xml'
+      fullPath: '/sitemap.xml'
+      preLoaderRoute: typeof SitemapDotxmlRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/rekisteroidy': {
@@ -330,6 +436,34 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/opas/': {
+      id: '/opas/'
+      path: '/opas'
+      fullPath: '/opas/'
+      preLoaderRoute: typeof OpasIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/opas/nuohous-hinta': {
+      id: '/opas/nuohous-hinta'
+      path: '/opas/nuohous-hinta'
+      fullPath: '/opas/nuohous-hinta'
+      preLoaderRoute: typeof OpasNuohousHintaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/opas/katon-tarkastus': {
+      id: '/opas/katon-tarkastus'
+      path: '/opas/katon-tarkastus'
+      fullPath: '/opas/katon-tarkastus'
+      preLoaderRoute: typeof OpasKatonTarkastusRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/opas/iv-puhdistus': {
+      id: '/opas/iv-puhdistus'
+      path: '/opas/iv-puhdistus'
+      fullPath: '/opas/iv-puhdistus'
+      preLoaderRoute: typeof OpasIvPuhdistusRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated/vuosikello': {
@@ -395,6 +529,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicPalauteRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/hooks/nuohous-muistutus': {
+      id: '/api/public/hooks/nuohous-muistutus'
+      path: '/api/public/hooks/nuohous-muistutus'
+      fullPath: '/api/public/hooks/nuohous-muistutus'
+      preLoaderRoute: typeof ApiPublicHooksNuohousMuistutusRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/hooks/laheta-kausikirje': {
       id: '/api/public/hooks/laheta-kausikirje'
       path: '/api/public/hooks/laheta-kausikirje'
@@ -438,22 +579,19 @@ const rootRouteChildren: RootRouteChildren = {
   LoginRoute: LoginRoute,
   PalauteRoute: PalauteRoute,
   RekisteroidyRoute: RekisteroidyRoute,
+  SitemapDotxmlRoute: SitemapDotxmlRoute,
   TietosuojaRoute: TietosuojaRoute,
+  UkkRoute: UkkRoute,
   UnohtunutSalasanaRoute: UnohtunutSalasanaRoute,
   VaihdaSalasanaRoute: VaihdaSalasanaRoute,
+  OpasIvPuhdistusRoute: OpasIvPuhdistusRoute,
+  OpasKatonTarkastusRoute: OpasKatonTarkastusRoute,
+  OpasNuohousHintaRoute: OpasNuohousHintaRoute,
+  OpasIndexRoute: OpasIndexRoute,
   ApiPublicPalauteRoute: ApiPublicPalauteRoute,
   ApiPublicHooksLahetaKausikirjeRoute: ApiPublicHooksLahetaKausikirjeRoute,
+  ApiPublicHooksNuohousMuistutusRoute: ApiPublicHooksNuohousMuistutusRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
