@@ -21,6 +21,7 @@ import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as OpasIndexRouteImport } from './routes/opas/index'
 import { Route as OpasNuohousHintaRouteImport } from './routes/opas/nuohous-hinta'
+import { Route as OpasIvPuhdistusRouteImport } from './routes/opas/iv-puhdistus'
 import { Route as AuthenticatedVuosikelloRouteImport } from './routes/_authenticated/vuosikello'
 import { Route as AuthenticatedTalonTiedotRouteImport } from './routes/_authenticated/talon-tiedot'
 import { Route as AuthenticatedPyynnotRouteImport } from './routes/_authenticated/pyynnot'
@@ -90,6 +91,11 @@ const OpasIndexRoute = OpasIndexRouteImport.update({
 const OpasNuohousHintaRoute = OpasNuohousHintaRouteImport.update({
   id: '/opas/nuohous-hinta',
   path: '/opas/nuohous-hinta',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const OpasIvPuhdistusRoute = OpasIvPuhdistusRouteImport.update({
+  id: '/opas/iv-puhdistus',
+  path: '/opas/iv-puhdistus',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedVuosikelloRoute = AuthenticatedVuosikelloRouteImport.update({
@@ -170,6 +176,7 @@ export interface FileRoutesByFullPath {
   '/pyynnot': typeof AuthenticatedPyynnotRoute
   '/talon-tiedot': typeof AuthenticatedTalonTiedotRoute
   '/vuosikello': typeof AuthenticatedVuosikelloRoute
+  '/opas/iv-puhdistus': typeof OpasIvPuhdistusRoute
   '/opas/nuohous-hinta': typeof OpasNuohousHintaRoute
   '/opas/': typeof OpasIndexRoute
   '/api/public/palaute': typeof ApiPublicPalauteRoute
@@ -194,6 +201,7 @@ export interface FileRoutesByTo {
   '/pyynnot': typeof AuthenticatedPyynnotRoute
   '/talon-tiedot': typeof AuthenticatedTalonTiedotRoute
   '/vuosikello': typeof AuthenticatedVuosikelloRoute
+  '/opas/iv-puhdistus': typeof OpasIvPuhdistusRoute
   '/opas/nuohous-hinta': typeof OpasNuohousHintaRoute
   '/opas': typeof OpasIndexRoute
   '/api/public/palaute': typeof ApiPublicPalauteRoute
@@ -220,6 +228,7 @@ export interface FileRoutesById {
   '/_authenticated/pyynnot': typeof AuthenticatedPyynnotRoute
   '/_authenticated/talon-tiedot': typeof AuthenticatedTalonTiedotRoute
   '/_authenticated/vuosikello': typeof AuthenticatedVuosikelloRoute
+  '/opas/iv-puhdistus': typeof OpasIvPuhdistusRoute
   '/opas/nuohous-hinta': typeof OpasNuohousHintaRoute
   '/opas/': typeof OpasIndexRoute
   '/api/public/palaute': typeof ApiPublicPalauteRoute
@@ -246,6 +255,7 @@ export interface FileRouteTypes {
     | '/pyynnot'
     | '/talon-tiedot'
     | '/vuosikello'
+    | '/opas/iv-puhdistus'
     | '/opas/nuohous-hinta'
     | '/opas/'
     | '/api/public/palaute'
@@ -270,6 +280,7 @@ export interface FileRouteTypes {
     | '/pyynnot'
     | '/talon-tiedot'
     | '/vuosikello'
+    | '/opas/iv-puhdistus'
     | '/opas/nuohous-hinta'
     | '/opas'
     | '/api/public/palaute'
@@ -295,6 +306,7 @@ export interface FileRouteTypes {
     | '/_authenticated/pyynnot'
     | '/_authenticated/talon-tiedot'
     | '/_authenticated/vuosikello'
+    | '/opas/iv-puhdistus'
     | '/opas/nuohous-hinta'
     | '/opas/'
     | '/api/public/palaute'
@@ -313,6 +325,7 @@ export interface RootRouteChildren {
   UkkRoute: typeof UkkRoute
   UnohtunutSalasanaRoute: typeof UnohtunutSalasanaRoute
   VaihdaSalasanaRoute: typeof VaihdaSalasanaRoute
+  OpasIvPuhdistusRoute: typeof OpasIvPuhdistusRoute
   OpasNuohousHintaRoute: typeof OpasNuohousHintaRoute
   OpasIndexRoute: typeof OpasIndexRoute
   ApiPublicPalauteRoute: typeof ApiPublicPalauteRoute
@@ -404,6 +417,13 @@ declare module '@tanstack/react-router' {
       path: '/opas/nuohous-hinta'
       fullPath: '/opas/nuohous-hinta'
       preLoaderRoute: typeof OpasNuohousHintaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/opas/iv-puhdistus': {
+      id: '/opas/iv-puhdistus'
+      path: '/opas/iv-puhdistus'
+      fullPath: '/opas/iv-puhdistus'
+      preLoaderRoute: typeof OpasIvPuhdistusRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated/vuosikello': {
@@ -523,6 +543,7 @@ const rootRouteChildren: RootRouteChildren = {
   UkkRoute: UkkRoute,
   UnohtunutSalasanaRoute: UnohtunutSalasanaRoute,
   VaihdaSalasanaRoute: VaihdaSalasanaRoute,
+  OpasIvPuhdistusRoute: OpasIvPuhdistusRoute,
   OpasNuohousHintaRoute: OpasNuohousHintaRoute,
   OpasIndexRoute: OpasIndexRoute,
   ApiPublicPalauteRoute: ApiPublicPalauteRoute,
