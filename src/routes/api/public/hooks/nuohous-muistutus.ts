@@ -113,7 +113,7 @@ function rakennaViesti(kausi: "kevat" | "syksy", etunimi: string, baseUrl: strin
         mitaItse: "onko hormin ympärillä tai nuohousluukussa näkyviä halkeamia, ja vetääkö tulisija normaalisti.",
         milloinAmm: "nuohous on aina ammattilaisen työ, ja samalla käynnillä voidaan tarkastaa hormin yleiskunto ja paloturvallisuus.",
         cta: "Varaa nuohous nyt, vältä syksyn ruuhka",
-      }, ctaUrl);
+      }, ctaUrl),
     };
   }
 
@@ -126,7 +126,7 @@ function rakennaViesti(kausi: "kevat" | "syksy", etunimi: string, baseUrl: strin
       mitaItse: "kertyikö viime talvena nokea tavallista enemmän, tai onko vedossa ollut muutoksia.",
       milloinAmm: "jos lämmityskausi on jo alkamassa eikä nuohousta ole tehty, kannattaa varata aika mahdollisimman pian.",
       cta: "Varaa nuohous ennen syksyn ruuhkaa",
-    }, ctaUrl);
+    }, ctaUrl),
   };
 }
 
