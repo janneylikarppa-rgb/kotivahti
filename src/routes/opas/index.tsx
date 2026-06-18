@@ -45,16 +45,15 @@ function OpasIndex() {
       </p>
       <div className="mt-10 grid gap-4 md:grid-cols-2">
         {OPPAAT.map((o) => (
-          <Link
+          <a
             key={o.slug}
-            to="/opas/$slug"
-            params={{ slug: o.slug }}
+            href={`/opas/${o.slug}`}
             className="block rounded-lg border border-cream/10 bg-cream/5 p-5 transition hover:border-[color:var(--kulta)]/40 hover:bg-cream/10"
           >
             <h2 className="font-serif text-xl text-cream">{o.title}</h2>
             <p className="mt-2 text-sm text-cream/70">{o.teaser}</p>
             <span className="mt-3 inline-block text-sm text-[color:var(--kulta)]">Lue opas →</span>
-          </Link>
+          </a>
         ))}
       </div>
     </main>
