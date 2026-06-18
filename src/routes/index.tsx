@@ -413,6 +413,12 @@ function LandingPage() {
       </section>
 
       <footer className="kv-footer">
+        <p style={{ marginBottom: "0.6rem" }}>
+          <a href="/ukk" style={{ color: "rgba(255,255,255,0.55)", textDecoration: "none", marginRight: "1.2rem" }}>UKK</a>
+          <a href="/opas" style={{ color: "rgba(255,255,255,0.55)", textDecoration: "none", marginRight: "1.2rem" }}>Oppaat</a>
+          <a href="/kayttoehdot" style={{ color: "rgba(255,255,255,0.55)", textDecoration: "none", marginRight: "1.2rem" }}>Käyttöehdot</a>
+          <a href="/tietosuoja" style={{ color: "rgba(255,255,255,0.55)", textDecoration: "none" }}>Tietosuoja</a>
+        </p>
         <p>© 2026 <span>Kotivahti</span> · Talosi oma avustaja · Kuopio, Suomi</p>
       </footer>
     </div>
