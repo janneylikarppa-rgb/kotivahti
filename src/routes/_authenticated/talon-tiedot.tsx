@@ -169,8 +169,15 @@ function TaloTiedotPage() {
   const kattilaMerkitLista = lammitysLisa.kattila_tyyppi ? (KATTILA_MERKIT[lammitysLisa.kattila_tyyppi] ?? ["Muu"]) : ["Muu"];
 
 
-  const buildPayload = (osioKey?: string) => {
-    const uudet = osioKey && !valmiit.includes(osioKey) ? [...valmiit, osioKey] : valmiit;
+  const buildPayload = (osioKey?: string, merkitseKaikkiValmiiksi?: boolean) => {
+    let uudet = valmiit;
+    if (merkitseKaikkiValmiiksi) {
+      const kaikki = OSIOT.filter((o) => o.key !== "dokumentit").map((o) => o.key);
+      const yhd = new Set([...valmiit, ...kaikki]);
+      uudet = Array.from(yhd);
+    } else if (osioKey && !valmiit.includes(osioKey)) {
+      uudet = [...valmiit, osioKey];
+    }
     return {
       profile: { nimi: str(p.nimi), puhelin: str(p.puhelin) },
       kiinteisto: {
@@ -221,13 +228,12 @@ function TaloTiedotPage() {
   };
 
   const save = useMutation({
-    mutationFn: async (opts: { osioKey?: string; silent?: boolean } = {}) => {
-      const payload = buildPayload(opts.osioKey);
+    mutationFn: async (opts: { osioKey?: string; silent?: boolean; merkitseKaikkiValmiiksi?: boolean } = {}) => {
+      const payload = buildPayload(opts.osioKey, opts.merkitseKaikkiValmiiksi);
       const uudet = payload._uudet;
       delete (payload as any)._uudet;
       await saveFn({ data: payload });
       setValmiit(uudet);
-      
       return opts;
     },
     onSuccess: (opts) => {
@@ -237,6 +243,8 @@ function TaloTiedotPage() {
       if (opts?.silent) {
         setAutoStatus("saved");
         setTimeout(() => setAutoStatus("idle"), 1500);
+      } else if (opts?.merkitseKaikkiValmiiksi) {
+        toast.success("Kaikki välilehdet tallennettu");
       } else {
         toast.success("Tallennettu");
       }
