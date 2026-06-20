@@ -190,6 +190,77 @@ const SAANTOJA: { avain: RegExp; info: HuoltoInfo }[] = [
       miten: "Tarkista kennon kunto huoltoluukun kautta. Jos koneessa on irrotettava kenno, pese se valmistajan ohjeen mukaan.",
       milloinAmmattilainen: "Kondenssivesiviemärin tukos ja sähköiset viat vaativat ammattilaisen.",
     },
+  {
+    avain: /keskuslämmityskattila \(puu\)|kattila.*puu/,
+    info: {
+      miksi: "Puukattilan hyötysuhde laskee, jos savukanavat ja tulipesä nokeentuvat. Lika kasvattaa polttoaineenkulutusta ja paloturvallisuusriskiä.",
+      miten: "Tyhjennä tuhka, harjaa savukanavat ja tarkista tiivisteet vähintään kerran lämmityskaudessa. Pidä varaajan paineet ja anodi tarkkailussa.",
+      milloinAmmattilainen: "Nuohous ja varaajan tarkistus tehdään ammattilaisen toimesta vuosittain. Kattilan käyttöikä on tyypillisesti 25–30 vuotta.",
+    },
+  },
+  {
+    avain: /keskuslämmityskattila \(öljy\)|öljykattila/,
+    info: {
+      miksi: "Öljypoltin ja sen suuttimet likaantuvat käytössä, jolloin palaminen heikkenee ja polttoainekulutus nousee. Säännöllinen huolto on myös vakuutusehto monissa kotivakuutuksissa.",
+      miten: "Tarkkaile poltinta ja kattilan painemittareita. Ilmoita poikkeavista äänistä tai noesta huoltoliikkeelle.",
+      milloinAmmattilainen: "Ammattihuolto vuosittain: suuttimen, suodattimen ja palotilan puhdistus. Käyttöikä 20–25 v.",
+    },
+  },
+  {
+    avain: /keskuslämmityskattila \(pelletti\)|pellettikattila/,
+    info: {
+      miksi: "Pellettipolttimen palopää ja kattilan konvektio-osa likaantuvat tuhkasta ja saostumista. Tukkeumat heikentävät hyötysuhdetta ja voivat sammuttaa kattilan.",
+      miten: "Tyhjennä tuhkalaatikko viikoittain käyttökaudella, harjaa palopää ja kattilan pinnat ohjeen mukaan.",
+      milloinAmmattilainen: "Vuosittainen ammattihuolto suositellaan. Käyttöikä 20–25 v.",
+    },
+  },
+  {
+    avain: /keskuslämmityskattila \(sähkö\)|sähkökattila/,
+    info: {
+      miksi: "Sähkökattilan vastukset ja anodi kuluvat, ja varaajassa voi kertyä sakkaa. Anodin uusiminen suojaa säiliötä korroosiolta.",
+      miten: "Tarkista paisuntasäiliön paine ja varoventtiilin toiminta. Anodi tarkistetaan ammattilaisen toimesta 5 v välein.",
+      milloinAmmattilainen: "Vastusten vaihto ja anodin uusinta ovat ammattilaisen töitä. Käyttöikä n. 25 v.",
+    },
+  },
+  {
+    avain: /lämmitysputkisto.*(rauta|teräs)/,
+    info: {
+      miksi: "Vanhat teräsputket korrodoituvat sisältä ja voivat alkaa vuotaa lähestyessään käyttöiän loppua (n. 40 v). Vuodot rakenteissa aiheuttavat usein laajoja kosteusvaurioita.",
+      miten: "Seuraa pattereiden ja liitosten ympäristöä silmämääräisesti — ruosteenvärjäykset, kosteat tahrat tai painumat ovat varoitusmerkkejä.",
+      milloinAmmattilainen: "Putkiston kuntoarvio ennen 40 v ikää. Uusiminen aina ammattilaisen työ.",
+    },
+  },
+  {
+    avain: /lämmitysputkisto.*(kupari|muovi|komposiitti)/,
+    info: {
+      miksi: "Kupari- ja muovipohjaiset lämmitysputket kestävät tyypillisesti 50 v. Liitokset ja jakotukit ovat heikoin lenkki — niitä kannattaa tarkkailla erityisesti.",
+      miten: "Tarkkaile jakotukkien ympäristöä vuosittain. Pidä lukuja patterien menoveden lämpötilasta — selittämätön muutos voi viitata tukkeumaan.",
+      milloinAmmattilainen: "Liitosvuodot ja jakotukin huolto kuuluvat LVI-asentajalle.",
+    },
+  },
+  {
+    avain: /vesikiertoinen lattialämmitys|lattialämmitys/,
+    info: {
+      miksi: "Lattialämmityksen putkisto on yleensä valettu betoniin — sen käyttöikä on pitkä (n. 50 v), mutta jakotukin huolto ja veden laatu vaikuttavat kestoon.",
+      miten: "Tasapainota piirit jakotukista vuosittain ja varmista paineen riittävyys. Tarkkaile lattian pintalämpöjä — kylmät kohdat voivat viitata ilmaa piirissä tai tukokseen.",
+      milloinAmmattilainen: "Piirien huuhtelu ja tasapainotus 10 v välein ammattilaisen toimesta.",
+    },
+  },
+  {
+    avain: /sähköpatter|suora sähkölämmit/,
+    info: {
+      miksi: "Sähköpatterien termostaatit kuluvat ja imevät pölyä, mikä laskee säätötarkkuutta ja kasvattaa kulutusta. Käyttöikä n. 30 v.",
+      miten: "Imuroi patterit kerran vuodessa ja testaa termostaatin reagointi. Vaihda yksittäiset viallisia.",
+      milloinAmmattilainen: "Patterin vaihto ja kiinteät asennukset aina sähköasentajalle.",
+    },
+  },
+  {
+    avain: /lämminvesivaraaja|lvv\b|varaaja/,
+    info: {
+      miksi: "Lämminvesivaraajan anodi suojaa säiliötä korroosiolta — kun anodi on syöpynyt loppuun, säiliö alkaa ruostua. Vastuksiin kertyy kalkkia, mikä kasvattaa sähkölaskua.",
+      miten: "Tarkasta varoventtiilin toiminta vuosittain (nostamalla vipua hetkeksi). Kuuntele kalkkikiviloksahdusta lämmityksen aikana.",
+      milloinAmmattilainen: "Anodi tarkistetaan ja vaihdetaan 3–5 v välein. Vastusten kalkin poisto ja anodinvaihto ovat ammattilaisen töitä. Käyttöikä n. 25 v.",
+    },
   },
 ];
 
