@@ -138,27 +138,35 @@ function TaloTiedotPage() {
   const [p, setP] = useState<any>({});
   const [valmiit, setValmiit] = useState<string[]>([]);
   const hydrated = useRef(false);
-  const initDone = useRef(false);
+  const hydratedKiinteistoId = useRef<string | null>(null);
 
   const [autoStatus, setAutoStatus] = useState<"idle" | "saving" | "saved">("idle");
 
   useEffect(() => {
-    if (data && !initDone.current) {
-      if (data.kiinteisto) setK(data.kiinteisto);
-      if (data.profile) setP(data.profile);
-      if (data.talo) {
-        setT(data.talo);
-        setValmiit(Array.isArray(data.talo.valmiit_osiot) ? data.talo.valmiit_osiot as string[] : []);
-      }
-      initDone.current = true;
-      const id = setTimeout(() => { hydrated.current = true; }, 50);
-      return () => clearTimeout(id);
+    const uusiId = data?.kiinteisto?.id ?? null;
+    if (!data || !uusiId) return;
+    if (hydratedKiinteistoId.current === uusiId) return;
+    // Uusi kiinteistö (joko ensimmäinen lataus tai vaihto) → hydrataan kaikki state
+    hydrated.current = false;
+    if (data.kiinteisto) setK(data.kiinteisto);
+    if (data.profile) setP(data.profile);
+    if (data.talo) {
+      setT(data.talo);
+      setValmiit(Array.isArray(data.talo.valmiit_osiot) ? data.talo.valmiit_osiot as string[] : []);
+    } else {
+      setT({});
+      setValmiit([]);
     }
+    setActive(0);
+    hydratedKiinteistoId.current = uusiId;
+    const id = setTimeout(() => { hydrated.current = true; }, 50);
+    return () => clearTimeout(id);
   }, [data]);
 
   const laite = t.lammitysmuoto ? MERKIT[t.lammitysmuoto] : undefined;
   const lammitysLisa = (t.lammitys_lisatieto && typeof t.lammitys_lisatieto === "object") ? t.lammitys_lisatieto : {};
   const setLisa = (patch: Record<string, any>) => setT({ ...t, lammitys_lisatieto: { ...lammitysLisa, ...patch } });
+  const kattilaMerkitLista = lammitysLisa.kattila_tyyppi ? (KATTILA_MERKIT[lammitysLisa.kattila_tyyppi] ?? ["Muu"]) : ["Muu"];
 
 
   const buildPayload = (osioKey?: string) => {
