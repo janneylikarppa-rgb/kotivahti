@@ -59,15 +59,19 @@ const KIUAS_TYYPIT: { key: string; nimi: string }[] = [
 const KOURUN_MATERIAALIT = ["Maalattu teräs", "Sinkitty teräs", "Kupari", "Alumiini", "Muovi"];
 const LAMMITYS = [
   { key: "maalampo", nimi: "Maalämpö" },
-  { key: "ilmavesilampo", nimi: "Ilma-vesilämpöpumppu" },
-  { key: "ilmalampopumppu", nimi: "Ilmalämpöpumppu" },
   { key: "kaukolampo", nimi: "Kaukolämpö" },
-  { key: "oljylammitys", nimi: "Öljylämmitys" },
-  { key: "pellettilammitys", nimi: "Pellettilämmitys" },
-  { key: "puulammitys", nimi: "Puulämmitys" },
-  { key: "sahkolammitys", nimi: "Sähkölämmitys" },
+  { key: "ilmavesilampo", nimi: "Ilma-vesilämpö" },
+  { key: "sahkolammitys", nimi: "Suora sähkölämmitys" },
+  { key: "keskuslammitys", nimi: "Keskuslämmitys (kattila + vesikierto)" },
+  { key: "ilmalampopumppu", nimi: "Ilmalämpöpumppu" },
   { key: "muu", nimi: "Muu" },
 ];
+// Legacy-arvot, jotka edelleen voivat löytyä tietokannasta — näytetään valinnassa jotta read-only toimii
+const LAMMITYS_LEGACY: Record<string, string> = {
+  oljylammitys: "Öljylämmitys (vanha — siirrä keskuslämmitykseen)",
+  pellettilammitys: "Pellettilämmitys (vanha — siirrä keskuslämmitykseen)",
+  puulammitys: "Puulämmitys (vanha — siirrä keskuslämmitykseen)",
+};
 const MERKIT: Record<string, { tyyppi: string; merkit: string[] }> = {
   maalampo: { tyyppi: "Maalämpöpumppu", merkit: ["Nibe", "IVT", "Thermia", "Bosch", "Gebwell", "Mitsubishi", "Stiebel Eltron", "Oilon", "Muu"] },
   ilmavesilampo: { tyyppi: "Ilma-vesilämpöpumppu", merkit: ["Nibe", "Mitsubishi", "Daikin", "Panasonic", "Bosch", "Thermia", "Toshiba", "LG", "Muu"] },
@@ -76,8 +80,34 @@ const MERKIT: Record<string, { tyyppi: string; merkit: string[] }> = {
   pellettilammitys: { tyyppi: "Pellettikattila", merkit: ["Ariterm", "Biotech", "ÖkoFEN", "Kaukora", "Muu"] },
   puulammitys: { tyyppi: "Puukattila", merkit: ["Jämä", "Kaukora", "Ariterm", "Högfors", "Muu"] },
   kaukolampo: { tyyppi: "Lämmönjakokeskus", merkit: ["Alfa Laval", "Danfoss", "Gebwell", "Högfors", "Cetetherm", "Muu"] },
-  sahkolammitys: { tyyppi: "Sähkökattila / varaaja", merkit: ["Jäspi", "Kaukora", "Nibe", "Muu"] },
+  sahkolammitys: { tyyppi: "Lämminvesivaraaja", merkit: ["Jäspi", "Kaukora", "Nibe", "Haato", "Muu"] },
 };
+const KATTILA_TYYPIT = [
+  { key: "puu", nimi: "Puukattila" },
+  { key: "sahko", nimi: "Sähkökattila" },
+  { key: "pelletti", nimi: "Pellettikattila" },
+  { key: "oljy", nimi: "Öljykattila" },
+];
+const KATTILA_MERKIT: Record<string, string[]> = {
+  puu: ["Jämä", "Kaukora", "Ariterm", "Högfors", "Muu"],
+  sahko: ["Jäspi", "Kaukora", "Nibe", "Muu"],
+  pelletti: ["Ariterm", "Biotech", "ÖkoFEN", "Kaukora", "Muu"],
+  oljy: ["Jämä", "Kaukora", "Högfors", "Viessmann", "Buderus", "Oilon", "Muu"],
+};
+const LAMMONJAOT = [
+  "Vesikiertoiset patterit",
+  "Vesikiertoinen lattialämmitys",
+  "Molemmat (patterit + lattialämmitys)",
+  "Muu",
+];
+const PUTKI_MATERIAALIT_LAMM = [
+  "Rauta / teräs",
+  "Kupari",
+  "Muovi (musta)",
+  "Muovi (harmaa)",
+  "Muovi (kirkas)",
+  "Komposiitti",
+];
 const ILMANVAIHDOT = ["Painovoimainen", "Koneellinen poisto", "Koneellinen tulo- ja poistoilmanvaihto (LTO)", "Hybridi"];
 const IKKUNATYYPIT = ["2-lasiset", "3-lasiset", "4-lasiset", "Sekoitus", "En tiedä"];
 const IV_SUODATTIMET = ["F7 (vakio)", "M5", "ePM1", "ePM10", "Aktiivihiili", "Muu"];
@@ -108,31 +138,46 @@ function TaloTiedotPage() {
   const [p, setP] = useState<any>({});
   const [valmiit, setValmiit] = useState<string[]>([]);
   const hydrated = useRef(false);
-  const initDone = useRef(false);
+  const hydratedKiinteistoId = useRef<string | null>(null);
 
   const [autoStatus, setAutoStatus] = useState<"idle" | "saving" | "saved">("idle");
 
   useEffect(() => {
-    if (data && !initDone.current) {
-      if (data.kiinteisto) setK(data.kiinteisto);
-      if (data.profile) setP(data.profile);
-      if (data.talo) {
-        setT(data.talo);
-        setValmiit(Array.isArray(data.talo.valmiit_osiot) ? data.talo.valmiit_osiot as string[] : []);
-      }
-      initDone.current = true;
-      const id = setTimeout(() => { hydrated.current = true; }, 50);
-      return () => clearTimeout(id);
+    const uusiId = data?.kiinteisto?.id ?? null;
+    if (!data || !uusiId) return;
+    if (hydratedKiinteistoId.current === uusiId) return;
+    // Uusi kiinteistö (joko ensimmäinen lataus tai vaihto) → hydrataan kaikki state
+    hydrated.current = false;
+    if (data.kiinteisto) setK(data.kiinteisto);
+    if (data.profile) setP(data.profile);
+    if (data.talo) {
+      setT(data.talo);
+      setValmiit(Array.isArray(data.talo.valmiit_osiot) ? data.talo.valmiit_osiot as string[] : []);
+    } else {
+      setT({});
+      setValmiit([]);
     }
+    setActive(0);
+    hydratedKiinteistoId.current = uusiId;
+    const id = setTimeout(() => { hydrated.current = true; }, 50);
+    return () => clearTimeout(id);
   }, [data]);
 
   const laite = t.lammitysmuoto ? MERKIT[t.lammitysmuoto] : undefined;
   const lammitysLisa = (t.lammitys_lisatieto && typeof t.lammitys_lisatieto === "object") ? t.lammitys_lisatieto : {};
   const setLisa = (patch: Record<string, any>) => setT({ ...t, lammitys_lisatieto: { ...lammitysLisa, ...patch } });
+  const kattilaMerkitLista = lammitysLisa.kattila_tyyppi ? (KATTILA_MERKIT[lammitysLisa.kattila_tyyppi] ?? ["Muu"]) : ["Muu"];
 
 
-  const buildPayload = (osioKey?: string) => {
-    const uudet = osioKey && !valmiit.includes(osioKey) ? [...valmiit, osioKey] : valmiit;
+  const buildPayload = (osioKey?: string, merkitseKaikkiValmiiksi?: boolean) => {
+    let uudet = valmiit;
+    if (merkitseKaikkiValmiiksi) {
+      const kaikki = OSIOT.filter((o) => o.key !== "dokumentit").map((o) => o.key);
+      const yhd = new Set([...valmiit, ...kaikki]);
+      uudet = Array.from(yhd);
+    } else if (osioKey && !valmiit.includes(osioKey)) {
+      uudet = [...valmiit, osioKey];
+    }
     return {
       profile: { nimi: str(p.nimi), puhelin: str(p.puhelin) },
       kiinteisto: {
@@ -183,13 +228,12 @@ function TaloTiedotPage() {
   };
 
   const save = useMutation({
-    mutationFn: async (opts: { osioKey?: string; silent?: boolean } = {}) => {
-      const payload = buildPayload(opts.osioKey);
+    mutationFn: async (opts: { osioKey?: string; silent?: boolean; merkitseKaikkiValmiiksi?: boolean } = {}) => {
+      const payload = buildPayload(opts.osioKey, opts.merkitseKaikkiValmiiksi);
       const uudet = payload._uudet;
       delete (payload as any)._uudet;
       await saveFn({ data: payload });
       setValmiit(uudet);
-      
       return opts;
     },
     onSuccess: (opts) => {
@@ -199,6 +243,8 @@ function TaloTiedotPage() {
       if (opts?.silent) {
         setAutoStatus("saved");
         setTimeout(() => setAutoStatus("idle"), 1500);
+      } else if (opts?.merkitseKaikkiValmiiksi) {
+        toast.success("Kaikki välilehdet tallennettu");
       } else {
         toast.success("Tallennettu");
       }
@@ -243,8 +289,8 @@ function TaloTiedotPage() {
             <span className="text-xs font-mono text-muted-foreground min-w-[120px] text-right">
               {autoStatus === "saving" ? "Tallennetaan..." : autoStatus === "saved" ? "✓ Tallennettu" : "Automaattitallennus"}
             </span>
-            <Button onClick={() => save.mutate({})} disabled={save.isPending} variant="outline" className="uppercase tracking-wider font-semibold">
-              Tallenna tiedot
+            <Button onClick={() => save.mutate({ merkitseKaikkiValmiiksi: true })} disabled={save.isPending} variant="outline" className="uppercase tracking-wider font-semibold">
+              Tallenna kaikki välilehdet
             </Button>
           </div>
         </div>
@@ -405,11 +451,17 @@ function TaloTiedotPage() {
               <Field label="Päälämmitysmuoto">
                 <Select value={t.lammitysmuoto ?? ""} onValueChange={(v) => setT({ ...t, lammitysmuoto: v })}>
                   <SelectTrigger><SelectValue placeholder="Valitse" /></SelectTrigger>
-                  <SelectContent>{LAMMITYS.map((l) => <SelectItem key={l.key} value={l.key}>{l.nimi}</SelectItem>)}</SelectContent>
+                  <SelectContent>
+                    {LAMMITYS.map((l) => <SelectItem key={l.key} value={l.key}>{l.nimi}</SelectItem>)}
+                    {t.lammitysmuoto && LAMMITYS_LEGACY[t.lammitysmuoto] && (
+                      <SelectItem value={t.lammitysmuoto}>{LAMMITYS_LEGACY[t.lammitysmuoto]}</SelectItem>
+                    )}
+                  </SelectContent>
                 </Select>
               </Field>
               <Field label="Järjestelmän asennusvuosi"><Input type="number" value={t.lammitys_asennettu_vuosi ?? ""} onChange={(e) => setT({ ...t, lammitys_asennettu_vuosi: e.target.value })} /></Field>
             </Row>
+
             {laite && (
               <div className="rounded-md border border-primary/30 bg-primary/5 p-4 space-y-4">
                 <p className="eyebrow text-primary">{laite.tyyppi}</p>
@@ -419,6 +471,61 @@ function TaloTiedotPage() {
                   </Field>
                   <Field label="Mallimerkintä"><Input value={lammitysLisa.malli ?? ""} onChange={(e) => setLisa({ malli: e.target.value })} placeholder="Esim. F1255-12" /></Field>
                 </Row>
+              </div>
+            )}
+
+            {/* Keskuslämmitys: kattilan tiedot */}
+            {t.lammitysmuoto === "keskuslammitys" && (
+              <div className="rounded-md border border-primary/30 bg-primary/5 p-4 space-y-4">
+                <p className="eyebrow text-primary">Kattila</p>
+                <Row>
+                  <Field label="Kattilatyyppi">
+                    <Select value={lammitysLisa.kattila_tyyppi ?? ""} onValueChange={(v) => setLisa({ kattila_tyyppi: v, kattila_merkki: null })}>
+                      <SelectTrigger><SelectValue placeholder="Valitse" /></SelectTrigger>
+                      <SelectContent>{KATTILA_TYYPIT.map((kt) => <SelectItem key={kt.key} value={kt.key}>{kt.nimi}</SelectItem>)}</SelectContent>
+                    </Select>
+                  </Field>
+                  <Field label="Kattilan asennusvuosi"><Input type="number" value={lammitysLisa.kattila_asennettu_vuosi ?? ""} onChange={(e) => setLisa({ kattila_asennettu_vuosi: e.target.value })} /></Field>
+                </Row>
+                {lammitysLisa.kattila_tyyppi && (
+                  <Row>
+                    <Field label="Kattilan merkki">
+                      <SelectOrOther value={lammitysLisa.kattila_merkki} options={kattilaMerkitLista} onChange={(v) => setLisa({ kattila_merkki: v })} />
+                    </Field>
+                    <Field label="Mallimerkintä"><Input value={lammitysLisa.kattila_malli ?? ""} onChange={(e) => setLisa({ kattila_malli: e.target.value })} /></Field>
+                  </Row>
+                )}
+              </div>
+            )}
+
+            {/* Vesikiertoinen lämmönjako + lämmitysputkisto */}
+            {(t.lammitysmuoto === "keskuslammitys" || t.lammitysmuoto === "kaukolampo" || t.lammitysmuoto === "maalampo" || t.lammitysmuoto === "ilmavesilampo") && (
+              <div className="rounded-md border border-border bg-card/40 p-4 space-y-4">
+                <p className="eyebrow text-primary">Lämmönjako ja lämmitysputkisto</p>
+                <Row>
+                  <Field label="Lämmönjako">
+                    <SelectOrOther value={lammitysLisa.lammonjako} options={LAMMONJAOT} onChange={(v) => setLisa({ lammonjako: v })} />
+                  </Field>
+                  <Field label="Putkiston asennusvuosi"><Input type="number" value={lammitysLisa.putki_asennettu_vuosi ?? ""} onChange={(e) => setLisa({ putki_asennettu_vuosi: e.target.value })} placeholder="Jätä tyhjäksi jos alkuperäinen" /></Field>
+                </Row>
+                <Field label="Lämmitysputkiston materiaali">
+                  <SelectOrOther value={lammitysLisa.putki_materiaali} options={PUTKI_MATERIAALIT_LAMM} onChange={(v) => setLisa({ putki_materiaali: v })} />
+                </Field>
+              </div>
+            )}
+
+            {/* Suora sähkölämmitys: patterit + LVV */}
+            {t.lammitysmuoto === "sahkolammitys" && (
+              <div className="rounded-md border border-border bg-card/40 p-4 space-y-4">
+                <p className="eyebrow text-primary">Sähköpatterit ja lämminvesivaraaja</p>
+                <Field label="Sähköpattereiden asennusvuosi"><Input type="number" value={lammitysLisa.sahkopatteri_asennettu_vuosi ?? ""} onChange={(e) => setLisa({ sahkopatteri_asennettu_vuosi: e.target.value })} /></Field>
+                <Row>
+                  <Field label="Lämminvesivaraajan merkki">
+                    <SelectOrOther value={lammitysLisa.lvv_merkki} options={MERKIT.sahkolammitys.merkit} onChange={(v) => setLisa({ lvv_merkki: v })} />
+                  </Field>
+                  <Field label="LVV:n mallimerkintä"><Input value={lammitysLisa.lvv_malli ?? ""} onChange={(e) => setLisa({ lvv_malli: e.target.value })} /></Field>
+                </Row>
+                <Field label="LVV:n asennusvuosi"><Input type="number" value={lammitysLisa.lvv_asennettu_vuosi ?? ""} onChange={(e) => setLisa({ lvv_asennettu_vuosi: e.target.value })} /></Field>
               </div>
             )}
 
