@@ -42,9 +42,9 @@ const onVesikiertoinen = (t: any) =>
   onLamm(t, "keskuslämmitys", "keskuslammitys", "kauko", "maalämpö", "maalampo", "ilma-vesi", "ilmavesi");
 
 export const PTS_KOHTEET: PtsKohde[] = [
-  // Lämmitys
+  // Lämmitys – legacy (vanha lammitysmuoto-arvo)
   { avain: "lammitys_oljy", nimi: "Öljykattila", kategoria: "Lämmitys", kayttoika: 25, huoltovali: 1,
-    lahdeVuosi: lammV, koskee: (t) => onLamm(t, "öljy", "oljy") },
+    lahdeVuosi: lammV, koskee: (t) => onLamm(t, "öljy", "oljy") && !onLamm(t, "keskus") },
   { avain: "lammitys_maalampo", nimi: "Maalämpöpumppu", kategoria: "Lämmitys", kayttoika: 22, huoltovali: 3,
     lahdeVuosi: lammV, koskee: (t) => onLamm(t, "maalämpö", "maalampo") },
   { avain: "lammitys_ilmavesi", nimi: "Ilma-vesilämpöpumppu", kategoria: "Lämmitys", kayttoika: 18, huoltovali: 1,
@@ -55,8 +55,33 @@ export const PTS_KOHTEET: PtsKohde[] = [
     lahdeVuosi: lammV, koskee: (t) => onLamm(t, "poistoilma", "pilp") },
   { avain: "lammitys_sahkokattila", nimi: "Sähkökattila", kategoria: "Lämmitys", kayttoika: 25, huoltovali: 5,
     lahdeVuosi: lammV, koskee: (t) => onLamm(t, "sähkökattila", "sahkokattila") },
-  { avain: "lammitys_sahkopatterit", nimi: "Sähköpatterit", kategoria: "Lämmitys", kayttoika: 30, huoltovali: 5,
-    lahdeVuosi: lammV, koskee: (t) => onLamm(t, "sähköpatter", "sahkopatter", "suora sähkö", "suora sahko") },
+  { avain: "lammitys_sahkopatterit", nimi: "Sähköpatterit (suora sähkölämmitys)", kategoria: "Lämmitys", kayttoika: 30, huoltovali: 5,
+    lahdeVuosi: (t) => i(lisa(t).sahkopatteri_asennettu_vuosi) ?? lammV(t),
+    koskee: (t) => onLamm(t, "sähköpatter", "sahkopatter", "suora sähkö", "suora sahko", "sahkolammitys", "sähkölämmitys") },
+  { avain: "lvv_suora", nimi: "Lämminvesivaraaja", kategoria: "Lämmitys", kayttoika: 25, huoltovali: 5,
+    lahdeVuosi: (t) => i(lisa(t).lvv_asennettu_vuosi),
+    koskee: (t) => onLamm(t, "sahkolammitys", "sähkölämmitys", "suora sähkö") && i(lisa(t).lvv_asennettu_vuosi) != null },
+  // Keskuslämmitys – kattilatyypit
+  { avain: "keskus_kattila_puu", nimi: "Keskuslämmityskattila (puu)", kategoria: "Lämmitys", kayttoika: 30, huoltovali: 1,
+    lahdeVuosi: kattilaV, koskee: (t) => onLamm(t, "keskus") && onKattila(t, "puu") },
+  { avain: "keskus_kattila_oljy", nimi: "Keskuslämmityskattila (öljy)", kategoria: "Lämmitys", kayttoika: 25, huoltovali: 1,
+    lahdeVuosi: kattilaV, koskee: (t) => onLamm(t, "keskus") && onKattila(t, "oljy") },
+  { avain: "keskus_kattila_pelletti", nimi: "Keskuslämmityskattila (pelletti)", kategoria: "Lämmitys", kayttoika: 25, huoltovali: 1,
+    lahdeVuosi: kattilaV, koskee: (t) => onLamm(t, "keskus") && onKattila(t, "pelletti") },
+  { avain: "keskus_kattila_sahko", nimi: "Keskuslämmityskattila (sähkö)", kategoria: "Lämmitys", kayttoika: 25, huoltovali: 5,
+    lahdeVuosi: kattilaV, koskee: (t) => onLamm(t, "keskus") && onKattila(t, "sahko") },
+  // Lämmitysputkisto (vesikiertoinen) – materiaalikohtainen
+  { avain: "lammitysputki_rauta", nimi: "Lämmitysputkisto (teräs/rauta)", kategoria: "Lämmitys", kayttoika: 40, huoltovali: 10,
+    lahdeVuosi: putkiV, koskee: (t) => onVesikiertoinen(t) && onPutkiMat(t, "rauta", "teräs", "teras") },
+  { avain: "lammitysputki_kupari", nimi: "Lämmitysputkisto (kupari)", kategoria: "Lämmitys", kayttoika: 50, huoltovali: 10,
+    lahdeVuosi: putkiV, koskee: (t) => onVesikiertoinen(t) && onPutkiMat(t, "kupari") },
+  { avain: "lammitysputki_muovi", nimi: "Lämmitysputkisto (muovi)", kategoria: "Lämmitys", kayttoika: 50, huoltovali: 10,
+    lahdeVuosi: putkiV, koskee: (t) => onVesikiertoinen(t) && onPutkiMat(t, "muovi") },
+  { avain: "lammitysputki_komposiitti", nimi: "Lämmitysputkisto (komposiitti)", kategoria: "Lämmitys", kayttoika: 50, huoltovali: 10,
+    lahdeVuosi: putkiV, koskee: (t) => onVesikiertoinen(t) && onPutkiMat(t, "komposiitti") },
+  // Vesikiertoinen lattialämmitys
+  { avain: "lattialammitys", nimi: "Vesikiertoinen lattialämmitys", kategoria: "Lämmitys", kayttoika: 50, huoltovali: 10,
+    lahdeVuosi: putkiV, koskee: (t) => onVesikiertoinen(t) && onLammonjako(t, "lattia") },
   { avain: "ilp", nimi: "Ilmalämpöpumppu", kategoria: "Lämmitys", kayttoika: 15, huoltovali: 1,
     lahdeVuosi: (t) => i(t?.ilp_asennettu_vuosi), koskee: (t) => i(t?.ilp_asennettu_vuosi) != null,
     kuvaus: "Vuosittain: puhdista sisäyksikön suodattimet ja imuroi ulkoyksikön lamellit. Laitteen sisälle, kennoille, puhallinrullaan ja kondenssialtaaseen kertyy ajan mittaan likaa, pölyä ja mikrobeja, joita pelkkä imurointi ei tavoita – tämä näkyy heikentyneenä viilennystehona, korkeampana sähkölaskuna ja huonompana sisäilmana. Tilaa ammattilaisen pesu noin 3–5 vuoden välein. Laitteen suositeltu uusimisikä on n. 15 vuotta." },
