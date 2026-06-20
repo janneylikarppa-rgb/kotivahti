@@ -289,8 +289,8 @@ function TaloTiedotPage() {
             <span className="text-xs font-mono text-muted-foreground min-w-[120px] text-right">
               {autoStatus === "saving" ? "Tallennetaan..." : autoStatus === "saved" ? "✓ Tallennettu" : "Automaattitallennus"}
             </span>
-            <Button onClick={() => save.mutate({})} disabled={save.isPending} variant="outline" className="uppercase tracking-wider font-semibold">
-              Tallenna tiedot
+            <Button onClick={() => save.mutate({ merkitseKaikkiValmiiksi: true })} disabled={save.isPending} variant="outline" className="uppercase tracking-wider font-semibold">
+              Tallenna kaikki välilehdet
             </Button>
           </div>
         </div>
