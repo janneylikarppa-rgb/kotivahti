@@ -190,6 +190,7 @@ const SAANTOJA: { avain: RegExp; info: HuoltoInfo }[] = [
       miten: "Tarkista kennon kunto huoltoluukun kautta. Jos koneessa on irrotettava kenno, pese se valmistajan ohjeen mukaan.",
       milloinAmmattilainen: "Kondenssivesiviemärin tukos ja sähköiset viat vaativat ammattilaisen.",
     },
+  },
   {
     avain: /keskuslämmityskattila \(puu\)|kattila.*puu/,
     info: {
