@@ -26,6 +26,20 @@ const onMat = (val: any, ...nimet: string[]) => {
 };
 const rakV = (t: any) => i(t?.rakennusvuosi);
 const lammV = (t: any) => i(t?.lammitys_asennettu_vuosi);
+const lisa = (t: any) => (t?.lammitys_lisatieto && typeof t.lammitys_lisatieto === "object") ? t.lammitys_lisatieto : {};
+const kattilaV = (t: any) => i(lisa(t).kattila_asennettu_vuosi) ?? lammV(t);
+const putkiV = (t: any) => i(lisa(t).putki_asennettu_vuosi) ?? rakV(t);
+const onKattila = (t: any, tyyppi: string) => String(lisa(t).kattila_tyyppi ?? "").toLowerCase() === tyyppi;
+const onPutkiMat = (t: any, ...nimet: string[]) => {
+  const m = String(lisa(t).putki_materiaali ?? "").toLowerCase();
+  return nimet.some((n) => m.includes(n.toLowerCase()));
+};
+const onLammonjako = (t: any, ...nimet: string[]) => {
+  const m = String(lisa(t).lammonjako ?? "").toLowerCase();
+  return nimet.some((n) => m.includes(n.toLowerCase()));
+};
+const onVesikiertoinen = (t: any) =>
+  onLamm(t, "keskuslämmitys", "keskuslammitys", "kauko", "maalämpö", "maalampo", "ilma-vesi", "ilmavesi");
 
 export const PTS_KOHTEET: PtsKohde[] = [
   // Lämmitys
