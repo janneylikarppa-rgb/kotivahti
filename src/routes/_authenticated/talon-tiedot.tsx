@@ -59,15 +59,19 @@ const KIUAS_TYYPIT: { key: string; nimi: string }[] = [
 const KOURUN_MATERIAALIT = ["Maalattu teräs", "Sinkitty teräs", "Kupari", "Alumiini", "Muovi"];
 const LAMMITYS = [
   { key: "maalampo", nimi: "Maalämpö" },
-  { key: "ilmavesilampo", nimi: "Ilma-vesilämpöpumppu" },
-  { key: "ilmalampopumppu", nimi: "Ilmalämpöpumppu" },
   { key: "kaukolampo", nimi: "Kaukolämpö" },
-  { key: "oljylammitys", nimi: "Öljylämmitys" },
-  { key: "pellettilammitys", nimi: "Pellettilämmitys" },
-  { key: "puulammitys", nimi: "Puulämmitys" },
-  { key: "sahkolammitys", nimi: "Sähkölämmitys" },
+  { key: "ilmavesilampo", nimi: "Ilma-vesilämpö" },
+  { key: "sahkolammitys", nimi: "Suora sähkölämmitys" },
+  { key: "keskuslammitys", nimi: "Keskuslämmitys (kattila + vesikierto)" },
+  { key: "ilmalampopumppu", nimi: "Ilmalämpöpumppu" },
   { key: "muu", nimi: "Muu" },
 ];
+// Legacy-arvot, jotka edelleen voivat löytyä tietokannasta — näytetään valinnassa jotta read-only toimii
+const LAMMITYS_LEGACY: Record<string, string> = {
+  oljylammitys: "Öljylämmitys (vanha — siirrä keskuslämmitykseen)",
+  pellettilammitys: "Pellettilämmitys (vanha — siirrä keskuslämmitykseen)",
+  puulammitys: "Puulämmitys (vanha — siirrä keskuslämmitykseen)",
+};
 const MERKIT: Record<string, { tyyppi: string; merkit: string[] }> = {
   maalampo: { tyyppi: "Maalämpöpumppu", merkit: ["Nibe", "IVT", "Thermia", "Bosch", "Gebwell", "Mitsubishi", "Stiebel Eltron", "Oilon", "Muu"] },
   ilmavesilampo: { tyyppi: "Ilma-vesilämpöpumppu", merkit: ["Nibe", "Mitsubishi", "Daikin", "Panasonic", "Bosch", "Thermia", "Toshiba", "LG", "Muu"] },
@@ -76,8 +80,34 @@ const MERKIT: Record<string, { tyyppi: string; merkit: string[] }> = {
   pellettilammitys: { tyyppi: "Pellettikattila", merkit: ["Ariterm", "Biotech", "ÖkoFEN", "Kaukora", "Muu"] },
   puulammitys: { tyyppi: "Puukattila", merkit: ["Jämä", "Kaukora", "Ariterm", "Högfors", "Muu"] },
   kaukolampo: { tyyppi: "Lämmönjakokeskus", merkit: ["Alfa Laval", "Danfoss", "Gebwell", "Högfors", "Cetetherm", "Muu"] },
-  sahkolammitys: { tyyppi: "Sähkökattila / varaaja", merkit: ["Jäspi", "Kaukora", "Nibe", "Muu"] },
+  sahkolammitys: { tyyppi: "Lämminvesivaraaja", merkit: ["Jäspi", "Kaukora", "Nibe", "Haato", "Muu"] },
 };
+const KATTILA_TYYPIT = [
+  { key: "puu", nimi: "Puukattila" },
+  { key: "sahko", nimi: "Sähkökattila" },
+  { key: "pelletti", nimi: "Pellettikattila" },
+  { key: "oljy", nimi: "Öljykattila" },
+];
+const KATTILA_MERKIT: Record<string, string[]> = {
+  puu: ["Jämä", "Kaukora", "Ariterm", "Högfors", "Muu"],
+  sahko: ["Jäspi", "Kaukora", "Nibe", "Muu"],
+  pelletti: ["Ariterm", "Biotech", "ÖkoFEN", "Kaukora", "Muu"],
+  oljy: ["Jämä", "Kaukora", "Högfors", "Viessmann", "Buderus", "Oilon", "Muu"],
+};
+const LAMMONJAOT = [
+  "Vesikiertoiset patterit",
+  "Vesikiertoinen lattialämmitys",
+  "Molemmat (patterit + lattialämmitys)",
+  "Muu",
+];
+const PUTKI_MATERIAALIT_LAMM = [
+  "Rauta / teräs",
+  "Kupari",
+  "Muovi (musta)",
+  "Muovi (harmaa)",
+  "Muovi (kirkas)",
+  "Komposiitti",
+];
 const ILMANVAIHDOT = ["Painovoimainen", "Koneellinen poisto", "Koneellinen tulo- ja poistoilmanvaihto (LTO)", "Hybridi"];
 const IKKUNATYYPIT = ["2-lasiset", "3-lasiset", "4-lasiset", "Sekoitus", "En tiedä"];
 const IV_SUODATTIMET = ["F7 (vakio)", "M5", "ePM1", "ePM10", "Aktiivihiili", "Muu"];
