@@ -451,11 +451,17 @@ function TaloTiedotPage() {
               <Field label="Päälämmitysmuoto">
                 <Select value={t.lammitysmuoto ?? ""} onValueChange={(v) => setT({ ...t, lammitysmuoto: v })}>
                   <SelectTrigger><SelectValue placeholder="Valitse" /></SelectTrigger>
-                  <SelectContent>{LAMMITYS.map((l) => <SelectItem key={l.key} value={l.key}>{l.nimi}</SelectItem>)}</SelectContent>
+                  <SelectContent>
+                    {LAMMITYS.map((l) => <SelectItem key={l.key} value={l.key}>{l.nimi}</SelectItem>)}
+                    {t.lammitysmuoto && LAMMITYS_LEGACY[t.lammitysmuoto] && (
+                      <SelectItem value={t.lammitysmuoto}>{LAMMITYS_LEGACY[t.lammitysmuoto]}</SelectItem>
+                    )}
+                  </SelectContent>
                 </Select>
               </Field>
               <Field label="Järjestelmän asennusvuosi"><Input type="number" value={t.lammitys_asennettu_vuosi ?? ""} onChange={(e) => setT({ ...t, lammitys_asennettu_vuosi: e.target.value })} /></Field>
             </Row>
+
             {laite && (
               <div className="rounded-md border border-primary/30 bg-primary/5 p-4 space-y-4">
                 <p className="eyebrow text-primary">{laite.tyyppi}</p>
@@ -465,6 +471,61 @@ function TaloTiedotPage() {
                   </Field>
                   <Field label="Mallimerkintä"><Input value={lammitysLisa.malli ?? ""} onChange={(e) => setLisa({ malli: e.target.value })} placeholder="Esim. F1255-12" /></Field>
                 </Row>
+              </div>
+            )}
+
+            {/* Keskuslämmitys: kattilan tiedot */}
+            {t.lammitysmuoto === "keskuslammitys" && (
+              <div className="rounded-md border border-primary/30 bg-primary/5 p-4 space-y-4">
+                <p className="eyebrow text-primary">Kattila</p>
+                <Row>
+                  <Field label="Kattilatyyppi">
+                    <Select value={lammitysLisa.kattila_tyyppi ?? ""} onValueChange={(v) => setLisa({ kattila_tyyppi: v, kattila_merkki: null })}>
+                      <SelectTrigger><SelectValue placeholder="Valitse" /></SelectTrigger>
+                      <SelectContent>{KATTILA_TYYPIT.map((kt) => <SelectItem key={kt.key} value={kt.key}>{kt.nimi}</SelectItem>)}</SelectContent>
+                    </Select>
+                  </Field>
+                  <Field label="Kattilan asennusvuosi"><Input type="number" value={lammitysLisa.kattila_asennettu_vuosi ?? ""} onChange={(e) => setLisa({ kattila_asennettu_vuosi: e.target.value })} /></Field>
+                </Row>
+                {lammitysLisa.kattila_tyyppi && (
+                  <Row>
+                    <Field label="Kattilan merkki">
+                      <SelectOrOther value={lammitysLisa.kattila_merkki} options={kattilaMerkitLista} onChange={(v) => setLisa({ kattila_merkki: v })} />
+                    </Field>
+                    <Field label="Mallimerkintä"><Input value={lammitysLisa.kattila_malli ?? ""} onChange={(e) => setLisa({ kattila_malli: e.target.value })} /></Field>
+                  </Row>
+                )}
+              </div>
+            )}
+
+            {/* Vesikiertoinen lämmönjako + lämmitysputkisto */}
+            {(t.lammitysmuoto === "keskuslammitys" || t.lammitysmuoto === "kaukolampo" || t.lammitysmuoto === "maalampo" || t.lammitysmuoto === "ilmavesilampo") && (
+              <div className="rounded-md border border-border bg-card/40 p-4 space-y-4">
+                <p className="eyebrow text-primary">Lämmönjako ja lämmitysputkisto</p>
+                <Row>
+                  <Field label="Lämmönjako">
+                    <SelectOrOther value={lammitysLisa.lammonjako} options={LAMMONJAOT} onChange={(v) => setLisa({ lammonjako: v })} />
+                  </Field>
+                  <Field label="Putkiston asennusvuosi"><Input type="number" value={lammitysLisa.putki_asennettu_vuosi ?? ""} onChange={(e) => setLisa({ putki_asennettu_vuosi: e.target.value })} placeholder="Jätä tyhjäksi jos alkuperäinen" /></Field>
+                </Row>
+                <Field label="Lämmitysputkiston materiaali">
+                  <SelectOrOther value={lammitysLisa.putki_materiaali} options={PUTKI_MATERIAALIT_LAMM} onChange={(v) => setLisa({ putki_materiaali: v })} />
+                </Field>
+              </div>
+            )}
+
+            {/* Suora sähkölämmitys: patterit + LVV */}
+            {t.lammitysmuoto === "sahkolammitys" && (
+              <div className="rounded-md border border-border bg-card/40 p-4 space-y-4">
+                <p className="eyebrow text-primary">Sähköpatterit ja lämminvesivaraaja</p>
+                <Field label="Sähköpattereiden asennusvuosi"><Input type="number" value={lammitysLisa.sahkopatteri_asennettu_vuosi ?? ""} onChange={(e) => setLisa({ sahkopatteri_asennettu_vuosi: e.target.value })} /></Field>
+                <Row>
+                  <Field label="Lämminvesivaraajan merkki">
+                    <SelectOrOther value={lammitysLisa.lvv_merkki} options={MERKIT.sahkolammitys.merkit} onChange={(v) => setLisa({ lvv_merkki: v })} />
+                  </Field>
+                  <Field label="LVV:n mallimerkintä"><Input value={lammitysLisa.lvv_malli ?? ""} onChange={(e) => setLisa({ lvv_malli: e.target.value })} /></Field>
+                </Row>
+                <Field label="LVV:n asennusvuosi"><Input type="number" value={lammitysLisa.lvv_asennettu_vuosi ?? ""} onChange={(e) => setLisa({ lvv_asennettu_vuosi: e.target.value })} /></Field>
               </div>
             )}
 
