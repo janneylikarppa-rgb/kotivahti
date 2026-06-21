@@ -776,6 +776,8 @@ const asetuksetSchema = z.object({
   vesi_puhdas_eur_m3: z.number(),
   vesi_jatevesi_eur_m3: z.number(),
   vesi_perusmaksu_eur_kk: z.number().optional(),
+  edellinen_mittarilukema: z.number().optional().nullable(),
+  edellinen_sahkomittari: z.number().optional().nullable(),
 });
 
 export const saveAsetukset = createServerFn({ method: "POST" })
