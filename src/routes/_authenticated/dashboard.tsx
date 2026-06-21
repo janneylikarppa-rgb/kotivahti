@@ -33,9 +33,6 @@ function DashboardPage() {
   return (
     <div className="mx-auto max-w-7xl space-y-8">
       <header>
-        <p className="eyebrow mb-3 flex items-center gap-3">
-          <span className="block h-px w-8 bg-primary" /> Yleiskuva
-        </p>
         <h1 className="font-serif text-4xl md:text-5xl text-cream">
           Hei{data.nimi ? `, ${data.nimi}` : ""} – <em className="text-primary not-italic italic">talosi tänään</em>
         </h1>

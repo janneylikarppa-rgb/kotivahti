@@ -14,7 +14,7 @@ export type PtsKohde = {
 
 const i = (v: any): number | null => {
   const n = Number(v);
-  return Number.isFinite(n) && n > 1900 && n < 2200 ? n : null;
+  return Number.isFinite(n) && n >= 1800 && n < 2200 ? n : null;
 };
 const onLamm = (t: any, ...nimet: string[]) => {
   const m = String(t?.lammitysmuoto ?? "").toLowerCase();

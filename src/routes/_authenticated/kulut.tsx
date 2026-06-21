@@ -11,7 +11,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Plus, Trash2 } from "lucide-react";
-import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, Tooltip, CartesianGrid } from "recharts";
+import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, Tooltip, CartesianGrid, ComposedChart, Line, Legend, PieChart, Pie, Cell } from "recharts";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/kulut")({
@@ -66,10 +66,30 @@ function KulutPage() {
     kat: KAT_LABEL[kat],
     summa: tamaVuosi.filter((k: any) => k.kategoria === kat).reduce((s: number, k: any) => s + Number(k.summa || 0), 0),
   }));
-  const perKk = Array.from({ length: 12 }, (_, i) => ({
+
+  // A. Juoksevat: sähkö + vesi €/kk + kulutus (kWh, m³)
+  const juoksevatPerKk = Array.from({ length: 12 }, (_, i) => {
+    const kkRivit = tamaVuosi.filter((k: any) => new Date(k.pvm).getMonth() === i);
+    return {
+      kk: KK[i],
+      sahko: kkRivit.filter((k: any) => k.kategoria === "sahko").reduce((s: number, k: any) => s + Number(k.summa || 0), 0),
+      vesi: kkRivit.filter((k: any) => k.kategoria === "vesi").reduce((s: number, k: any) => s + Number(k.summa || 0), 0),
+      kwh: kkRivit.filter((k: any) => k.kategoria === "sahko").reduce((s: number, k: any) => s + Number(k.kwh || 0), 0),
+      m3: kkRivit.filter((k: any) => k.kategoria === "vesi").reduce((s: number, k: any) => s + Number(k.kulutus_m3 || 0), 0),
+    };
+  });
+  const huoltoPerKk = Array.from({ length: 12 }, (_, i) => ({
     kk: KK[i],
-    summa: tamaVuosi.filter((k: any) => new Date(k.pvm).getMonth() === i).reduce((s: number, k: any) => s + Number(k.summa || 0), 0),
+    summa: tamaVuosi.filter((k: any) => k.kategoria === "huolto" && new Date(k.pvm).getMonth() === i).reduce((s: number, k: any) => s + Number(k.summa || 0), 0),
   }));
+  const huoltoSumma = huoltoPerKk.reduce((s, r) => s + r.summa, 0);
+  const KIINTEAT_KAT = ["vakuutus", "kiinteistovero", "lammitys", "muu"] as const;
+  const kiinteatData = KIINTEAT_KAT.map((kat) => ({
+    nimi: KAT_LABEL[kat],
+    summa: tamaVuosi.filter((k: any) => k.kategoria === kat).reduce((s: number, k: any) => s + Number(k.summa || 0), 0),
+  })).filter((r) => r.summa > 0);
+  const kiinteatSumma = kiinteatData.reduce((s, r) => s + r.summa, 0);
+  const KIINTEAT_VARIT = ["#c9a961", "#7a8b99", "#8b6f47", "#5a6b7a"];
 
   return (
     <div className="mx-auto max-w-6xl space-y-8">
@@ -94,25 +114,96 @@ function KulutPage() {
         <TabsContent value="yhteenveto" className="space-y-6 pt-4">
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             <Stat label="Yhteensä" value={`${summa.toFixed(0)} €`} hi />
-            {["sahko", "vesi", "lammitys"].map((kat) => (
-              <Stat key={kat} label={KAT_LABEL[kat]}
-                    value={`${perKategoria.find((p) => p.kat === KAT_LABEL[kat])!.summa.toFixed(0)} €`} />
-            ))}
+            <Stat label="Sähkö" value={`${perKategoria.find((p) => p.kat === "Sähkö")!.summa.toFixed(0)} €`} />
+            <Stat label="Vesi" value={`${perKategoria.find((p) => p.kat === "Vesi")!.summa.toFixed(0)} €`} />
+            <Stat label="Huolto / korjaus" value={`${huoltoSumma.toFixed(0)} €`} />
           </div>
+
+          {/* A. Juoksevat kulut */}
           <Card className="gold-card">
             <CardContent className="pt-6">
-              <p className="eyebrow mb-4">Kulut kuukausittain</p>
-              <div className="h-64">
+              <p className="eyebrow mb-1">Juoksevat kulut</p>
+              <p className="text-xs text-muted-foreground mb-4">Sähkö ja vesi kuukausittain — kulutuksen trendi näkyy viivasta.</p>
+              <div className="h-72">
                 <ResponsiveContainer>
-                  <BarChart data={perKk}>
+                  <ComposedChart data={juoksevatPerKk}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
+                    <XAxis dataKey="kk" stroke="var(--muted-foreground)" fontSize={11} />
+                    <YAxis yAxisId="eur" stroke="var(--muted-foreground)" fontSize={11} label={{ value: "€", angle: 0, position: "insideTopLeft", fill: "var(--muted-foreground)", fontSize: 10 }} />
+                    <YAxis yAxisId="kulutus" orientation="right" stroke="var(--muted-foreground)" fontSize={11} />
+                    <Tooltip contentStyle={{ backgroundColor: "var(--card)", border: "1px solid var(--border)", borderRadius: 8 }} cursor={{ fill: "color-mix(in oklab, var(--gold) 8%, transparent)" }} />
+                    <Legend wrapperStyle={{ fontSize: 11 }} />
+                    <Bar yAxisId="eur" dataKey="sahko" name="Sähkö €" fill="var(--gold)" radius={[4, 4, 0, 0]} />
+                    <Bar yAxisId="eur" dataKey="vesi" name="Vesi €" fill="#7a8b99" radius={[4, 4, 0, 0]} />
+                    <Line yAxisId="kulutus" type="monotone" dataKey="kwh" name="Sähkö kWh" stroke="var(--gold)" strokeWidth={2} dot={false} />
+                    <Line yAxisId="kulutus" type="monotone" dataKey="m3" name="Vesi m³" stroke="#7a8b99" strokeWidth={2} strokeDasharray="4 4" dot={false} />
+                  </ComposedChart>
+                </ResponsiveContainer>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* B. Huolto & korjaus */}
+          <Card className="gold-card">
+            <CardContent className="pt-6">
+              <div className="flex items-end justify-between mb-4">
+                <div>
+                  <p className="eyebrow mb-1">Huolto & korjaus</p>
+                  <p className="text-xs text-muted-foreground">Suunnitellut ja akuutit huoltokulut kuukausittain.</p>
+                </div>
+                <p className="font-serif text-xl text-primary">{huoltoSumma.toFixed(0)} € / vuosi</p>
+              </div>
+              <div className="h-56">
+                <ResponsiveContainer>
+                  <BarChart data={huoltoPerKk}>
                     <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
                     <XAxis dataKey="kk" stroke="var(--muted-foreground)" fontSize={11} />
                     <YAxis stroke="var(--muted-foreground)" fontSize={11} />
-                    <Tooltip contentStyle={{ backgroundColor: "var(--card)", border: "1px solid var(--border)", borderRadius: 8 }} cursor={{ fill: "color-mix(in oklab, var(--gold) 8%, transparent)" }} />
-                    <Bar dataKey="summa" fill="var(--gold)" radius={[4, 4, 0, 0]} />
+                    <Tooltip contentStyle={{ backgroundColor: "var(--card)", border: "1px solid var(--border)", borderRadius: 8 }} cursor={{ fill: "color-mix(in oklab, #8b6f47 12%, transparent)" }} />
+                    <Bar dataKey="summa" name="Huolto €" fill="#8b6f47" radius={[4, 4, 0, 0]} />
                   </BarChart>
                 </ResponsiveContainer>
               </div>
+            </CardContent>
+          </Card>
+
+          {/* C. Kiinteät kulut */}
+          <Card className="gold-card">
+            <CardContent className="pt-6">
+              <div className="flex items-end justify-between mb-4">
+                <div>
+                  <p className="eyebrow mb-1">Kiinteät kulut</p>
+                  <p className="text-xs text-muted-foreground">Vakuutukset, verot, lämmitys ja muut vuosittaiset.</p>
+                </div>
+                <p className="font-serif text-xl text-primary">{kiinteatSumma.toFixed(0)} € / vuosi</p>
+              </div>
+              {kiinteatData.length === 0 ? (
+                <p className="py-8 text-center text-sm text-muted-foreground">Ei vielä kiinteitä kuluja tälle vuodelle.</p>
+              ) : (
+                <div className="grid gap-6 md:grid-cols-[180px_1fr] items-center">
+                  <div className="h-44">
+                    <ResponsiveContainer>
+                      <PieChart>
+                        <Pie data={kiinteatData} dataKey="summa" nameKey="nimi" innerRadius={40} outerRadius={70} paddingAngle={2}>
+                          {kiinteatData.map((_, i) => <Cell key={i} fill={KIINTEAT_VARIT[i % KIINTEAT_VARIT.length]} />)}
+                        </Pie>
+                        <Tooltip contentStyle={{ backgroundColor: "var(--card)", border: "1px solid var(--border)", borderRadius: 8 }} formatter={(v: any) => `${Number(v).toFixed(0)} €`} />
+                      </PieChart>
+                    </ResponsiveContainer>
+                  </div>
+                  <ul className="space-y-2">
+                    {kiinteatData.map((r, i) => (
+                      <li key={r.nimi} className="flex items-center justify-between gap-3 text-sm">
+                        <span className="flex items-center gap-2">
+                          <span className="block h-3 w-3 rounded-sm" style={{ backgroundColor: KIINTEAT_VARIT[i % KIINTEAT_VARIT.length] }} />
+                          <span className="text-cream">{r.nimi}</span>
+                        </span>
+                        <span className="font-mono text-primary">{r.summa.toFixed(0)} €</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
             </CardContent>
           </Card>
         </TabsContent>
