@@ -625,17 +625,55 @@ export const kuittaaHuolto = createServerFn({ method: "POST" })
   });
 
 // ---------- Kulut ----------
+async function materialisoiToistuvat(supabase: any, kiinteistoId: string) {
+  const { data: toistuvat } = await supabase
+    .from("toistuvat_kulut").select("*").eq("kiinteisto_id", kiinteistoId).eq("aktiivinen", true);
+  if (!toistuvat || toistuvat.length === 0) return;
+  const nykyinen = new Date().getFullYear();
+  const avaimet = toistuvat.flatMap((t: any) => {
+    const vuodet: number[] = [];
+    for (let v = Math.max(2000, Number(t.alkuvuosi)); v <= nykyinen; v++) vuodet.push(v);
+    return vuodet.map((v) => ({ t, v, avain: `toistuva:${t.id}:${v}` }));
+  });
+  if (avaimet.length === 0) return;
+  const { data: olemassa } = await supabase
+    .from("kulut").select("id, kohde_avain, summa, nimi, pvm")
+    .eq("kiinteisto_id", kiinteistoId)
+    .in("kohde_avain", avaimet.map((a: any) => a.avain));
+  const mapByAvain = new Map<string, any>((olemassa ?? []).map((r: any) => [r.kohde_avain, r]));
+  const insertit: any[] = [];
+  for (const { t, v, avain } of avaimet) {
+    const kk = String(t.eraantymiskuukausi).padStart(2, "0");
+    const pvm = `${v}-${kk}-01`;
+    const existing = mapByAvain.get(avain);
+    if (!existing) {
+      insertit.push({
+        kiinteisto_id: kiinteistoId,
+        nimi: t.nimi, kategoria: t.kategoria, summa: t.summa, pvm,
+        kohde_avain: avain,
+      });
+    } else if (Number(existing.summa) !== Number(t.summa) || existing.nimi !== t.nimi) {
+      await supabase.from("kulut").update({ summa: t.summa, nimi: t.nimi }).eq("id", existing.id);
+    }
+  }
+  if (insertit.length > 0) {
+    await supabase.from("kulut").insert(insertit);
+  }
+}
+
 export const getKulut = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
     const { supabase, userId } = context;
     const k = await getActiveKiinteisto(supabase, userId);
-    if (!k) return { kulut: [], asetukset: null };
-    const [kulutRes, asetuksetRes] = await Promise.all([
+    if (!k) return { kulut: [], asetukset: null, toistuvat: [] };
+    await materialisoiToistuvat(supabase, k.id);
+    const [kulutRes, asetuksetRes, toistuvatRes] = await Promise.all([
       supabase.from("kulut").select("*").eq("kiinteisto_id", k.id).order("pvm", { ascending: false }),
       supabase.from("kulu_asetukset").select("*").eq("kiinteisto_id", k.id).maybeSingle(),
+      supabase.from("toistuvat_kulut").select("*").eq("kiinteisto_id", k.id).order("nimi"),
     ]);
-    return { kulut: kulutRes.data ?? [], asetukset: asetuksetRes.data };
+    return { kulut: kulutRes.data ?? [], asetukset: asetuksetRes.data, toistuvat: toistuvatRes.data ?? [] };
   });
 
 const kuluSchema = z.object({
