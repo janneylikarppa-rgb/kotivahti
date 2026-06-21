@@ -52,7 +52,6 @@ export const PERUSHUOLLOT: Record<Kausi, HuoltoRivi[]> = {
     f("Pesukoneiden vesiletkujen tarkastus"),
     f("Ulkovesipisteen talvisulku ja tyhjennys"),
     f("Ilmalämpöpumpun talvivalmistelu"),
-    f("Öljysäiliön tilan tarkastus"),
   ],
   talvi: [
     f("Katon lumikuorman seuranta"),
@@ -88,16 +87,24 @@ export type TalonTiedotLite = {
   julkisivumateriaali?: string | null;
   kiuas_tyyppi?: string | null;
   hormityyppi?: string | null;
+  lammitys_lisatieto?: { kattila_tyyppi?: string | null } | null;
 };
 
 export function dynamicHuollot(tt: TalonTiedotLite | null | undefined): Partial<Record<Kausi, HuoltoRivi[]>> {
   const out: Record<Kausi, HuoltoRivi[]> = { kevat: [], kesa: [], syksy: [], talvi: [], ympari_vuoden: [] };
   if (!tt) return out;
 
+  const onOljy =
+    tt.lammitysmuoto === "oljylammitys" ||
+    tt.lammitys_lisatieto?.kattila_tyyppi === "oljy";
+  if (onOljy) {
+    out.syksy.push(t("Öljykattilan vuosihuolto (ammattilainen)"));
+    out.syksy.push(f("Öljysäiliön tilan tarkastus"));
+    out.kevat.push(f("Öljysäiliön kunnon silmämääräinen tarkastus"));
+  }
+
   switch (tt.lammitysmuoto) {
     case "oljylammitys":
-      out.syksy.push(t("Öljykattilan vuosihuolto (ammattilainen)"));
-      out.kevat.push(f("Öljysäiliön kunnon silmämääräinen tarkastus"));
       break;
     case "maalampo":
       out.kevat.push(t("Maalämpöpumpun määräaikaishuolto (2–3 v välein)"));
