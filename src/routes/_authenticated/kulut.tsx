@@ -2,7 +2,11 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
-import { addKulu, deleteKulu, getKulut, saveAsetukset } from "@/lib/kotivahti.functions";
+import {
+  addKulu, deleteKulu, getKulut, saveAsetukset,
+  addToistuvaKulu, updateToistuvaKulu, deleteToistuvaKulu,
+  tallennaKuukaudenMittari,
+} from "@/lib/kotivahti.functions";
 import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
@@ -10,7 +14,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Plus, Trash2 } from "lucide-react";
+import { Switch } from "@/components/ui/switch";
+import { Plus, Trash2, Repeat, Gauge } from "lucide-react";
 import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, Tooltip, CartesianGrid, ComposedChart, Line, Legend, PieChart, Pie, Cell } from "recharts";
 import { toast } from "sonner";
 
@@ -23,21 +28,37 @@ export const Route = createFileRoute("/_authenticated/kulut")({
 });
 
 const KK = ["Tam", "Hel", "Maa", "Huh", "Tou", "Kes", "Hei", "Elo", "Syy", "Lok", "Mar", "Jou"];
+const KK_PITKA = ["Tammikuu","Helmikuu","Maaliskuu","Huhtikuu","Toukokuu","Kesäkuu","Heinäkuu","Elokuu","Syyskuu","Lokakuu","Marraskuu","Joulukuu"];
 const KATEGORIAT = ["sahko", "vesi", "lammitys", "huolto", "vakuutus", "kiinteistovero", "muu"] as const;
 const KAT_LABEL: Record<string, string> = { sahko: "Sähkö", vesi: "Vesi", lammitys: "Lämmitys", huolto: "Huolto", vakuutus: "Vakuutus", kiinteistovero: "Kiinteistövero", muu: "Muu" };
+const TOISTUVA_KATEGORIAT = ["vakuutus", "kiinteistovero", "muu"] as const;
+const PIKAMALLIT: { nimi: string; kategoria: string }[] = [
+  { nimi: "Kiinteistövero", kategoria: "kiinteistovero" },
+  { nimi: "Kotivakuutus", kategoria: "vakuutus" },
+  { nimi: "Maavuokra", kategoria: "muu" },
+  { nimi: "Jätehuolto", kategoria: "muu" },
+  { nimi: "Talvikunnossapito", kategoria: "muu" },
+  { nimi: "Nuohous-sopimus", kategoria: "muu" },
+];
 
 function KulutPage() {
   const fetchFn = useServerFn(getKulut);
   const addFn = useServerFn(addKulu);
   const delFn = useServerFn(deleteKulu);
   const saveAsFn = useServerFn(saveAsetukset);
+  const addToistuvaFn = useServerFn(addToistuvaKulu);
+  const updateToistuvaFn = useServerFn(updateToistuvaKulu);
+  const deleteToistuvaFn = useServerFn(deleteToistuvaKulu);
+  const tallennaMittariFn = useServerFn(tallennaKuukaudenMittari);
   const qc = useQueryClient();
   const { data, isLoading } = useQuery({ queryKey: ["kulut"], queryFn: () => fetchFn(), staleTime: 30_000 });
   const [vuosi, setVuosi] = useState<number>(new Date().getFullYear());
 
+  const invalidate = () => { qc.invalidateQueries({ queryKey: ["kulut"] }); qc.invalidateQueries({ queryKey: ["dashboard"] }); };
+
   const addM = useMutation({
     mutationFn: (v: any) => addFn({ data: v }),
-    onSuccess: () => { toast.success("Kulu lisätty"); qc.invalidateQueries({ queryKey: ["kulut"] }); qc.invalidateQueries({ queryKey: ["dashboard"] }); },
+    onSuccess: () => { toast.success("Kulu lisätty"); invalidate(); },
     onError: (e: any) => toast.error(e.message),
   });
   const delM = useMutation({
@@ -47,16 +68,41 @@ function KulutPage() {
         : false;
       return delFn({ data: { id: kulu.id, poista_myos_linkitetty } });
     },
-    onSuccess: () => { qc.invalidateQueries({ queryKey: ["kulut"] }); qc.invalidateQueries({ queryKey: ["dashboard"] }); },
+    onSuccess: invalidate,
   });
   const saveM = useMutation({
     mutationFn: (v: any) => saveAsFn({ data: v }),
-    onSuccess: () => { toast.success("Asetukset tallennettu"); qc.invalidateQueries({ queryKey: ["kulut"] }); },
+    onSuccess: () => { toast.success("Asetukset tallennettu"); invalidate(); },
+  });
+  const addToistuvaM = useMutation({
+    mutationFn: (v: any) => addToistuvaFn({ data: v }),
+    onSuccess: () => { toast.success("Toistuva kulu lisätty"); invalidate(); },
+    onError: (e: any) => toast.error(e.message),
+  });
+  const updateToistuvaM = useMutation({
+    mutationFn: (v: any) => updateToistuvaFn({ data: v }),
+    onSuccess: invalidate,
+  });
+  const deleteToistuvaM = useMutation({
+    mutationFn: (id: string) => deleteToistuvaFn({ data: { id, poista_materialisoidut: true } }),
+    onSuccess: () => { toast.success("Toistuva kulu poistettu"); invalidate(); },
+  });
+  const mittariM = useMutation({
+    mutationFn: (v: any) => tallennaMittariFn({ data: v }),
+    onSuccess: (r: any) => {
+      const osat: string[] = [];
+      if (r?.sahko) osat.push(`Sähkö ${r.sahko.kulutus.toFixed(0)} kWh · ${r.sahko.summa.toFixed(2)} €`);
+      if (r?.vesi) osat.push(`Vesi ${r.vesi.kulutus.toFixed(2)} m³ · ${r.vesi.summa.toFixed(2)} €`);
+      toast.success(osat.join(" · ") || "Mittarilukema tallennettu");
+      invalidate();
+    },
+    onError: (e: any) => toast.error(e.message),
   });
 
   if (isLoading) return <p className="text-muted-foreground">Ladataan...</p>;
   const kulut = data?.kulut ?? [];
   const asetukset = data?.asetukset;
+  const toistuvat = data?.toistuvat ?? [];
   const nykyinen = new Date().getFullYear();
   const vuodetSaatavilla = Array.from(new Set<number>([nykyinen, ...kulut.map((k: any) => new Date(k.pvm).getFullYear())])).sort((a, b) => b - a);
   const tamaVuosi = kulut.filter((k: any) => new Date(k.pvm).getFullYear() === vuosi);
@@ -67,7 +113,6 @@ function KulutPage() {
     summa: tamaVuosi.filter((k: any) => k.kategoria === kat).reduce((s: number, k: any) => s + Number(k.summa || 0), 0),
   }));
 
-  // A. Juoksevat: sähkö + vesi €/kk + kulutus (kWh, m³)
   const juoksevatPerKk = Array.from({ length: 12 }, (_, i) => {
     const kkRivit = tamaVuosi.filter((k: any) => new Date(k.pvm).getMonth() === i);
     return {
@@ -108,10 +153,13 @@ function KulutPage() {
         <TabsList>
           <TabsTrigger value="yhteenveto">Yhteenveto</TabsTrigger>
           <TabsTrigger value="kaikki">Kaikki kulut</TabsTrigger>
+          <TabsTrigger value="toistuvat">Toistuvat kulut</TabsTrigger>
           <TabsTrigger value="asetukset">Asetukset</TabsTrigger>
         </TabsList>
 
         <TabsContent value="yhteenveto" className="space-y-6 pt-4">
+          <MittariKortti asetukset={asetukset} onSave={(v) => mittariM.mutate(v)} loading={mittariM.isPending} />
+
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             <Stat label="Yhteensä" value={`${summa.toFixed(0)} €`} hi />
             <Stat label="Sähkö" value={`${perKategoria.find((p) => p.kat === "Sähkö")!.summa.toFixed(0)} €`} />
@@ -119,7 +167,6 @@ function KulutPage() {
             <Stat label="Huolto / korjaus" value={`${huoltoSumma.toFixed(0)} €`} />
           </div>
 
-          {/* A. Juoksevat kulut */}
           <Card className="gold-card">
             <CardContent className="pt-6">
               <p className="eyebrow mb-1">Juoksevat kulut</p>
@@ -129,7 +176,7 @@ function KulutPage() {
                   <ComposedChart data={juoksevatPerKk}>
                     <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
                     <XAxis dataKey="kk" stroke="var(--muted-foreground)" fontSize={11} />
-                    <YAxis yAxisId="eur" stroke="var(--muted-foreground)" fontSize={11} label={{ value: "€", angle: 0, position: "insideTopLeft", fill: "var(--muted-foreground)", fontSize: 10 }} />
+                    <YAxis yAxisId="eur" stroke="var(--muted-foreground)" fontSize={11} />
                     <YAxis yAxisId="kulutus" orientation="right" stroke="var(--muted-foreground)" fontSize={11} />
                     <Tooltip contentStyle={{ backgroundColor: "var(--card)", border: "1px solid var(--border)", borderRadius: 8 }} cursor={{ fill: "color-mix(in oklab, var(--gold) 8%, transparent)" }} />
                     <Legend wrapperStyle={{ fontSize: 11 }} />
@@ -143,7 +190,6 @@ function KulutPage() {
             </CardContent>
           </Card>
 
-          {/* B. Huolto & korjaus */}
           <Card className="gold-card">
             <CardContent className="pt-6">
               <div className="flex items-end justify-between mb-4">
@@ -167,7 +213,6 @@ function KulutPage() {
             </CardContent>
           </Card>
 
-          {/* C. Kiinteät kulut */}
           <Card className="gold-card">
             <CardContent className="pt-6">
               <div className="flex items-end justify-between mb-4">
@@ -217,23 +262,39 @@ function KulutPage() {
           ) : (
             <Card className="gold-card"><CardContent className="p-0">
               <ul className="divide-y divide-border/60">
-                {kulut.map((k: any) => (
-                  <li key={k.id} className="flex items-center gap-4 px-4 py-3">
-                    <span className="eyebrow w-28 text-muted-foreground">{KAT_LABEL[k.kategoria] || k.kategoria}</span>
-                    <div className="flex-1">
-                      <p className="text-cream flex items-center gap-1">
-                        {k.huolto_id && <span title="Linkitetty huoltohistoriaan" aria-label="Linkitetty huoltohistoriaan">🔧</span>}
-                        {k.nimi}
-                      </p>
-                      <p className="text-xs text-muted-foreground">{new Date(k.pvm).toLocaleDateString("fi-FI")}{k.kwh ? ` · ${k.kwh} kWh` : ""}{k.kulutus_m3 ? ` · ${k.kulutus_m3} m³` : ""}</p>
-                    </div>
-                    <span className="font-mono text-primary">{Number(k.summa).toFixed(2)} €</span>
-                    <Button variant="ghost" size="icon" onClick={() => delM.mutate(k)}><Trash2 className="h-4 w-4" /></Button>
-                  </li>
-                ))}
+                {kulut.map((k: any) => {
+                  const onToistuva = typeof k.kohde_avain === "string" && k.kohde_avain.startsWith("toistuva:");
+                  const onMittari = typeof k.kohde_avain === "string" && k.kohde_avain.startsWith("mittari:");
+                  return (
+                    <li key={k.id} className="flex items-center gap-4 px-4 py-3">
+                      <span className="eyebrow w-28 text-muted-foreground">{KAT_LABEL[k.kategoria] || k.kategoria}</span>
+                      <div className="flex-1">
+                        <p className="text-cream flex items-center gap-1.5">
+                          {k.huolto_id && <span title="Linkitetty huoltohistoriaan">🔧</span>}
+                          {onToistuva && <Repeat className="h-3.5 w-3.5 text-primary" />}
+                          {onMittari && <Gauge className="h-3.5 w-3.5 text-primary" />}
+                          {k.nimi}
+                        </p>
+                        <p className="text-xs text-muted-foreground">{new Date(k.pvm).toLocaleDateString("fi-FI")}{k.kwh ? ` · ${k.kwh} kWh` : ""}{k.kulutus_m3 ? ` · ${k.kulutus_m3} m³` : ""}</p>
+                      </div>
+                      <span className="font-mono text-primary">{Number(k.summa).toFixed(2)} €</span>
+                      {!onToistuva && (
+                        <Button variant="ghost" size="icon" onClick={() => delM.mutate(k)}><Trash2 className="h-4 w-4" /></Button>
+                      )}
+                    </li>
+                  );
+                })}
               </ul>
             </CardContent></Card>
           )}
+        </TabsContent>
+
+        <TabsContent value="toistuvat" className="space-y-4 pt-4">
+          <ToistuvatVali toistuvat={toistuvat}
+            onAdd={(v) => addToistuvaM.mutate(v)}
+            onUpdate={(v) => updateToistuvaM.mutate(v)}
+            onDelete={(id) => deleteToistuvaM.mutate(id)}
+            adding={addToistuvaM.isPending} />
         </TabsContent>
 
         <TabsContent value="asetukset" className="pt-4">
@@ -250,6 +311,167 @@ function Stat({ label, value, hi }: { label: string; value: string; hi?: boolean
       <p className="eyebrow">{label}</p>
       <p className={`mt-2 font-serif text-3xl ${hi ? "text-primary" : "text-cream"}`}>{value}</p>
     </CardContent></Card>
+  );
+}
+
+function MittariKortti({ asetukset, onSave, loading }: { asetukset: any; onSave: (v: any) => void; loading: boolean }) {
+  const nyt = new Date();
+  const [vuosi, setVuosi] = useState(nyt.getFullYear());
+  const [kk, setKk] = useState(nyt.getMonth() + 1);
+  const [sahko, setSahko] = useState("");
+  const [vesi, setVesi] = useState("");
+
+  const edSahko = Number(asetukset?.edellinen_sahkomittari || 0);
+  const edVesi = Number(asetukset?.edellinen_mittarilukema || 0);
+  const sahkoTariffi = Number(asetukset?.sahko_energia_snt || 0) + Number(asetukset?.sahko_siirto_snt || 0);
+  const sahkoPerus = Number(asetukset?.sahko_perusmaksu_eur_kk || 0);
+  const vesiTariffi = Number(asetukset?.vesi_puhdas_eur_m3 || 0) + Number(asetukset?.vesi_jatevesi_eur_m3 || 0);
+  const vesiPerus = Number(asetukset?.vesi_perusmaksu_eur_kk || 0);
+
+  const sahkoKulutus = sahko ? Math.max(0, Number(sahko) - edSahko) : 0;
+  const sahkoEur = sahko ? (sahkoKulutus * sahkoTariffi) / 100 + sahkoPerus : 0;
+  const vesiKulutus = vesi ? Math.max(0, Number(vesi) - edVesi) : 0;
+  const vesiEur = vesi ? vesiKulutus * vesiTariffi + vesiPerus : 0;
+
+  const submit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!sahko && !vesi) { toast.error("Anna ainakin yksi mittarilukema"); return; }
+    const v: any = { vuosi, kuukausi: kk };
+    if (sahko) v.sahko_lukema = Number(sahko);
+    if (vesi) v.vesi_lukema = Number(vesi);
+    onSave(v);
+    setSahko(""); setVesi("");
+  };
+
+  return (
+    <Card className="gold-card">
+      <CardContent className="pt-6">
+        <div className="flex items-center gap-2 mb-1">
+          <Gauge className="h-4 w-4 text-primary" />
+          <p className="eyebrow">Kuukauden mittarilukemat</p>
+        </div>
+        <p className="text-xs text-muted-foreground mb-4">Syötä mittarilukema kerran kuussa — €-summa lasketaan automaattisesti asetusten tariffeista.</p>
+        <form onSubmit={submit} className="grid gap-3 md:grid-cols-[1fr_1fr_1fr_1fr_auto] items-end">
+          <div className="space-y-1.5">
+            <Label className="text-xs">Kuukausi</Label>
+            <Select value={String(kk)} onValueChange={(v) => setKk(Number(v))}>
+              <SelectTrigger><SelectValue /></SelectTrigger>
+              <SelectContent>{KK_PITKA.map((n, i) => <SelectItem key={i} value={String(i + 1)}>{n}</SelectItem>)}</SelectContent>
+            </Select>
+          </div>
+          <div className="space-y-1.5">
+            <Label className="text-xs">Vuosi</Label>
+            <Input type="number" value={vuosi} onChange={(e) => setVuosi(Number(e.target.value))} />
+          </div>
+          <div className="space-y-1.5">
+            <Label className="text-xs">Sähkömittari (kWh)</Label>
+            <Input type="number" step="0.01" value={sahko} onChange={(e) => setSahko(e.target.value)} placeholder={edSahko ? `ed. ${edSahko}` : "lukema"} />
+          </div>
+          <div className="space-y-1.5">
+            <Label className="text-xs">Vesimittari (m³)</Label>
+            <Input type="number" step="0.001" value={vesi} onChange={(e) => setVesi(e.target.value)} placeholder={edVesi ? `ed. ${edVesi}` : "lukema"} />
+          </div>
+          <Button type="submit" disabled={loading} className="uppercase tracking-wider font-semibold">{loading ? "Tallennetaan..." : "Tallenna"}</Button>
+        </form>
+        {(sahko || vesi) && (
+          <div className="mt-3 flex flex-wrap gap-x-6 gap-y-1 text-xs text-muted-foreground">
+            {sahko && <span>Sähkö: <span className="text-cream">{sahkoKulutus.toFixed(0)} kWh</span> → <span className="text-primary font-mono">{sahkoEur.toFixed(2)} €</span></span>}
+            {vesi && <span>Vesi: <span className="text-cream">{vesiKulutus.toFixed(2)} m³</span> → <span className="text-primary font-mono">{vesiEur.toFixed(2)} €</span></span>}
+          </div>
+        )}
+      </CardContent>
+    </Card>
+  );
+}
+
+function ToistuvatVali({ toistuvat, onAdd, onUpdate, onDelete, adding }:
+  { toistuvat: any[]; onAdd: (v: any) => void; onUpdate: (v: any) => void; onDelete: (id: string) => void; adding: boolean }) {
+  return (
+    <div className="space-y-4">
+      <div className="flex justify-between items-end gap-4">
+        <p className="text-xs text-muted-foreground max-w-2xl">Lisää vuosittain toistuvat kiinteät kulut — ne ilmestyvät automaattisesti Kulut-yhteenvetoon joka vuodelle alkuvuodesta nykyhetkeen.</p>
+        <ToistuvaDialog onSave={onAdd} loading={adding} />
+      </div>
+      {toistuvat.length === 0 ? (
+        <Card className="gold-card"><CardContent className="py-12 text-center text-muted-foreground">Ei vielä toistuvia kuluja.</CardContent></Card>
+      ) : (
+        <Card className="gold-card"><CardContent className="p-0">
+          <ul className="divide-y divide-border/60">
+            {toistuvat.map((t: any) => (
+              <li key={t.id} className="flex items-center gap-4 px-4 py-3">
+                <Repeat className="h-4 w-4 text-primary" />
+                <span className="eyebrow w-28 text-muted-foreground">{KAT_LABEL[t.kategoria] || t.kategoria}</span>
+                <div className="flex-1">
+                  <p className="text-cream">{t.nimi}</p>
+                  <p className="text-xs text-muted-foreground">{KK_PITKA[t.eraantymiskuukausi - 1]} · alkaen {t.alkuvuosi}</p>
+                </div>
+                <Switch checked={t.aktiivinen} onCheckedChange={(v) => onUpdate({ id: t.id, aktiivinen: v })} />
+                <span className="font-mono text-primary w-24 text-right">{Number(t.summa).toFixed(0)} € / v</span>
+                <Button variant="ghost" size="icon" onClick={() => { if (window.confirm("Poistetaanko myös aiemmin luodut vuosittaiset rivit?")) onDelete(t.id); }}>
+                  <Trash2 className="h-4 w-4" />
+                </Button>
+              </li>
+            ))}
+          </ul>
+        </CardContent></Card>
+      )}
+    </div>
+  );
+}
+
+function ToistuvaDialog({ onSave, loading }: { onSave: (v: any) => void; loading: boolean }) {
+  const [open, setOpen] = useState(false);
+  const [nimi, setNimi] = useState("");
+  const [kategoria, setKategoria] = useState<string>("muu");
+  const [summa, setSumma] = useState("");
+  const [kk, setKk] = useState(1);
+  const [alku, setAlku] = useState(new Date().getFullYear());
+
+  const submit = (e: React.FormEvent) => {
+    e.preventDefault();
+    const s = Number(summa);
+    if (!nimi || !s) { toast.error("Anna nimi ja summa"); return; }
+    onSave({ nimi, kategoria, summa: s, eraantymiskuukausi: kk, alkuvuosi: alku, aktiivinen: true });
+    setOpen(false); setNimi(""); setSumma("");
+  };
+
+  return (
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild><Button className="uppercase tracking-wider font-semibold"><Plus className="mr-2 h-4 w-4" /> Lisää toistuva</Button></DialogTrigger>
+      <DialogContent className="max-w-md">
+        <DialogHeader><DialogTitle className="font-serif text-xl">Toistuva vuosikulu</DialogTitle></DialogHeader>
+        <div className="flex flex-wrap gap-2 mb-1">
+          {PIKAMALLIT.map((p) => (
+            <button key={p.nimi} type="button" onClick={() => { setNimi(p.nimi); setKategoria(p.kategoria); }}
+              className="text-xs px-3 py-1 rounded-full border border-border/60 text-muted-foreground hover:text-primary hover:border-primary/60 transition">
+              {p.nimi}
+            </button>
+          ))}
+        </div>
+        <form onSubmit={submit} className="space-y-4">
+          <div className="space-y-2"><Label>Nimi</Label><Input value={nimi} onChange={(e) => setNimi(e.target.value)} required /></div>
+          <div className="grid grid-cols-2 gap-3">
+            <div className="space-y-2"><Label>Kategoria</Label>
+              <Select value={kategoria} onValueChange={setKategoria}>
+                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectContent>{TOISTUVA_KATEGORIAT.map((k) => <SelectItem key={k} value={k}>{KAT_LABEL[k]}</SelectItem>)}</SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2"><Label>Summa (€/v)</Label><Input type="number" step="0.01" value={summa} onChange={(e) => setSumma(e.target.value)} required /></div>
+          </div>
+          <div className="grid grid-cols-2 gap-3">
+            <div className="space-y-2"><Label>Erääntymiskuukausi</Label>
+              <Select value={String(kk)} onValueChange={(v) => setKk(Number(v))}>
+                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectContent>{KK_PITKA.map((n, i) => <SelectItem key={i} value={String(i + 1)}>{n}</SelectItem>)}</SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2"><Label>Alkuvuosi</Label><Input type="number" value={alku} onChange={(e) => setAlku(Number(e.target.value))} /></div>
+          </div>
+          <Button type="submit" disabled={loading} className="w-full uppercase tracking-wider font-semibold">{loading ? "Tallennetaan..." : "Tallenna"}</Button>
+        </form>
+      </DialogContent>
+    </Dialog>
   );
 }
 
@@ -339,6 +561,8 @@ function AsetuksetForm({ asetukset, onSave, loading }: { asetukset: any; onSave:
   const [vp, setVp] = useState(asetukset?.vesi_puhdas_eur_m3 ?? 2.5);
   const [vj, setVj] = useState(asetukset?.vesi_jatevesi_eur_m3 ?? 3.5);
   const [vpm, setVpm] = useState(asetukset?.vesi_perusmaksu_eur_kk ?? 0);
+  const [edS, setEdS] = useState(asetukset?.edellinen_sahkomittari ?? 0);
+  const [edV, setEdV] = useState(asetukset?.edellinen_mittarilukema ?? 0);
 
   return (
     <Card className="gold-card"><CardContent className="pt-6 space-y-5">
@@ -358,7 +582,15 @@ function AsetuksetForm({ asetukset, onSave, loading }: { asetukset: any; onSave:
           <div className="space-y-2"><Label>Perusmaksu (€/kk)</Label><Input type="number" step="0.01" value={vpm} onChange={(e) => setVpm(Number(e.target.value))} /></div>
         </div>
       </div>
-      <Button onClick={() => onSave({ sahko_energia_snt: se, sahko_siirto_snt: ss, sahko_perusmaksu_eur_kk: sp, vesi_puhdas_eur_m3: vp, vesi_jatevesi_eur_m3: vj, vesi_perusmaksu_eur_kk: vpm })}
+      <div>
+        <h3 className="font-serif text-lg text-cream mb-3">Edelliset mittarilukemat</h3>
+        <p className="text-xs text-muted-foreground mb-3">Käytetään lähtöarvona kun syötät seuraavan kuukauden lukeman. Päivittyy automaattisesti jokaisen tallennuksen jälkeen.</p>
+        <div className="grid grid-cols-2 gap-3">
+          <div className="space-y-2"><Label>Sähkömittari (kWh)</Label><Input type="number" step="0.01" value={edS} onChange={(e) => setEdS(Number(e.target.value))} /></div>
+          <div className="space-y-2"><Label>Vesimittari (m³)</Label><Input type="number" step="0.001" value={edV} onChange={(e) => setEdV(Number(e.target.value))} /></div>
+        </div>
+      </div>
+      <Button onClick={() => onSave({ sahko_energia_snt: se, sahko_siirto_snt: ss, sahko_perusmaksu_eur_kk: sp, vesi_puhdas_eur_m3: vp, vesi_jatevesi_eur_m3: vj, vesi_perusmaksu_eur_kk: vpm, edellinen_sahkomittari: Number(edS), edellinen_mittarilukema: Number(edV) })}
               disabled={loading} className="uppercase tracking-wider font-semibold">
         {loading ? "Tallennetaan..." : "Tallenna asetukset"}
       </Button>
