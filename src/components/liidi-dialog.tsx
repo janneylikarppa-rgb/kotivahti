@@ -153,7 +153,7 @@ export function LiidiDialog({ open, onOpenChange, esitaytetty }: LiidiDialogProp
         <DialogHeader>
           <DialogTitle className="font-serif text-2xl">Tilaa palvelu</DialogTitle>
           <DialogDescription>
-            Välitämme pyynnön tarkastetuille ammattilaisille omalla alueellasi.
+            Välitämme pyynnön tarkastetuille oman paikkakuntasi ammattilaiselle. Palvelu on maksuton, ja sen käyttämisestä voit itse päättää.
           </DialogDescription>
         </DialogHeader>
 
