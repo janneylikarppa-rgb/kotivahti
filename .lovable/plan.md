@@ -1,57 +1,83 @@
-## 1. Rakennusvuosi 1900 -bugi
+## Tavoite
 
-`src/lib/pts-kohteet.ts` rivi 17:
+1. Käyttäjä lisää **toistuvat vuosittaiset kiinteät kulut** (esim. kiinteistövero, kotivakuutus, maavuokra, jätehuolto, talvikunnossapito, nuohous-sopimus) → näkyvät automaattisesti joka vuoden Kulut-yhteenvedossa ja kaavioissa.
+2. **Sähkö ja vesi** saadaan kuukausittain automaattisesti: käyttäjä syöttää vain mittarilukeman (esim. kuukauden 1. päivä), summa lasketaan asetuksissa olevista tariffeista (energia + siirto + perusmaksu / vesi €/m³ + jätevesi + perusmaksu). Ei enää tarvetta syöttää € erikseen.
+
+## Käyttäjäkokemus
+
+### A) Uusi välilehti "Toistuvat kulut"
+
+Lista nykyisistä → nimi, kategoria, €/vuosi, erääntymiskuukausi, poista.
+
+"Lisää toistuva kulu" -dialog, jossa pikamallit-rivi: **Kiinteistövero · Kotivakuutus · Maavuokra · Jätehuolto · Talvikunnossapito · Nuohous-sopimus**. Kentät: nimi, kategoria (vakuutus / kiinteistovero / muu), summa €/v, erääntymiskuukausi, alkuvuosi.
+
+### B) Mittarilukema-pohjainen kuukausisyöttö
+
+**Kulut-sivun ylälaitaan** uusi kortti "Kuukauden mittarilukemat":
+- Kentät: kuukausi (oletus kuluva), Sähkömittari (kWh), Vesimittari (m³)
+- Painike "Tallenna kuukauden mittari"
+- Järjestelmä laskee:
+  - Sähkö-kulutus = lukema − edellinen sähkölukema; summa = kulutus × (energia + siirto) / 100 + perusmaksu
+  - Vesi-kulutus = lukema − edellinen vesilukema; summa = kulutus × (puhdas + jätevesi) + perusmaksu
+- Luo kaksi `kulut`-riviä (kategoria sahko/vesi), kohde_avain `mittari:sahko:YYYY-MM` / `mittari:vesi:YYYY-MM` (idempotentti — saman kk:n uusi syöttö päivittää).
+- Päivittää `kulu_asetukset.edellinen_mittarilukema` veteen + uusi sarake `edellinen_sahkomittari` sähkölle.
+
+Nykyinen "Lisää kulu" -dialog jää ennalleen yksittäisiä/satunnaisia kuluja varten (esim. huolto, vakuutus-rivi käsin), mutta sähkö ja vesi tulevat ensisijaisesti mittarilukemista.
+
+### C) Yhteenveto
+
+Toistuvat kulut näkyvät automaattisesti Kiinteät-piirakassa heti lisäyksen jälkeen. Sähkö/vesi näkyvät Juoksevat-kuvaajassa heti mittarilukeman tallennuksen jälkeen.
+
+## Tekninen toteutus
+
+### 1. Migraatio
+
+**Uusi taulu `toistuvat_kulut`**:
 ```
-n > 1900 && n < 2200  →  n >= 1900 && n < 2200
+id uuid pk, kiinteisto_id uuid fk (cascade),
+nimi text, kategoria text (vakuutus|kiinteistovero|muu),
+summa numeric, erääntymiskuukausi smallint (1..12) default 1,
+alkuvuosi int default extract(year from now()),
+aktiivinen boolean default true,
+created_at, updated_at timestamptz
 ```
-Validaattori `i()` palauttaa nyt `null` arvolle 1900, jolloin kaikki `rakV(t)`-pohjaiset PTS-rivit (julkisivu, katto, putket, viemäri, sähköt jne.) tippuvat pois "ei tietoa" -tilaan. Yläraja >= ja alaraja tarkistettava että 1900 on sallittu.
+RLS: omistajan luku/kirjoitus `omistaa_kiinteiston(kiinteisto_id)`. Grantit authenticated + service_role. `set_updated_at`-trigger.
 
-## 2. Öljysäiliön tarkastus vain öljylämmittäjille
+**`kulu_asetukset`** lisäys:
+- `edellinen_sahkomittari numeric default 0`
+- `edellinen_vesimittari_pvm date` (valinnainen — viimeksi syötetty kk)
+- `edellinen_sahkomittari_pvm date`
 
-`src/lib/vuosikello-data.ts`:
-- Poistetaan rivi 55 `f("Öljysäiliön tilan tarkastus")` `STAATTISET.syksy`-listasta.
-- `dynamicHuollot()`-funktion `case "oljylammitys"` -haaraan lisätään syksyyn `f("Öljysäiliön tilan tarkastus")` (kevätrivi pysyy).
-- Lisäksi `lammitys_lisatieto.kattila_tyyppi === "oljy"` (uusi keskuslämmityskattilamalli) huomioidaan samalla logiikalla, ettei rivi katoa migroiduilta käyttäjiltä.
+### 2. Server-funktiot `src/lib/kotivahti.functions.ts`
 
-## 3. Kulut-näkymän uudistus
+- `getToistuvatKulut()` — listaa
+- `addToistuvaKulu / updateToistuvaKulu / deleteToistuvaKulu`
+- `tallennaKuukaudenMittari({ vuosi, kuukausi, sahko_lukema?, vesi_lukema? })`
+  - Lukee asetukset (tariffit + edelliset lukemat)
+  - Laskee €, upsertaa `kulut`-rivin kohde_avaimella `mittari:sahko:YYYY-MM` / `mittari:vesi:YYYY-MM`
+  - Päivittää `kulu_asetukset.edellinen_*mittari` + `_pvm`
+  - Palauttaa lasketut summat käyttäjälle vahvistukseksi
 
-Korvataan nykyinen yksi `BarChart` (`perKk`, kaikki kategoriat yhteen pinkkaamattomaan palkkiin) `kulut.tsx`-tiedoston Yhteenveto-välilehdellä **kolmiosaisella näkymällä**, jossa kaikki saman vuoden data näkyy yhdellä silmäyksellä:
+### 3. `getKulut`-materialisointi
 
-**A. Juoksevat kulut – Sähkö & Vesi (yhdistetty pylväs+viiva -kaavio)**
-- `ComposedChart`: pylväät = €/kk (Sähkö kullanruskea, Vesi sininen), kaksi viivaa = kulutus (kWh, m³) toissijaisella Y-akselilla.
-- Otsikko "Juoksevat kulut" + alle pieni info "Sähkö ja vesi kuukausittain – trendi näkyy viivasta."
+`getKulut`-funktiossa: hae aktiiviset toistuvat, ja jokaiselle (toistuva, vuosi alkuvuosi..kuluva) varmista `kulut`-rivi kohde_avaimella `toistuva:{id}:{vuosi}` (upsert). Olemassa olevan rivin summa/nimi/pvm päivitetään, jos toistuvaa on muokattu.
 
-**B. Huolto & korjaus -kulut (oma kaavio, eri väri)**
-- Pylväät kuukausittain (`huolto`-kategoria), eri värisävy (esim. vihreä/oranssi) erottuakseen juoksevista. Yhteissumma vuodessa otsikon vieressä.
+### 4. UI `src/routes/_authenticated/kulut.tsx`
 
-**C. Kiinteät kulut (vakuutus + kiinteistövero + muu)**
-- Donitsi tai vaakapylväs: kategoriasummat vuodessa. Otsikko "Kiinteät kulut – vakuutukset, verot ja muut".
+- Uusi kortti "Kuukauden mittarilukemat" Yhteenveto-välilehden yläosaan (näyttää edellisen lukeman ja lasketun esikatselun reaaliajassa).
+- Uusi välilehti `Toistuvat kulut` (lista + dialog + pikamallit).
+- `Kaikki kulut`-listalla: 🔁 toistuville (`kohde_avain LIKE 'toistuva:%'`), 📊 mittareille (`kohde_avain LIKE 'mittari:%'`).
+- Asetukset-välilehti pysyy (tariffit + perusmaksut säädetään täällä).
 
-Stat-kortteihin yläosaan lisätään neljäs: "Huolto/korjaus" `summa` (`huolto`-kategoria).
+### 5. Yhteensopivuus
 
-`KAT_LABEL` ja `KATEGORIAT` pysyvät, vain ryhmittely:
-```
-JUOKSEVAT = ["sahko","vesi","lammitys"]
-HUOLTO    = ["huolto"]
-KIINTEAT  = ["vakuutus","kiinteistovero","muu"]
-```
+- Olemassaoleva "Lisää kulu" -dialog säilyy.
+- Nykyinen `edellinen_mittarilukema` (vesi) migroidaan: arvo kopioidaan myös uuteen `edellinen_vesimittari`-sarakkeeseen tai pidetään käytössä — käytetään nykyistä saraketta ja lisätään vain `edellinen_sahkomittari` + päivämääräkentät, jotta vältetään koodin rikkoutuminen.
 
-## 4. Poista "Yleiskuva"-eyebrow Dashboardista
+## Vaikutusalue
 
-`src/routes/_authenticated/dashboard.tsx` rivit 36–38: poistetaan `<p className="eyebrow">… Yleiskuva</p>` kokonaan. H1 ja kuvausteksti jäävät.
+- DB: 1 uusi taulu + 3 saraketta `kulu_asetukset`-tauluun
+- 5 uutta server-funktiota + `getKulut`-materialisointi
+- UI: vain `kulut.tsx`
 
-## 5. Tilaa palvelu -kortin teksti
-
-`src/components/liidi-dialog.tsx` rivi 155–157 `DialogDescription`:
-> Välitämme pyynnön tarkastetuille oman paikkakuntasi ammattilaiselle. Palvelu on maksuton, ja sen käyttämisestä voit itse päättää.
-
-(Etusivun `kil-mock`-kortti `index.tsx`:ssä jätetään ennalleen – se on markkinointimockup, ei oikea kortti.)
-
-## Tiedostot
-- `src/lib/pts-kohteet.ts` (rivi 17)
-- `src/lib/vuosikello-data.ts` (rivit 55, ~98)
-- `src/routes/_authenticated/kulut.tsx` (Yhteenveto-välilehti)
-- `src/routes/_authenticated/dashboard.tsx` (header)
-- `src/components/liidi-dialog.tsx` (DialogDescription)
-
-Ei tietokantamuutoksia. Recharts-komponentit (`ComposedChart`, `Line`, `Legend`) ovat jo `recharts`-paketissa.
+Dashboard, vuosikello ym. saavat sekä toistuvat että mittari-pohjaiset kulut "ilmaiseksi", koska kaikki päätyy `kulut`-tauluun.

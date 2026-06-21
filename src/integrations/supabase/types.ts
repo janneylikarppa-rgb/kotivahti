@@ -217,6 +217,9 @@ export type Database = {
       kulu_asetukset: {
         Row: {
           edellinen_mittarilukema: number | null
+          edellinen_sahkomittari: number | null
+          edellinen_sahkomittari_pvm: string | null
+          edellinen_vesimittari_pvm: string | null
           id: string
           kiinteisto_id: string
           sahko_energia_snt: number | null
@@ -229,6 +232,9 @@ export type Database = {
         }
         Insert: {
           edellinen_mittarilukema?: number | null
+          edellinen_sahkomittari?: number | null
+          edellinen_sahkomittari_pvm?: string | null
+          edellinen_vesimittari_pvm?: string | null
           id?: string
           kiinteisto_id: string
           sahko_energia_snt?: number | null
@@ -241,6 +247,9 @@ export type Database = {
         }
         Update: {
           edellinen_mittarilukema?: number | null
+          edellinen_sahkomittari?: number | null
+          edellinen_sahkomittari_pvm?: string | null
+          edellinen_vesimittari_pvm?: string | null
           id?: string
           kiinteisto_id?: string
           sahko_energia_snt?: number | null
@@ -785,6 +794,53 @@ export type Database = {
             foreignKeyName: "talon_tiedot_kiinteisto_id_fkey"
             columns: ["kiinteisto_id"]
             isOneToOne: true
+            referencedRelation: "kiinteistot"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      toistuvat_kulut: {
+        Row: {
+          aktiivinen: boolean
+          alkuvuosi: number
+          created_at: string
+          eraantymiskuukausi: number
+          id: string
+          kategoria: string
+          kiinteisto_id: string
+          nimi: string
+          summa: number
+          updated_at: string
+        }
+        Insert: {
+          aktiivinen?: boolean
+          alkuvuosi?: number
+          created_at?: string
+          eraantymiskuukausi?: number
+          id?: string
+          kategoria?: string
+          kiinteisto_id: string
+          nimi: string
+          summa?: number
+          updated_at?: string
+        }
+        Update: {
+          aktiivinen?: boolean
+          alkuvuosi?: number
+          created_at?: string
+          eraantymiskuukausi?: number
+          id?: string
+          kategoria?: string
+          kiinteisto_id?: string
+          nimi?: string
+          summa?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "toistuvat_kulut_kiinteisto_id_fkey"
+            columns: ["kiinteisto_id"]
+            isOneToOne: false
             referencedRelation: "kiinteistot"
             referencedColumns: ["id"]
           },

@@ -625,17 +625,55 @@ export const kuittaaHuolto = createServerFn({ method: "POST" })
   });
 
 // ---------- Kulut ----------
+async function materialisoiToistuvat(supabase: any, kiinteistoId: string) {
+  const { data: toistuvat } = await supabase
+    .from("toistuvat_kulut").select("*").eq("kiinteisto_id", kiinteistoId).eq("aktiivinen", true);
+  if (!toistuvat || toistuvat.length === 0) return;
+  const nykyinen = new Date().getFullYear();
+  const avaimet = toistuvat.flatMap((t: any) => {
+    const vuodet: number[] = [];
+    for (let v = Math.max(2000, Number(t.alkuvuosi)); v <= nykyinen; v++) vuodet.push(v);
+    return vuodet.map((v) => ({ t, v, avain: `toistuva:${t.id}:${v}` }));
+  });
+  if (avaimet.length === 0) return;
+  const { data: olemassa } = await supabase
+    .from("kulut").select("id, kohde_avain, summa, nimi, pvm")
+    .eq("kiinteisto_id", kiinteistoId)
+    .in("kohde_avain", avaimet.map((a: any) => a.avain));
+  const mapByAvain = new Map<string, any>((olemassa ?? []).map((r: any) => [r.kohde_avain, r]));
+  const insertit: any[] = [];
+  for (const { t, v, avain } of avaimet) {
+    const kk = String(t.eraantymiskuukausi).padStart(2, "0");
+    const pvm = `${v}-${kk}-01`;
+    const existing = mapByAvain.get(avain);
+    if (!existing) {
+      insertit.push({
+        kiinteisto_id: kiinteistoId,
+        nimi: t.nimi, kategoria: t.kategoria, summa: t.summa, pvm,
+        kohde_avain: avain,
+      });
+    } else if (Number(existing.summa) !== Number(t.summa) || existing.nimi !== t.nimi) {
+      await supabase.from("kulut").update({ summa: t.summa, nimi: t.nimi }).eq("id", existing.id);
+    }
+  }
+  if (insertit.length > 0) {
+    await supabase.from("kulut").insert(insertit);
+  }
+}
+
 export const getKulut = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
     const { supabase, userId } = context;
     const k = await getActiveKiinteisto(supabase, userId);
-    if (!k) return { kulut: [], asetukset: null };
-    const [kulutRes, asetuksetRes] = await Promise.all([
+    if (!k) return { kulut: [], asetukset: null, toistuvat: [] };
+    await materialisoiToistuvat(supabase, k.id);
+    const [kulutRes, asetuksetRes, toistuvatRes] = await Promise.all([
       supabase.from("kulut").select("*").eq("kiinteisto_id", k.id).order("pvm", { ascending: false }),
       supabase.from("kulu_asetukset").select("*").eq("kiinteisto_id", k.id).maybeSingle(),
+      supabase.from("toistuvat_kulut").select("*").eq("kiinteisto_id", k.id).order("nimi"),
     ]);
-    return { kulut: kulutRes.data ?? [], asetukset: asetuksetRes.data };
+    return { kulut: kulutRes.data ?? [], asetukset: asetuksetRes.data, toistuvat: toistuvatRes.data ?? [] };
   });
 
 const kuluSchema = z.object({
@@ -738,6 +776,8 @@ const asetuksetSchema = z.object({
   vesi_puhdas_eur_m3: z.number(),
   vesi_jatevesi_eur_m3: z.number(),
   vesi_perusmaksu_eur_kk: z.number().optional(),
+  edellinen_mittarilukema: z.number().optional().nullable(),
+  edellinen_sahkomittari: z.number().optional().nullable(),
 });
 
 export const saveAsetukset = createServerFn({ method: "POST" })
@@ -752,7 +792,125 @@ export const saveAsetukset = createServerFn({ method: "POST" })
     return { ok: true };
   });
 
-// ---------- PTS-suunnitelma (pts_suunnitelma-taulu) ----------
+// ---------- Toistuvat kulut ----------
+const toistuvaSchema = z.object({
+  nimi: z.string().min(1),
+  kategoria: z.string().default("muu"),
+  summa: z.number().min(0),
+  eraantymiskuukausi: z.number().int().min(1).max(12).default(1),
+  alkuvuosi: z.number().int().min(2000).max(2100),
+  aktiivinen: z.boolean().default(true),
+});
+
+export const addToistuvaKulu = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) => toistuvaSchema.parse(input))
+  .handler(async ({ data, context }) => {
+    const { supabase, userId } = context;
+    const k = await getActiveKiinteisto(supabase, userId);
+    if (!k) throw new Error("Kiinteistöä ei löytynyt");
+    const { error } = await supabase.from("toistuvat_kulut").insert({ kiinteisto_id: k.id, ...data });
+    if (error) throw error;
+    await materialisoiToistuvat(supabase, k.id);
+    return { ok: true };
+  });
+
+export const updateToistuvaKulu = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) => toistuvaSchema.partial().extend({ id: z.string().uuid() }).parse(input))
+  .handler(async ({ data, context }) => {
+    const { supabase, userId } = context;
+    const k = await getActiveKiinteisto(supabase, userId);
+    if (!k) throw new Error("Kiinteistöä ei löytynyt");
+    const { id, ...patch } = data;
+    const { error } = await supabase.from("toistuvat_kulut").update(patch).eq("id", id);
+    if (error) throw error;
+    await materialisoiToistuvat(supabase, k.id);
+    return { ok: true };
+  });
+
+export const deleteToistuvaKulu = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) =>
+    z.object({ id: z.string().uuid(), poista_materialisoidut: z.boolean().default(true) }).parse(input))
+  .handler(async ({ data, context }) => {
+    const { supabase } = context;
+    if (data.poista_materialisoidut) {
+      await supabase.from("kulut").delete().like("kohde_avain", `toistuva:${data.id}:%`);
+    }
+    const { error } = await supabase.from("toistuvat_kulut").delete().eq("id", data.id);
+    if (error) throw error;
+    return { ok: true };
+  });
+
+// ---------- Kuukauden mittarilukema (sähkö + vesi automaattinen kululaskenta) ----------
+const mittariSchema = z.object({
+  vuosi: z.number().int().min(2000).max(2100),
+  kuukausi: z.number().int().min(1).max(12),
+  sahko_lukema: z.number().optional().nullable(),
+  vesi_lukema: z.number().optional().nullable(),
+});
+
+export const tallennaKuukaudenMittari = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) => mittariSchema.parse(input))
+  .handler(async ({ data, context }) => {
+    const { supabase, userId } = context;
+    const k = await getActiveKiinteisto(supabase, userId);
+    if (!k) throw new Error("Kiinteistöä ei löytynyt");
+    const { data: a } = await supabase.from("kulu_asetukset").select("*").eq("kiinteisto_id", k.id).maybeSingle();
+    if (!a) throw new Error("Kuluasetuksia ei löytynyt");
+    const kk = String(data.kuukausi).padStart(2, "0");
+    const pvm = `${data.vuosi}-${kk}-01`;
+    const tulos: any = {};
+    const asPatch: any = {};
+
+    if (data.sahko_lukema != null) {
+      const edellinen = Number(a.edellinen_sahkomittari || 0);
+      const kulutus = Math.max(0, Number(data.sahko_lukema) - edellinen);
+      const tariffi = Number(a.sahko_energia_snt || 0) + Number(a.sahko_siirto_snt || 0);
+      const perus = Number(a.sahko_perusmaksu_eur_kk || 0);
+      const summa = Number(((kulutus * tariffi) / 100 + perus).toFixed(2));
+      const avain = `mittari:sahko:${data.vuosi}-${kk}`;
+      const { data: existing } = await supabase
+        .from("kulut").select("id").eq("kiinteisto_id", k.id).eq("kohde_avain", avain).maybeSingle();
+      const row = {
+        kiinteisto_id: k.id, nimi: `Sähkö ${data.vuosi}-${kk}`, kategoria: "sahko",
+        summa, pvm, kwh: kulutus, mittarilukema: data.sahko_lukema, kohde_avain: avain,
+      };
+      if (existing?.id) await supabase.from("kulut").update(row).eq("id", existing.id);
+      else await supabase.from("kulut").insert(row);
+      asPatch.edellinen_sahkomittari = data.sahko_lukema;
+      asPatch.edellinen_sahkomittari_pvm = pvm;
+      tulos.sahko = { kulutus, summa };
+    }
+
+    if (data.vesi_lukema != null) {
+      const edellinen = Number(a.edellinen_mittarilukema || 0);
+      const kulutus = Math.max(0, Number(data.vesi_lukema) - edellinen);
+      const tariffi = Number(a.vesi_puhdas_eur_m3 || 0) + Number(a.vesi_jatevesi_eur_m3 || 0);
+      const perus = Number(a.vesi_perusmaksu_eur_kk || 0);
+      const summa = Number((kulutus * tariffi + perus).toFixed(2));
+      const avain = `mittari:vesi:${data.vuosi}-${kk}`;
+      const { data: existing } = await supabase
+        .from("kulut").select("id").eq("kiinteisto_id", k.id).eq("kohde_avain", avain).maybeSingle();
+      const row = {
+        kiinteisto_id: k.id, nimi: `Vesi ${data.vuosi}-${kk}`, kategoria: "vesi",
+        summa, pvm, kulutus_m3: kulutus, mittarilukema: data.vesi_lukema, kohde_avain: avain,
+      };
+      if (existing?.id) await supabase.from("kulut").update(row).eq("id", existing.id);
+      else await supabase.from("kulut").insert(row);
+      asPatch.edellinen_mittarilukema = data.vesi_lukema;
+      asPatch.edellinen_vesimittari_pvm = pvm;
+      tulos.vesi = { kulutus, summa };
+    }
+
+    if (Object.keys(asPatch).length > 0) {
+      await supabase.from("kulu_asetukset").update(asPatch).eq("kiinteisto_id", k.id);
+    }
+    return { ok: true, ...tulos };
+  });
+
 export const getPts = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
