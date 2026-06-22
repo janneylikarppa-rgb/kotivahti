@@ -94,6 +94,8 @@ const TILA_META: Record<string, { label: string; emoji: string; chip: string; ri
 
 function PtsPage() {
   const fetchFn = useServerFn(getPts);
+  const merkitseFn = useServerFn(merkitsePtsAvattu);
+  useEffect(() => { merkitseFn().catch(() => {}); }, [merkitseFn]);
   const addFn = useServerFn(addPtsRivi);
   const delFn = useServerFn(deletePtsRivi);
   const huoltoFn = useServerFn(addHuolto);
