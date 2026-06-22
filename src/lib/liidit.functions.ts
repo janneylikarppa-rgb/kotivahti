@@ -197,7 +197,7 @@ export const luoLiidi = createServerFn({ method: "POST" })
       }
       await supabase
         .from("liidit")
-        .update({ lahetetty_at: new Date().toISOString(), status: "valitetty", ammattilainen_id: ammattilainenId })
+        .update({ lahetetty_at: new Date().toISOString(), ammattilainen_id: ammattilainenId })
         .eq("id", inserted.id);
     }
 
