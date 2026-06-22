@@ -185,11 +185,27 @@ export const luoLiidi = createServerFn({ method: "POST" })
     }
 
     if (lahetetty) {
+      // Liitä ensimmäinen sopiva ammattilainen (jos olemassa) liidiin pisteytystä varten
+      let ammattilainenId: string | null = null;
+      if (sopivat.length > 0) {
+        const { data: ammRow } = await supabase
+          .from("ammattilaiset")
+          .select("id")
+          .eq("sahkoposti", sopivat[0].sahkoposti)
+          .maybeSingle();
+        ammattilainenId = (ammRow as any)?.id ?? null;
+      }
       await supabase
         .from("liidit")
-        .update({ lahetetty_at: new Date().toISOString() })
+        .update({ lahetetty_at: new Date().toISOString(), status: "valitetty", ammattilainen_id: ammattilainenId })
         .eq("id", inserted.id);
     }
+
+    // Metriikka: liidi lähetetty
+    try {
+      const { inkrementoiMetriikka } = await import("@/lib/palaute.functions");
+      await inkrementoiMetriikka(userId, "liideja_lahetetty", 1);
+    } catch {}
 
     return { ok: true, id: inserted.id, ammattilaisia: sopivat.length };
   });
