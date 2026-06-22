@@ -17,38 +17,47 @@ export type Database = {
       ammattilaiset: {
         Row: {
           aktiivinen: boolean
+          arviomaara: number
           created_at: string
           id: string
           kategoria: string
+          keskiarvopisteet: number | null
           prioriteetti: number
           puhelin: string | null
           sahkoposti: string
           toimialueet: string[]
           updated_at: string
+          viimeisin_arvio: string | null
           yritys: string
         }
         Insert: {
           aktiivinen?: boolean
+          arviomaara?: number
           created_at?: string
           id?: string
           kategoria: string
+          keskiarvopisteet?: number | null
           prioriteetti?: number
           puhelin?: string | null
           sahkoposti: string
           toimialueet?: string[]
           updated_at?: string
+          viimeisin_arvio?: string | null
           yritys: string
         }
         Update: {
           aktiivinen?: boolean
+          arviomaara?: number
           created_at?: string
           id?: string
           kategoria?: string
+          keskiarvopisteet?: number | null
           prioriteetti?: number
           puhelin?: string | null
           sahkoposti?: string
           toimialueet?: string[]
           updated_at?: string
+          viimeisin_arvio?: string | null
           yritys?: string
         }
         Relationships: []
@@ -346,6 +355,7 @@ export type Database = {
       }
       liidit: {
         Row: {
+          ammattilainen_id: string | null
           created_at: string
           id: string
           kategoria: string
@@ -368,6 +378,7 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          ammattilainen_id?: string | null
           created_at?: string
           id?: string
           kategoria: string
@@ -390,6 +401,7 @@ export type Database = {
           user_id: string
         }
         Update: {
+          ammattilainen_id?: string | null
           created_at?: string
           id?: string
           kategoria?: string
@@ -411,7 +423,15 @@ export type Database = {
           updated_at?: string
           user_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "liidit_ammattilainen_id_fkey"
+            columns: ["ammattilainen_id"]
+            isOneToOne: false
+            referencedRelation: "ammattilaiset"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       palaute_kyselyt: {
         Row: {
@@ -940,6 +960,10 @@ export type Database = {
       omistaa_kiinteiston: {
         Args: { _kiinteisto_id: string }
         Returns: boolean
+      }
+      paivita_ammattilainen_pisteet: {
+        Args: { _amm_id: string }
+        Returns: undefined
       }
     }
     Enums: {

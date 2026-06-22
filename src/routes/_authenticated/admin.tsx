@@ -28,10 +28,12 @@ import {
   getKonversioputki,
   getKayttajaSegmentit,
   getPalauteVastaukset,
-  getLiidiPalautteet,
   getAmmattilaisarviot,
   getKausikirjeTilastot,
   lahetaTestiKausikirje,
+  getYdinprosessiMittarit,
+  getAmmattilaisRanking,
+  getYdinprosessiLiidiStatukset,
 } from "@/lib/palaute.functions";
 import { LIIDI_KATEGORIAT, LIIDI_STATUKSET, LIIDI_PALVELUT } from "@/lib/liidit-kategoriat";
 import { MAAKUNNAT } from "@/lib/maakunnat";
@@ -97,8 +99,10 @@ type Filtteri = "kaikki" | "uusi" | "kasittelyssa" | "valitetty" | "valmis";
 function LiiditTab() {
   const fetchFn = useServerFn(getAdminLiidit);
   const updFn = useServerFn(paivitaLiidinStatus);
+  const statusFn = useServerFn(getYdinprosessiLiidiStatukset);
   const qc = useQueryClient();
   const { data = [] } = useQuery({ queryKey: ["admin-liidit"], queryFn: () => fetchFn() });
+  const { data: statukset = {} } = useQuery({ queryKey: ["liidi-vaihestatukset"], queryFn: () => statusFn() });
   const [filtteri, setFiltteri] = useState<Filtteri>("kaikki");
   const [avoinId, setAvoinId] = useState<string | null>(null);
 
@@ -170,6 +174,7 @@ function LiiditTab() {
                   <th className="px-3 py-2 text-left">Osoite</th>
                   <th className="px-3 py-2 text-left">Maakunta</th>
                   <th className="px-3 py-2 text-left">Status</th>
+                  <th className="px-3 py-2 text-left">V1/V2/V3</th>
                 </tr>
               </thead>
               <tbody>
@@ -189,6 +194,7 @@ function LiiditTab() {
                     <td className="px-3 py-2 text-muted-foreground">{l.osoite ?? "—"}</td>
                     <td className="px-3 py-2 text-muted-foreground whitespace-nowrap">{l.maakunta ?? "—"}</td>
                     <td className="px-3 py-2">{statusBadge(l.status)}</td>
+                    <td className="px-3 py-2"><VaiheStatukset s={(statukset as any)[l.id]} /></td>
                   </tr>
                 ))}
               </tbody>
@@ -430,6 +436,8 @@ function PalauteTab() {
   const arvFn = useServerFn(getAmmattilaisarviot);
   const kkFn = useServerFn(getKausikirjeTilastot);
   const testiFn = useServerFn(lahetaTestiKausikirje);
+  const ypFn = useServerFn(getYdinprosessiMittarit);
+  const rankFn = useServerFn(getAmmattilaisRanking);
 
   const yh = useQuery({ queryKey: ["palaute-yhteenveto"], queryFn: () => yhFn() });
   const kp = useQuery({ queryKey: ["palaute-konversio"], queryFn: () => kpFn() });
@@ -437,6 +445,8 @@ function PalauteTab() {
   const vast = useQuery({ queryKey: ["palaute-vastaukset"], queryFn: () => vastFn() });
   const arv = useQuery({ queryKey: ["palaute-amm-arviot"], queryFn: () => arvFn() });
   const kk = useQuery({ queryKey: ["palaute-kausikirje"], queryFn: () => kkFn() });
+  const yp = useQuery({ queryKey: ["palaute-ydinprosessi"], queryFn: () => ypFn() });
+  const rank = useQuery({ queryKey: ["palaute-amm-ranking"], queryFn: () => rankFn() });
 
   const [kausi, setKausi] = useState<"kevat" | "kesa" | "syksy" | "talvi">("kevat");
   const testi = useMutation({
@@ -450,12 +460,59 @@ function PalauteTab() {
   return (
     <div className="space-y-6">
       {/* Yhteenvetokortit */}
-      <div className="grid gap-3 md:grid-cols-4">
+      <div className="grid gap-3 md:grid-cols-3">
         <Yhteenveto otsikko="NPS" arvo={yh.data?.nps != null ? String(yh.data.nps) : "—"} />
         <Yhteenveto otsikko="Kausikirje vastaus-%" arvo={yh.data?.kausiPros != null ? `${yh.data.kausiPros}%` : "—"} />
-        <Yhteenveto otsikko="Liidi-tyytyväisyys" arvo={yh.data?.liidiPros != null ? `${yh.data.liidiPros}%` : "—"} />
         <Yhteenveto otsikko="Reagoimattomat (7pv)" arvo={String(yh.data?.reagoimattomat ?? 0)} korosta={!!yh.data?.reagoimattomat && yh.data.reagoimattomat > 0} />
       </div>
+
+      {/* Ydinprosessin mittarit */}
+      <Card className="gold-card">
+        <CardContent className="py-5 space-y-4">
+          <h3 className="font-serif text-lg text-cream">Ydinprosessi</h3>
+          <div className="grid gap-3 md:grid-cols-3">
+            <Yhteenveto
+              otsikko="Yhteydenotto"
+              arvo={yp.data?.yhteydenottoPros != null ? `${yp.data.yhteydenottoPros}%` : "—"}
+            />
+            <Yhteenveto
+              otsikko="Käynti"
+              arvo={yp.data?.kayntiPros != null ? `${yp.data.kayntiPros}%` : "—"}
+            />
+            <Yhteenveto
+              otsikko="Tyytyväisyys"
+              arvo={yp.data?.tyytyvaisyysPros != null ? `${yp.data.tyytyvaisyysPros}%` : "—"}
+            />
+          </div>
+          <div className="text-[11px] text-muted-foreground">
+            Vastauksia: V1 {yp.data?.v1Vastauksia ?? 0} · V2 {yp.data?.v2Vastauksia ?? 0} · V3 {yp.data?.v3Vastauksia ?? 0}
+          </div>
+
+          <div className="pt-2 border-t border-border/40">
+            <h4 className="font-serif text-sm text-cream mb-2">Ammattilaisten ranking</h4>
+            {((rank.data as any[]) ?? []).length === 0 ? (
+              <p className="text-xs text-muted-foreground">Ei vielä pisteytettyjä ammattilaisia (vaatii ≥ 3 vastausta).</p>
+            ) : (
+              <div className="space-y-1">
+                {((rank.data as any[]) ?? []).map((a) => {
+                  const heikko = a.keskiarvopisteet != null && a.keskiarvopisteet < 3.0;
+                  return (
+                    <div key={a.id}
+                      className={`flex items-center justify-between text-sm border-b border-border/30 pb-1 ${heikko ? "text-red-400" : "text-cream"}`}>
+                      <span>{a.yritys} <span className="text-xs text-muted-foreground">· {a.kategoria}</span></span>
+                      <span className="font-mono">
+                        {a.keskiarvopisteet != null ? `${Number(a.keskiarvopisteet).toFixed(2)} pist` : "—"}
+                        <span className="text-muted-foreground ml-2">({a.arviomaara})</span>
+                      </span>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+        </CardContent>
+      </Card>
+
 
       {/* Konversioputki */}
       <Card className="gold-card">
@@ -581,5 +638,41 @@ function Yhteenveto({ otsikko, arvo, korosta }: { otsikko: string; arvo: string;
         <div className={`font-serif text-2xl mt-1 ${korosta ? "text-orange-400" : "text-cream"}`}>{arvo}</div>
       </CardContent>
     </Card>
+  );
+}
+
+type Vaihe = { vastattu: boolean; vastaukset?: any; lahetetty_at?: string };
+function vaiheVari(vaihe: "v1" | "v2" | "v3", v?: Vaihe): string {
+  if (!v) return "bg-muted/30 text-muted-foreground border-border/40";
+  if (!v.vastattu) return "bg-orange-500/15 text-orange-300 border-orange-500/40";
+  const a = v.vastaukset ?? {};
+  if (vaihe === "v1") {
+    if (String(a.yhteydenotto ?? "").startsWith("kylla_")) return "bg-emerald-500/15 text-emerald-300 border-emerald-500/40";
+    if (a.yhteydenotto === "ei_viela") return "bg-orange-500/15 text-orange-300 border-orange-500/40";
+    return "bg-red-500/15 text-red-300 border-red-500/40";
+  }
+  if (vaihe === "v2") {
+    if (a.kavi === "kylla_kavi") return "bg-emerald-500/15 text-emerald-300 border-emerald-500/40";
+    if (a.kavi === "sovittu_ei_viela") return "bg-orange-500/15 text-orange-300 border-orange-500/40";
+    return "bg-red-500/15 text-red-300 border-red-500/40";
+  }
+  // v3
+  const ka = Number(a.tyo_laatu);
+  if (ka >= 4 || a.kokonaisuus === "taysin") return "bg-emerald-500/15 text-emerald-300 border-emerald-500/40";
+  if (ka === 3 || a.kokonaisuus === "osittain") return "bg-orange-500/15 text-orange-300 border-orange-500/40";
+  return "bg-red-500/15 text-red-300 border-red-500/40";
+}
+function VaiheStatukset({ s }: { s?: { v1?: Vaihe; v2?: Vaihe; v3?: Vaihe } }) {
+  const cell = (n: string, vaihe: "v1" | "v2" | "v3", v?: Vaihe) => (
+    <span className={`inline-flex h-5 w-7 items-center justify-center rounded border text-[10px] font-semibold ${vaiheVari(vaihe, v)}`}>
+      {n}
+    </span>
+  );
+  return (
+    <div className="flex gap-1">
+      {cell("V1", "v1", s?.v1)}
+      {cell("V2", "v2", s?.v2)}
+      {cell("V3", "v3", s?.v3)}
+    </div>
   );
 }
