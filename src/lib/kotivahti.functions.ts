@@ -303,6 +303,11 @@ export const saveTaloTiedot = createServerFn({ method: "POST" })
     const { data: kRow } = await supabase.from("kiinteistot").select("rakennusvuosi").eq("id", k.id).maybeSingle();
     const talo = taloRaw ? { ...taloRaw, rakennusvuosi: (kRow as any)?.rakennusvuosi } : null;
     await synkronoiPts(supabase, k.id, talo);
+    // Metriikka: talon tiedot täytetty
+    try {
+      const { inkrementoiMetriikka } = await import("@/lib/palaute.functions");
+      await inkrementoiMetriikka(userId, "talon_tiedot_taytetty", 1);
+    } catch {}
     return { ok: true };
   });
 
@@ -484,6 +489,12 @@ export const addHuolto = createServerFn({ method: "POST" })
     const vuosi = new Date(data.pvm).getFullYear();
     await paivitaPts(supabase, k.id, kohdeAvain, data.tyyppi, vuosi, data.pts_siirto ?? 0);
 
+    // Metriikka: huolto kirjattu
+    try {
+      const { inkrementoiMetriikka } = await import("@/lib/palaute.functions");
+      await inkrementoiMetriikka(userId, "huoltoja_kirjattu", 1);
+    } catch {}
+
     return { ok: true };
   });
 
@@ -620,6 +631,12 @@ export const kuittaaHuolto = createServerFn({ method: "POST" })
       kiinteisto_id: k.id, vuosi, kuitattu_pvm: pvm, historia_id, ...row,
     }, { onConflict: "kiinteisto_id,kausi_key,huolto_nimi,vuosi" });
     if (error) throw error;
+
+    // Metriikka: vuosikellon kuittaus
+    try {
+      const { inkrementoiMetriikka } = await import("@/lib/palaute.functions");
+      await inkrementoiMetriikka(userId, "vuosikelloa_kuitattu", 1);
+    } catch {}
 
     return { ok: true };
   });

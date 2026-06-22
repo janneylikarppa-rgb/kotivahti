@@ -6,12 +6,13 @@ import { requirePreviewOrSupabaseAuth as requireSupabaseAuth } from "@/lib/previ
 // ----- Tyypit -----
 export type KyselyTyyppi =
   | "onboarding" | "nps" | "churn"
-  | "liidi_yhteydenotto" | "liidi_tulos"
+  | "ydinprosessi_yhteydenotto" | "ydinprosessi_kaynnin_jalkeen" | "ydinprosessi_kokonaiskokemus"
+  | "liidi_yhteydenotto" | "liidi_tulos" // legacy, säilyy historiana
   | "tyonlaatu"
   | "kausikirje_kevat" | "kausikirje_kesa" | "kausikirje_syksy" | "kausikirje_talvi";
 
 export type AktiivinenKysely = {
-  id: string;            // palaute_kyselyt.id
+  id: string;
   tyyppi: KyselyTyyppi;
   trigger_id: string | null;
   meta?: Record<string, any>;
@@ -22,6 +23,14 @@ const ARKIPV_MS = 24 * 60 * 60 * 1000;
 function paivaSitten(ts: string | Date, paivaa: number): boolean {
   const t = typeof ts === "string" ? new Date(ts).getTime() : ts.getTime();
   return Date.now() - t >= paivaa * ARKIPV_MS;
+}
+
+// Arkipäivien laskenta (rouhea, hyväksyttävä tarkkuus liidien triggereille).
+function arkipaiviaSitten(ts: string | Date, arkipv: number): boolean {
+  const t = typeof ts === "string" ? new Date(ts).getTime() : ts.getTime();
+  // Yksinkertainen approksimaatio: 7/5 kalenterivuorokautta
+  const tarvitsee = Math.ceil(arkipv * 1.4);
+  return Date.now() - t >= tarvitsee * ARKIPV_MS;
 }
 
 async function admin() {
@@ -38,16 +47,15 @@ export const haeAktiivinenKysely = createServerFn({ method: "GET" })
     const { supabase, userId } = context;
     const a = await admin();
 
-    // Käyttäjän kaikki palautekyselyt (rajaa)
     const { data: kyselyt } = await supabase
       .from("palaute_kyselyt")
-      .select("id, tyyppi, trigger_id, lahetetty_at, vastattu_at")
+      .select("id, tyyppi, trigger_id, lahetetty_at, vastattu_at, vastaukset")
       .eq("user_id", userId)
       .order("lahetetty_at", { ascending: false })
       .limit(200);
     const lista = kyselyt ?? [];
 
-    // Onko jo avoin (lähetetty mutta ei vastattu) → palauta se
+    // Avoin (lähetetty mutta ei vastattu, ei kausikirje)
     const avoin = lista.find((k: any) => !k.vastattu_at && !String(k.tyyppi).startsWith("kausikirje_"));
     if (avoin) {
       return { id: avoin.id, tyyppi: avoin.tyyppi as KyselyTyyppi, trigger_id: avoin.trigger_id ?? null };
@@ -70,36 +78,51 @@ export const haeAktiivinenKysely = createServerFn({ method: "GET" })
       return { id: data.id, tyyppi: data.tyyppi as KyselyTyyppi, trigger_id: data.trigger_id ?? null };
     };
 
-    // Metriikat ja profiili
     const { data: m } = await a.from("kayttaja_metriikat").select("*").eq("user_id", userId).maybeSingle();
 
-    // P1: Liidi yhteydenotto
+    // Hae liidit ydinprosessivaiheille
     const { data: liidit } = await supabase
       .from("liidit")
-      .select("id, status, lahetetty_at, created_at, nimi, puhelin, sahkoposti, kategoria, palvelu, kaupunki")
+      .select("id, status, lahetetty_at, created_at")
       .eq("user_id", userId)
       .order("created_at", { ascending: false })
-      .limit(20);
+      .limit(30);
+
+    // VAIHE 1: ydinprosessi_yhteydenotto — 3 arkipäivää välityksestä
     for (const l of liidit ?? []) {
       const ts = l.lahetetty_at ?? l.created_at;
-      if (l.status === "valitetty" && paivaSitten(ts, 3) && !onkoLahetetty("liidi_yhteydenotto", l.id)) {
-        return luo("liidi_yhteydenotto", l.id);
-      }
+      if (l.status !== "valitetty") continue;
+      if (!arkipaiviaSitten(ts, 3)) continue;
+      if (onkoLahetetty("ydinprosessi_yhteydenotto", l.id)) continue;
+      return luo("ydinprosessi_yhteydenotto", l.id);
     }
 
-    // P2: Liidi tulos
+    // VAIHE 2: 7 päivää vaiheen 1 vastauksesta jos "kyllä_*"
     for (const l of liidit ?? []) {
-      if (onkoLahetetty("liidi_tulos", l.id)) continue;
-      const yhKysely = lista.find((k: any) => k.tyyppi === "liidi_yhteydenotto" && k.trigger_id === l.id && k.vastattu_at);
-      const yhVast = yhKysely as any;
-      const ehto1 = yhVast && yhVast.vastattu_at && paivaSitten(yhVast.vastattu_at, 7);
-      const ehto2 = paivaSitten(l.created_at, 14);
-      if (ehto1 || ehto2) {
-        return luo("liidi_tulos", l.id);
-      }
+      if (onkoLahetetty("ydinprosessi_kaynnin_jalkeen", l.id)) continue;
+      const v1 = lista.find((k: any) =>
+        k.tyyppi === "ydinprosessi_yhteydenotto" && k.trigger_id === l.id && k.vastattu_at
+      ) as any;
+      if (!v1) continue;
+      const ans = String(v1.vastaukset?.yhteydenotto ?? "");
+      if (!ans.startsWith("kylla_")) continue;
+      if (!paivaSitten(v1.vastattu_at, 7)) continue;
+      return luo("ydinprosessi_kaynnin_jalkeen", l.id);
     }
 
-    // P3: Tyonlaatu
+    // VAIHE 3: 5 päivää vaiheen 2 "kyllä, kävi"-vastauksesta
+    for (const l of liidit ?? []) {
+      if (onkoLahetetty("ydinprosessi_kokonaiskokemus", l.id)) continue;
+      const v2 = lista.find((k: any) =>
+        k.tyyppi === "ydinprosessi_kaynnin_jalkeen" && k.trigger_id === l.id && k.vastattu_at
+      ) as any;
+      if (!v2) continue;
+      if (v2.vastaukset?.kavi !== "kylla_kavi") continue;
+      if (!paivaSitten(v2.vastattu_at, 5)) continue;
+      return luo("ydinprosessi_kokonaiskokemus", l.id);
+    }
+
+    // Tyonlaatu (huoltohistoria)
     const { data: huollot } = await supabase
       .from("huolto_historia")
       .select("id, pvm, tekija, tekija_nimi, created_at")
@@ -115,12 +138,10 @@ export const haeAktiivinenKysely = createServerFn({ method: "GET" })
 
     if (!m) return null;
 
-    // P4: Onboarding
     if (paivaSitten(m.rekisteroity_at, 7) && !onkoLahetetty("onboarding")) {
       return luo("onboarding");
     }
 
-    // P5: NPS
     if (
       paivaSitten(m.rekisteroity_at, 30) &&
       (m.kirjautumisia ?? 0) >= 3 &&
@@ -129,7 +150,6 @@ export const haeAktiivinenKysely = createServerFn({ method: "GET" })
       return luo("nps");
     }
 
-    // P6: Churn
     const viim = m.viimeisin_kirjautuminen;
     if (
       viim && paivaSitten(viim, 14) &&
@@ -168,7 +188,7 @@ export const vastaaKyselyyn = createServerFn({ method: "POST" })
       .eq("id", data.id);
     if (error) throw error;
 
-    // NPS → metriikka
+    // NPS
     if (kysely.tyyppi === "nps" && typeof data.vastaukset.pisteet === "number") {
       await a.from("kayttaja_metriikat")
         .update({
@@ -178,30 +198,61 @@ export const vastaaKyselyyn = createServerFn({ method: "POST" })
         .eq("user_id", userId);
     }
 
-    // Liidi yhteydenotto: "ei_ollenkaan" → omistajalle hälytys
-    if (kysely.tyyppi === "liidi_yhteydenotto" && data.vastaukset.yhteydenotto === "ei_ollenkaan" && kysely.trigger_id) {
+    // Vaihe 2: kriittinen hälytys jos "ei käynyt eikä ilmoittanut"
+    if (
+      kysely.tyyppi === "ydinprosessi_kaynnin_jalkeen" &&
+      data.vastaukset.kavi === "ei_kaynyt_ei_ilmoittanut" &&
+      kysely.trigger_id
+    ) {
+      void lahetaKriittinenHalytys(kysely.trigger_id, "kriittinen_ei_kaynyt");
+    }
+
+    // Vaihe 3: päivitä ammattilaisen pisteet
+    if (kysely.tyyppi === "ydinprosessi_kokonaiskokemus" && kysely.trigger_id) {
       try {
-        const [{ lahetaEmail }, { rakennaOmistajaHalytys }] = await Promise.all([
-          import("@/lib/email.server"),
-          import("@/lib/kausikirje.server"),
-        ]);
-        const { data: l } = await a.from("liidit").select("*").eq("id", kysely.trigger_id).maybeSingle();
-        const ownerEmail = process.env.OWNER_EMAIL;
-        if (ownerEmail && l) {
-          const msg = rakennaOmistajaHalytys({
-            asiakas: l.nimi, puhelin: l.puhelin, kategoria: l.kategoria,
-            palvelu: l.palvelu, kaupunki: l.kaupunki ?? "—",
-            lahetetty: new Date(l.lahetetty_at ?? l.created_at).toLocaleString("fi-FI"),
-          });
-          await lahetaEmail({ to: ownerEmail, subject: msg.subject, html: msg.html });
+        const { data: l } = await a
+          .from("liidit").select("ammattilainen_id").eq("id", kysely.trigger_id).maybeSingle();
+        if (l?.ammattilainen_id) {
+          await a.rpc("paivita_ammattilainen_pisteet", { _amm_id: l.ammattilainen_id });
         }
       } catch (e) {
-        console.error("Omistajahälytys epäonnistui", e);
+        console.error("Ammattilaisen pisteytys epäonnistui", e);
       }
     }
 
     return { ok: true };
   });
+
+async function lahetaKriittinenHalytys(liidiId: string, tyyppi: "kriittinen_ei_kaynyt") {
+  try {
+    const a = await admin();
+    const [{ lahetaEmail }] = await Promise.all([import("@/lib/email.server")]);
+    const { data: l } = await a
+      .from("liidit")
+      .select("nimi, puhelin, sahkoposti, kategoria, palvelu, kaupunki, ammattilainen_id, lahetetty_at, created_at")
+      .eq("id", liidiId).maybeSingle();
+    if (!l) return;
+    const { data: amm } = l.ammattilainen_id
+      ? await a.from("ammattilaiset").select("yritys, sahkoposti, puhelin").eq("id", l.ammattilainen_id).maybeSingle()
+      : { data: null as any };
+    const ownerEmail = process.env.OWNER_EMAIL;
+    if (!ownerEmail) return;
+    const subject = tyyppi === "kriittinen_ei_kaynyt"
+      ? `🚨 KRIITTINEN – Ammattilainen ei käynyt eikä ilmoittanut – ${l.kategoria} – ${l.kaupunki ?? "—"}`
+      : `⚠️ KIIREELLINEN – ${l.kategoria} – ${l.kaupunki ?? "—"}`;
+    const html = `
+      <h2>${subject}</h2>
+      <p><strong>Asiakas:</strong> ${l.nimi} – ${l.puhelin} – ${l.sahkoposti}</p>
+      <p><strong>Palvelu:</strong> ${l.palvelu} (${l.kategoria})</p>
+      <p><strong>Kaupunki:</strong> ${l.kaupunki ?? "—"}</p>
+      <p><strong>Ammattilainen:</strong> ${amm?.yritys ?? "—"}${amm?.sahkoposti ? ` (${amm.sahkoposti})` : ""}${amm?.puhelin ? `, ${amm.puhelin}` : ""}</p>
+      <p><strong>Liidi luotu:</strong> ${new Date(l.lahetetty_at ?? l.created_at).toLocaleString("fi-FI")}</p>
+    `;
+    await lahetaEmail({ to: ownerEmail, subject, html });
+  } catch (e) {
+    console.error("Kriittinen hälytys epäonnistui", e);
+  }
+}
 
 // ===========================================================
 // Metriikka-päivitykset
@@ -240,7 +291,7 @@ export const getOmaMetriikka = createServerFn({ method: "GET" })
     return data;
   });
 
-// Server-only helper kutsuttavaksi muista serverFn:istä:
+// Server-only helper kutsuttavaksi muista serverFn:istä
 export async function inkrementoiMetriikka(userId: string, kentta: string, maara = 1) {
   try {
     const a = await admin();
@@ -251,7 +302,7 @@ export async function inkrementoiMetriikka(userId: string, kentta: string, maara
 }
 
 // ===========================================================
-// ADMIN: yhteenvedot
+// ADMIN
 // ===========================================================
 async function vaadiAdmin(supabase: any, userId: string) {
   const { data } = await supabase.from("user_roles").select("role").eq("user_id", userId).eq("role", "admin").maybeSingle();
@@ -263,11 +314,9 @@ export const getPalauteYhteenveto = createServerFn({ method: "GET" })
   .handler(async ({ context }) => {
     await vaadiAdmin(context.supabase, context.userId);
     const a = await admin();
-
     const { data: kaikki } = await a.from("palaute_kyselyt").select("tyyppi, vastattu_at, vastaukset, lahetetty_at");
     const lista = kaikki ?? [];
 
-    // NPS
     const npsv = lista.filter((k: any) => k.tyyppi === "nps" && k.vastattu_at && typeof k.vastaukset?.pisteet === "number");
     const nps = npsv.length
       ? Math.round(
@@ -276,26 +325,84 @@ export const getPalauteYhteenveto = createServerFn({ method: "GET" })
         )
       : null;
 
-    // Kausikirje vastaus-%
     const kk = lista.filter((k: any) => String(k.tyyppi).startsWith("kausikirje_"));
     const kkVast = kk.filter((k: any) => k.vastattu_at);
     const kausiPros = kk.length ? Math.round((kkVast.length / kk.length) * 100) : null;
 
-    // Liidi-tyytyväisyys
-    const lt = lista.filter((k: any) => k.tyyppi === "liidi_tulos" && k.vastattu_at);
-    const lTyyt = lt.filter((k: any) => k.vastaukset?.tarve === "taysin").length;
-    const liidiPros = lt.length ? Math.round((lTyyt / lt.length) * 100) : null;
-
-    // Reagoimattomat ammattilaiset viim. 7pv
+    // Reagoimattomat 7pv (vaihe 1 "ei_ollenkaan")
     const viikkoSitten = Date.now() - 7 * ARKIPV_MS;
     const reagoimattomat = lista.filter((k: any) =>
-      k.tyyppi === "liidi_yhteydenotto" &&
+      k.tyyppi === "ydinprosessi_yhteydenotto" &&
       k.vastattu_at &&
       new Date(k.vastattu_at).getTime() >= viikkoSitten &&
       k.vastaukset?.yhteydenotto === "ei_ollenkaan",
     ).length;
 
-    return { nps, kausiPros, liidiPros, reagoimattomat };
+    return { nps, kausiPros, reagoimattomat };
+  });
+
+// Ydinprosessin mittarit
+export const getYdinprosessiMittarit = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    await vaadiAdmin(context.supabase, context.userId);
+    const a = await admin();
+
+    const { data: vaiheet } = await a.from("palaute_kyselyt")
+      .select("tyyppi, trigger_id, vastattu_at, vastaukset")
+      .in("tyyppi", ["ydinprosessi_yhteydenotto", "ydinprosessi_kaynnin_jalkeen", "ydinprosessi_kokonaiskokemus"]);
+    const v = vaiheet ?? [];
+
+    const v1Vastatut = v.filter((k: any) => k.tyyppi === "ydinprosessi_yhteydenotto" && k.vastattu_at);
+    const v1Kylla = v1Vastatut.filter((k: any) => String(k.vastaukset?.yhteydenotto ?? "").startsWith("kylla_"));
+    const yhteydenottoPros = v1Vastatut.length ? Math.round((v1Kylla.length / v1Vastatut.length) * 100) : null;
+
+    const v2Vastatut = v.filter((k: any) => k.tyyppi === "ydinprosessi_kaynnin_jalkeen" && k.vastattu_at);
+    const v2Kavi = v2Vastatut.filter((k: any) => k.vastaukset?.kavi === "kylla_kavi");
+    const kayntiPros = v2Vastatut.length ? Math.round((v2Kavi.length / v2Vastatut.length) * 100) : null;
+
+    const v3Vastatut = v.filter((k: any) => k.tyyppi === "ydinprosessi_kokonaiskokemus" && k.vastattu_at);
+    const v3Tyyt = v3Vastatut.filter((k: any) => k.vastaukset?.kokonaisuus === "taysin");
+    const tyytyvaisyysPros = v3Vastatut.length ? Math.round((v3Tyyt.length / v3Vastatut.length) * 100) : null;
+
+    return {
+      yhteydenottoPros, kayntiPros, tyytyvaisyysPros,
+      v1Vastauksia: v1Vastatut.length, v2Vastauksia: v2Vastatut.length, v3Vastauksia: v3Vastatut.length,
+    };
+  });
+
+// Ammattilaisten ranking (uusi pisteytys)
+export const getAmmattilaisRanking = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    await vaadiAdmin(context.supabase, context.userId);
+    const a = await admin();
+    const { data } = await a.from("ammattilaiset")
+      .select("id, yritys, kategoria, keskiarvopisteet, arviomaara, viimeisin_arvio")
+      .order("keskiarvopisteet", { ascending: false, nullsFirst: false });
+    return data ?? [];
+  });
+
+// Liidi-statukset (V1/V2/V3) admin-liidit-listalle
+export const getYdinprosessiLiidiStatukset = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    await vaadiAdmin(context.supabase, context.userId);
+    const a = await admin();
+    const { data } = await a.from("palaute_kyselyt")
+      .select("trigger_id, tyyppi, vastaukset, vastattu_at, lahetetty_at")
+      .in("tyyppi", ["ydinprosessi_yhteydenotto", "ydinprosessi_kaynnin_jalkeen", "ydinprosessi_kokonaiskokemus"])
+      .not("trigger_id", "is", null);
+    const map: Record<string, { v1?: any; v2?: any; v3?: any }> = {};
+    for (const k of data ?? []) {
+      const id = k.trigger_id as string;
+      if (!map[id]) map[id] = {};
+      const v = { vastattu: !!k.vastattu_at, vastaukset: k.vastaukset, lahetetty_at: k.lahetetty_at };
+      if (k.tyyppi === "ydinprosessi_yhteydenotto") map[id].v1 = v;
+      else if (k.tyyppi === "ydinprosessi_kaynnin_jalkeen") map[id].v2 = v;
+      else if (k.tyyppi === "ydinprosessi_kokonaiskokemus") map[id].v3 = v;
+    }
+    return map;
   });
 
 export const getKonversioputki = createServerFn({ method: "GET" })
@@ -311,7 +418,6 @@ export const getKonversioputki = createServerFn({ method: "GET" })
     const vuosikelloKuitattu = list.filter((m: any) => (m.vuosikelloa_kuitattu ?? 0) > 0).length;
     const liidiLahetetty = list.filter((m: any) => (m.liideja_lahetetty ?? 0) > 0).length;
 
-    // Työ tehty: laskee uniikit user_id:t joilla on ammattilaisen tekemä huolto
     const { data: huollot } = await a.from("huolto_historia").select("kiinteisto_id, tekija, tekija_nimi").not("tekija", "in", '("itse","jatetaan")');
     const { data: kt } = await a.from("kiinteistot").select("id, user_id");
     const ktMap = new Map((kt ?? []).map((k: any) => [k.id, k.user_id]));
@@ -362,26 +468,6 @@ export const getPalauteVastaukset = createServerFn({ method: "GET" })
       .order("vastattu_at", { ascending: false })
       .limit(200);
     return data ?? [];
-  });
-
-export const getLiidiPalautteet = createServerFn({ method: "GET" })
-  .middleware([requireSupabaseAuth])
-  .handler(async ({ context }) => {
-    await vaadiAdmin(context.supabase, context.userId);
-    const a = await admin();
-    const { data } = await a.from("palaute_kyselyt")
-      .select("trigger_id, tyyppi, vastaukset, vastattu_at")
-      .in("tyyppi", ["liidi_yhteydenotto", "liidi_tulos"])
-      .not("trigger_id", "is", null)
-      .not("vastattu_at", "is", null);
-    const map: Record<string, { v1?: any; v2?: any }> = {};
-    for (const k of data ?? []) {
-      const id = k.trigger_id as string;
-      if (!map[id]) map[id] = {};
-      if (k.tyyppi === "liidi_yhteydenotto") map[id].v1 = k.vastaukset;
-      else map[id].v2 = k.vastaukset;
-    }
-    return map;
   });
 
 export const getAmmattilaisarviot = createServerFn({ method: "GET" })
@@ -453,7 +539,6 @@ export const lahetaTestiKausikirje = createServerFn({ method: "POST" })
     const baseUrl = process.env.PUBLIC_APP_URL ?? "https://kotivahti.fi";
     const etunimi = (prof.nimi ?? prof.email).split(" ")[0];
 
-    // Luo testirivi (token) ja lähetä
     const { data: kysely, error } = await a.from("palaute_kyselyt")
       .insert({ user_id: context.userId, tyyppi: `kausikirje_${data.kausi}` })
       .select("token")
