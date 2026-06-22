@@ -33,6 +33,7 @@ import { Route as AuthenticatedHuoltohistoriaRouteImport } from './routes/_authe
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 import { Route as ApiPublicPalauteRouteImport } from './routes/api/public/palaute'
+import { Route as ApiPublicHooksYdinprosessiEskalointiRouteImport } from './routes/api/public/hooks/ydinprosessi-eskalointi'
 import { Route as ApiPublicHooksNuohousMuistutusRouteImport } from './routes/api/public/hooks/nuohous-muistutus'
 import { Route as ApiPublicHooksLahetaKausikirjeRouteImport } from './routes/api/public/hooks/laheta-kausikirje'
 
@@ -157,6 +158,12 @@ const ApiPublicPalauteRoute = ApiPublicPalauteRouteImport.update({
   path: '/api/public/palaute',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicHooksYdinprosessiEskalointiRoute =
+  ApiPublicHooksYdinprosessiEskalointiRouteImport.update({
+    id: '/api/public/hooks/ydinprosessi-eskalointi',
+    path: '/api/public/hooks/ydinprosessi-eskalointi',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiPublicHooksNuohousMuistutusRoute =
   ApiPublicHooksNuohousMuistutusRouteImport.update({
     id: '/api/public/hooks/nuohous-muistutus',
@@ -196,6 +203,7 @@ export interface FileRoutesByFullPath {
   '/api/public/palaute': typeof ApiPublicPalauteRoute
   '/api/public/hooks/laheta-kausikirje': typeof ApiPublicHooksLahetaKausikirjeRoute
   '/api/public/hooks/nuohous-muistutus': typeof ApiPublicHooksNuohousMuistutusRoute
+  '/api/public/hooks/ydinprosessi-eskalointi': typeof ApiPublicHooksYdinprosessiEskalointiRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -223,6 +231,7 @@ export interface FileRoutesByTo {
   '/api/public/palaute': typeof ApiPublicPalauteRoute
   '/api/public/hooks/laheta-kausikirje': typeof ApiPublicHooksLahetaKausikirjeRoute
   '/api/public/hooks/nuohous-muistutus': typeof ApiPublicHooksNuohousMuistutusRoute
+  '/api/public/hooks/ydinprosessi-eskalointi': typeof ApiPublicHooksYdinprosessiEskalointiRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -252,6 +261,7 @@ export interface FileRoutesById {
   '/api/public/palaute': typeof ApiPublicPalauteRoute
   '/api/public/hooks/laheta-kausikirje': typeof ApiPublicHooksLahetaKausikirjeRoute
   '/api/public/hooks/nuohous-muistutus': typeof ApiPublicHooksNuohousMuistutusRoute
+  '/api/public/hooks/ydinprosessi-eskalointi': typeof ApiPublicHooksYdinprosessiEskalointiRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -281,6 +291,7 @@ export interface FileRouteTypes {
     | '/api/public/palaute'
     | '/api/public/hooks/laheta-kausikirje'
     | '/api/public/hooks/nuohous-muistutus'
+    | '/api/public/hooks/ydinprosessi-eskalointi'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -308,6 +319,7 @@ export interface FileRouteTypes {
     | '/api/public/palaute'
     | '/api/public/hooks/laheta-kausikirje'
     | '/api/public/hooks/nuohous-muistutus'
+    | '/api/public/hooks/ydinprosessi-eskalointi'
   id:
     | '__root__'
     | '/'
@@ -336,6 +348,7 @@ export interface FileRouteTypes {
     | '/api/public/palaute'
     | '/api/public/hooks/laheta-kausikirje'
     | '/api/public/hooks/nuohous-muistutus'
+    | '/api/public/hooks/ydinprosessi-eskalointi'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -357,6 +370,7 @@ export interface RootRouteChildren {
   ApiPublicPalauteRoute: typeof ApiPublicPalauteRoute
   ApiPublicHooksLahetaKausikirjeRoute: typeof ApiPublicHooksLahetaKausikirjeRoute
   ApiPublicHooksNuohousMuistutusRoute: typeof ApiPublicHooksNuohousMuistutusRoute
+  ApiPublicHooksYdinprosessiEskalointiRoute: typeof ApiPublicHooksYdinprosessiEskalointiRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -529,6 +543,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicPalauteRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/hooks/ydinprosessi-eskalointi': {
+      id: '/api/public/hooks/ydinprosessi-eskalointi'
+      path: '/api/public/hooks/ydinprosessi-eskalointi'
+      fullPath: '/api/public/hooks/ydinprosessi-eskalointi'
+      preLoaderRoute: typeof ApiPublicHooksYdinprosessiEskalointiRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/hooks/nuohous-muistutus': {
       id: '/api/public/hooks/nuohous-muistutus'
       path: '/api/public/hooks/nuohous-muistutus'
@@ -591,6 +612,8 @@ const rootRouteChildren: RootRouteChildren = {
   ApiPublicPalauteRoute: ApiPublicPalauteRoute,
   ApiPublicHooksLahetaKausikirjeRoute: ApiPublicHooksLahetaKausikirjeRoute,
   ApiPublicHooksNuohousMuistutusRoute: ApiPublicHooksNuohousMuistutusRoute,
+  ApiPublicHooksYdinprosessiEskalointiRoute:
+    ApiPublicHooksYdinprosessiEskalointiRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
