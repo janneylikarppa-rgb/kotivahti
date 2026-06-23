@@ -32,6 +32,7 @@ export const Route = createFileRoute("/api/public/hooks/kausikirje-followup")({
           const v = (k.vastaukset ?? {}) as any;
           if (v.vastaus !== "kesken") { ohitettu++; continue; }
           if (v.followup_at) { ohitettu++; continue; }
+          if (!k.user_id) { ohitettu++; continue; }
 
           const { data: prof } = await supabaseAdmin
             .from("profiles").select("email, nimi").eq("id", k.user_id).maybeSingle();
