@@ -12,7 +12,7 @@ export const Route = createFileRoute("/palaute")({
 
 function PalauteSivu() {
   const { token, vastaus, kausi } = Route.useSearch();
-  const [tila, setTila] = useState<"laheta" | "ok" | "virhe">("laheta");
+  const [tila, setTila] = useState<"laheta" | "ok" | "virhe" | "vanhentunut">("laheta");
   const [virhe, setVirhe] = useState("");
 
   useEffect(() => {
@@ -23,7 +23,12 @@ function PalauteSivu() {
       body: JSON.stringify({ token, vastaus, kausi }),
     })
       .then(async (r) => {
-        if (!r.ok) { const txt = await r.text(); throw new Error(txt || `Virhe ${r.status}`); }
+        if (r.status === 410) { setTila("vanhentunut"); return; }
+        if (!r.ok) {
+          let msg = `Virhe ${r.status}`;
+          try { const j = await r.json(); if (j?.error === "token_expired") { setTila("vanhentunut"); return; } } catch {}
+          throw new Error(msg);
+        }
         setTila("ok");
       })
       .catch((e) => { setTila("virhe"); setVirhe(e?.message ?? "Tuntematon virhe"); });
@@ -43,6 +48,16 @@ function PalauteSivu() {
             <p className="eyebrow text-primary">Kiitos!</p>
             <h1 className="text-3xl font-serif text-cream">Vastauksesi on tallennettu</h1>
             <p className="text-sm text-muted-foreground">Pidämme sinut tulevana kautena ajan tasalla.</p>
+            <Link to="/" className="inline-flex items-center justify-center rounded-md bg-primary px-5 py-2.5 text-sm font-semibold uppercase tracking-wider text-primary-foreground hover:bg-[color:var(--gold-2)] mt-4">
+              Avaa Kotivahti
+            </Link>
+          </>
+        )}
+        {tila === "vanhentunut" && (
+          <>
+            <p className="eyebrow">Linkki vanhentunut</p>
+            <h1 className="text-3xl font-serif text-cream">Tämä palautekutsu on vanhentunut</h1>
+            <p className="text-sm text-muted-foreground">Kiitos kuitenkin kiinnostuksestasi — voit antaa palautetta sovelluksessa milloin tahansa.</p>
             <Link to="/" className="inline-flex items-center justify-center rounded-md bg-primary px-5 py-2.5 text-sm font-semibold uppercase tracking-wider text-primary-foreground hover:bg-[color:var(--gold-2)] mt-4">
               Avaa Kotivahti
             </Link>
