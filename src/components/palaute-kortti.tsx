@@ -192,7 +192,10 @@ function OnboardingKysely({ onVastaa, loading }: { onVastaa: (v: Record<string, 
           ))}
         </div>
       </div>
-      <Textarea rows={2} placeholder="Mitä toivoisit lisää?" value={toive} onChange={(e) => setToive(e.target.value)} />
+      <div>
+        <p className="text-xs text-muted-foreground mb-1.5">Mitä toivoisit Kotivahdilta lisää?</p>
+        <Textarea rows={2} placeholder="Vapaa sana (valinnainen)" value={toive} onChange={(e) => setToive(e.target.value)} />
+      </div>
       <Button disabled={!helppous || !ensivaikutelma || loading} className="w-full uppercase tracking-wider font-semibold"
         onClick={() => onVastaa({ helppous, ensivaikutelma, ...(toive ? { toive } : {}) })}>
         {loading ? "Lähetetään..." : "Lähetä"}
