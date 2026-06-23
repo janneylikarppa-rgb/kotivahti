@@ -78,7 +78,12 @@ export function AppSidebar() {
                 const showBadge = item.url === "/admin" && uusiaCount > 0;
                 return (
                   <SidebarMenuItem key={item.url}>
-                    <SidebarMenuButton asChild isActive={path === item.url} tooltip={item.title}>
+                    <SidebarMenuButton
+                      asChild
+                      isActive={path === item.url}
+                      tooltip={item.title}
+                      className="data-[active=true]:border-l-2 data-[active=true]:border-primary data-[active=true]:bg-sidebar-accent data-[active=true]:text-cream rounded-l-none"
+                    >
                       <Link to={item.url} className="flex items-center gap-2" onClick={handleNav}>
                         <item.icon className="h-4 w-4" />
                         <span className="flex-1">{item.title}</span>
@@ -90,6 +95,7 @@ export function AppSidebar() {
                       </Link>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
+
                 );
               })}
             </SidebarMenu>
