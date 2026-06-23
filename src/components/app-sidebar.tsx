@@ -63,7 +63,7 @@ export function AppSidebar() {
     <Sidebar collapsible="icon">
       <SidebarHeader className="px-3 pt-5 pb-3">
         <Link to="/dashboard" className="flex items-center gap-2 px-2">
-          <div className="grid h-8 w-8 place-items-center rounded-md bg-[#152a22] text-cream font-serif text-lg">K</div>
+          <div className="grid h-8 w-8 place-items-center rounded-md bg-[#152a22] text-white font-serif text-lg">K</div>
           <div className="font-serif text-lg leading-none text-cream">
             Kotivahti<span className="text-primary">.</span>
           </div>
