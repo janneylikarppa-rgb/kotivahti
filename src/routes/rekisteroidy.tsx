@@ -16,7 +16,7 @@ const PAGE_STYLES = `
   .auth-page { min-height: 100vh; background: #f5f0e8; font-family: 'DM Sans', system-ui, sans-serif; color: #1e3a2f; display: flex; flex-direction: column; }
   .auth-nav { padding: 1.5rem 2rem; }
   .auth-logo { display: inline-flex; align-items: center; gap: 0.6rem; text-decoration: none; }
-  .auth-logo-mark { width: 36px; height: 36px; display: grid; place-items: center; background: #1e3a2f; color: #f5f0e8; border-radius: 8px; font-family: 'Playfair Display', serif; font-size: 1.1rem; font-weight: 600; }
+  .auth-logo-mark { width: 36px; height: 36px; display: grid; place-items: center; background: #152a22; color: #ffffff; border-radius: 8px; font-family: 'Playfair Display', serif; font-size: 1.1rem; font-weight: 600; }
   .auth-logo-name { font-family: 'Playfair Display', serif; font-size: 1.25rem; color: #1e3a2f; }
   .auth-logo-name .dot { color: #c8973a; }
   .auth-main { flex: 1; display: flex; align-items: center; justify-content: center; padding: 1rem 1.5rem 3rem; }
