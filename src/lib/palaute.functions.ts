@@ -123,6 +123,16 @@ export const haeAktiivinenKysely = createServerFn({ method: "GET" })
       return luo("ydinprosessi_kokonaiskokemus", l.id);
     }
 
+    // Globaali rate limit: ei näytetä yleisiä kyselyitä (tyonlaatu / onboarding /
+    // nps / churn) jos käyttäjä on saanut minkään in-app-kyselyn viimeisen
+    // 7 päivän aikana. Ydinprosessi-kyselyt yllä ohittavat tämän.
+    const yleisetCooldownAktiivi = lista.some((k: any) =>
+      !String(k.tyyppi).startsWith("kausikirje_") &&
+      !String(k.tyyppi).startsWith("ydinprosessi_") &&
+      Date.now() - new Date(k.lahetetty_at).getTime() < IN_APP_COOLDOWN_PV * ARKIPV_MS
+    );
+    if (yleisetCooldownAktiivi) return null;
+
     // Tyonlaatu (huoltohistoria)
     const { data: huollot } = await supabase
       .from("huolto_historia")
