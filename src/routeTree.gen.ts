@@ -36,6 +36,7 @@ import { Route as ApiPublicPalauteRouteImport } from './routes/api/public/palaut
 import { Route as ApiPublicHooksYdinprosessiEskalointiRouteImport } from './routes/api/public/hooks/ydinprosessi-eskalointi'
 import { Route as ApiPublicHooksNuohousMuistutusRouteImport } from './routes/api/public/hooks/nuohous-muistutus'
 import { Route as ApiPublicHooksLahetaKausikirjeRouteImport } from './routes/api/public/hooks/laheta-kausikirje'
+import { Route as ApiPublicHooksKausikirjeFollowupRouteImport } from './routes/api/public/hooks/kausikirje-followup'
 
 const VaihdaSalasanaRoute = VaihdaSalasanaRouteImport.update({
   id: '/vaihda-salasana',
@@ -176,6 +177,12 @@ const ApiPublicHooksLahetaKausikirjeRoute =
     path: '/api/public/hooks/laheta-kausikirje',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiPublicHooksKausikirjeFollowupRoute =
+  ApiPublicHooksKausikirjeFollowupRouteImport.update({
+    id: '/api/public/hooks/kausikirje-followup',
+    path: '/api/public/hooks/kausikirje-followup',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -201,6 +208,7 @@ export interface FileRoutesByFullPath {
   '/opas/nuohous-hinta': typeof OpasNuohousHintaRoute
   '/opas/': typeof OpasIndexRoute
   '/api/public/palaute': typeof ApiPublicPalauteRoute
+  '/api/public/hooks/kausikirje-followup': typeof ApiPublicHooksKausikirjeFollowupRoute
   '/api/public/hooks/laheta-kausikirje': typeof ApiPublicHooksLahetaKausikirjeRoute
   '/api/public/hooks/nuohous-muistutus': typeof ApiPublicHooksNuohousMuistutusRoute
   '/api/public/hooks/ydinprosessi-eskalointi': typeof ApiPublicHooksYdinprosessiEskalointiRoute
@@ -229,6 +237,7 @@ export interface FileRoutesByTo {
   '/opas/nuohous-hinta': typeof OpasNuohousHintaRoute
   '/opas': typeof OpasIndexRoute
   '/api/public/palaute': typeof ApiPublicPalauteRoute
+  '/api/public/hooks/kausikirje-followup': typeof ApiPublicHooksKausikirjeFollowupRoute
   '/api/public/hooks/laheta-kausikirje': typeof ApiPublicHooksLahetaKausikirjeRoute
   '/api/public/hooks/nuohous-muistutus': typeof ApiPublicHooksNuohousMuistutusRoute
   '/api/public/hooks/ydinprosessi-eskalointi': typeof ApiPublicHooksYdinprosessiEskalointiRoute
@@ -259,6 +268,7 @@ export interface FileRoutesById {
   '/opas/nuohous-hinta': typeof OpasNuohousHintaRoute
   '/opas/': typeof OpasIndexRoute
   '/api/public/palaute': typeof ApiPublicPalauteRoute
+  '/api/public/hooks/kausikirje-followup': typeof ApiPublicHooksKausikirjeFollowupRoute
   '/api/public/hooks/laheta-kausikirje': typeof ApiPublicHooksLahetaKausikirjeRoute
   '/api/public/hooks/nuohous-muistutus': typeof ApiPublicHooksNuohousMuistutusRoute
   '/api/public/hooks/ydinprosessi-eskalointi': typeof ApiPublicHooksYdinprosessiEskalointiRoute
@@ -289,6 +299,7 @@ export interface FileRouteTypes {
     | '/opas/nuohous-hinta'
     | '/opas/'
     | '/api/public/palaute'
+    | '/api/public/hooks/kausikirje-followup'
     | '/api/public/hooks/laheta-kausikirje'
     | '/api/public/hooks/nuohous-muistutus'
     | '/api/public/hooks/ydinprosessi-eskalointi'
@@ -317,6 +328,7 @@ export interface FileRouteTypes {
     | '/opas/nuohous-hinta'
     | '/opas'
     | '/api/public/palaute'
+    | '/api/public/hooks/kausikirje-followup'
     | '/api/public/hooks/laheta-kausikirje'
     | '/api/public/hooks/nuohous-muistutus'
     | '/api/public/hooks/ydinprosessi-eskalointi'
@@ -346,6 +358,7 @@ export interface FileRouteTypes {
     | '/opas/nuohous-hinta'
     | '/opas/'
     | '/api/public/palaute'
+    | '/api/public/hooks/kausikirje-followup'
     | '/api/public/hooks/laheta-kausikirje'
     | '/api/public/hooks/nuohous-muistutus'
     | '/api/public/hooks/ydinprosessi-eskalointi'
@@ -368,6 +381,7 @@ export interface RootRouteChildren {
   OpasNuohousHintaRoute: typeof OpasNuohousHintaRoute
   OpasIndexRoute: typeof OpasIndexRoute
   ApiPublicPalauteRoute: typeof ApiPublicPalauteRoute
+  ApiPublicHooksKausikirjeFollowupRoute: typeof ApiPublicHooksKausikirjeFollowupRoute
   ApiPublicHooksLahetaKausikirjeRoute: typeof ApiPublicHooksLahetaKausikirjeRoute
   ApiPublicHooksNuohousMuistutusRoute: typeof ApiPublicHooksNuohousMuistutusRoute
   ApiPublicHooksYdinprosessiEskalointiRoute: typeof ApiPublicHooksYdinprosessiEskalointiRoute
@@ -564,6 +578,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicHooksLahetaKausikirjeRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/hooks/kausikirje-followup': {
+      id: '/api/public/hooks/kausikirje-followup'
+      path: '/api/public/hooks/kausikirje-followup'
+      fullPath: '/api/public/hooks/kausikirje-followup'
+      preLoaderRoute: typeof ApiPublicHooksKausikirjeFollowupRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -610,6 +631,7 @@ const rootRouteChildren: RootRouteChildren = {
   OpasNuohousHintaRoute: OpasNuohousHintaRoute,
   OpasIndexRoute: OpasIndexRoute,
   ApiPublicPalauteRoute: ApiPublicPalauteRoute,
+  ApiPublicHooksKausikirjeFollowupRoute: ApiPublicHooksKausikirjeFollowupRoute,
   ApiPublicHooksLahetaKausikirjeRoute: ApiPublicHooksLahetaKausikirjeRoute,
   ApiPublicHooksNuohousMuistutusRoute: ApiPublicHooksNuohousMuistutusRoute,
   ApiPublicHooksYdinprosessiEskalointiRoute:
@@ -618,13 +640,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
