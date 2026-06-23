@@ -9,14 +9,17 @@ import { haeAktiivinenKysely, vastaaKyselyyn, type AktiivinenKysely } from "@/li
 
 const OHITETUT_AVAIN = "kotivahti_palaute_ohitettu";
 
+// localStorage säilyy yli session — sama suljettu kysely-id ei nouse uudelleen.
 function ohitetut(): Set<string> {
   if (typeof window === "undefined") return new Set();
-  try { return new Set(JSON.parse(sessionStorage.getItem(OHITETUT_AVAIN) || "[]")); } catch { return new Set(); }
+  try { return new Set(JSON.parse(localStorage.getItem(OHITETUT_AVAIN) || "[]")); } catch { return new Set(); }
 }
 function ohitaSessio(id: string) {
   if (typeof window === "undefined") return;
   const s = ohitetut(); s.add(id);
-  sessionStorage.setItem(OHITETUT_AVAIN, JSON.stringify(Array.from(s)));
+  // Pidä lista kohtuullisena (max 200 viimeisintä)
+  const arr = Array.from(s).slice(-200);
+  localStorage.setItem(OHITETUT_AVAIN, JSON.stringify(arr));
 }
 
 export function PalauteKortti() {
