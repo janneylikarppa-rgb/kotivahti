@@ -85,11 +85,11 @@ export const haeAktiivinenKysely = createServerFn({ method: "GET" })
       .order("created_at", { ascending: false })
       .limit(30);
 
-    // VAIHE 1: ydinprosessi_yhteydenotto — 3 arkipäivää välityksestä
+    // VAIHE 1: ydinprosessi_yhteydenotto — 3 arkipäivää (≈ 5 kalenteripäivää) liidin välityksestä
     for (const l of liidit ?? []) {
       const ts = l.lahetetty_at ?? l.created_at;
       if (l.status !== "valitetty") continue;
-      if (!arkipaiviaSitten(ts, 3)) continue;
+      if (!paivaSitten(ts, 5)) continue;
       if (onkoLahetetty("ydinprosessi_yhteydenotto", l.id)) continue;
       return luo("ydinprosessi_yhteydenotto", l.id);
     }
@@ -107,15 +107,19 @@ export const haeAktiivinenKysely = createServerFn({ method: "GET" })
       return luo("ydinprosessi_kaynnin_jalkeen", l.id);
     }
 
-    // VAIHE 3: 5 päivää vaiheen 2 "kyllä, kävi"-vastauksesta
+    // VAIHE 3: lähetetään kaikille positiivisille K1-vastauksille
+    //  - "kylla_kavi" → 5 päivän kuluttua (käynti tapahtunut)
+    //  - "sovittu_ei_viela" → 14 päivän kuluttua (anna käynnin tapahtua)
     for (const l of liidit ?? []) {
       if (onkoLahetetty("ydinprosessi_kokonaiskokemus", l.id)) continue;
       const v2 = lista.find((k: any) =>
         k.tyyppi === "ydinprosessi_kaynnin_jalkeen" && k.trigger_id === l.id && k.vastattu_at
       ) as any;
       if (!v2) continue;
-      if (v2.vastaukset?.kavi !== "kylla_kavi") continue;
-      if (!paivaSitten(v2.vastattu_at, 5)) continue;
+      const k1 = v2.vastaukset?.kavi;
+      const odotus = k1 === "kylla_kavi" ? 5 : k1 === "sovittu_ei_viela" ? 14 : null;
+      if (!odotus) continue;
+      if (!paivaSitten(v2.vastattu_at, odotus)) continue;
       return luo("ydinprosessi_kokonaiskokemus", l.id);
     }
 
