@@ -138,7 +138,7 @@ function KulutPage() {
 
   return (
     <div className="mx-auto max-w-6xl space-y-8">
-      <header className="flex flex-wrap items-end justify-between gap-4">
+      <header className="animate-fade-up flex flex-wrap items-end justify-between gap-4">
         <div>
           <p className="eyebrow mb-3 flex items-center gap-3"><span className="block h-px w-8 bg-primary" /> Kulujenseuranta</p>
           <h1 className="font-serif text-4xl text-cream">Talon <em className="text-primary not-italic italic">kulut</em></h1>
