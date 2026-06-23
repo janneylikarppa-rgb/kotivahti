@@ -24,9 +24,11 @@ export const Route = createFileRoute("/api/public/palaute")({
           .select("id, vastattu_at, token_voimassa")
           .eq("token", parsed.token)
           .maybeSingle();
-        if (hErr || !kysely) return new Response("Linkkiä ei löytynyt", { status: 404 });
+        if (hErr || !kysely) {
+          return new Response(JSON.stringify({ error: "ei_loytynyt" }), { status: 404, headers: { "Content-Type": "application/json" } });
+        }
         if (kysely.token_voimassa && new Date(kysely.token_voimassa).getTime() < Date.now()) {
-          return new Response("Linkki on vanhentunut", { status: 410 });
+          return new Response(JSON.stringify({ error: "token_expired" }), { status: 410, headers: { "Content-Type": "application/json" } });
         }
         if (kysely.vastattu_at) {
           return new Response(JSON.stringify({ ok: true, already: true }), { headers: { "Content-Type": "application/json" } });
