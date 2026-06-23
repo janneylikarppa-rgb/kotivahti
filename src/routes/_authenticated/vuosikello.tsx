@@ -67,7 +67,7 @@ function VuosikelloPage() {
 
   return (
     <div className="mx-auto max-w-5xl space-y-8">
-      <header>
+      <header className="animate-fade-up">
         <p className="eyebrow mb-3 flex items-center gap-3"><span className="block h-px w-8 bg-primary" /> Vuosikello {new Date().getFullYear()}</p>
         <h1 className="font-serif text-4xl text-cream">Kauden <em className="text-primary not-italic italic">työt</em></h1>
         <p className="mt-3 text-muted-foreground">Kuittaa tehdyt huollot. Kuittaukset nollautuvat vuodenvaihteessa.</p>

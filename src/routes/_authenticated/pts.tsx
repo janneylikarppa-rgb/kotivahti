@@ -181,10 +181,10 @@ function PtsPage() {
 
   return (
     <div className="space-y-6 p-4 md:p-6">
-      <header className="space-y-2">
-        <div className="eyebrow">4.4 PTS-suunnitelma</div>
+      <header className="animate-fade-up space-y-2">
+        <p className="eyebrow mb-3 flex items-center gap-3"><span className="block h-px w-8 bg-primary" /> Pitkän tähtäimen suunnitelma</p>
         <h1 className="font-serif text-3xl text-cream md:text-4xl">
-          Pitkän tähtäimen suunnitelma
+          Pitkän tähtäimen <em className="text-primary not-italic italic">suunnitelma</em>
         </h1>
         <p className="max-w-3xl text-cream/70">
           Seuraavan 10 vuoden suositellut toimenpiteet. Perustuu talosi tietoihin

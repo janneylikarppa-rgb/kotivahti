@@ -281,7 +281,7 @@ function TaloTiedotPage() {
 
   return (
     <div className="mx-auto max-w-5xl space-y-6">
-      <header>
+      <header className="animate-fade-up">
         <p className="eyebrow mb-3 flex items-center gap-3"><span className="block h-px w-8 bg-primary" /> Talon tiedot</p>
         <div className="flex items-start justify-between gap-4 flex-wrap">
           <h1 className="font-serif text-4xl text-cream">Rakennuksen <em className="text-primary not-italic italic">profiili</em></h1>

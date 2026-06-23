@@ -140,6 +140,43 @@
   --cream: oklch(0.95 0.025 90);
 }
 
+/*
+ * "Metsäinen ammattilainen" – tumma ilme kirjautuneelle alueelle.
+ * AuthSync (__root.tsx) asettaa data-authenticated="true" <html>-elementtiin
+ * kun käyttäjä on kirjautunut. Tämä swap pitää etusivun vaaleana ja
+ * sovelluksen tummana ilman komponenttitason muutoksia.
+ */
+:root[data-authenticated="true"] {
+  --background: oklch(0.22 0.028 152);
+  --foreground: oklch(0.94 0.02 90);
+  --card: oklch(0.26 0.030 152);
+  --card-foreground: oklch(0.94 0.02 90);
+  --popover: oklch(0.26 0.030 152);
+  --popover-foreground: oklch(0.94 0.02 90);
+  --primary: oklch(0.74 0.135 85);
+  --primary-foreground: oklch(0.22 0.028 152);
+  --secondary: oklch(0.30 0.030 152);
+  --secondary-foreground: oklch(0.94 0.02 90);
+  --muted: oklch(0.30 0.030 152);
+  --muted-foreground: oklch(0.72 0.04 145);
+  --accent: oklch(0.30 0.030 152);
+  --accent-foreground: oklch(0.82 0.13 85);
+  --border: oklch(0.74 0.135 85 / 0.18);
+  --input: oklch(0.30 0.030 152);
+  --ring: oklch(0.74 0.135 85);
+  --cream: oklch(0.96 0.025 90);
+  --surface: oklch(0.26 0.030 152);
+  --surface-2: oklch(0.30 0.030 152);
+  --sidebar: oklch(0.18 0.025 152);
+  --sidebar-foreground: oklch(0.88 0.025 90);
+  --sidebar-primary: oklch(0.74 0.135 85);
+  --sidebar-primary-foreground: oklch(0.22 0.028 152);
+  --sidebar-accent: oklch(0.26 0.030 152);
+  --sidebar-accent-foreground: oklch(0.96 0.025 90);
+  --sidebar-border: oklch(0.74 0.135 85 / 0.18);
+  --sidebar-ring: oklch(0.74 0.135 85);
+}
+
 @layer base {
   * {
     border-color: var(--color-border);
@@ -167,7 +204,7 @@
   .gold-card {
     position: relative;
     background-color: var(--color-card);
-    border: 1px solid var(--color-border);
+    border: 1px solid color-mix(in oklab, var(--gold) 20%, transparent);
     border-radius: var(--radius-lg);
   }
   .gold-card::before {
@@ -180,6 +217,28 @@
   }
 }
 
+@keyframes fade-up {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@utility animate-fade-up {
+  animation: fade-up 0.6s ease both;
+}
+@utility animate-fade-up-1 {
+  animation: fade-up 0.6s 0.1s ease both;
+}
+@utility animate-fade-up-2 {
+  animation: fade-up 0.6s 0.2s ease both;
+}
+@utility animate-fade-up-3 {
+  animation: fade-up 0.6s 0.3s ease both;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .gold-card { animation: none; }
+  .animate-fade-up,
+  .animate-fade-up-1,
+  .animate-fade-up-2,
+  .animate-fade-up-3 { animation: none; }
 }
+
