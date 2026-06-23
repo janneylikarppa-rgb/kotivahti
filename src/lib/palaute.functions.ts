@@ -25,13 +25,10 @@ function paivaSitten(ts: string | Date, paivaa: number): boolean {
   return Date.now() - t >= paivaa * ARKIPV_MS;
 }
 
-// Arkipäivien laskenta (rouhea, hyväksyttävä tarkkuus liidien triggereille).
-function arkipaiviaSitten(ts: string | Date, arkipv: number): boolean {
-  const t = typeof ts === "string" ? new Date(ts).getTime() : ts.getTime();
-  // Yksinkertainen approksimaatio: 7/5 kalenterivuorokautta
-  const tarvitsee = Math.ceil(arkipv * 1.4);
-  return Date.now() - t >= tarvitsee * ARKIPV_MS;
-}
+// Globaali in-app-kyselyiden cooldown — käyttäjälle korkeintaan yksi
+// kortti per 7 kalenteripäivää (ydinprosessi-kyselyt poikkeuksena: ne
+// ovat liidikohtaisia ja tärkeitä, joten ne ohittavat cooldownin).
+const IN_APP_COOLDOWN_PV = 7;
 
 async function admin() {
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
