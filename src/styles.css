@@ -212,3 +212,27 @@
   .animate-fade-up-3 { animation: none; }
 }
 
+
+@media print {
+  @page { size: A4 portrait; margin: 20mm; }
+  body, html { background: white !important; }
+  /* Hide app chrome */
+  [data-sidebar], header, nav, .no-print, [data-sonner-toaster] { display: none !important; }
+  /* Reset shell layout */
+  main, .raportti { box-shadow: none !important; padding: 0 !important; }
+  .raportti {
+    background: white !important;
+    color: black !important;
+    max-width: 100% !important;
+    border-radius: 0 !important;
+  }
+  .raportti * { color: black !important; }
+  .raportti .text-primary,
+  .raportti [style*="var(--gold)"] {
+    color: var(--gold) !important;
+    background: var(--gold) !important;
+  }
+  .page-break { page-break-before: always; }
+  .kulutus-taulu { font-size: 9pt; }
+  a[href]::after { content: ""; }
+}
