@@ -1227,4 +1227,59 @@ export const addKiinteisto = createServerFn({ method: "POST" })
     return { ok: true, id: uusi.id };
   });
 
+// ---------- Myyntiraportti ----------
+export const getMyyntiraportti = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const { supabase, userId } = context;
+    const k = await getActiveKiinteisto(supabase, userId);
+    if (!k) return null;
+
+    const vuosi = new Date().getFullYear() - 1;
+    const vuosiAlku = `${vuosi}-01-01`;
+    const vuosiLoppu = `${vuosi}-12-31`;
+
+    const [taloRes, huoltoRes, dokRes, kulutRes, toistuvatRes] = await Promise.all([
+      supabase.from("talon_tiedot").select("*").eq("kiinteisto_id", k.id).maybeSingle(),
+      supabase.from("huolto_historia").select("*").eq("kiinteisto_id", k.id).order("pvm", { ascending: true }),
+      supabase.from("talo_dokumentit").select("*").eq("kiinteisto_id", k.id).neq("tyyppi", "kuva"),
+      supabase
+        .from("kulut")
+        .select("*")
+        .eq("kiinteisto_id", k.id)
+        .in("kategoria", ["sahko", "lammitys", "vesi"])
+        .gte("pvm", vuosiAlku)
+        .lte("pvm", vuosiLoppu),
+      supabase
+        .from("toistuvat_kulut")
+        .select("*")
+        .eq("kiinteisto_id", k.id)
+        .eq("aktiivinen", true)
+        .in("kategoria", ["kiinteistovero", "muu"]),
+    ]);
+
+    // Signed URLs for documents
+    const dokumentit = await Promise.all(
+      (dokRes.data ?? []).map(async (d: any) => {
+        let url: string | null = null;
+        if (d.tiedosto_polku) {
+          const { data: s } = await supabase.storage
+            .from("talo-dokumentit")
+            .createSignedUrl(d.tiedosto_polku, 3600);
+          url = s?.signedUrl ?? null;
+        }
+        return { ...d, url };
+      }),
+    );
+
+    return {
+      kiinteisto: k,
+      talo: taloRes.data ?? null,
+      huollot: huoltoRes.data ?? [],
+      dokumentit,
+      kulutVuosi: vuosi,
+      kulut: kulutRes.data ?? [],
+      toistuvat: toistuvatRes.data ?? [],
+    };
+  });
 
