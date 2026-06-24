@@ -126,7 +126,7 @@ function DashboardPage() {
           </CardContent>
         </Card>
 
-        </Card>
+
 
         <Card className="gold-card">
           <CardHeader className="pb-3"><CardTitle className="text-base font-serif flex items-center gap-2"><FileText className="h-4 w-4 text-primary" /> Myyntiraportti</CardTitle></CardHeader>
