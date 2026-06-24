@@ -1227,3 +1227,4 @@ export const addKiinteisto = createServerFn({ method: "POST" })
     return { ok: true, id: uusi.id };
   });
 
+
