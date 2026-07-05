@@ -39,7 +39,6 @@ import {
 import { Plus, Check, Trash2, Wrench, AlertTriangle, Calendar, Clock, Undo2 } from "lucide-react";
 import { toast } from "sonner";
 import { LiidiDialog } from "@/components/liidi-dialog";
-import { AurinkoSuositusKortti } from "@/components/aurinkosuositus-kortti";
 import { arvaaKategoria } from "@/lib/liidit-kategoriat";
 
 export const Route = createFileRoute("/_authenticated/pts")({
@@ -53,6 +52,10 @@ export const Route = createFileRoute("/_authenticated/pts")({
   },
   component: PtsPage,
 });
+
+const AURINKO_ID = "aurinko-suositus";
+const AURINKO_DISMISS_KEY = "kotivahti_aurinko_kuitattu";
+const AURINKO_LYKKAYS_KEY = "kotivahti_aurinko_lykatty_asti";
 
 type PtsRivi = {
   id: string;
@@ -114,6 +117,7 @@ function PtsPage() {
   const [kuittaa, setKuittaa] = useState<PtsRivi | null>(null);
   const [lykkaa, setLykkaa] = useState<PtsRivi | null>(null);
   const [liidiRivi, setLiidiRivi] = useState<PtsRivi | null>(null);
+  const [aurinkoTick, setAurinkoTick] = useState(0);
 
   const invalidate = () => {
     qc.invalidateQueries({ queryKey: ["pts"] });
@@ -173,12 +177,47 @@ function PtsPage() {
     return <div className="p-6 text-cream/60">Ladataan…</div>;
   }
 
-  const rivit: PtsRivi[] = (data?.rivit ?? []) as any;
+  const rivitDb: PtsRivi[] = (data?.rivit ?? []) as any;
+  const aurinko = (data as any).aurinko;
+  const nyt = new Date().getFullYear();
+  const aurinkoNakyy = (() => {
+    void aurinkoTick;
+    if (!aurinko?.suositus) return false;
+    if (typeof window === "undefined") return true;
+    if (localStorage.getItem(AURINKO_DISMISS_KEY) === "1") return false;
+    const lyk = Number(localStorage.getItem(AURINKO_LYKKAYS_KEY) || 0);
+    if (lyk && nyt < lyk) return false;
+    return true;
+  })();
+  const aurinkoRivi: PtsRivi | null = aurinkoNakyy ? {
+    id: AURINKO_ID,
+    lahde: "auto",
+    kohde: "Aurinkosähkön kartoitus",
+    kategoria: "Aurinkosähkö ja paneelit",
+    vuosi: nyt,
+    vuosiaJaljella: 0,
+    tila: "kiireellinen",
+    kuvaus: `Talosi sähkönkulutus viimeisen ${aurinko?.data_kuukausia ?? 0} kuukauden ajalta viittaa siihen, että aurinkosähkö voi olla kannattava investointi. Katon suunta, varjostukset ja rakenne ratkaisevat lopullisen kannattavuuden – paras seuraava askel on ammattilaisen maksuton kartoitus.`,
+    huoltovali: 0,
+  } : null;
+  const rivit: PtsRivi[] = aurinkoRivi ? [aurinkoRivi, ...rivitDb] : rivitDb;
   const ryhmat = {
     kiireellinen: rivit.filter((r) => r.tila === "kiireellinen"),
     lahivuosina: rivit.filter((r) => r.tila === "lahivuosina"),
     seurannassa: rivit.filter((r) => r.tila === "seurannassa"),
   };
+
+  const handleKuittaa = (r: PtsRivi) => {
+    if (r.id === AURINKO_ID) {
+      localStorage.setItem(AURINKO_DISMISS_KEY, "1");
+      setAurinkoTick((t) => t + 1);
+      toast.success("Aurinkosuositus piilotettu");
+      return;
+    }
+    setKuittaa(r);
+  };
+  const handleLykkaa = (r: PtsRivi) => setLykkaa(r);
+  const handlePyydaArvio = (r: PtsRivi) => setLiidiRivi(r);
 
   return (
     <div className="space-y-6 p-4 md:p-6">
@@ -212,16 +251,8 @@ function PtsPage() {
         </Card>
       )}
 
-      <AurinkoSuositusKortti aurinko={(data as any).aurinko} />
 
-      {(data as any).aurinko?.aurinkopaneelit && (
-        <Card className="gold-card">
-          <CardContent className="p-4 text-sm text-cream/80">
-            <span aria-hidden className="mr-2">☀️</span>
-            Aurinkopaneelit – muista vuosihuolto ja paneelien kevätpuhdistus.
-          </CardContent>
-        </Card>
-      )}
+
 
 
 
@@ -244,32 +275,32 @@ function PtsPage() {
       <RyhmaOsio
         otsikko="🔴 Kiireellinen"
         rivit={ryhmat.kiireellinen}
-        onKuittaa={setKuittaa}
-        onLykkaa={setLykkaa}
+        onKuittaa={handleKuittaa}
+        onLykkaa={handleLykkaa}
         onPeruLykkays={(k) => peruM.mutate(k)}
         onDelete={(id) => delM.mutate(id)}
-        onPyydaArvio={setLiidiRivi}
+        onPyydaArvio={handlePyydaArvio}
         tyhja="Ei kiireellisiä toimenpiteitä – hienoa työtä!"
         defaultOpen
       />
       <RyhmaOsio
         otsikko="🟡 Lähivuosina"
         rivit={ryhmat.lahivuosina}
-        onKuittaa={setKuittaa}
-        onLykkaa={setLykkaa}
+        onKuittaa={handleKuittaa}
+        onLykkaa={handleLykkaa}
         onPeruLykkays={(k) => peruM.mutate(k)}
         onDelete={(id) => delM.mutate(id)}
-        onPyydaArvio={setLiidiRivi}
+        onPyydaArvio={handlePyydaArvio}
         tyhja="Ei toimenpiteitä lähivuosille."
       />
       <RyhmaOsio
         otsikko="🟢 Seurannassa"
         rivit={ryhmat.seurannassa}
-        onKuittaa={setKuittaa}
-        onLykkaa={setLykkaa}
+        onKuittaa={handleKuittaa}
+        onLykkaa={handleLykkaa}
         onPeruLykkays={(k) => peruM.mutate(k)}
         onDelete={(id) => delM.mutate(id)}
-        onPyydaArvio={setLiidiRivi}
+        onPyydaArvio={handlePyydaArvio}
         tyhja="Ei seurattavia kohteita 10 vuoden ikkunassa."
       />
 
@@ -295,12 +326,22 @@ function PtsPage() {
         {lykkaa && (
           <LykkaysDialog
             rivi={lykkaa}
-            onSubmit={(v) => lykkaysM.mutate({
-              ...v,
-              kohde: lykkaa.kohde,
-              lahde: lykkaa.lahde,
-              rivi_id: lykkaa.id,
-            })}
+            onSubmit={(v) => {
+              if (lykkaa.id === AURINKO_ID) {
+                const uusi = new Date().getFullYear() + v.vuosia;
+                localStorage.setItem(AURINKO_LYKKAYS_KEY, String(uusi));
+                setAurinkoTick((t) => t + 1);
+                setLykkaa(null);
+                toast.success(`Aurinkosuositus siirretty vuoteen ${uusi}`);
+                return;
+              }
+              lykkaysM.mutate({
+                ...v,
+                kohde: lykkaa.kohde,
+                lahde: lykkaa.lahde,
+                rivi_id: lykkaa.id,
+              });
+            }}
           />
         )}
       </Dialog>
@@ -308,13 +349,20 @@ function PtsPage() {
       <LiidiDialog
         open={!!liidiRivi}
         onOpenChange={(o) => !o && setLiidiRivi(null)}
-        esitaytetty={liidiRivi ? {
-          palvelu: "kuntoarvio",
-          kategoria: arvaaKategoria(liidiRivi.kohde),
-          kuvaus: `PTS-suunnitelma suosittelee kuntoarviota: ${liidiRivi.kohde}, arvioitu toimenpidevuosi ${liidiRivi.vuosi}.`,
-          pts_kohde: liidiRivi.kohde,
-          lukitseKategoria: false,
-        } : undefined}
+        esitaytetty={liidiRivi ? (
+          liidiRivi.id === AURINKO_ID ? {
+            palvelu: "kuntoarvio",
+            kategoria: "Aurinkosähkö ja paneelit",
+            kuvaus: "Aurinkosähkökartoitus",
+            lukitseKategoria: true,
+          } : {
+            palvelu: "kuntoarvio",
+            kategoria: arvaaKategoria(liidiRivi.kohde),
+            kuvaus: `PTS-suunnitelma suosittelee kuntoarviota: ${liidiRivi.kohde}, arvioitu toimenpidevuosi ${liidiRivi.vuosi}.`,
+            pts_kohde: liidiRivi.kohde,
+            lukitseKategoria: false,
+          }
+        ) : undefined}
       />
     </div>
   );
