@@ -39,6 +39,7 @@ import {
 import { Plus, Check, Trash2, Wrench, AlertTriangle, Calendar, Clock, Undo2 } from "lucide-react";
 import { toast } from "sonner";
 import { LiidiDialog } from "@/components/liidi-dialog";
+import { AurinkoSuositusKortti } from "@/components/aurinkosuositus-kortti";
 import { arvaaKategoria } from "@/lib/liidit-kategoriat";
 
 export const Route = createFileRoute("/_authenticated/pts")({
@@ -210,6 +211,19 @@ function PtsPage() {
           </CardContent>
         </Card>
       )}
+
+      <AurinkoSuositusKortti aurinko={(data as any).aurinko} />
+
+      {(data as any).aurinko?.aurinkopaneelit && (
+        <Card className="gold-card">
+          <CardContent className="p-4 text-sm text-cream/80">
+            <span aria-hidden className="mr-2">☀️</span>
+            Aurinkopaneelit – muista vuosihuolto ja paneelien kevätpuhdistus.
+          </CardContent>
+        </Card>
+      )}
+
+
 
       <div className="flex flex-wrap items-center gap-3">
         <div className="hidden md:grid grid-cols-3 gap-2">

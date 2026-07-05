@@ -7,6 +7,7 @@ import { Progress } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Wrench, Wallet, CalendarDays, Home, FileText } from "lucide-react";
 import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, Tooltip, CartesianGrid } from "recharts";
+import { AurinkoSuositusKortti } from "@/components/aurinkosuositus-kortti";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
   loader: ({ context }) => {
@@ -42,6 +43,8 @@ function DashboardPage() {
         </p>
       </header>
 
+
+      <AurinkoSuositusKortti aurinko={(data as any).aurinko} />
 
       {/* Edistyminen */}
       <Card className="gold-card">

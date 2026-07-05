@@ -221,6 +221,7 @@ function TaloTiedotPage() {
         terassi_lasitettu: boolOrNull(t.terassi_lasitettu),
         terassi_lasitus_vuosi: num(t.terassi_lasitus_vuosi),
         salaojat: boolOrNull(t.salaojat), salaojat_tarkastettu: dateStr(t.salaojat_tarkastettu),
+        aurinkopaneelit: Boolean(t.aurinkopaneelit),
         valmiit_osiot: uudet,
       },
       _uudet: uudet,
@@ -551,6 +552,22 @@ function TaloTiedotPage() {
               </Field>
               <Field label="Suodatin vaihdettu viimeksi"><Input type="date" value={t.iv_suodatin_vaihdettu ?? ""} onChange={(e) => setT({ ...t, iv_suodatin_vaihdettu: e.target.value })} /></Field>
             </Row>
+
+            <p className="eyebrow text-primary pt-4">Aurinkopaneelit</p>
+            <Field label="Onko talossa aurinkopaneelit?">
+              <Select
+                value={t.aurinkopaneelit ? "true" : "false"}
+                onValueChange={(v) => setT({ ...t, aurinkopaneelit: v === "true" })}
+              >
+                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="false">Ei</SelectItem>
+                  <SelectItem value="true">Kyllä</SelectItem>
+                </SelectContent>
+              </Select>
+            </Field>
+
+
 
             <p className="eyebrow text-primary pt-4">Vesiputket ja viemärit</p>
             <Row>

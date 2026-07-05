@@ -158,13 +158,68 @@ async function getActiveKiinteisto(supabase: any, userId: string) {
   return kaikki[0];
 }
 
+// ---------- Aurinkosähkö-suosituksen laskenta ----------
+async function tarkistaAurinkosahkoSoveltuvuus(
+  supabase: any,
+  kiinteistoId: string,
+  aurinkopaneelit: boolean,
+) {
+  const { data: sahko } = await supabase
+    .from("kulut")
+    .select("pvm, kwh, kategoria")
+    .eq("kiinteisto_id", kiinteistoId)
+    .eq("kategoria", "sahko");
+
+  const rivit = (sahko ?? []) as Array<{ pvm: string; kwh: number | null }>;
+
+  // Huhti–syyskuu
+  const kesaKuukaudet = new Set<string>();
+  let aurinkokuukaudet_kwh = 0;
+  for (const r of rivit) {
+    if (!r.pvm) continue;
+    const d = new Date(r.pvm);
+    const kk = d.getMonth() + 1; // 1..12
+    if (kk >= 4 && kk <= 9) {
+      kesaKuukaudet.add(`${d.getFullYear()}-${kk}`);
+      aurinkokuukaudet_kwh += Number(r.kwh ?? 0);
+    }
+  }
+  const aurinkokuukaudet_kk = kesaKuukaudet.size;
+
+  // Kaikki eri kuukaudet joilta kirjauksia on (koko kulut-taulu)
+  const { data: kaikkiKulut } = await supabase
+    .from("kulut")
+    .select("pvm")
+    .eq("kiinteisto_id", kiinteistoId);
+  const kaikkiKuukaudet = new Set<string>();
+  for (const r of (kaikkiKulut ?? []) as Array<{ pvm: string }>) {
+    if (!r.pvm) continue;
+    const d = new Date(r.pvm);
+    kaikkiKuukaudet.add(`${d.getFullYear()}-${d.getMonth() + 1}`);
+  }
+  const data_kuukausia = kaikkiKuukaudet.size;
+
+  const suositus =
+    data_kuukausia >= 6 &&
+    aurinkokuukaudet_kwh >= 1500 &&
+    !aurinkopaneelit;
+
+  return {
+    suositus,
+    aurinkokuukaudet_kk,
+    aurinkokuukaudet_kwh: Math.round(aurinkokuukaudet_kwh),
+    data_kuukausia,
+    aurinkopaneelit,
+  };
+}
+
 // ---------- Dashboard yhteenveto ----------
 export const getDashboard = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
     const { supabase, userId } = context;
     const kiinteisto = await getActiveKiinteisto(supabase, userId);
-    if (!kiinteisto) return { kiinteisto: null, talo: null, huollot: [], kulutSumma: 0, edistyminen: 0 };
+    if (!kiinteisto) return { kiinteisto: null, talo: null, huollot: [], kulutSumma: 0, edistyminen: 0, aurinko: null };
 
     const [taloRes, huoltoRes, kuluRes, profRes] = await Promise.all([
       supabase.from("talon_tiedot").select("*").eq("kiinteisto_id", kiinteisto.id).maybeSingle(),
@@ -178,6 +233,12 @@ export const getDashboard = createServerFn({ method: "GET" })
     const edistyminen = Math.round((valmiit / 6) * 100);
     const kulutSumma = (kuluRes.data ?? []).reduce((a: number, r: any) => a + Number(r.summa || 0), 0);
 
+    const aurinko = await tarkistaAurinkosahkoSoveltuvuus(
+      supabase,
+      kiinteisto.id,
+      Boolean((talo as any)?.aurinkopaneelit),
+    );
+
     return {
       kiinteisto,
       talo,
@@ -187,6 +248,7 @@ export const getDashboard = createServerFn({ method: "GET" })
       edistyminen,
       valmiitOsiot: valmiit,
       nimi: profRes.data?.nimi ?? null,
+      aurinko,
     };
   });
 
@@ -277,6 +339,7 @@ const taloSchema = z.object({
     terassi_rakennettu_vuosi: z.number().int().optional().nullable(),
     terassi_kunnostettu_vuosi: z.number().int().optional().nullable(),
     salaojat: z.boolean().optional().nullable(),
+    aurinkopaneelit: z.boolean().optional().nullable(),
     salaojat_tarkastettu: z.string().optional().nullable(),
     lammitys_lisatieto: z.record(z.string(), z.any()).optional().nullable(),
     valmiit_osiot: z.array(z.string()).optional(),
@@ -933,7 +996,7 @@ export const getPts = createServerFn({ method: "GET" })
   .handler(async ({ context }) => {
     const { supabase, userId } = context;
     const k = await getActiveKiinteisto(supabase, userId);
-    if (!k) return { rivit: [], talonTiedotPuuttuu: true };
+    if (!k) return { rivit: [], talonTiedotPuuttuu: true, aurinko: null };
     const { data: taloRaw } = await supabase.from("talon_tiedot").select("*").eq("kiinteisto_id", k.id).maybeSingle();
     const talo = taloRaw ? { ...taloRaw, rakennusvuosi: k.rakennusvuosi } : null;
 
@@ -969,7 +1032,12 @@ export const getPts = createServerFn({ method: "GET" })
     }).sort((a: any, b: any) => a.vuosi - b.vuosi);
 
     const talonTiedotPuuttuu = !talo || (!talo.lammitysmuoto && !talo.kattomateriaali && !talo.rakennusvuosi);
-    return { rivit, talonTiedotPuuttuu };
+    const aurinko = await tarkistaAurinkosahkoSoveltuvuus(
+      supabase,
+      k.id,
+      Boolean((talo as any)?.aurinkopaneelit),
+    );
+    return { rivit, talonTiedotPuuttuu, aurinko };
   });
 
 const lykkaysSchema = z.object({
