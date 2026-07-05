@@ -8,6 +8,7 @@ export const LIIDI_KATEGORIAT = [
   "Kylpyhuone ja märkätilat",
   "Lämmitysjärjestelmä",
   "Ilmalämpöpumppu",
+  "Aurinkosähkö ja paneelit",
   "Salaojat ja sadevesijärjestelmä",
   "Julkisivu ja maalaus",
   "Ikkunat ja ovet",
