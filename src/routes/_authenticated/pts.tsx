@@ -173,12 +173,47 @@ function PtsPage() {
     return <div className="p-6 text-cream/60">Ladataan…</div>;
   }
 
-  const rivit: PtsRivi[] = (data?.rivit ?? []) as any;
+  const rivitDb: PtsRivi[] = (data?.rivit ?? []) as any;
+  const aurinko = (data as any).aurinko;
+  const nyt = new Date().getFullYear();
+  const aurinkoNakyy = (() => {
+    void aurinkoTick;
+    if (!aurinko?.suositus) return false;
+    if (typeof window === "undefined") return true;
+    if (localStorage.getItem(AURINKO_DISMISS_KEY) === "1") return false;
+    const lyk = Number(localStorage.getItem(AURINKO_LYKKAYS_KEY) || 0);
+    if (lyk && nyt < lyk) return false;
+    return true;
+  })();
+  const aurinkoRivi: PtsRivi | null = aurinkoNakyy ? {
+    id: AURINKO_ID,
+    lahde: "auto",
+    kohde: "Aurinkosähkön kartoitus",
+    kategoria: "Aurinkosähkö ja paneelit",
+    vuosi: nyt,
+    vuosiaJaljella: 0,
+    tila: "kiireellinen",
+    kuvaus: `Talosi sähkönkulutus viimeisen ${aurinko?.data_kuukausia ?? 0} kuukauden ajalta viittaa siihen, että aurinkosähkö voi olla kannattava investointi. Katon suunta, varjostukset ja rakenne ratkaisevat lopullisen kannattavuuden – paras seuraava askel on ammattilaisen maksuton kartoitus.`,
+    huoltovali: 0,
+  } : null;
+  const rivit: PtsRivi[] = aurinkoRivi ? [aurinkoRivi, ...rivitDb] : rivitDb;
   const ryhmat = {
     kiireellinen: rivit.filter((r) => r.tila === "kiireellinen"),
     lahivuosina: rivit.filter((r) => r.tila === "lahivuosina"),
     seurannassa: rivit.filter((r) => r.tila === "seurannassa"),
   };
+
+  const handleKuittaa = (r: PtsRivi) => {
+    if (r.id === AURINKO_ID) {
+      localStorage.setItem(AURINKO_DISMISS_KEY, "1");
+      setAurinkoTick((t) => t + 1);
+      toast.success("Aurinkosuositus piilotettu");
+      return;
+    }
+    setKuittaa(r);
+  };
+  const handleLykkaa = (r: PtsRivi) => setLykkaa(r);
+  const handlePyydaArvio = (r: PtsRivi) => setLiidiRivi(r);
 
   return (
     <div className="space-y-6 p-4 md:p-6">
