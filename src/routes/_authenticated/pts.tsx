@@ -326,12 +326,22 @@ function PtsPage() {
         {lykkaa && (
           <LykkaysDialog
             rivi={lykkaa}
-            onSubmit={(v) => lykkaysM.mutate({
-              ...v,
-              kohde: lykkaa.kohde,
-              lahde: lykkaa.lahde,
-              rivi_id: lykkaa.id,
-            })}
+            onSubmit={(v) => {
+              if (lykkaa.id === AURINKO_ID) {
+                const uusi = new Date().getFullYear() + v.vuosia;
+                localStorage.setItem(AURINKO_LYKKAYS_KEY, String(uusi));
+                setAurinkoTick((t) => t + 1);
+                setLykkaa(null);
+                toast.success(`Aurinkosuositus siirretty vuoteen ${uusi}`);
+                return;
+              }
+              lykkaysM.mutate({
+                ...v,
+                kohde: lykkaa.kohde,
+                lahde: lykkaa.lahde,
+                rivi_id: lykkaa.id,
+              });
+            }}
           />
         )}
       </Dialog>
@@ -339,13 +349,20 @@ function PtsPage() {
       <LiidiDialog
         open={!!liidiRivi}
         onOpenChange={(o) => !o && setLiidiRivi(null)}
-        esitaytetty={liidiRivi ? {
-          palvelu: "kuntoarvio",
-          kategoria: arvaaKategoria(liidiRivi.kohde),
-          kuvaus: `PTS-suunnitelma suosittelee kuntoarviota: ${liidiRivi.kohde}, arvioitu toimenpidevuosi ${liidiRivi.vuosi}.`,
-          pts_kohde: liidiRivi.kohde,
-          lukitseKategoria: false,
-        } : undefined}
+        esitaytetty={liidiRivi ? (
+          liidiRivi.id === AURINKO_ID ? {
+            palvelu: "kuntoarvio",
+            kategoria: "Aurinkosähkö ja paneelit",
+            kuvaus: "Aurinkosähkökartoitus",
+            lukitseKategoria: true,
+          } : {
+            palvelu: "kuntoarvio",
+            kategoria: arvaaKategoria(liidiRivi.kohde),
+            kuvaus: `PTS-suunnitelma suosittelee kuntoarviota: ${liidiRivi.kohde}, arvioitu toimenpidevuosi ${liidiRivi.vuosi}.`,
+            pts_kohde: liidiRivi.kohde,
+            lukitseKategoria: false,
+          }
+        ) : undefined}
       />
     </div>
   );
