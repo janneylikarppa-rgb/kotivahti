@@ -221,6 +221,7 @@ function TaloTiedotPage() {
         terassi_lasitettu: boolOrNull(t.terassi_lasitettu),
         terassi_lasitus_vuosi: num(t.terassi_lasitus_vuosi),
         salaojat: boolOrNull(t.salaojat), salaojat_tarkastettu: dateStr(t.salaojat_tarkastettu),
+        aurinkopaneelit: Boolean(t.aurinkopaneelit),
         valmiit_osiot: uudet,
       },
       _uudet: uudet,
