@@ -55,6 +55,7 @@ export function arvaaKategoria(nimi: string): LiidiKategoria {
   if (/(ikkun|ovi|tiiviste)/.test(n)) return "Ikkunat ja ovet";
   if (/(teras|puu)/.test(n)) return "Terassi ja puurakenteet";
   if (/(sisäilm|kosteus|home)/.test(n)) return "Kosteus ja sisäilma";
-  if (/(piha|nurmik|istutu|aurink|aita)/.test(n)) return "Piha ja maanrakennus";
+  if (/(piha|nurmik|istutu|aita)/.test(n)) return "Piha ja maanrakennus";
+  if (/(aurink|paneel)/.test(n)) return "Aurinkosähkö ja paneelit";
   return "Muu / yleinen";
 }
