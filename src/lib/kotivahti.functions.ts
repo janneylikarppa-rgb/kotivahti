@@ -339,6 +339,7 @@ const taloSchema = z.object({
     terassi_rakennettu_vuosi: z.number().int().optional().nullable(),
     terassi_kunnostettu_vuosi: z.number().int().optional().nullable(),
     salaojat: z.boolean().optional().nullable(),
+    aurinkopaneelit: z.boolean().optional().nullable(),
     salaojat_tarkastettu: z.string().optional().nullable(),
     lammitys_lisatieto: z.record(z.string(), z.any()).optional().nullable(),
     valmiit_osiot: z.array(z.string()).optional(),
