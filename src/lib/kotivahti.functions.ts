@@ -185,6 +185,16 @@ async function tarkistaAurinkosahkoSoveltuvuus(
   );
 }
 
+// Onko talossa jo aurinkopaneelit (tulee talon_tiedoista).
+// Pelkkä akusto ei estä paneelisuositusta.
+function onPaneelitAsennettu(talo: any): boolean {
+  const tyyppi = String(talo?.aurinko_tyyppi ?? "").toLowerCase();
+  if (tyyppi === "paneelit" || tyyppi === "molemmat") return true;
+  return Boolean(talo?.aurinkopaneelit);
+}
+
+
+
 
 // ---------- Dashboard yhteenveto ----------
 export const getDashboard = createServerFn({ method: "GET" })
@@ -209,7 +219,7 @@ export const getDashboard = createServerFn({ method: "GET" })
     const aurinko = await tarkistaAurinkosahkoSoveltuvuus(
       supabase,
       kiinteisto.id,
-      Boolean((talo as any)?.aurinkopaneelit),
+      onPaneelitAsennettu(talo),
     );
 
     return {
@@ -313,6 +323,8 @@ const taloSchema = z.object({
     terassi_kunnostettu_vuosi: z.number().int().optional().nullable(),
     salaojat: z.boolean().optional().nullable(),
     aurinkopaneelit: z.boolean().optional().nullable(),
+    aurinko_tyyppi: z.string().optional().nullable(),
+    aurinko_asennus_vuosi: z.number().int().optional().nullable(),
     salaojat_tarkastettu: z.string().optional().nullable(),
     lammitys_lisatieto: z.record(z.string(), z.any()).optional().nullable(),
     valmiit_osiot: z.array(z.string()).optional(),
@@ -1008,7 +1020,7 @@ export const getPts = createServerFn({ method: "GET" })
     const aurinko = await tarkistaAurinkosahkoSoveltuvuus(
       supabase,
       k.id,
-      Boolean((talo as any)?.aurinkopaneelit),
+      onPaneelitAsennettu(talo),
     );
     return { rivit, talonTiedotPuuttuu, aurinko };
   });

@@ -221,7 +221,9 @@ function TaloTiedotPage() {
         terassi_lasitettu: boolOrNull(t.terassi_lasitettu),
         terassi_lasitus_vuosi: num(t.terassi_lasitus_vuosi),
         salaojat: boolOrNull(t.salaojat), salaojat_tarkastettu: dateStr(t.salaojat_tarkastettu),
-        aurinkopaneelit: Boolean(t.aurinkopaneelit),
+        aurinkopaneelit: Boolean(t.aurinko_tyyppi === "paneelit" || t.aurinko_tyyppi === "molemmat"),
+        aurinko_tyyppi: t.aurinko_tyyppi ? String(t.aurinko_tyyppi) : null,
+        aurinko_asennus_vuosi: num(t.aurinko_asennus_vuosi),
         valmiit_osiot: uudet,
       },
       _uudet: uudet,
@@ -553,19 +555,48 @@ function TaloTiedotPage() {
               <Field label="Suodatin vaihdettu viimeksi"><Input type="date" value={t.iv_suodatin_vaihdettu ?? ""} onChange={(e) => setT({ ...t, iv_suodatin_vaihdettu: e.target.value })} /></Field>
             </Row>
 
-            <p className="eyebrow text-primary pt-4">Aurinkopaneelit</p>
-            <Field label="Onko talossa aurinkopaneelit?">
+            <p className="eyebrow text-primary pt-4">Aurinkopaneelit tai akusto</p>
+            <Field label="Onko talossa aurinkopaneelit tai akusto?">
               <Select
-                value={t.aurinkopaneelit ? "true" : "false"}
-                onValueChange={(v) => setT({ ...t, aurinkopaneelit: v === "true" })}
+                value={t.aurinko_tyyppi ? "kylla" : "ei"}
+                onValueChange={(v) => setT({
+                  ...t,
+                  aurinko_tyyppi: v === "kylla" ? (t.aurinko_tyyppi || "paneelit") : null,
+                  aurinko_asennus_vuosi: v === "kylla" ? t.aurinko_asennus_vuosi : null,
+                })}
               >
                 <SelectTrigger><SelectValue /></SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="false">Ei</SelectItem>
-                  <SelectItem value="true">Kyllä</SelectItem>
+                  <SelectItem value="ei">Ei</SelectItem>
+                  <SelectItem value="kylla">Kyllä</SelectItem>
                 </SelectContent>
               </Select>
             </Field>
+            {t.aurinko_tyyppi && (
+              <Row>
+                <Field label="Mitä on asennettu?">
+                  <Select
+                    value={t.aurinko_tyyppi}
+                    onValueChange={(v) => setT({ ...t, aurinko_tyyppi: v })}
+                  >
+                    <SelectTrigger><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="paneelit">Aurinkopaneelit</SelectItem>
+                      <SelectItem value="akusto">Akusto</SelectItem>
+                      <SelectItem value="molemmat">Paneelit ja akusto</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </Field>
+                <Field label="Asennusvuosi">
+                  <Input
+                    type="number"
+                    value={t.aurinko_asennus_vuosi ?? ""}
+                    onChange={(e) => setT({ ...t, aurinko_asennus_vuosi: e.target.value })}
+                    placeholder="esim. 2022"
+                  />
+                </Field>
+              </Row>
+            )}
 
 
 

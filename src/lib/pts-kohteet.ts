@@ -142,6 +142,23 @@ export const PTS_KOHTEET: PtsKohde[] = [
   { avain: "terassi_lasitus", nimi: "Terassin lasitus", kategoria: "Piha", kayttoika: 30, huoltovali: 2,
     lahdeVuosi: (t) => i(t?.terassi_lasitus_vuosi) ?? i(t?.terassi_rakennettu_vuosi),
     koskee: (t) => t?.terassi_lasitettu === true },
+  // Aurinkojärjestelmä
+  { avain: "aurinko_paneelit_huolto", nimi: "Aurinkopaneelien tarkastus ja puhdistus", kategoria: "Talotekniikka", kayttoika: 30, huoltovali: 2,
+    lahdeVuosi: (t) => i(t?.aurinko_asennus_vuosi),
+    koskee: (t) => (String(t?.aurinko_tyyppi ?? "").includes("paneelit") || String(t?.aurinko_tyyppi ?? "") === "molemmat") && i(t?.aurinko_asennus_vuosi) != null,
+    kuvaus: "Tarkasta paneelien kiinnitykset, tiivistykset ja kaapelit vuosittain. Puhdista paneelit 1–2 vuoden välein (pöly, siitepöly, linnunjätökset heikentävät tuottoa). Ammattilaisen tarkastus 5 vuoden välein." },
+  { avain: "aurinko_invertteri", nimi: "Invertterin vaihto", kategoria: "Talotekniikka", kayttoika: 12, huoltovali: 0,
+    lahdeVuosi: (t) => i(t?.aurinko_asennus_vuosi),
+    koskee: (t) => (String(t?.aurinko_tyyppi ?? "").includes("paneelit") || String(t?.aurinko_tyyppi ?? "") === "molemmat") && i(t?.aurinko_asennus_vuosi) != null,
+    kuvaus: "Invertteri on aurinkojärjestelmän kulutusherkin osa. Käyttöikä 10–15 vuotta – paneelit kestävät selvästi pidempään. Varaudu vaihtokustannukseen n. 12 vuoden kohdalla." },
+  { avain: "aurinko_paneelit_uusinta", nimi: "Aurinkopaneelien uusinta", kategoria: "Talotekniikka", kayttoika: 30, huoltovali: 0,
+    lahdeVuosi: (t) => i(t?.aurinko_asennus_vuosi),
+    koskee: (t) => (String(t?.aurinko_tyyppi ?? "").includes("paneelit") || String(t?.aurinko_tyyppi ?? "") === "molemmat") && i(t?.aurinko_asennus_vuosi) != null,
+    kuvaus: "Modernien paneelien käyttöikä on 25–30 vuotta. Teho heikkenee vähitellen (n. 0,5 % vuodessa) – arvioi uusimistarve käyttöiän lähestyessä." },
+  { avain: "aurinko_akusto", nimi: "Akuston uusinta", kategoria: "Talotekniikka", kayttoika: 10, huoltovali: 0,
+    lahdeVuosi: (t) => i(t?.aurinko_asennus_vuosi),
+    koskee: (t) => (String(t?.aurinko_tyyppi ?? "") === "akusto" || String(t?.aurinko_tyyppi ?? "") === "molemmat") && i(t?.aurinko_asennus_vuosi) != null,
+    kuvaus: "Litiumakuston käyttöikä on tyypillisesti 10–15 vuotta latauskertojen mukaan. Seuraa varaustason vaihtelua – jos tallennuskyky romahtaa, akusto lähestyy vaihtoikää." },
 ];
 
 // Hae kohde avaimella
