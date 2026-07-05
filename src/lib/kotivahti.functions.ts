@@ -1031,7 +1031,12 @@ export const getPts = createServerFn({ method: "GET" })
     }).sort((a: any, b: any) => a.vuosi - b.vuosi);
 
     const talonTiedotPuuttuu = !talo || (!talo.lammitysmuoto && !talo.kattomateriaali && !talo.rakennusvuosi);
-    return { rivit, talonTiedotPuuttuu };
+    const aurinko = await tarkistaAurinkosahkoSoveltuvuus(
+      supabase,
+      k.id,
+      Boolean((talo as any)?.aurinkopaneelit),
+    );
+    return { rivit, talonTiedotPuuttuu, aurinko };
   });
 
 const lykkaysSchema = z.object({
