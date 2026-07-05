@@ -39,7 +39,6 @@ import {
 import { Plus, Check, Trash2, Wrench, AlertTriangle, Calendar, Clock, Undo2 } from "lucide-react";
 import { toast } from "sonner";
 import { LiidiDialog } from "@/components/liidi-dialog";
-import { AurinkoSuositusKortti } from "@/components/aurinkosuositus-kortti";
 import { arvaaKategoria } from "@/lib/liidit-kategoriat";
 
 export const Route = createFileRoute("/_authenticated/pts")({
