@@ -113,6 +113,7 @@ function PtsPage() {
   const [kuittaa, setKuittaa] = useState<PtsRivi | null>(null);
   const [lykkaa, setLykkaa] = useState<PtsRivi | null>(null);
   const [liidiRivi, setLiidiRivi] = useState<PtsRivi | null>(null);
+  const [aurinkoTick, setAurinkoTick] = useState(0);
 
   const invalidate = () => {
     qc.invalidateQueries({ queryKey: ["pts"] });
