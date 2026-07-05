@@ -191,6 +191,9 @@ function onPaneelitAsennettu(talo: any): boolean {
   const tyyppi = String(talo?.aurinko_tyyppi ?? "").toLowerCase();
   if (tyyppi === "paneelit" || tyyppi === "molemmat") return true;
   return Boolean(talo?.aurinkopaneelit);
+}
+
+
 
 
 // ---------- Dashboard yhteenveto ----------
