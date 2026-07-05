@@ -44,7 +44,7 @@ function DashboardPage() {
       </header>
 
 
-      <AurinkoSuositusKortti aurinko={(data as any).aurinko} />
+
 
       {/* Edistyminen */}
       <Card className="gold-card">
