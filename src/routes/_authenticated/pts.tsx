@@ -275,32 +275,32 @@ function PtsPage() {
       <RyhmaOsio
         otsikko="🔴 Kiireellinen"
         rivit={ryhmat.kiireellinen}
-        onKuittaa={setKuittaa}
-        onLykkaa={setLykkaa}
+        onKuittaa={handleKuittaa}
+        onLykkaa={handleLykkaa}
         onPeruLykkays={(k) => peruM.mutate(k)}
         onDelete={(id) => delM.mutate(id)}
-        onPyydaArvio={setLiidiRivi}
+        onPyydaArvio={handlePyydaArvio}
         tyhja="Ei kiireellisiä toimenpiteitä – hienoa työtä!"
         defaultOpen
       />
       <RyhmaOsio
         otsikko="🟡 Lähivuosina"
         rivit={ryhmat.lahivuosina}
-        onKuittaa={setKuittaa}
-        onLykkaa={setLykkaa}
+        onKuittaa={handleKuittaa}
+        onLykkaa={handleLykkaa}
         onPeruLykkays={(k) => peruM.mutate(k)}
         onDelete={(id) => delM.mutate(id)}
-        onPyydaArvio={setLiidiRivi}
+        onPyydaArvio={handlePyydaArvio}
         tyhja="Ei toimenpiteitä lähivuosille."
       />
       <RyhmaOsio
         otsikko="🟢 Seurannassa"
         rivit={ryhmat.seurannassa}
-        onKuittaa={setKuittaa}
-        onLykkaa={setLykkaa}
+        onKuittaa={handleKuittaa}
+        onLykkaa={handleLykkaa}
         onPeruLykkays={(k) => peruM.mutate(k)}
         onDelete={(id) => delM.mutate(id)}
-        onPyydaArvio={setLiidiRivi}
+        onPyydaArvio={handlePyydaArvio}
         tyhja="Ei seurattavia kohteita 10 vuoden ikkunassa."
       />
 
