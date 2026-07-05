@@ -159,59 +159,32 @@ async function getActiveKiinteisto(supabase: any, userId: string) {
 }
 
 // ---------- Aurinkosähkö-suosituksen laskenta ----------
+import { laskeAurinkoSuositus } from "./aurinkosahko";
+
 async function tarkistaAurinkosahkoSoveltuvuus(
   supabase: any,
   kiinteistoId: string,
   aurinkopaneelit: boolean,
 ) {
-  const { data: sahko } = await supabase
-    .from("kulut")
-    .select("pvm, kwh, kategoria")
-    .eq("kiinteisto_id", kiinteistoId)
-    .eq("kategoria", "sahko");
+  const [sahkoRes, kaikkiRes] = await Promise.all([
+    supabase
+      .from("kulut")
+      .select("pvm, kwh")
+      .eq("kiinteisto_id", kiinteistoId)
+      .eq("kategoria", "sahko"),
+    supabase
+      .from("kulut")
+      .select("pvm")
+      .eq("kiinteisto_id", kiinteistoId),
+  ]);
 
-  const rivit = (sahko ?? []) as Array<{ pvm: string; kwh: number | null }>;
-
-  // Huhti–syyskuu
-  const kesaKuukaudet = new Set<string>();
-  let aurinkokuukaudet_kwh = 0;
-  for (const r of rivit) {
-    if (!r.pvm) continue;
-    const d = new Date(r.pvm);
-    const kk = d.getMonth() + 1; // 1..12
-    if (kk >= 4 && kk <= 9) {
-      kesaKuukaudet.add(`${d.getFullYear()}-${kk}`);
-      aurinkokuukaudet_kwh += Number(r.kwh ?? 0);
-    }
-  }
-  const aurinkokuukaudet_kk = kesaKuukaudet.size;
-
-  // Kaikki eri kuukaudet joilta kirjauksia on (koko kulut-taulu)
-  const { data: kaikkiKulut } = await supabase
-    .from("kulut")
-    .select("pvm")
-    .eq("kiinteisto_id", kiinteistoId);
-  const kaikkiKuukaudet = new Set<string>();
-  for (const r of (kaikkiKulut ?? []) as Array<{ pvm: string }>) {
-    if (!r.pvm) continue;
-    const d = new Date(r.pvm);
-    kaikkiKuukaudet.add(`${d.getFullYear()}-${d.getMonth() + 1}`);
-  }
-  const data_kuukausia = kaikkiKuukaudet.size;
-
-  const suositus =
-    data_kuukausia >= 6 &&
-    aurinkokuukaudet_kwh >= 1500 &&
-    !aurinkopaneelit;
-
-  return {
-    suositus,
-    aurinkokuukaudet_kk,
-    aurinkokuukaudet_kwh: Math.round(aurinkokuukaudet_kwh),
-    data_kuukausia,
+  return laskeAurinkoSuositus(
+    (sahkoRes.data ?? []) as Array<{ pvm: string; kwh: number | null }>,
+    (kaikkiRes.data ?? []) as Array<{ pvm: string }>,
     aurinkopaneelit,
-  };
+  );
 }
+
 
 // ---------- Dashboard yhteenveto ----------
 export const getDashboard = createServerFn({ method: "GET" })
