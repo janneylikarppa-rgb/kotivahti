@@ -185,6 +185,13 @@ async function tarkistaAurinkosahkoSoveltuvuus(
   );
 }
 
+// Onko talossa jo aurinkopaneelit (tulee talon_tiedoista).
+// Pelkkä akusto ei estä paneelisuositusta.
+function onPaneelitAsennettu(talo: any): boolean {
+  const tyyppi = String(talo?.aurinko_tyyppi ?? "").toLowerCase();
+  if (tyyppi === "paneelit" || tyyppi === "molemmat") return true;
+  return Boolean(talo?.aurinkopaneelit);
+
 
 // ---------- Dashboard yhteenveto ----------
 export const getDashboard = createServerFn({ method: "GET" })
