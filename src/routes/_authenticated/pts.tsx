@@ -53,6 +53,10 @@ export const Route = createFileRoute("/_authenticated/pts")({
   component: PtsPage,
 });
 
+const AURINKO_ID = "aurinko-suositus";
+const AURINKO_DISMISS_KEY = "kotivahti_aurinko_kuitattu";
+const AURINKO_LYKKAYS_KEY = "kotivahti_aurinko_lykatty_asti";
+
 type PtsRivi = {
   id: string;
   lahde: "auto" | "oma";
