@@ -219,7 +219,7 @@ export const getDashboard = createServerFn({ method: "GET" })
     const aurinko = await tarkistaAurinkosahkoSoveltuvuus(
       supabase,
       kiinteisto.id,
-      Boolean((talo as any)?.aurinkopaneelit),
+      onPaneelitAsennettu(talo),
     );
 
     return {
