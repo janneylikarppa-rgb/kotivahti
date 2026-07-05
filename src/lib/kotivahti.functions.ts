@@ -995,7 +995,7 @@ export const getPts = createServerFn({ method: "GET" })
   .handler(async ({ context }) => {
     const { supabase, userId } = context;
     const k = await getActiveKiinteisto(supabase, userId);
-    if (!k) return { rivit: [], talonTiedotPuuttuu: true };
+    if (!k) return { rivit: [], talonTiedotPuuttuu: true, aurinko: null };
     const { data: taloRaw } = await supabase.from("talon_tiedot").select("*").eq("kiinteisto_id", k.id).maybeSingle();
     const talo = taloRaw ? { ...taloRaw, rakennusvuosi: k.rakennusvuosi } : null;
 
