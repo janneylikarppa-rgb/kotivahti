@@ -607,6 +607,7 @@ export type Database = {
       talon_tiedot: {
         Row: {
           asukkaita: number | null
+          aurinkopaneelit: boolean
           created_at: string
           data: Json | null
           eriste: string | null
@@ -675,6 +676,7 @@ export type Database = {
         }
         Insert: {
           asukkaita?: number | null
+          aurinkopaneelit?: boolean
           created_at?: string
           data?: Json | null
           eriste?: string | null
@@ -743,6 +745,7 @@ export type Database = {
         }
         Update: {
           asukkaita?: number | null
+          aurinkopaneelit?: boolean
           created_at?: string
           data?: Json | null
           eriste?: string | null

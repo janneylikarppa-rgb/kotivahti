@@ -1,0 +1,1 @@
+ALTER TABLE public.talon_tiedot ADD COLUMN IF NOT EXISTS aurinkopaneelit boolean NOT NULL DEFAULT false;
