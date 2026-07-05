@@ -211,16 +211,8 @@ function PtsPage() {
         </Card>
       )}
 
-      <AurinkoSuositusKortti aurinko={(data as any).aurinko} />
 
-      {(data as any).aurinko?.aurinkopaneelit && (
-        <Card className="gold-card">
-          <CardContent className="p-4 text-sm text-cream/80">
-            <span aria-hidden className="mr-2">☀️</span>
-            Aurinkopaneelit – muista vuosihuolto ja paneelien kevätpuhdistus.
-          </CardContent>
-        </Card>
-      )}
+
 
 
 
