@@ -1020,7 +1020,7 @@ export const getPts = createServerFn({ method: "GET" })
     const aurinko = await tarkistaAurinkosahkoSoveltuvuus(
       supabase,
       k.id,
-      Boolean((talo as any)?.aurinkopaneelit),
+      onPaneelitAsennettu(talo),
     );
     return { rivit, talonTiedotPuuttuu, aurinko };
   });
