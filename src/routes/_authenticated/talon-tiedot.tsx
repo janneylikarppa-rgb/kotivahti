@@ -327,6 +327,33 @@ function TaloTiedotPage() {
 
             <p className="eyebrow text-primary pt-2">Sijainti</p>
             <Field label="Osoite"><Input value={k.osoite ?? ""} onChange={(e) => setK({ ...k, osoite: e.target.value })} /></Field>
+
+            <div className="space-y-1.5">
+              <Button
+                type="button"
+                variant="outline"
+                disabled={ryhtiHaku.isPending}
+                onClick={() => ryhtiHaku.mutate()}
+                className="w-full justify-center gap-2 border-2 border-dashed border-teal-500/60 bg-teal-500/5 text-teal-300 hover:bg-teal-500/10 hover:text-teal-200 sm:w-auto"
+              >
+                {ryhtiHaku.isPending ? (
+                  <><Loader2 className="h-4 w-4 animate-spin" /> Haetaan tietoja...</>
+                ) : (
+                  <><Search className="h-4 w-4" /> Hae talon tiedot Ryhti-rajapinnasta</>
+                )}
+              </Button>
+              <p className="text-xs text-muted-foreground">
+                Täyttää kodin viralliset perustiedot automaattisesti.{" "}
+                <button
+                  type="button"
+                  onClick={() => setRyhtiInfo(true)}
+                  className="underline underline-offset-2 hover:text-cream"
+                >
+                  Mikä Ryhti?
+                </button>
+              </p>
+            </div>
+
             <Row>
               <Field label="Postinumero"><Input value={k.postinumero ?? ""} onChange={(e) => setK({ ...k, postinumero: e.target.value })} /></Field>
               <Field label="Kaupunki"><Input value={k.kaupunki ?? ""} onChange={(e) => setK({ ...k, kaupunki: e.target.value })} /></Field>
