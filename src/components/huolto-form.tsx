@@ -129,9 +129,14 @@ export function HuoltoForm({
               materiaali: matOptiot.length > 0 ? (laite.materiaali.trim() || null) : null,
             }
           : null;
+        const ktv = form.kotitalousvahennys_tyyppi === "yritys" || form.kotitalousvahennys_tyyppi === "palkka"
+          ? form.kotitalousvahennys_tyyppi
+          : null;
         onSubmit({
           ...form,
           kustannus: Number(form.kustannus || 0),
+          kotitalousvahennys_tyyppi: ktv,
+          tyon_osuus: ktv ? Number(form.tyon_osuus || 0) : null,
           takuu_vuotta: Number(form.takuu_vuotta || 0),
           pts_siirto: Number(form.pts_siirto || 0),
           liitteet: uudet,
