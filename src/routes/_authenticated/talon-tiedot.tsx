@@ -42,11 +42,6 @@ const KIINTEISTOTYYPIT = [
   { key: "erillistalo", nimi: "Erillistalo" },
   { key: "mokki", nimi: "Mökki" },
 ];
-const HANKINTATAVAT = [
-  { key: "ostettu", nimi: "Ostettu" },
-  { key: "rakennettu", nimi: "Rakennettu" },
-  { key: "peritty", nimi: "Peritty / lahjoitettu" },
-];
 const ILP_MERKIT = ["Mitsubishi", "Daikin", "Panasonic", "Toshiba", "Fujitsu", "LG", "Samsung", "Sharp", "Muu"];
 const RAKENNUSTAVAT = ["Puurunko", "Hirsi", "Tiili", "Kevytsoraharkko (Leca)", "Betoniharkko", "Kevytbetoni (Siporex)", "Betonielementti", "Teräsrunko"];
 const JULKISIVUMATERIAALIT = ["Puu (lautaverhous)", "Tiili", "Rappaus", "Levyverhous", "Hirsi", "Pelti", "Kuitusementtilevy", "Kivi"];
