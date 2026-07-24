@@ -369,13 +369,14 @@ function TaloTiedotPage() {
 
             <p className="eyebrow text-primary pt-2">Koko ja ikä</p>
             <Row>
-              <Field label="Rakennusvuosi"><Input type="number" value={k.rakennusvuosi ?? ""} onChange={(e) => setK({ ...k, rakennusvuosi: e.target.value })} /></Field>
-              <Field label="Kerrosten määrä"><Input type="number" value={t.kerroksia ?? ""} onChange={(e) => setT({ ...t, kerroksia: e.target.value })} /></Field>
+              <Field label="Rakennusvuosi" ryhti={ryhtiKentat.has("rakennusvuosi")}><Input type="number" value={k.rakennusvuosi ?? ""} onChange={(e) => { poistaRyhtiMerkki("rakennusvuosi"); setK({ ...k, rakennusvuosi: e.target.value }); }} /></Field>
+              <Field label="Kerrosten määrä" ryhti={ryhtiKentat.has("kerroksia")}><Input type="number" value={t.kerroksia ?? ""} onChange={(e) => { poistaRyhtiMerkki("kerroksia"); setT({ ...t, kerroksia: e.target.value }); }} /></Field>
             </Row>
             <Row>
-              <Field label="Asuinpinta-ala (m²)"><Input type="number" value={t.pinta_ala ?? ""} onChange={(e) => setT({ ...t, pinta_ala: e.target.value })} /></Field>
+              <Field label="Asuinpinta-ala (m²)" ryhti={ryhtiKentat.has("pinta_ala")}><Input type="number" value={t.pinta_ala ?? ""} onChange={(e) => { poistaRyhtiMerkki("pinta_ala"); setT({ ...t, pinta_ala: e.target.value }); }} /></Field>
               <Field label="Kokonaispinta-ala (m²)"><Input type="number" value={t.kokonaispinta_ala ?? ""} onChange={(e) => setT({ ...t, kokonaispinta_ala: e.target.value })} /></Field>
             </Row>
+
 
             <p className="eyebrow text-primary pt-4">Rakennusmateriaalit</p>
             <Row>
