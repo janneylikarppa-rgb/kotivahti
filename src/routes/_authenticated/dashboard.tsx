@@ -84,6 +84,19 @@ function DashboardPage() {
         </Card>
 
         <Card className="gold-card">
+          <CardHeader className="pb-3"><CardTitle className="text-base font-serif flex items-center gap-2"><CalendarDays className="h-4 w-4 text-primary" /> Vuosikello</CardTitle></CardHeader>
+          <CardContent>
+            <p className="text-sm text-muted-foreground">Tarkista kauden työt ja kuittaa tehdyt.</p>
+            <div className="mt-4 grid grid-cols-4 gap-2 text-center">
+              {["🌱", "☀️", "🍂", "❄️"].map((i) => (
+                <div key={i} className="rounded-md border border-border/60 bg-surface-2 py-2 text-lg">{i}</div>
+              ))}
+            </div>
+            <Button asChild variant="link" className="px-0 mt-3 text-primary"><Link to="/vuosikello">Avaa vuosikello →</Link></Button>
+          </CardContent>
+        </Card>
+
+        <Card className="gold-card">
           <CardHeader className="pb-3"><CardTitle className="text-base font-serif flex items-center gap-2"><Wallet className="h-4 w-4 text-primary" /> Kulut tänä vuonna</CardTitle></CardHeader>
           <CardContent>
             <p className="font-serif text-3xl text-primary">{data.kulutSumma.toFixed(0)} €</p>
@@ -96,19 +109,6 @@ function DashboardPage() {
               </ResponsiveContainer>
             </div>
             <Button asChild variant="link" className="px-0 mt-2 text-primary"><Link to="/kulut">Avaa kulut →</Link></Button>
-          </CardContent>
-        </Card>
-
-        <Card className="gold-card">
-          <CardHeader className="pb-3"><CardTitle className="text-base font-serif flex items-center gap-2"><CalendarDays className="h-4 w-4 text-primary" /> Vuosikello</CardTitle></CardHeader>
-          <CardContent>
-            <p className="text-sm text-muted-foreground">Tarkista kauden työt ja kuittaa tehdyt.</p>
-            <div className="mt-4 grid grid-cols-4 gap-2 text-center">
-              {["🌱", "☀️", "🍂", "❄️"].map((i) => (
-                <div key={i} className="rounded-md border border-border/60 bg-surface-2 py-2 text-lg">{i}</div>
-              ))}
-            </div>
-            <Button asChild variant="link" className="px-0 mt-3 text-primary"><Link to="/vuosikello">Avaa vuosikello →</Link></Button>
           </CardContent>
         </Card>
 
