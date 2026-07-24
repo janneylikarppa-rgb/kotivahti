@@ -70,6 +70,7 @@ export type Database = {
           kiinteisto_id: string
           kohde: string | null
           kohde_avain: string | null
+          kotitalousvahennys_tyyppi: string | null
           kulu_id: string | null
           kustannus: number | null
           kuvaus: string | null
@@ -78,6 +79,7 @@ export type Database = {
           takuu_vuotta: number | null
           tekija: string | null
           tekija_nimi: string | null
+          tyon_osuus: number | null
           tyyppi: string
         }
         Insert: {
@@ -87,6 +89,7 @@ export type Database = {
           kiinteisto_id: string
           kohde?: string | null
           kohde_avain?: string | null
+          kotitalousvahennys_tyyppi?: string | null
           kulu_id?: string | null
           kustannus?: number | null
           kuvaus?: string | null
@@ -95,6 +98,7 @@ export type Database = {
           takuu_vuotta?: number | null
           tekija?: string | null
           tekija_nimi?: string | null
+          tyon_osuus?: number | null
           tyyppi: string
         }
         Update: {
@@ -104,6 +108,7 @@ export type Database = {
           kiinteisto_id?: string
           kohde?: string | null
           kohde_avain?: string | null
+          kotitalousvahennys_tyyppi?: string | null
           kulu_id?: string | null
           kustannus?: number | null
           kuvaus?: string | null
@@ -112,6 +117,7 @@ export type Database = {
           takuu_vuotta?: number | null
           tekija?: string | null
           tekija_nimi?: string | null
+          tyon_osuus?: number | null
           tyyppi?: string
         }
         Relationships: [
