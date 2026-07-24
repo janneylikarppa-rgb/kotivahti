@@ -440,6 +440,8 @@ const huoltoSchema = z.object({
   tekija: z.string().default("itse"),
   tekija_nimi: z.string().optional().nullable(),
   kustannus: z.number().default(0),
+  tyon_osuus: z.number().nullable().optional(),
+  kotitalousvahennys_tyyppi: z.enum(["yritys", "palkka"]).nullable().optional(),
   takuu_vuotta: z.number().int().default(0),
   pts_siirto: z.number().int().min(0).max(50).default(0),
   linkita_kulut: z.boolean().default(true),
@@ -1343,3 +1345,24 @@ export const getMyyntiraportti = createServerFn({ method: "GET" })
     };
   });
 
+
+// ---------- Kotitalousvähennys ----------
+export const getKotitalousvahennys = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) =>
+    z.object({ vuosi: z.number().int().min(2000).max(2100) }).parse(input))
+  .handler(async ({ data, context }) => {
+    const { supabase, userId } = context;
+    const k = await getActiveKiinteisto(supabase, userId);
+    if (!k) return { vuosi: data.vuosi, kirjaukset: [] as any[] };
+    const { data: rows, error } = await supabase
+      .from("huolto_historia")
+      .select("id, pvm, tyyppi, kohde, kuvaus, tekija, tekija_nimi, kustannus, tyon_osuus, kotitalousvahennys_tyyppi")
+      .eq("kiinteisto_id", k.id)
+      .not("kotitalousvahennys_tyyppi", "is", null)
+      .gte("pvm", `${data.vuosi}-01-01`)
+      .lte("pvm", `${data.vuosi}-12-31`)
+      .order("pvm", { ascending: false });
+    if (error) throw error;
+    return { vuosi: data.vuosi, kirjaukset: rows ?? [] };
+  });

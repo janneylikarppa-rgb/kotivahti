@@ -1,7 +1,8 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery } from "@tanstack/react-query";
-import { getDashboard } from "@/lib/kotivahti.functions";
+import { getDashboard, getKotitalousvahennys } from "@/lib/kotivahti.functions";
+import { laskeVahennys, euro } from "@/lib/kotitalousvahennys";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
@@ -119,12 +120,39 @@ function DashboardPage() {
             </div>
           </CardContent>
         </Card>
-
-
-
+        <KtvKortti />
 
       </div>
     </div>
   );
 }
+
+function KtvKortti() {
+  const vuosi = new Date().getFullYear();
+  const haeFn = useServerFn(getKotitalousvahennys);
+  const { data } = useQuery({
+    queryKey: ["kotitalousvahennys", vuosi],
+    queryFn: () => haeFn({ data: { vuosi } }),
+    staleTime: 30_000,
+  });
+  const kirjaukset = data?.kirjaukset ?? [];
+  if (kirjaukset.length === 0) return null;
+  const tulos = laskeVahennys(kirjaukset as any, 1);
+  return (
+    <Card className="gold-card">
+      <CardHeader className="pb-3">
+        <CardTitle className="text-base font-serif">💰 Kotitalousvähennys {vuosi}</CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-2">
+        <p className="text-sm text-muted-foreground">
+          Käytetty: <span className="text-primary font-mono">{euro(tulos.vahennys)}</span> / {euro(tulos.katto)}
+        </p>
+        <Button asChild variant="link" className="px-0 text-primary">
+          <Link to="/kotitalousvahennys">Katso tiedot →</Link>
+        </Button>
+      </CardContent>
+    </Card>
+  );
+}
+
 

@@ -30,6 +30,7 @@ import { Route as AuthenticatedPyynnotRouteImport } from './routes/_authenticate
 import { Route as AuthenticatedPtsRouteImport } from './routes/_authenticated/pts'
 import { Route as AuthenticatedMyyntiraporttiRouteImport } from './routes/_authenticated/myyntiraportti'
 import { Route as AuthenticatedKulutRouteImport } from './routes/_authenticated/kulut'
+import { Route as AuthenticatedKotitalousvahennysRouteImport } from './routes/_authenticated/kotitalousvahennys'
 import { Route as AuthenticatedHuoltohistoriaRouteImport } from './routes/_authenticated/huoltohistoria'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
@@ -145,6 +146,12 @@ const AuthenticatedKulutRoute = AuthenticatedKulutRouteImport.update({
   path: '/kulut',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
+const AuthenticatedKotitalousvahennysRoute =
+  AuthenticatedKotitalousvahennysRouteImport.update({
+    id: '/kotitalousvahennys',
+    path: '/kotitalousvahennys',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
 const AuthenticatedHuoltohistoriaRoute =
   AuthenticatedHuoltohistoriaRouteImport.update({
     id: '/huoltohistoria',
@@ -205,6 +212,7 @@ export interface FileRoutesByFullPath {
   '/admin': typeof AuthenticatedAdminRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/huoltohistoria': typeof AuthenticatedHuoltohistoriaRoute
+  '/kotitalousvahennys': typeof AuthenticatedKotitalousvahennysRoute
   '/kulut': typeof AuthenticatedKulutRoute
   '/myyntiraportti': typeof AuthenticatedMyyntiraporttiRoute
   '/pts': typeof AuthenticatedPtsRoute
@@ -235,6 +243,7 @@ export interface FileRoutesByTo {
   '/admin': typeof AuthenticatedAdminRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/huoltohistoria': typeof AuthenticatedHuoltohistoriaRoute
+  '/kotitalousvahennys': typeof AuthenticatedKotitalousvahennysRoute
   '/kulut': typeof AuthenticatedKulutRoute
   '/myyntiraportti': typeof AuthenticatedMyyntiraporttiRoute
   '/pts': typeof AuthenticatedPtsRoute
@@ -267,6 +276,7 @@ export interface FileRoutesById {
   '/_authenticated/admin': typeof AuthenticatedAdminRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/huoltohistoria': typeof AuthenticatedHuoltohistoriaRoute
+  '/_authenticated/kotitalousvahennys': typeof AuthenticatedKotitalousvahennysRoute
   '/_authenticated/kulut': typeof AuthenticatedKulutRoute
   '/_authenticated/myyntiraportti': typeof AuthenticatedMyyntiraporttiRoute
   '/_authenticated/pts': typeof AuthenticatedPtsRoute
@@ -299,6 +309,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/dashboard'
     | '/huoltohistoria'
+    | '/kotitalousvahennys'
     | '/kulut'
     | '/myyntiraportti'
     | '/pts'
@@ -329,6 +340,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/dashboard'
     | '/huoltohistoria'
+    | '/kotitalousvahennys'
     | '/kulut'
     | '/myyntiraportti'
     | '/pts'
@@ -360,6 +372,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin'
     | '/_authenticated/dashboard'
     | '/_authenticated/huoltohistoria'
+    | '/_authenticated/kotitalousvahennys'
     | '/_authenticated/kulut'
     | '/_authenticated/myyntiraportti'
     | '/_authenticated/pts'
@@ -549,6 +562,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedKulutRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/kotitalousvahennys': {
+      id: '/_authenticated/kotitalousvahennys'
+      path: '/kotitalousvahennys'
+      fullPath: '/kotitalousvahennys'
+      preLoaderRoute: typeof AuthenticatedKotitalousvahennysRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/huoltohistoria': {
       id: '/_authenticated/huoltohistoria'
       path: '/huoltohistoria'
@@ -612,6 +632,7 @@ interface AuthenticatedRouteChildren {
   AuthenticatedAdminRoute: typeof AuthenticatedAdminRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedHuoltohistoriaRoute: typeof AuthenticatedHuoltohistoriaRoute
+  AuthenticatedKotitalousvahennysRoute: typeof AuthenticatedKotitalousvahennysRoute
   AuthenticatedKulutRoute: typeof AuthenticatedKulutRoute
   AuthenticatedMyyntiraporttiRoute: typeof AuthenticatedMyyntiraporttiRoute
   AuthenticatedPtsRoute: typeof AuthenticatedPtsRoute
@@ -624,6 +645,7 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedAdminRoute: AuthenticatedAdminRoute,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedHuoltohistoriaRoute: AuthenticatedHuoltohistoriaRoute,
+  AuthenticatedKotitalousvahennysRoute: AuthenticatedKotitalousvahennysRoute,
   AuthenticatedKulutRoute: AuthenticatedKulutRoute,
   AuthenticatedMyyntiraporttiRoute: AuthenticatedMyyntiraporttiRoute,
   AuthenticatedPtsRoute: AuthenticatedPtsRoute,
@@ -662,3 +684,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}

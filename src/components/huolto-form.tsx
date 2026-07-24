@@ -45,6 +45,8 @@ export function HuoltoForm({
     tekija: initial?.tekija ?? "itse",
     tekija_nimi: initial?.tekija_nimi ?? "",
     kustannus: initial?.kustannus != null && Number(initial.kustannus) !== 0 ? String(initial.kustannus) : "",
+    tyon_osuus: initial?.tyon_osuus != null && Number(initial.tyon_osuus) !== 0 ? String(initial.tyon_osuus) : "",
+    kotitalousvahennys_tyyppi: initial?.kotitalousvahennys_tyyppi ?? "ei",
     takuu_vuotta: initial?.takuu_vuotta != null && Number(initial.takuu_vuotta) !== 0 ? String(initial.takuu_vuotta) : "",
     pts_siirto: initial?.pts_siirto != null ? String(initial.pts_siirto) : "0",
   });
@@ -127,9 +129,14 @@ export function HuoltoForm({
               materiaali: matOptiot.length > 0 ? (laite.materiaali.trim() || null) : null,
             }
           : null;
+        const ktv = form.kotitalousvahennys_tyyppi === "yritys" || form.kotitalousvahennys_tyyppi === "palkka"
+          ? form.kotitalousvahennys_tyyppi
+          : null;
         onSubmit({
           ...form,
           kustannus: Number(form.kustannus || 0),
+          kotitalousvahennys_tyyppi: ktv,
+          tyon_osuus: ktv ? Number(form.tyon_osuus || 0) : null,
           takuu_vuotta: Number(form.takuu_vuotta || 0),
           pts_siirto: Number(form.pts_siirto || 0),
           liitteet: uudet,
@@ -235,6 +242,48 @@ export function HuoltoForm({
           <p className="text-[10px] text-muted-foreground">Siirtää suositusta vuosilla</p>
         </div>
       </div>
+
+      <div className="space-y-3 rounded-md border border-primary/30 bg-primary/5 p-3">
+        <Label>Kotitalousvähennys</Label>
+        <div className="space-y-1.5">
+          {[
+            { v: "ei", l: "Ei vähennykseen" },
+            { v: "yritys", l: "Vähennyskelpoinen (yritykseltä ostettu työ)" },
+            { v: "palkka", l: "Vähennyskelpoinen (palkattu työntekijä)" },
+          ].map((o) => (
+            <label key={o.v} className="flex items-center gap-2 text-sm cursor-pointer">
+              <input
+                type="radio"
+                name="kotitalousvahennys_tyyppi"
+                className="accent-primary"
+                checked={(form.kotitalousvahennys_tyyppi ?? "ei") === o.v}
+                onChange={() => handleChange("kotitalousvahennys_tyyppi", o.v)}
+              />
+              <span>{o.l}</span>
+            </label>
+          ))}
+        </div>
+        {(form.kotitalousvahennys_tyyppi === "yritys" || form.kotitalousvahennys_tyyppi === "palkka") && (
+          <div className="space-y-2">
+            <Label>Työn osuus (sis. alv) (€)</Label>
+            <Input
+              type="number"
+              min="0"
+              step="0.01"
+              placeholder="0"
+              value={form.tyon_osuus}
+              onChange={(e) => handleChange("tyon_osuus", e.target.value)}
+            />
+            <p className="text-[10px] text-muted-foreground">
+              {form.kotitalousvahennys_tyyppi === "palkka"
+                ? "Ilmoita maksettu palkka ja työnantajan sivukulut yhteensä. Materiaalikustannukset eivät kuulu vähennykseen."
+                : "Vain työn osuus on vähennyskelpoinen. Materiaalikustannukset eivät kuulu vähennykseen. Työn osuus löytyy laskusta eriteltynä."}
+            </p>
+          </div>
+        )}
+      </div>
+
+
 
       {voiPaivittaa && (
         <div className="space-y-3 rounded-md border border-primary/30 bg-primary/5 p-3">

@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import { Link, useRouterState, useNavigate } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { LayoutDashboard, Home, Wrench, CalendarDays, Wallet, LogOut, ClipboardList, Send, Shield, FileText } from "lucide-react";
+import { LayoutDashboard, Home, Wrench, CalendarDays, Wallet, LogOut, ClipboardList, Send, Shield, FileText, Receipt } from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
@@ -26,6 +26,7 @@ const items = [
   { title: "PTS-suunnitelma", url: "/pts", icon: ClipboardList },
   { title: "Vuosikello", url: "/vuosikello", icon: CalendarDays },
   { title: "Kulut", url: "/kulut", icon: Wallet },
+  { title: "Kotitalousvähennys", url: "/kotitalousvahennys", icon: Receipt },
   { title: "Pyynnöt", url: "/pyynnot", icon: Send },
   { title: "Myyntiraportti", url: "/myyntiraportti", icon: FileText },
   { title: "Admin", url: "/admin", icon: Shield },

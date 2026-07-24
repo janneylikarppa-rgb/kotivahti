@@ -106,6 +106,9 @@ function HuoltoPage() {
                         <span className="font-serif text-cream">{h.tyyppi}</span>
                         {h.kohde && <span className="text-sm text-muted-foreground">· {h.kohde}</span>}
                         {h.kohde === "Vuosikello" && <span className="text-[10px] uppercase tracking-wider text-primary">vk</span>}
+                        {h.kotitalousvahennys_tyyppi && (
+                          <span className="text-[10px] lowercase tracking-wider text-primary" title="Kotitalousvähennyskelpoinen">ktv</span>
+                        )}
                       </div>
                       {h.kuvaus && <p className="text-sm text-muted-foreground mt-1">{h.kuvaus}</p>}
                       <div className="flex flex-wrap gap-3 mt-2 text-xs text-muted-foreground">
@@ -122,6 +125,9 @@ function HuoltoPage() {
                       <span className="font-mono text-primary flex items-center gap-1" title={h.kulu_id ? "Linkitetty kuluihin" : undefined}>
                         {h.kulu_id && <span aria-label="Linkitetty kuluihin">💰</span>}
                         {Number(h.kustannus).toFixed(0)} €
+                        {Number(h.tyon_osuus) > 0 && (
+                          <span className="text-xs text-muted-foreground">(työ {Number(h.tyon_osuus).toFixed(0)} €)</span>
+                        )}
                       </span>
                     )}
                     
