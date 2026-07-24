@@ -5,7 +5,7 @@ import { getDashboard } from "@/lib/kotivahti.functions";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, Wrench, Wallet, CalendarDays, Home, FileText } from "lucide-react";
+import { ArrowRight, Wrench, Wallet, CalendarDays, FileText } from "lucide-react";
 import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, Tooltip, CartesianGrid } from "recharts";
 
 
@@ -96,25 +96,16 @@ function DashboardPage() {
           </CardContent>
         </Card>
 
-        <Card className="gold-card">
-          <CardHeader className="pb-3"><CardTitle className="text-base font-serif flex items-center gap-2"><Wallet className="h-4 w-4 text-primary" /> Kulut tänä vuonna</CardTitle></CardHeader>
-          <CardContent>
-            <p className="font-serif text-3xl text-primary">{data.kulutSumma.toFixed(0)} €</p>
-            <p className="text-xs text-muted-foreground mt-1">{new Date().getFullYear()} yhteensä</p>
-            <div className="mt-4 h-24">
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={kulutPerKk}>
-                  <Bar dataKey="summa" fill="var(--gold)" radius={[3, 3, 0, 0]} />
-                </BarChart>
-              </ResponsiveContainer>
-            </div>
-            <Button asChild variant="link" className="px-0 mt-2 text-primary"><Link to="/kulut">Avaa kulut →</Link></Button>
-          </CardContent>
-        </Card>
-
         <Card className="gold-card md:col-span-2 lg:col-span-2">
-          <CardHeader className="pb-3"><CardTitle className="text-base font-serif flex items-center gap-2"><Home className="h-4 w-4 text-primary" /> Kuluerittely kuukausittain</CardTitle></CardHeader>
+          <CardHeader className="pb-3"><CardTitle className="text-base font-serif flex items-center gap-2"><Wallet className="h-4 w-4 text-primary" /> Kulut</CardTitle></CardHeader>
           <CardContent>
+            <div className="flex items-end justify-between mb-4">
+              <div>
+                <p className="font-serif text-3xl text-primary">{data.kulutSumma.toFixed(0)} €</p>
+                <p className="text-xs text-muted-foreground mt-1">{new Date().getFullYear()} yhteensä</p>
+              </div>
+              <Button asChild variant="link" className="px-0 text-primary"><Link to="/kulut">Avaa kulut →</Link></Button>
+            </div>
             <div className="h-48">
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={kulutPerKk}>
