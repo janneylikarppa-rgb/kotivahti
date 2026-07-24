@@ -359,7 +359,7 @@ function TaloTiedotPage() {
             <Field label="Talon nimi (näytetään etusivulla)"><Input value={k.nimi ?? ""} onChange={(e) => setK({ ...k, nimi: e.target.value })} /></Field>
             <Row>
               <Field label="Asukkaita"><Input type="number" value={t.asukkaita ?? ""} onChange={(e) => setT({ ...t, asukkaita: e.target.value })} /></Field>
-              <Field label="Kerroksia"><Input type="number" value={t.kerroksia ?? ""} onChange={(e) => setT({ ...t, kerroksia: e.target.value })} /></Field>
+              <Field label="Kerroksia" ryhti={ryhtiKentat.has("kerroksia")}><Input type="number" value={t.kerroksia ?? ""} onChange={(e) => { poistaRyhtiMerkki("kerroksia"); setT({ ...t, kerroksia: e.target.value }); }} /></Field>
             </Row>
           </>)}
 
