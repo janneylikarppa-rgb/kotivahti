@@ -45,6 +45,8 @@ export function HuoltoForm({
     tekija: initial?.tekija ?? "itse",
     tekija_nimi: initial?.tekija_nimi ?? "",
     kustannus: initial?.kustannus != null && Number(initial.kustannus) !== 0 ? String(initial.kustannus) : "",
+    tyon_osuus: initial?.tyon_osuus != null && Number(initial.tyon_osuus) !== 0 ? String(initial.tyon_osuus) : "",
+    kotitalousvahennys_tyyppi: initial?.kotitalousvahennys_tyyppi ?? "ei",
     takuu_vuotta: initial?.takuu_vuotta != null && Number(initial.takuu_vuotta) !== 0 ? String(initial.takuu_vuotta) : "",
     pts_siirto: initial?.pts_siirto != null ? String(initial.pts_siirto) : "0",
   });
