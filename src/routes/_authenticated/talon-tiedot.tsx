@@ -42,11 +42,6 @@ const KIINTEISTOTYYPIT = [
   { key: "erillistalo", nimi: "Erillistalo" },
   { key: "mokki", nimi: "Mökki" },
 ];
-const HANKINTATAVAT = [
-  { key: "ostettu", nimi: "Ostettu" },
-  { key: "rakennettu", nimi: "Rakennettu" },
-  { key: "peritty", nimi: "Peritty / lahjoitettu" },
-];
 const ILP_MERKIT = ["Mitsubishi", "Daikin", "Panasonic", "Toshiba", "Fujitsu", "LG", "Samsung", "Sharp", "Muu"];
 const RAKENNUSTAVAT = ["Puurunko", "Hirsi", "Tiili", "Kevytsoraharkko (Leca)", "Betoniharkko", "Kevytbetoni (Siporex)", "Betonielementti", "Teräsrunko"];
 const JULKISIVUMATERIAALIT = ["Puu (lautaverhous)", "Tiili", "Rappaus", "Levyverhous", "Hirsi", "Pelti", "Kuitusementtilevy", "Kivi"];
@@ -233,7 +228,7 @@ function TaloTiedotPage() {
       kiinteisto: {
         nimi: k.nimi, osoite: k.osoite, postinumero: k.postinumero, kaupunki: k.kaupunki,
         rakennusvuosi: num(k.rakennusvuosi), tyyppi: str(k.tyyppi),
-        hankintatapa: str(k.hankintatapa), hankinta_vuosi: num(k.hankinta_vuosi),
+        hankinta_vuosi: num(k.hankinta_vuosi),
       },
       talo: {
         pinta_ala: num(t.pinta_ala), kokonaispinta_ala: num(t.kokonaispinta_ala), tilavuus: num(t.tilavuus),
@@ -420,15 +415,8 @@ function TaloTiedotPage() {
               <Field label="Puhelinnumero"><Input value={p.puhelin ?? ""} onChange={(e) => setP({ ...p, puhelin: e.target.value })} placeholder="+358 40 123 4567" /></Field>
             </Row>
             <Field label="Sähköposti"><Input value={p.email ?? ""} disabled className="opacity-70" /></Field>
-            <Row>
-              <Field label="Hankintatapa">
-                <Select value={k.hankintatapa ?? ""} onValueChange={(v) => setK({ ...k, hankintatapa: v })}>
-                  <SelectTrigger><SelectValue placeholder="Valitse" /></SelectTrigger>
-                  <SelectContent>{HANKINTATAVAT.map((h) => <SelectItem key={h.key} value={h.key}>{h.nimi}</SelectItem>)}</SelectContent>
-                </Select>
-              </Field>
-              <Field label="Ostettu / rakennettu (vuosi)"><Input type="number" value={k.hankinta_vuosi ?? ""} onChange={(e) => setK({ ...k, hankinta_vuosi: e.target.value })} /></Field>
-            </Row>
+            <Field label="Ostettu / rakennettu (vuosi)"><Input type="number" value={k.hankinta_vuosi ?? ""} onChange={(e) => setK({ ...k, hankinta_vuosi: e.target.value })} /></Field>
+
 
             <Field label="Talon nimi (näytetään etusivulla)"><Input value={k.nimi ?? ""} onChange={(e) => setK({ ...k, nimi: e.target.value })} /></Field>
             <Row>

@@ -259,7 +259,7 @@ const taloSchema = z.object({
     kaupunki: z.string().optional().nullable(),
     rakennusvuosi: z.number().int().optional().nullable(),
     tyyppi: z.string().optional().nullable(),
-    hankintatapa: z.string().optional().nullable(),
+    
     hankinta_vuosi: z.number().int().optional().nullable(),
   }),
   talo: z.object({
@@ -1250,6 +1250,10 @@ const lisaaKiinteistoSchema = z.object({
   osoite: z.string().max(200).optional().nullable(),
   kaupunki: z.string().max(120).optional().nullable(),
   rakennusvuosi: z.number().int().min(1700).max(2100).optional().nullable(),
+  pinta_ala: z.number().optional().nullable(),
+  kerroksia: z.number().int().optional().nullable(),
+  lammitysmuoto: z.string().max(60).optional().nullable(),
+  julkisivumateriaali: z.string().max(120).optional().nullable(),
 });
 
 export const addKiinteisto = createServerFn({ method: "POST" })
@@ -1270,7 +1274,14 @@ export const addKiinteisto = createServerFn({ method: "POST" })
       .select("id")
       .single();
     if (error) throw error;
-    await supabase.from("talon_tiedot").insert({ kiinteisto_id: uusi.id });
+    await supabase.from("talon_tiedot").insert({
+      kiinteisto_id: uusi.id,
+      pinta_ala: data.pinta_ala ?? null,
+      kerroksia: data.kerroksia ?? null,
+      lammitysmuoto: data.lammitysmuoto ?? null,
+      julkisivumateriaali: data.julkisivumateriaali ?? null,
+    });
+
     await supabase.from("kulu_asetukset").insert({ kiinteisto_id: uusi.id });
     await supabase.from("profiles").update({ valittu_kiinteisto_id: uusi.id }).eq("id", userId);
     return { ok: true, id: uusi.id };
