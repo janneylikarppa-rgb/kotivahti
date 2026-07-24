@@ -228,7 +228,7 @@ function TaloTiedotPage() {
       kiinteisto: {
         nimi: k.nimi, osoite: k.osoite, postinumero: k.postinumero, kaupunki: k.kaupunki,
         rakennusvuosi: num(k.rakennusvuosi), tyyppi: str(k.tyyppi),
-        hankintatapa: str(k.hankintatapa), hankinta_vuosi: num(k.hankinta_vuosi),
+        hankinta_vuosi: num(k.hankinta_vuosi),
       },
       talo: {
         pinta_ala: num(t.pinta_ala), kokonaispinta_ala: num(t.kokonaispinta_ala), tilavuus: num(t.tilavuus),
