@@ -1,31 +1,57 @@
 ## Tavoite
-1. "Lisää kiinteistö" -dialogiin (yläpalkin kiinteistövalitsin) sama Ryhti-haku kuin Talon tiedot -sivulla.
-2. Talon tiedot -sivulta poistetaan "Hankintatapa"-kenttä.
 
-## 1. Ryhti-haku lisäysdialogiin
+Seurata kotitalousvähennystä huoltokirjausten pohjalta: työn osuus talteen kirjattaessa, oma sivu laskelmalle, muistutus etusivulla ja merkintä huoltohistorialistassa.
 
-**`src/components/property-switcher.tsx`**
-- Osoite/Kaupunki-kenttien alle sama outline-nappi kuin talon tiedoissa: katkoviivareunus, teal-sävy, `🔍 Hae talon tiedot Ryhti-rajapinnasta` / lataustilassa `Loader2` + "Haetaan tietoja...".
-- Alle apuvirke "Täyttää kodin viralliset perustiedot automaattisesti." + "Mikä Ryhti?" -linkki, joka avaa saman info-tekstin (pieni sisäkkäinen selitelaatikko dialogin sisällä, ei uutta modaalia modaalin päälle).
-- Nappi disabloitu jos osoite tyhjä. Kutsuu olemassa olevaa `haeRyhtiTiedot`-server functionia (`useServerFn`) osoitteella + kaupungilla.
-- Onnistuessa haetut arvot tallennetaan dialogin paikalliseen tilaan `ryhtiTiedot` ja näytetään dialogissa pienenä yhteenvetona (esim. "✓ Ryhti: rakennusvuosi 1998 · 142 m² · 2 krs · maalämpö"), jotta käyttäjä näkee mitä tallennetaan. Toast: "✓ Talon tiedot haettu Ryhti-rajapinnasta."
-- Virheet samoin viestein kuin talon tiedoissa (`NO_ADDRESS`/`NO_BUILDING` → "Rakennusta ei löydy tällä osoitteella…", `TIMEOUT`/`UPSTREAM_ERROR` → "Ryhti-palvelu ei vastaa juuri nyt…").
-- Jos käyttäjä muuttaa osoitetta haun jälkeen, `ryhtiTiedot` nollataan.
-- "Lisää"-napissa haetut arvot lähetetään `addKiinteisto`-kutsun mukana.
+## 1. Tietokanta (migraatio)
 
-**`src/lib/kotivahti.functions.ts`**
-- `lisaaKiinteistoSchema`: lisätään valinnaiset kentät `rakennusvuosi`, `pinta_ala`, `kerroksia`, `lammitysmuoto`, `julkisivumateriaali` (kaikki nullable/optional).
-- `addKiinteisto`-handler: `rakennusvuosi` menee jo `kiinteistot`-riville; `talon_tiedot`-insertiin lisätään `pinta_ala`, `kerroksia`, `lammitysmuoto`, `julkisivumateriaali` niiltä osin kuin arvo on annettu.
+`huolto_historia`-tauluun kaksi uutta saraketta:
+- `tyon_osuus` numeric, nullable
+- `kotitalousvahennys_tyyppi` text, nullable (sallitut arvot `yritys` / `palkka` / tyhjä)
 
-Ei uutta migraatiota — kaikki sarakkeet ovat jo olemassa.
+Olemassa olevat käyttöoikeudet ja tietoturvasäännöt riittävät (rivit ovat jo kiinteistön omistajan takana).
 
-## 2. Hankintatapa pois
+## 2. Verovakiot
 
-**`src/routes/_authenticated/talon-tiedot.tsx`**
-- Poistetaan "Hankintatapa"-`Field` (Select) perustiedoista; "Ostettu / rakennettu (vuosi)" jää yksinään riville.
-- Poistetaan `hankintatapa` tallennuspayloadista ja `HANKINTATAVAT`-import/lista jos se jää käyttämättömäksi.
+Uusi tiedosto `src/lib/kotitalousvahennys.ts`:
+- `VAHENNYS_YRITYS = 0.35`, `VAHENNYS_PALKKA = 0.13`
+- `OMAVASTUU = 150` (€/henkilö/vuosi), `ENIMMAISMAARA = 1600` (€/henkilö/vuosi)
+- `LAHDE = "vero.fi 2025–2026"`
+- Laskentafunktio `laskeVahennys(kirjaukset, henkiloita)`:
+  - yritystyö: `max(0, summa(tyon_osuus) − 150 × henkilöä) × 0,35`
+  - palkkatyö: `summa(tyon_osuus) × 0,13`
+  - yhteissumma katkaistaan katolla `1600 × henkilöä`
+  - palauttaa myös erittelyn (yritys/palkka), katon ja täyttöasteen
+- Yksikkötestit laskennalle.
 
-**`src/lib/kotivahti.functions.ts`**
-- Poistetaan `hankintatapa` tallennuksen skeemasta ja updatesta.
+## 3. Huoltokirjauslomake (`src/components/huolto-form.tsx`)
 
-Tietokantasaraketta ei poisteta (ei tarpeen, ei riskiä).
+Kustannuskentän viereen:
+- Radiovalinta: Ei vähennykseen / Vähennyskelpoinen (yritykseltä ostettu työ) / Vähennyskelpoinen (palkattu työntekijä)
+- Jos vähennyskelpoinen: "Työn osuus (sis. alv)" €-kenttä + ohjeteksti materiaalien rajaamisesta
+- Kentät mukaan tallennus- ja muokkauslogiikkaan (`addHuolto` / `updateHuolto` skeemat `src/lib/kotivahti.functions.ts`)
+
+## 4. Uusi sivu `/kotitalousvahennys`
+
+Reitti `src/routes/_authenticated/kotitalousvahennys.tsx`, oma head-metadata. Sivupalkkiin Receipt-ikoni ja teksti "Kotitalousvähennys" Kulut-linkin jälkeen.
+
+Sisältö ylhäältä alas:
+1. Kontrollit: vuosivalitsin (oletus kuluva vuosi) + 1/2 henkilöä -valinta
+2. Verovähennyskortti: "Arvioitu verovähennys", summa isolla, selite henkilömäärän mukaan
+3. Yksi edistymispalkki: X € / 1 600 € (tai 3 200 €), väri teal → oranssi (80 %) → harmaa (100 %)
+4. Avattava "Miten vähennys lasketaan?" -osio esimerkkilaskelmineen
+5. Tapahtumalista "Vähennyskelpoiset toimenpiteet", uusin ensin; tyhjänä ohjeteksti + "Lisää toimenpide" -nappi huoltohistoriaan
+6. Vastuuvapauslauseke alareunassa
+
+Data: uusi palvelinfunktio `getKotitalousvahennys` (vuosi parametrina) hakee valitun kiinteistön huoltokirjaukset, joissa `kotitalousvahennys_tyyppi` on asetettu.
+
+## 5. Dashboard-kortti
+
+Pieni kortti näkyy vain kun kuluvalta vuodelta löytyy vähintään yksi vähennyskelpoinen kirjaus: "💰 Kotitalousvähennys [vuosi]", "Käytetty: X € / 1 600 €", linkki sivulle.
+
+## 6. Huoltohistorialistaus
+
+Rivin perään pieni "ktv"-merkintä kun `kotitalousvahennys_tyyppi` ei ole tyhjä, ja kustannuksen perään työn osuus muodossa `450 € (työ 350 €)`.
+
+## Tekninen huomio
+
+Palkatun työntekijän kohdalla "työnantajan sivukulut" lisätään laskentaan siten, että ne sisällytetään ilmoitettuun työn osuuteen (kenttä ohjeistetaan: palkka + sivukulut). Erillistä sivukulukenttää ei lisätä, ellei toivot sitä.
