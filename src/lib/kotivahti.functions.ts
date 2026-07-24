@@ -259,7 +259,7 @@ const taloSchema = z.object({
     kaupunki: z.string().optional().nullable(),
     rakennusvuosi: z.number().int().optional().nullable(),
     tyyppi: z.string().optional().nullable(),
-    hankintatapa: z.string().optional().nullable(),
+    
     hankinta_vuosi: z.number().int().optional().nullable(),
   }),
   talo: z.object({
