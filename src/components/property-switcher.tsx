@@ -217,7 +217,10 @@ export function PropertySwitcher() {
                 <Input
                   id="ks-osoite"
                   value={osoite}
-                  onChange={(e) => setOsoite(e.target.value)}
+                  onChange={(e) => {
+                    setOsoite(e.target.value);
+                    setRyhtiTiedot(null);
+                  }}
                 />
               </div>
               <div className="space-y-1.5">
@@ -225,11 +228,51 @@ export function PropertySwitcher() {
                 <Input
                   id="ks-kaupunki"
                   value={kaupunki}
-                  onChange={(e) => setKaupunki(e.target.value)}
+                  onChange={(e) => {
+                    setKaupunki(e.target.value);
+                    setRyhtiTiedot(null);
+                  }}
                 />
               </div>
             </div>
+
+            <div className="space-y-1.5">
+              <Button
+                type="button"
+                variant="outline"
+                disabled={!osoite.trim() || ryhtiHaku.isPending}
+                onClick={() => ryhtiHaku.mutate()}
+                className="w-full justify-center gap-2 border-2 border-dashed border-teal-500/60 bg-teal-500/5 text-teal-600 hover:bg-teal-500/10"
+              >
+                {ryhtiHaku.isPending ? (
+                  <><Loader2 className="h-4 w-4 animate-spin" /> Haetaan tietoja...</>
+                ) : (
+                  <><Search className="h-4 w-4" /> Hae talon tiedot Ryhti-rajapinnasta</>
+                )}
+              </Button>
+              <p className="text-xs text-muted-foreground">
+                Täyttää kodin viralliset perustiedot automaattisesti.{" "}
+                <button
+                  type="button"
+                  onClick={() => setRyhtiInfo((v) => !v)}
+                  className="underline underline-offset-2"
+                >
+                  Mikä Ryhti?
+                </button>
+              </p>
+              {ryhtiInfo && (
+                <p className="rounded-md border border-border bg-muted/40 p-3 text-xs text-muted-foreground">
+                  Ryhti on ympäristöministeriön rakennetun ympäristön tietojärjestelmä, johon kunnat
+                  toimittavat rakennusten viralliset tiedot. Haemme osoitteesi perusteella lähimmän
+                  asuinrakennuksen perustiedot — voit muokata niitä vapaasti jälkikäteen.
+                </p>
+              )}
+              {ryhtiTiedot && ryhtiYhteenveto && (
+                <p className="text-xs font-medium text-emerald-600">✓ Ryhti: {ryhtiYhteenveto}</p>
+              )}
+            </div>
           </div>
+
           <DialogFooter>
             <Button variant="ghost" onClick={() => setOpenDialog(false)}>
               Peruuta
