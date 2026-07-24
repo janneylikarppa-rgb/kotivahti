@@ -1,33 +1,61 @@
 ## Tavoite
-Talon tiedoissa vain **Aurinkopaneelit: Kyllä / Ei**, ja Kyllä-valinnalla **Asennusvuosi**. Poistetaan tyyppivalinta (paneelit/akusto/molemmat) ja akustoon liittyvä logiikka. PTS-suunnitelmaan generoidaan asennusvuoden perusteella vain paneelit ja invertteri.
+Lisää talon-tiedot-sivulle "Hae Ryhti-rajapinnasta" -nappi, joka hakee osoitteen perusteella viralliset rakennustiedot ja esitäyttää lomakkeen kentät. Käyttäjä voi muokata arvoja normaalisti.
+
+## Huomio arkkitehtuurista
+Ohjeen mukainen "Supabase Edge Function" korvataan TanStack `createServerFn`:llä — projektissa ei luoda uusia Supabase Edge Functioneita. Ulkoiset API-kutsut (Digitransit + Ryhti) tehdään server functionissa, jotta CORS-ongelmia ei tule ja logiikka pysyy palvelinpuolella.
 
 ## Muutokset
 
-**1. `src/routes/_authenticated/talon-tiedot.tsx`**
-- "Tekniset järjestelmät" -osioon:
-  - "Onko talossa aurinkopaneelit?" → Kyllä / Ei
-  - Jos Kyllä: "Asennusvuosi" (numerokenttä)
-- Poistetaan "Mitä on asennettu?" (paneelit/akusto/molemmat) -kenttä sekä siihen liittyvät labelit.
-- Skeema/payload: `aurinkopaneelit: boolean`, `aurinko_asennus_vuosi: number | null`. Poistetaan `aurinko_tyyppi` täysin.
+**1. `src/lib/ryhti.functions.ts` (uusi)**
+- `haeRyhtiTiedot` createServerFn (`POST`), input: `{ osoite: string, kaupunki?: string | null }`.
+- Vaihe 1: Digitransit Geocoding
+  `GET https://api.digitransit.fi/geocoding/v1/search?text=<osoite[, kaupunki]>&size=1&layers=address&boundary.country=FIN`
+  → poimi `features[0].geometry.coordinates` = `[lon, lat]`.
+- Vaihe 2: Ryhti
+  `GET https://api.ryhti.fi/koodistot/v1/rakennukset/haku?lat=<lat>&lon=<lon>&radius=50`
+  → suodata `kayttotarkoitus`-koodit vain asuinrakennuksiin (asuinpientalot / paritalot / rivitalot; ei autotalleja, saunoja, talousrakennuksia). Jos useita, valitse etäisyydeltään lähin koordinaatista (Haversine).
+- Palauta normalisoitu DTO:
+  ```
+  { rakennusvuosi, pinta_ala, lammitysmuoto,
+    julkisivumateriaali, kerroksia, lahde: "ryhti" }
+  ```
+- Timeout 8 s (`AbortController`) per API-kutsu. Palauta selkeät virhekoodit:
+  - `NO_ADDRESS` — Digitransit ei löytänyt osoitetta
+  - `NO_BUILDING` — Ryhti ei palauttanut asuinrakennusta
+  - `TIMEOUT` / `UPSTREAM_ERROR`
 
-**2. `src/lib/pts-kohteet.ts`**
-Säilytetään ja yksinkertaistetaan:
-- `aurinko_paneelit_huolto` — Aurinkopaneelien tarkastus ja puhdistus (2 v välein, käyttöikä 30 v). `koskee`: `t?.aurinkopaneelit === true && i(t?.aurinko_asennus_vuosi) != null`.
-- `aurinko_invertteri` — Invertterin vaihto (n. 12 v). Sama `koskee`-ehto.
-- `aurinko_paneelit_uusinta` — Aurinkopaneelien uusinta (25–30 v). Sama `koskee`-ehto.
+**2. `src/routes/_authenticated/talon-tiedot.tsx`**
+- Lisää osoitekentän alle:
+  - Outline-nappi teal-värillä, katkoviivareunus: `[🔍 Hae talon tiedot Ryhti-rajapinnasta]`
+  - Apuvirke: "Täyttää kodin viralliset perustiedot automaattisesti."
+  - Linkki "Mikä Ryhti?" → shadcn `Dialog` info-modaali annetuilla teksteillä.
+- Napin klikkaus:
+  - Validoi osoite ei tyhjä → muuten `toast.error("Syötä ensin osoite")`.
+  - Lataustila: nappi disabled, teksti `⏳ Haetaan tietoja...`, `Loader2` spinner.
+  - Kutsu `haeRyhtiTiedot` `useServerFn`-käärittynä.
+- Onnistuessa:
+  - Esitäytä lomakkeen tila: `rakennusvuosi` (kiinteistöt), `pinta_ala`, `lammitysmuoto`, `julkisivumateriaali`, `kerroksia`. Käytetään vain kenttiä, joihin Ryhti palautti arvon; muihin ei kosketa.
+  - Merkitse haetut kentät Setiin `ryhtiFilled: Set<string>`; kentän vieressä pieni vihreä `✓ Ryhti` -badge. Kenttä pysyy normaalisti muokattavana; jos käyttäjä muuttaa arvoa, badge poistuu.
+  - `toast.success("✓ Talon tiedot haettu Ryhti-rajapinnasta. Tarkista ja täydennä tarvittaessa.")`
+- Virheet:
+  - `NO_ADDRESS` / `NO_BUILDING` → "Rakennusta ei löydy tällä osoitteella. Voit täyttää tiedot käsin."
+  - `TIMEOUT` / `UPSTREAM_ERROR` → "Ryhti-palvelu ei vastaa juuri nyt. Yritä hetken kuluttua uudelleen tai täytä tiedot käsin."
 
-Poistetaan:
-- `aurinko_akusto` -kohde kokonaan.
-- Kaikki viittaukset `aurinko_tyyppi`-kenttään (koskee-funktioista pois).
+**3. Kenttäkartoitus (talon_tiedot / kiinteistot -sarakkeisiin)**
+| Ryhti | Kotivahti-sarake |
+|---|---|
+| rakennusvuosi | `kiinteistot.rakennusvuosi` |
+| huoneistoala (m²) | `talon_tiedot.pinta_ala` |
+| lammitystapa | `talon_tiedot.lammitysmuoto` |
+| julkisivumateriaali | `talon_tiedot.julkisivumateriaali` |
+| kerrostenlkm | `talon_tiedot.kerroksia` |
 
-**3. `src/lib/kotivahti.functions.ts`**
-- `talon_tiedot` upsert/päivitys: poistetaan `aurinko_tyyppi`-kentän luku/kirjoitus. `aurinkopaneelit` (boolean) ja `aurinko_asennus_vuosi` (number) säilyvät.
-- Aurinkosähkösuosituksen esto-lippu käyttää edelleen `aurinkopaneelit`-boolia (ei muutosta logiikkaan).
+`rakennusvuosi` päivittyy jo olemassa olevan `updateKiinteisto`-flown kautta (tai laajennetaan tallennuspayloadia). Muut kentät ovat jo `talonTiedotSchema`ssa.
 
-**4. Tietokanta**
-- Ei uutta migraatiota tarvita: `aurinkopaneelit` ja `aurinko_asennus_vuosi` -sarakkeet ovat jo olemassa `talon_tiedot`-taulussa. Aiemmin lisätty `aurinko_tyyppi`-sarake jää tauluun käyttämättömänä — ei haittaa, voidaan pudottaa myöhemmin erillisellä siivousmigraatiolla jos haluat.
+## Mitä ei muuteta
+- Ei uutta migraatiota — kaikki tarvittavat sarakkeet ovat jo tauluissa.
+- Ei muutoksia property-switcherin lisäysdialogiin.
+- Kentät joita Ryhti ei täytä (katto, IV yms.) jäävät käyttäjän täytettäviksi kuten nyt.
 
-## Mitä EI muuteta
-- Aurinkosähkösuositus PTS:ssä (kiireellinen rivi + kuittaa/siirrä/tilaa kartoitus) toimii kuten nyt.
-- `src/lib/aurinkosahko.ts` ja sen testit.
-- Muut PTS-kohteet ja huoltohistorian mappaus.
+## Riskit / avoimet kohdat
+- Ryhti-rajapinnan tarkka URL/parametrit/vastausskeema saattavat poiketa ohjeen esimerkistä. Toteutan mappauksen puolustavasti (optional chaining, tyyppitarkistukset) ja lokitan palvelinpuolella tuntemattomat kenttärakenteet, jotta tarvittaessa hienosäätö on nopeaa.
