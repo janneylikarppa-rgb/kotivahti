@@ -781,7 +781,21 @@ function TaloTiedotPage() {
       </Card>
 
       <KausikirjeToggle />
+
+      <Dialog open={ryhtiInfo} onOpenChange={setRyhtiInfo}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Mikä Ryhti?</DialogTitle>
+            <DialogDescription className="text-left leading-relaxed">
+              Ryhti on Suomen rakennetun ympäristön tietojärjestelmä (ympäristöministeriö ja Syke).
+              Se hakee kotisi viralliset rakennustiedot — rakennusvuosi, pinta-ala, lämmitysmuoto,
+              julkisivu ynnä muut — pelkän osoitteen perusteella.
+            </DialogDescription>
+          </DialogHeader>
+        </DialogContent>
+      </Dialog>
     </div>
+
   );
 }
 
