@@ -259,7 +259,7 @@ function MyyntiraporttiPage() {
               yksikko="kWh / €"
             />
           )}
-          <ValidointiKortti nimi="Vedenkulutus" onData={!!kulutusInfo?.vesi} kentta="vesi" yksikko="m³" />
+          
         </div>
 
         <div className="flex flex-wrap gap-3 pt-2">
@@ -421,14 +421,6 @@ function MyyntiraporttiPage() {
                 </div>
               ))}
 
-            {sisallyta.vesi ? (
-              <Rivi label={`Vedenkulutus ${vuosi}`} value={kulutusInfo?.vesi ? `${fmtNum(kulutusInfo.vesi, 1)} m³` : "—"} />
-            ) : (
-              <div className="flex justify-between py-1 border-b border-dashed border-black/20">
-                <span>Vedenkulutus {vuosi}:</span>
-                <span className="opacity-50">_________ m³</span>
-              </div>
-            )}
           </div>
         </section>
 
