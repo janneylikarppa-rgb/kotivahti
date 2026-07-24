@@ -801,9 +801,22 @@ function DokumentitOsio({ kiinteistoId, dokumentit }: { kiinteistoId?: string; d
 function Row({ children }: { children: React.ReactNode }) {
   return <div className="grid gap-4 md:grid-cols-2">{children}</div>;
 }
-function Field({ label, children }: { label: string; children: React.ReactNode }) {
-  return <div className="space-y-2"><Label>{label}</Label>{children}</div>;
+function Field({ label, children, ryhti }: { label: string; children: React.ReactNode; ryhti?: boolean }) {
+  return (
+    <div className="space-y-2">
+      <div className="flex items-center gap-2">
+        <Label>{label}</Label>
+        {ryhti && (
+          <span className="inline-flex items-center gap-1 rounded-full border border-emerald-500/40 bg-emerald-500/10 px-2 py-0.5 text-[10px] font-medium uppercase tracking-wider text-emerald-400">
+            ✓ Ryhti
+          </span>
+        )}
+      </div>
+      {children}
+    </div>
+  );
 }
+
 
 function SelectOrOther({ value, options, onChange }: { value: string | null | undefined; options: string[]; onChange: (v: string) => void }) {
   const isPreset = !!value && options.includes(value);
