@@ -453,7 +453,7 @@ function TaloTiedotPage() {
 
             <p className="eyebrow text-primary pt-2">Lämmitysjärjestelmä</p>
             <Row>
-              <Field label="Päälämmitysmuoto">
+              <Field label="Päälämmitysmuoto" ryhti={ryhtiKentat.has("lammitysmuoto")}>
                 <Select value={t.lammitysmuoto ?? ""} onValueChange={(v) => setT({ ...t, lammitysmuoto: v })}>
                   <SelectTrigger><SelectValue placeholder="Valitse" /></SelectTrigger>
                   <SelectContent>
