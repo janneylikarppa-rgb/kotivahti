@@ -382,9 +382,10 @@ function TaloTiedotPage() {
               <Field label="Kantava rakenne">
                 <SelectOrOther value={t.rakennustapa} options={RAKENNUSTAVAT} onChange={(v) => setT({ ...t, rakennustapa: v })} />
               </Field>
-              <Field label="Julkisivumateriaali">
-                <SelectOrOther value={t.julkisivumateriaali} options={JULKISIVUMATERIAALIT} onChange={(v) => setT({ ...t, julkisivumateriaali: v })} />
+              <Field label="Julkisivumateriaali" ryhti={ryhtiKentat.has("julkisivumateriaali")}>
+                <SelectOrOther value={t.julkisivumateriaali} options={JULKISIVUMATERIAALIT} onChange={(v) => { poistaRyhtiMerkki("julkisivumateriaali"); setT({ ...t, julkisivumateriaali: v }); }} />
               </Field>
+
             </Row>
             <Row>
               <Field label="Perustus">
