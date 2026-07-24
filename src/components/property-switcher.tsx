@@ -107,6 +107,11 @@ export function PropertySwitcher() {
           tyyppi,
           osoite: osoite.trim() || null,
           kaupunki: kaupunki.trim() || null,
+          rakennusvuosi: ryhtiTiedot?.rakennusvuosi ?? null,
+          pinta_ala: ryhtiTiedot?.pinta_ala ?? null,
+          kerroksia: ryhtiTiedot?.kerroksia ?? null,
+          lammitysmuoto: ryhtiTiedot?.lammitysmuoto ?? null,
+          julkisivumateriaali: ryhtiTiedot?.julkisivumateriaali ?? null,
         },
       }),
     onSuccess: async () => {
@@ -115,11 +120,13 @@ export function PropertySwitcher() {
       setNimi("");
       setOsoite("");
       setKaupunki("");
+      setRyhtiTiedot(null);
       await qc.invalidateQueries();
       router.invalidate();
     },
     onError: (e: any) => toast.error(e?.message ?? "Lisäys epäonnistui"),
   });
+
 
   const kiinteistot = data?.kiinteistot ?? [];
   const valittuId = data?.valittuId ?? null;
