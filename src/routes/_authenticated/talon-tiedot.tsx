@@ -3,6 +3,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useRef, useState } from "react";
 import { getTaloTiedot, saveTaloTiedot, addDokumentti, deleteDokumentti, getDokumenttiUrl } from "@/lib/kotivahti.functions";
+import { haeRyhtiTiedot } from "@/lib/ryhti.functions";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -11,9 +12,11 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Progress } from "@/components/ui/progress";
-import { Check, Trash2, FileText, Download, Upload } from "lucide-react";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Check, Trash2, FileText, Download, Upload, Search, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { KausikirjeToggle } from "@/components/kausikirje-toggle";
+
 
 export const Route = createFileRoute("/_authenticated/talon-tiedot")({
   loader: ({ context }) => {
@@ -163,7 +166,54 @@ function TaloTiedotPage() {
     return () => clearTimeout(id);
   }, [data]);
 
+  const ryhtiFn = useServerFn(haeRyhtiTiedot);
+  const [ryhtiInfo, setRyhtiInfo] = useState(false);
+  const [ryhtiKentat, setRyhtiKentat] = useState<Set<string>>(new Set());
+  const poistaRyhtiMerkki = (kentta: string) =>
+    setRyhtiKentat((prev) => {
+      if (!prev.has(kentta)) return prev;
+      const seuraava = new Set(prev);
+      seuraava.delete(kentta);
+      return seuraava;
+    });
+
+  const ryhtiHaku = useMutation({
+    mutationFn: async () => {
+      const osoite = String(k.osoite ?? "").trim();
+      if (!osoite) throw new Error("Syötä ensin osoite");
+      return ryhtiFn({ data: { osoite, kaupunki: String(k.kaupunki ?? "").trim() || null } });
+    },
+    onSuccess: (res: any) => {
+      if (!res?.ok) {
+        if (res?.koodi === "TIMEOUT" || res?.koodi === "UPSTREAM_ERROR") {
+          toast.error("Ryhti-palvelu ei vastaa juuri nyt. Yritä hetken kuluttua uudelleen tai täytä tiedot käsin.");
+        } else {
+          toast.error("Rakennusta ei löydy tällä osoitteella. Voit täyttää tiedot käsin.");
+        }
+        return;
+      }
+      const r = res.tiedot;
+      const taytetyt = new Set<string>();
+      if (r.rakennusvuosi != null) {
+        setK((prev: any) => ({ ...prev, rakennusvuosi: r.rakennusvuosi }));
+        taytetyt.add("rakennusvuosi");
+      }
+      setT((prev: any) => {
+        const seuraava = { ...prev };
+        if (r.pinta_ala != null) { seuraava.pinta_ala = r.pinta_ala; taytetyt.add("pinta_ala"); }
+        if (r.kerroksia != null) { seuraava.kerroksia = r.kerroksia; taytetyt.add("kerroksia"); }
+        if (r.lammitysmuoto) { seuraava.lammitysmuoto = r.lammitysmuoto; taytetyt.add("lammitysmuoto"); }
+        if (r.julkisivumateriaali) { seuraava.julkisivumateriaali = r.julkisivumateriaali; taytetyt.add("julkisivumateriaali"); }
+        return seuraava;
+      });
+      setRyhtiKentat(taytetyt);
+      toast.success("✓ Talon tiedot haettu Ryhti-rajapinnasta. Tarkista ja täydennä tarvittaessa.");
+    },
+    onError: (e: any) => toast.error(e?.message ?? "Haku epäonnistui"),
+  });
+
   const laite = t.lammitysmuoto ? MERKIT[t.lammitysmuoto] : undefined;
+
   const lammitysLisa = (t.lammitys_lisatieto && typeof t.lammitys_lisatieto === "object") ? t.lammitys_lisatieto : {};
   const setLisa = (patch: Record<string, any>) => setT({ ...t, lammitys_lisatieto: { ...lammitysLisa, ...patch } });
   const kattilaMerkitLista = lammitysLisa.kattila_tyyppi ? (KATTILA_MERKIT[lammitysLisa.kattila_tyyppi] ?? ["Muu"]) : ["Muu"];
@@ -324,6 +374,33 @@ function TaloTiedotPage() {
 
             <p className="eyebrow text-primary pt-2">Sijainti</p>
             <Field label="Osoite"><Input value={k.osoite ?? ""} onChange={(e) => setK({ ...k, osoite: e.target.value })} /></Field>
+
+            <div className="space-y-1.5">
+              <Button
+                type="button"
+                variant="outline"
+                disabled={ryhtiHaku.isPending}
+                onClick={() => ryhtiHaku.mutate()}
+                className="w-full justify-center gap-2 border-2 border-dashed border-teal-500/60 bg-teal-500/5 text-teal-300 hover:bg-teal-500/10 hover:text-teal-200 sm:w-auto"
+              >
+                {ryhtiHaku.isPending ? (
+                  <><Loader2 className="h-4 w-4 animate-spin" /> Haetaan tietoja...</>
+                ) : (
+                  <><Search className="h-4 w-4" /> Hae talon tiedot Ryhti-rajapinnasta</>
+                )}
+              </Button>
+              <p className="text-xs text-muted-foreground">
+                Täyttää kodin viralliset perustiedot automaattisesti.{" "}
+                <button
+                  type="button"
+                  onClick={() => setRyhtiInfo(true)}
+                  className="underline underline-offset-2 hover:text-cream"
+                >
+                  Mikä Ryhti?
+                </button>
+              </p>
+            </div>
+
             <Row>
               <Field label="Postinumero"><Input value={k.postinumero ?? ""} onChange={(e) => setK({ ...k, postinumero: e.target.value })} /></Field>
               <Field label="Kaupunki"><Input value={k.kaupunki ?? ""} onChange={(e) => setK({ ...k, kaupunki: e.target.value })} /></Field>
@@ -356,7 +433,7 @@ function TaloTiedotPage() {
             <Field label="Talon nimi (näytetään etusivulla)"><Input value={k.nimi ?? ""} onChange={(e) => setK({ ...k, nimi: e.target.value })} /></Field>
             <Row>
               <Field label="Asukkaita"><Input type="number" value={t.asukkaita ?? ""} onChange={(e) => setT({ ...t, asukkaita: e.target.value })} /></Field>
-              <Field label="Kerroksia"><Input type="number" value={t.kerroksia ?? ""} onChange={(e) => setT({ ...t, kerroksia: e.target.value })} /></Field>
+              <Field label="Kerroksia" ryhti={ryhtiKentat.has("kerroksia")}><Input type="number" value={t.kerroksia ?? ""} onChange={(e) => { poistaRyhtiMerkki("kerroksia"); setT({ ...t, kerroksia: e.target.value }); }} /></Field>
             </Row>
           </>)}
 
@@ -366,22 +443,24 @@ function TaloTiedotPage() {
 
             <p className="eyebrow text-primary pt-2">Koko ja ikä</p>
             <Row>
-              <Field label="Rakennusvuosi"><Input type="number" value={k.rakennusvuosi ?? ""} onChange={(e) => setK({ ...k, rakennusvuosi: e.target.value })} /></Field>
-              <Field label="Kerrosten määrä"><Input type="number" value={t.kerroksia ?? ""} onChange={(e) => setT({ ...t, kerroksia: e.target.value })} /></Field>
+              <Field label="Rakennusvuosi" ryhti={ryhtiKentat.has("rakennusvuosi")}><Input type="number" value={k.rakennusvuosi ?? ""} onChange={(e) => { poistaRyhtiMerkki("rakennusvuosi"); setK({ ...k, rakennusvuosi: e.target.value }); }} /></Field>
+              <Field label="Kerrosten määrä" ryhti={ryhtiKentat.has("kerroksia")}><Input type="number" value={t.kerroksia ?? ""} onChange={(e) => { poistaRyhtiMerkki("kerroksia"); setT({ ...t, kerroksia: e.target.value }); }} /></Field>
             </Row>
             <Row>
-              <Field label="Asuinpinta-ala (m²)"><Input type="number" value={t.pinta_ala ?? ""} onChange={(e) => setT({ ...t, pinta_ala: e.target.value })} /></Field>
+              <Field label="Asuinpinta-ala (m²)" ryhti={ryhtiKentat.has("pinta_ala")}><Input type="number" value={t.pinta_ala ?? ""} onChange={(e) => { poistaRyhtiMerkki("pinta_ala"); setT({ ...t, pinta_ala: e.target.value }); }} /></Field>
               <Field label="Kokonaispinta-ala (m²)"><Input type="number" value={t.kokonaispinta_ala ?? ""} onChange={(e) => setT({ ...t, kokonaispinta_ala: e.target.value })} /></Field>
             </Row>
+
 
             <p className="eyebrow text-primary pt-4">Rakennusmateriaalit</p>
             <Row>
               <Field label="Kantava rakenne">
                 <SelectOrOther value={t.rakennustapa} options={RAKENNUSTAVAT} onChange={(v) => setT({ ...t, rakennustapa: v })} />
               </Field>
-              <Field label="Julkisivumateriaali">
-                <SelectOrOther value={t.julkisivumateriaali} options={JULKISIVUMATERIAALIT} onChange={(v) => setT({ ...t, julkisivumateriaali: v })} />
+              <Field label="Julkisivumateriaali" ryhti={ryhtiKentat.has("julkisivumateriaali")}>
+                <SelectOrOther value={t.julkisivumateriaali} options={JULKISIVUMATERIAALIT} onChange={(v) => { poistaRyhtiMerkki("julkisivumateriaali"); setT({ ...t, julkisivumateriaali: v }); }} />
               </Field>
+
             </Row>
             <Row>
               <Field label="Perustus">
@@ -450,7 +529,7 @@ function TaloTiedotPage() {
 
             <p className="eyebrow text-primary pt-2">Lämmitysjärjestelmä</p>
             <Row>
-              <Field label="Päälämmitysmuoto">
+              <Field label="Päälämmitysmuoto" ryhti={ryhtiKentat.has("lammitysmuoto")}>
                 <Select value={t.lammitysmuoto ?? ""} onValueChange={(v) => setT({ ...t, lammitysmuoto: v })}>
                   <SelectTrigger><SelectValue placeholder="Valitse" /></SelectTrigger>
                   <SelectContent>
@@ -702,7 +781,21 @@ function TaloTiedotPage() {
       </Card>
 
       <KausikirjeToggle />
+
+      <Dialog open={ryhtiInfo} onOpenChange={setRyhtiInfo}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Mikä Ryhti?</DialogTitle>
+            <DialogDescription className="text-left leading-relaxed">
+              Ryhti on Suomen rakennetun ympäristön tietojärjestelmä (ympäristöministeriö ja Syke).
+              Se hakee kotisi viralliset rakennustiedot — rakennusvuosi, pinta-ala, lämmitysmuoto,
+              julkisivu ynnä muut — pelkän osoitteen perusteella.
+            </DialogDescription>
+          </DialogHeader>
+        </DialogContent>
+      </Dialog>
     </div>
+
   );
 }
 
@@ -798,9 +891,22 @@ function DokumentitOsio({ kiinteistoId, dokumentit }: { kiinteistoId?: string; d
 function Row({ children }: { children: React.ReactNode }) {
   return <div className="grid gap-4 md:grid-cols-2">{children}</div>;
 }
-function Field({ label, children }: { label: string; children: React.ReactNode }) {
-  return <div className="space-y-2"><Label>{label}</Label>{children}</div>;
+function Field({ label, children, ryhti }: { label: string; children: React.ReactNode; ryhti?: boolean }) {
+  return (
+    <div className="space-y-2">
+      <div className="flex items-center gap-2">
+        <Label>{label}</Label>
+        {ryhti && (
+          <span className="inline-flex items-center gap-1 rounded-full border border-emerald-500/40 bg-emerald-500/10 px-2 py-0.5 text-[10px] font-medium uppercase tracking-wider text-emerald-400">
+            ✓ Ryhti
+          </span>
+        )}
+      </div>
+      {children}
+    </div>
+  );
 }
+
 
 function SelectOrOther({ value, options, onChange }: { value: string | null | undefined; options: string[]; onChange: (v: string) => void }) {
   const isPreset = !!value && options.includes(value);
