@@ -166,7 +166,54 @@ function TaloTiedotPage() {
     return () => clearTimeout(id);
   }, [data]);
 
+  const ryhtiFn = useServerFn(haeRyhtiTiedot);
+  const [ryhtiInfo, setRyhtiInfo] = useState(false);
+  const [ryhtiKentat, setRyhtiKentat] = useState<Set<string>>(new Set());
+  const poistaRyhtiMerkki = (kentta: string) =>
+    setRyhtiKentat((prev) => {
+      if (!prev.has(kentta)) return prev;
+      const seuraava = new Set(prev);
+      seuraava.delete(kentta);
+      return seuraava;
+    });
+
+  const ryhtiHaku = useMutation({
+    mutationFn: async () => {
+      const osoite = String(k.osoite ?? "").trim();
+      if (!osoite) throw new Error("Syötä ensin osoite");
+      return ryhtiFn({ data: { osoite, kaupunki: String(k.kaupunki ?? "").trim() || null } });
+    },
+    onSuccess: (res: any) => {
+      if (!res?.ok) {
+        if (res?.koodi === "TIMEOUT" || res?.koodi === "UPSTREAM_ERROR") {
+          toast.error("Ryhti-palvelu ei vastaa juuri nyt. Yritä hetken kuluttua uudelleen tai täytä tiedot käsin.");
+        } else {
+          toast.error("Rakennusta ei löydy tällä osoitteella. Voit täyttää tiedot käsin.");
+        }
+        return;
+      }
+      const r = res.tiedot;
+      const taytetyt = new Set<string>();
+      if (r.rakennusvuosi != null) {
+        setK((prev: any) => ({ ...prev, rakennusvuosi: r.rakennusvuosi }));
+        taytetyt.add("rakennusvuosi");
+      }
+      setT((prev: any) => {
+        const seuraava = { ...prev };
+        if (r.pinta_ala != null) { seuraava.pinta_ala = r.pinta_ala; taytetyt.add("pinta_ala"); }
+        if (r.kerroksia != null) { seuraava.kerroksia = r.kerroksia; taytetyt.add("kerroksia"); }
+        if (r.lammitysmuoto) { seuraava.lammitysmuoto = r.lammitysmuoto; taytetyt.add("lammitysmuoto"); }
+        if (r.julkisivumateriaali) { seuraava.julkisivumateriaali = r.julkisivumateriaali; taytetyt.add("julkisivumateriaali"); }
+        return seuraava;
+      });
+      setRyhtiKentat(taytetyt);
+      toast.success("✓ Talon tiedot haettu Ryhti-rajapinnasta. Tarkista ja täydennä tarvittaessa.");
+    },
+    onError: (e: any) => toast.error(e?.message ?? "Haku epäonnistui"),
+  });
+
   const laite = t.lammitysmuoto ? MERKIT[t.lammitysmuoto] : undefined;
+
   const lammitysLisa = (t.lammitys_lisatieto && typeof t.lammitys_lisatieto === "object") ? t.lammitys_lisatieto : {};
   const setLisa = (patch: Record<string, any>) => setT({ ...t, lammitys_lisatieto: { ...lammitysLisa, ...patch } });
   const kattilaMerkitLista = lammitysLisa.kattila_tyyppi ? (KATTILA_MERKIT[lammitysLisa.kattila_tyyppi] ?? ["Muu"]) : ["Muu"];
