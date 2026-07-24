@@ -50,6 +50,40 @@ export function PropertySwitcher() {
   const [tyyppi, setTyyppi] = useState("omakotitalo");
   const [osoite, setOsoite] = useState("");
   const [kaupunki, setKaupunki] = useState("");
+  const [ryhtiTiedot, setRyhtiTiedot] = useState<any>(null);
+  const [ryhtiInfo, setRyhtiInfo] = useState(false);
+  const ryhtiFn = useServerFn(haeRyhtiTiedot);
+
+  const ryhtiHaku = useMutation({
+    mutationFn: async () =>
+      ryhtiFn({ data: { osoite: osoite.trim(), kaupunki: kaupunki.trim() || null } }),
+    onSuccess: (res: any) => {
+      if (!res?.ok) {
+        if (res?.koodi === "TIMEOUT" || res?.koodi === "UPSTREAM_ERROR") {
+          toast.error("Ryhti-palvelu ei vastaa juuri nyt. Yritä hetken kuluttua uudelleen tai täytä tiedot käsin.");
+        } else {
+          toast.error("Rakennusta ei löydy tällä osoitteella. Voit täyttää tiedot käsin.");
+        }
+        return;
+      }
+      setRyhtiTiedot(res.tiedot);
+      toast.success("✓ Talon tiedot haettu Ryhti-rajapinnasta.");
+    },
+    onError: (e: any) => toast.error(e?.message ?? "Haku epäonnistui"),
+  });
+
+  const ryhtiYhteenveto = ryhtiTiedot
+    ? [
+        ryhtiTiedot.rakennusvuosi ? `rakennusvuosi ${ryhtiTiedot.rakennusvuosi}` : null,
+        ryhtiTiedot.pinta_ala ? `${ryhtiTiedot.pinta_ala} m²` : null,
+        ryhtiTiedot.kerroksia ? `${ryhtiTiedot.kerroksia} krs` : null,
+        ryhtiTiedot.lammitysmuoto,
+        ryhtiTiedot.julkisivumateriaali,
+      ]
+        .filter(Boolean)
+        .join(" · ")
+    : "";
+
 
   const { data } = useQuery({
     queryKey: ["kiinteistot"],
