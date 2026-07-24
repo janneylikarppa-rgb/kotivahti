@@ -5,7 +5,7 @@ import { getDashboard } from "@/lib/kotivahti.functions";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, Wrench, Wallet, CalendarDays, FileText } from "lucide-react";
+import { ArrowRight, Wrench, Wallet, CalendarDays } from "lucide-react";
 import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, Tooltip, CartesianGrid } from "recharts";
 
 
