@@ -122,13 +122,6 @@ function DashboardPage() {
 
 
 
-        <Card className="gold-card">
-          <CardHeader className="pb-3"><CardTitle className="text-base font-serif flex items-center gap-2"><FileText className="h-4 w-4 text-primary" /> Myyntiraportti</CardTitle></CardHeader>
-          <CardContent>
-            <p className="text-sm text-muted-foreground">Tulosta dokumentoitu raportti välittäjälle – huollot, remontit ja liitteet yhdessä paketissa.</p>
-            <Button asChild variant="link" className="px-0 mt-3 text-primary"><Link to="/myyntiraportti">Avaa raportti →</Link></Button>
-          </CardContent>
-        </Card>
 
       </div>
     </div>
