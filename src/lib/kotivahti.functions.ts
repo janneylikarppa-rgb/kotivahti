@@ -440,6 +440,8 @@ const huoltoSchema = z.object({
   tekija: z.string().default("itse"),
   tekija_nimi: z.string().optional().nullable(),
   kustannus: z.number().default(0),
+  tyon_osuus: z.number().nullable().optional(),
+  kotitalousvahennys_tyyppi: z.enum(["yritys", "palkka"]).nullable().optional(),
   takuu_vuotta: z.number().int().default(0),
   pts_siirto: z.number().int().min(0).max(50).default(0),
   linkita_kulut: z.boolean().default(true),
