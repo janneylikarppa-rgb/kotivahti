@@ -3,7 +3,8 @@ import { useServerFn } from "@tanstack/react-start";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useRef, useState } from "react";
 import { getTaloTiedot, saveTaloTiedot, addDokumentti, deleteDokumentti, getDokumenttiUrl } from "@/lib/kotivahti.functions";
-import { haeRyhtiTiedot } from "@/lib/ryhti.functions";
+import { haeRyhtiTiedot, haeRyhtiKoordinaateilla } from "@/lib/ryhti.functions";
+import { OsoiteAutocomplete } from "@/components/osoite-autocomplete";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -162,6 +163,7 @@ function TaloTiedotPage() {
   }, [data]);
 
   const ryhtiFn = useServerFn(haeRyhtiTiedot);
+  const ryhtiKoordFn = useServerFn(haeRyhtiKoordinaateilla);
   const [ryhtiInfo, setRyhtiInfo] = useState(false);
   const [ryhtiKentat, setRyhtiKentat] = useState<Set<string>>(new Set());
   const poistaRyhtiMerkki = (kentta: string) =>
@@ -380,8 +382,8 @@ function TaloTiedotPage() {
             <Field label="Osoite">
               <OsoiteAutocomplete
                 arvo={k.osoite ?? ""}
-                onChangeTeksti={(v) => setK({ ...k, osoite: v })}
-                onValitse={(val) => {
+                onChangeTeksti={(v: string) => setK({ ...k, osoite: v })}
+                onValitse={(val: { katuosoite: string; postinumero: string | null; kaupunki: string | null; lat: number; lon: number }) => {
                   setK((prev: any) => ({
                     ...prev,
                     osoite: val.katuosoite,
