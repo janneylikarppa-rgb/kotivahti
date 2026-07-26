@@ -209,7 +209,7 @@ function TaloTiedotPage() {
       if (!osoite) throw new Error("Syötä ensin osoite");
       return ryhtiFn({ data: { osoite, kaupunki: String(k.kaupunki ?? "").trim() || null } });
     },
-    onSuccess: kasitteleRyhtiTulos,
+    onSuccess: (res: any) => kasitteleRyhtiTulos(res),
     onError: (e: any) => toast.error(e?.message ?? "Haku epäonnistui"),
   });
 
