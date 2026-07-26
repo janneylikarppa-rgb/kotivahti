@@ -237,33 +237,31 @@ export type OsoiteEhdotus = {
 
 /** Osoite-ehdotukset kirjoittamisen aikana (Digitransit autocomplete, ei avainta) */
 export async function haeOsoiteEhdotukset(teksti: string): Promise<OsoiteEhdotus[]> {
-  const url =
-    "https://api.digitransit.fi/geocoding/v1/autocomplete" +
-    `?text=${encodeURIComponent(teksti.trim())}` +
-    "&size=10&layers=address&boundary.country=FIN";
-  const data = await fetchJson(url);
-  const features = Array.isArray(data?.features) ? data.features : [];
+  const data = await fetchJson(nominatimUrl(teksti.trim(), 20));
+  const osumat = Array.isArray(data) ? data : [];
   const nahdyt = new Set<string>();
   const tulos: OsoiteEhdotus[] = [];
-  for (const f of features) {
-    const pr = f?.properties ?? {};
-    const c = f?.geometry?.coordinates;
-    const lon = Number(Array.isArray(c) ? c[0] : NaN);
-    const lat = Number(Array.isArray(c) ? c[1] : NaN);
+  for (const o of osumat) {
+    const a = o?.address ?? {};
+    const lat = Number(o?.lat);
+    const lon = Number(o?.lon);
     if (!Number.isFinite(lat) || !Number.isFinite(lon)) continue;
-    const katuosoite = String(pr.name ?? pr.street ?? "").trim();
-    if (!katuosoite) continue;
-    const postinumero = pr.postalcode ? String(pr.postalcode).trim() : null;
+    const katu = String(a.road ?? a.pedestrian ?? a.residential ?? "").trim();
+    if (!katu) continue;
+    const numero = a.house_number ? String(a.house_number).trim() : "";
+    const katuosoite = [katu, numero].filter(Boolean).join(" ");
+    const postinumero = a.postcode ? String(a.postcode).trim() : null;
     const kaupunki =
-      (pr.localadmin && String(pr.localadmin).trim()) ||
-      (pr.locality && String(pr.locality).trim()) ||
-      (pr.county && String(pr.county).trim()) ||
+      (a.city && String(a.city).trim()) ||
+      (a.town && String(a.town).trim()) ||
+      (a.village && String(a.village).trim()) ||
+      (a.municipality && String(a.municipality).trim()) ||
       null;
     const avain = `${katuosoite.toLowerCase()}|${postinumero ?? ""}|${(kaupunki ?? "").toLowerCase()}`;
     if (nahdyt.has(avain)) continue;
     nahdyt.add(avain);
     tulos.push({
-      id: String(pr.gid ?? avain),
+      id: String(o?.place_id ?? avain),
       katuosoite,
       postinumero,
       kaupunki,
@@ -275,3 +273,4 @@ export async function haeOsoiteEhdotukset(teksti: string): Promise<OsoiteEhdotus
   }
   return tulos;
 }
+
