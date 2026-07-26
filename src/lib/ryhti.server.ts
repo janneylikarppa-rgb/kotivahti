@@ -218,3 +218,54 @@ export function mappaaRakennus(r: any): RyhtiTulos {
     lahde: "ryhti",
   };
 }
+
+export type OsoiteEhdotus = {
+  id: string;
+  katuosoite: string;
+  postinumero: string | null;
+  kaupunki: string | null;
+  lat: number;
+  lon: number;
+  label: string;
+};
+
+/** Osoite-ehdotukset kirjoittamisen aikana (Digitransit autocomplete, ei avainta) */
+export async function haeOsoiteEhdotukset(teksti: string): Promise<OsoiteEhdotus[]> {
+  const url =
+    "https://api.digitransit.fi/geocoding/v1/autocomplete" +
+    `?text=${encodeURIComponent(teksti.trim())}` +
+    "&size=10&layers=address&boundary.country=FIN";
+  const data = await fetchJson(url);
+  const features = Array.isArray(data?.features) ? data.features : [];
+  const nahdyt = new Set<string>();
+  const tulos: OsoiteEhdotus[] = [];
+  for (const f of features) {
+    const pr = f?.properties ?? {};
+    const c = f?.geometry?.coordinates;
+    const lon = Number(Array.isArray(c) ? c[0] : NaN);
+    const lat = Number(Array.isArray(c) ? c[1] : NaN);
+    if (!Number.isFinite(lat) || !Number.isFinite(lon)) continue;
+    const katuosoite = String(pr.name ?? pr.street ?? "").trim();
+    if (!katuosoite) continue;
+    const postinumero = pr.postalcode ? String(pr.postalcode).trim() : null;
+    const kaupunki =
+      (pr.localadmin && String(pr.localadmin).trim()) ||
+      (pr.locality && String(pr.locality).trim()) ||
+      (pr.county && String(pr.county).trim()) ||
+      null;
+    const avain = `${katuosoite.toLowerCase()}|${postinumero ?? ""}|${(kaupunki ?? "").toLowerCase()}`;
+    if (nahdyt.has(avain)) continue;
+    nahdyt.add(avain);
+    tulos.push({
+      id: String(pr.gid ?? avain),
+      katuosoite,
+      postinumero,
+      kaupunki,
+      lat,
+      lon,
+      label: [katuosoite, [postinumero, kaupunki].filter(Boolean).join(" ")].filter(Boolean).join(", "),
+    });
+    if (tulos.length >= 7) break;
+  }
+  return tulos;
+}
