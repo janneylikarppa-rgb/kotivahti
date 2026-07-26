@@ -4,7 +4,8 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { Check, ChevronDown, Home, Plus, Loader2, Search } from "lucide-react";
 import { toast } from "sonner";
-import { haeRyhtiTiedot } from "@/lib/ryhti.functions";
+import { haeRyhtiTiedot, haeRyhtiKoordinaateilla } from "@/lib/ryhti.functions";
+import { OsoiteAutocomplete } from "@/components/osoite-autocomplete";
 
 import {
   DropdownMenu,
@@ -53,6 +54,7 @@ export function PropertySwitcher() {
   const [ryhtiTiedot, setRyhtiTiedot] = useState<any>(null);
   const [ryhtiInfo, setRyhtiInfo] = useState(false);
   const ryhtiFn = useServerFn(haeRyhtiTiedot);
+  const ryhtiKoordFn = useServerFn(haeRyhtiKoordinaateilla);
 
   const ryhtiHaku = useMutation({
     mutationFn: async () =>
@@ -64,6 +66,19 @@ export function PropertySwitcher() {
         } else {
           toast.error("Rakennusta ei löydy tällä osoitteella. Voit täyttää tiedot käsin.");
         }
+        return;
+      }
+      setRyhtiTiedot(res.tiedot);
+      toast.success("✓ Talon tiedot haettu Ryhti-rajapinnasta.");
+    },
+    onError: (e: any) => toast.error(e?.message ?? "Haku epäonnistui"),
+  });
+
+  const ryhtiKoordinaattiHaku = useMutation({
+    mutationFn: (v: { lat: number; lon: number }) => ryhtiKoordFn({ data: v }),
+    onSuccess: (res: any) => {
+      if (!res?.ok) {
+        toast.info("Osoite valittu. Talon virallisia tietoja ei löytynyt – täytä loput käsin.");
         return;
       }
       setRyhtiTiedot(res.tiedot);
@@ -214,12 +229,18 @@ export function PropertySwitcher() {
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1.5">
                 <Label htmlFor="ks-osoite">Osoite</Label>
-                <Input
+                <OsoiteAutocomplete
                   id="ks-osoite"
-                  value={osoite}
-                  onChange={(e) => {
-                    setOsoite(e.target.value);
+                  arvo={osoite}
+                  onChangeTeksti={(v: string) => {
+                    setOsoite(v);
                     setRyhtiTiedot(null);
+                  }}
+                  onValitse={(val: { katuosoite: string; postinumero: string | null; kaupunki: string | null; lat: number; lon: number }) => {
+                    setOsoite(val.katuosoite);
+                    if (val.kaupunki) setKaupunki(val.kaupunki);
+                    setRyhtiTiedot(null);
+                    ryhtiKoordinaattiHaku.mutate({ lat: val.lat, lon: val.lon });
                   }}
                 />
               </div>
@@ -240,18 +261,18 @@ export function PropertySwitcher() {
               <Button
                 type="button"
                 variant="outline"
-                disabled={!osoite.trim() || ryhtiHaku.isPending}
+                disabled={!osoite.trim() || ryhtiHaku.isPending || ryhtiKoordinaattiHaku.isPending}
                 onClick={() => ryhtiHaku.mutate()}
                 className="w-full justify-center gap-2 border-2 border-dashed border-teal-500/60 bg-teal-500/5 text-teal-600 hover:bg-teal-500/10"
               >
-                {ryhtiHaku.isPending ? (
+                {ryhtiHaku.isPending || ryhtiKoordinaattiHaku.isPending ? (
                   <><Loader2 className="h-4 w-4 animate-spin" /> Haetaan tietoja...</>
                 ) : (
                   <><Search className="h-4 w-4" /> Hae talon tiedot Ryhti-rajapinnasta</>
                 )}
               </Button>
               <p className="text-xs text-muted-foreground">
-                Täyttää kodin viralliset perustiedot automaattisesti.{" "}
+                Kirjoita osoite ja valitse listasta oikea paikkakunta – tai hae napista.{" "}
                 <button
                   type="button"
                   onClick={() => setRyhtiInfo((v) => !v)}

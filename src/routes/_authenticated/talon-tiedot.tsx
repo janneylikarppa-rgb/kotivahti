@@ -3,7 +3,8 @@ import { useServerFn } from "@tanstack/react-start";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useRef, useState } from "react";
 import { getTaloTiedot, saveTaloTiedot, addDokumentti, deleteDokumentti, getDokumenttiUrl } from "@/lib/kotivahti.functions";
-import { haeRyhtiTiedot } from "@/lib/ryhti.functions";
+import { haeRyhtiTiedot, haeRyhtiKoordinaateilla } from "@/lib/ryhti.functions";
+import { OsoiteAutocomplete } from "@/components/osoite-autocomplete";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -162,6 +163,7 @@ function TaloTiedotPage() {
   }, [data]);
 
   const ryhtiFn = useServerFn(haeRyhtiTiedot);
+  const ryhtiKoordFn = useServerFn(haeRyhtiKoordinaateilla);
   const [ryhtiInfo, setRyhtiInfo] = useState(false);
   const [ryhtiKentat, setRyhtiKentat] = useState<Set<string>>(new Set());
   const poistaRyhtiMerkki = (kentta: string) =>
@@ -172,40 +174,51 @@ function TaloTiedotPage() {
       return seuraava;
     });
 
+  const kasitteleRyhtiTulos = (res: any, pehmea = false) => {
+    if (!res?.ok) {
+      if (pehmea) {
+        toast.info("Osoite valittu. Talon virallisia tietoja ei löytynyt – täytä loput käsin.");
+      } else if (res?.koodi === "TIMEOUT" || res?.koodi === "UPSTREAM_ERROR") {
+        toast.error("Ryhti-palvelu ei vastaa juuri nyt. Yritä hetken kuluttua uudelleen tai täytä tiedot käsin.");
+      } else {
+        toast.error("Rakennusta ei löydy tällä osoitteella. Voit täyttää tiedot käsin.");
+      }
+      return;
+    }
+    const r = res.tiedot;
+    const taytetyt = new Set<string>();
+    if (r.rakennusvuosi != null) {
+      setK((prev: any) => ({ ...prev, rakennusvuosi: r.rakennusvuosi }));
+      taytetyt.add("rakennusvuosi");
+    }
+    setT((prev: any) => {
+      const seuraava = { ...prev };
+      if (r.pinta_ala != null) { seuraava.pinta_ala = r.pinta_ala; taytetyt.add("pinta_ala"); }
+      if (r.kerroksia != null) { seuraava.kerroksia = r.kerroksia; taytetyt.add("kerroksia"); }
+      if (r.lammitysmuoto) { seuraava.lammitysmuoto = r.lammitysmuoto; taytetyt.add("lammitysmuoto"); }
+      if (r.julkisivumateriaali) { seuraava.julkisivumateriaali = r.julkisivumateriaali; taytetyt.add("julkisivumateriaali"); }
+      return seuraava;
+    });
+    setRyhtiKentat(taytetyt);
+    toast.success("✓ Talon tiedot haettu Ryhti-rajapinnasta. Tarkista ja täydennä tarvittaessa.");
+  };
+
   const ryhtiHaku = useMutation({
     mutationFn: async () => {
       const osoite = String(k.osoite ?? "").trim();
       if (!osoite) throw new Error("Syötä ensin osoite");
       return ryhtiFn({ data: { osoite, kaupunki: String(k.kaupunki ?? "").trim() || null } });
     },
-    onSuccess: (res: any) => {
-      if (!res?.ok) {
-        if (res?.koodi === "TIMEOUT" || res?.koodi === "UPSTREAM_ERROR") {
-          toast.error("Ryhti-palvelu ei vastaa juuri nyt. Yritä hetken kuluttua uudelleen tai täytä tiedot käsin.");
-        } else {
-          toast.error("Rakennusta ei löydy tällä osoitteella. Voit täyttää tiedot käsin.");
-        }
-        return;
-      }
-      const r = res.tiedot;
-      const taytetyt = new Set<string>();
-      if (r.rakennusvuosi != null) {
-        setK((prev: any) => ({ ...prev, rakennusvuosi: r.rakennusvuosi }));
-        taytetyt.add("rakennusvuosi");
-      }
-      setT((prev: any) => {
-        const seuraava = { ...prev };
-        if (r.pinta_ala != null) { seuraava.pinta_ala = r.pinta_ala; taytetyt.add("pinta_ala"); }
-        if (r.kerroksia != null) { seuraava.kerroksia = r.kerroksia; taytetyt.add("kerroksia"); }
-        if (r.lammitysmuoto) { seuraava.lammitysmuoto = r.lammitysmuoto; taytetyt.add("lammitysmuoto"); }
-        if (r.julkisivumateriaali) { seuraava.julkisivumateriaali = r.julkisivumateriaali; taytetyt.add("julkisivumateriaali"); }
-        return seuraava;
-      });
-      setRyhtiKentat(taytetyt);
-      toast.success("✓ Talon tiedot haettu Ryhti-rajapinnasta. Tarkista ja täydennä tarvittaessa.");
-    },
+    onSuccess: (res: any) => kasitteleRyhtiTulos(res),
     onError: (e: any) => toast.error(e?.message ?? "Haku epäonnistui"),
   });
+
+  const ryhtiKoordinaattiHaku = useMutation({
+    mutationFn: (v: { lat: number; lon: number }) => ryhtiKoordFn({ data: v }),
+    onSuccess: (res: any) => kasitteleRyhtiTulos(res, true),
+    onError: (e: any) => toast.error(e?.message ?? "Haku epäonnistui"),
+  });
+
 
   const laite = t.lammitysmuoto ? MERKIT[t.lammitysmuoto] : undefined;
 
@@ -368,7 +381,25 @@ function TaloTiedotPage() {
             <p className="text-xs text-muted-foreground">Aloitetaan perusteista. Näiden tietojen perusteella rakennamme henkilökohtaisen huoltosuunnitelman.</p>
 
             <p className="eyebrow text-primary pt-2">Sijainti</p>
-            <Field label="Osoite"><Input value={k.osoite ?? ""} onChange={(e) => setK({ ...k, osoite: e.target.value })} /></Field>
+            <Field label="Osoite">
+              <OsoiteAutocomplete
+                arvo={k.osoite ?? ""}
+                onChangeTeksti={(v: string) => setK({ ...k, osoite: v })}
+                onValitse={(val: { katuosoite: string; postinumero: string | null; kaupunki: string | null; lat: number; lon: number }) => {
+                  setK((prev: any) => ({
+                    ...prev,
+                    osoite: val.katuosoite,
+                    postinumero: val.postinumero ?? prev.postinumero,
+                    kaupunki: val.kaupunki ?? prev.kaupunki,
+                  }));
+                  ryhtiKoordinaattiHaku.mutate({ lat: val.lat, lon: val.lon });
+                }}
+              />
+            </Field>
+            <p className="text-xs text-muted-foreground">
+              Kirjoita osoite ja valitse listasta oikea paikkakunta – haemme talon tiedot automaattisesti.
+            </p>
+
 
             <div className="space-y-1.5">
               <Button

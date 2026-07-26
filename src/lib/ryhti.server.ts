@@ -33,7 +33,10 @@ export async function fetchJson(url: string): Promise<any> {
   try {
     const res = await fetch(url, {
       signal: controller.signal,
-      headers: { Accept: "application/json" },
+      headers: {
+        Accept: "application/json",
+        "User-Agent": "Kotivahti/1.0 (kiinteistonhuoltopalvelu)",
+      },
     });
     if (!res.ok) {
       throw new RyhtiError("UPSTREAM_ERROR", `HTTP ${res.status} (${url})`);
@@ -48,24 +51,27 @@ export async function fetchJson(url: string): Promise<any> {
   }
 }
 
-/** Vaihe 1: osoite → koordinaatit (Digitransit Geocoding, ei avainta) */
+function nominatimUrl(teksti: string, limit: number) {
+  return (
+    "https://nominatim.openstreetmap.org/search" +
+    `?q=${encodeURIComponent(teksti)}` +
+    `&countrycodes=fi&format=jsonv2&addressdetails=1&limit=${limit}`
+  );
+}
+
+/** Vaihe 1: osoite → koordinaatit (OSM Nominatim, ei avainta) */
 export async function geokoodaa(osoite: string, kaupunki?: string | null) {
   const teksti = [osoite.trim(), kaupunki?.trim()].filter(Boolean).join(", ");
-  const url =
-    "https://api.digitransit.fi/geocoding/v1/search" +
-    `?text=${encodeURIComponent(teksti)}` +
-    "&size=1&layers=address&boundary.country=FIN";
-  const data = await fetchJson(url);
-  const coords = data?.features?.[0]?.geometry?.coordinates;
-  if (!Array.isArray(coords) || coords.length < 2) {
-    throw new RyhtiError("NO_ADDRESS");
-  }
-  const [lon, lat] = coords.map(Number);
+  const data = await fetchJson(nominatimUrl(teksti, 1));
+  const ensimmainen = Array.isArray(data) ? data[0] : null;
+  const lat = Number(ensimmainen?.lat);
+  const lon = Number(ensimmainen?.lon);
   if (!Number.isFinite(lat) || !Number.isFinite(lon)) {
     throw new RyhtiError("NO_ADDRESS");
   }
   return { lat, lon };
 }
+
 
 /** Vaihe 2: koordinaatit → rakennukset (Ryhti) */
 export async function haeRakennukset(lat: number, lon: number) {
@@ -218,3 +224,53 @@ export function mappaaRakennus(r: any): RyhtiTulos {
     lahde: "ryhti",
   };
 }
+
+export type OsoiteEhdotus = {
+  id: string;
+  katuosoite: string;
+  postinumero: string | null;
+  kaupunki: string | null;
+  lat: number;
+  lon: number;
+  label: string;
+};
+
+/** Osoite-ehdotukset kirjoittamisen aikana (Digitransit autocomplete, ei avainta) */
+export async function haeOsoiteEhdotukset(teksti: string): Promise<OsoiteEhdotus[]> {
+  const data = await fetchJson(nominatimUrl(teksti.trim(), 20));
+  const osumat = Array.isArray(data) ? data : [];
+  const nahdyt = new Set<string>();
+  const tulos: OsoiteEhdotus[] = [];
+  for (const o of osumat) {
+    const a = o?.address ?? {};
+    const lat = Number(o?.lat);
+    const lon = Number(o?.lon);
+    if (!Number.isFinite(lat) || !Number.isFinite(lon)) continue;
+    const katu = String(a.road ?? a.pedestrian ?? a.residential ?? "").trim();
+    if (!katu) continue;
+    const numero = a.house_number ? String(a.house_number).trim() : "";
+    const katuosoite = [katu, numero].filter(Boolean).join(" ");
+    const postinumero = a.postcode ? String(a.postcode).trim() : null;
+    const kaupunki =
+      (a.city && String(a.city).trim()) ||
+      (a.town && String(a.town).trim()) ||
+      (a.village && String(a.village).trim()) ||
+      (a.municipality && String(a.municipality).trim()) ||
+      null;
+    const avain = `${katuosoite.toLowerCase()}|${postinumero ?? ""}|${(kaupunki ?? "").toLowerCase()}`;
+    if (nahdyt.has(avain)) continue;
+    nahdyt.add(avain);
+    tulos.push({
+      id: String(o?.place_id ?? avain),
+      katuosoite,
+      postinumero,
+      kaupunki,
+      lat,
+      lon,
+      label: [katuosoite, [postinumero, kaupunki].filter(Boolean).join(" ")].filter(Boolean).join(", "),
+    });
+    if (tulos.length >= 7) break;
+  }
+  return tulos;
+}
+
