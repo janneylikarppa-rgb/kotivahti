@@ -368,7 +368,25 @@ function TaloTiedotPage() {
             <p className="text-xs text-muted-foreground">Aloitetaan perusteista. Näiden tietojen perusteella rakennamme henkilökohtaisen huoltosuunnitelman.</p>
 
             <p className="eyebrow text-primary pt-2">Sijainti</p>
-            <Field label="Osoite"><Input value={k.osoite ?? ""} onChange={(e) => setK({ ...k, osoite: e.target.value })} /></Field>
+            <Field label="Osoite">
+              <OsoiteAutocomplete
+                arvo={k.osoite ?? ""}
+                onChangeTeksti={(v) => setK({ ...k, osoite: v })}
+                onValitse={(val) => {
+                  setK((prev: any) => ({
+                    ...prev,
+                    osoite: val.katuosoite,
+                    postinumero: val.postinumero ?? prev.postinumero,
+                    kaupunki: val.kaupunki ?? prev.kaupunki,
+                  }));
+                  ryhtiKoordinaattiHaku.mutate({ lat: val.lat, lon: val.lon });
+                }}
+              />
+            </Field>
+            <p className="text-xs text-muted-foreground">
+              Kirjoita osoite ja valitse listasta oikea paikkakunta – haemme talon tiedot automaattisesti.
+            </p>
+
 
             <div className="space-y-1.5">
               <Button
