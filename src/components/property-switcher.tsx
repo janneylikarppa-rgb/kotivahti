@@ -78,11 +78,7 @@ export function PropertySwitcher() {
     mutationFn: (v: { lat: number; lon: number }) => ryhtiKoordFn({ data: v }),
     onSuccess: (res: any) => {
       if (!res?.ok) {
-        if (res?.koodi === "TIMEOUT" || res?.koodi === "UPSTREAM_ERROR") {
-          toast.error("Ryhti-palvelu ei vastaa juuri nyt. Yritä hetken kuluttua uudelleen tai täytä tiedot käsin.");
-        } else {
-          toast.error("Rakennusta ei löydy tällä osoitteella. Voit täyttää tiedot käsin.");
-        }
+        toast.info("Osoite valittu. Talon virallisia tietoja ei löytynyt – täytä loput käsin.");
         return;
       }
       setRyhtiTiedot(res.tiedot);

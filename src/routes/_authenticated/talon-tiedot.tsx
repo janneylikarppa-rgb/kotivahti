@@ -174,9 +174,11 @@ function TaloTiedotPage() {
       return seuraava;
     });
 
-  const kasitteleRyhtiTulos = (res: any) => {
+  const kasitteleRyhtiTulos = (res: any, pehmea = false) => {
     if (!res?.ok) {
-      if (res?.koodi === "TIMEOUT" || res?.koodi === "UPSTREAM_ERROR") {
+      if (pehmea) {
+        toast.info("Osoite valittu. Talon virallisia tietoja ei löytynyt – täytä loput käsin.");
+      } else if (res?.koodi === "TIMEOUT" || res?.koodi === "UPSTREAM_ERROR") {
         toast.error("Ryhti-palvelu ei vastaa juuri nyt. Yritä hetken kuluttua uudelleen tai täytä tiedot käsin.");
       } else {
         toast.error("Rakennusta ei löydy tällä osoitteella. Voit täyttää tiedot käsin.");
@@ -213,7 +215,7 @@ function TaloTiedotPage() {
 
   const ryhtiKoordinaattiHaku = useMutation({
     mutationFn: (v: { lat: number; lon: number }) => ryhtiKoordFn({ data: v }),
-    onSuccess: kasitteleRyhtiTulos,
+    onSuccess: (res: any) => kasitteleRyhtiTulos(res, true),
     onError: (e: any) => toast.error(e?.message ?? "Haku epäonnistui"),
   });
 
