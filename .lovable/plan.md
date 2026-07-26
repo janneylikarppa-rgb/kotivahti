@@ -1,57 +1,42 @@
 ## Tavoite
 
-Seurata kotitalousvähennystä huoltokirjausten pohjalta: työn osuus talteen kirjattaessa, oma sivu laskelmalle, muistutus etusivulla ja merkintä huoltohistorialistassa.
+Osoitekenttään kirjoittaessa haetaan automaattisesti osoite-ehdotuksia ja näytetään lista, jossa jokainen rivi kertoo kaupungin/postinumeron. Käyttäjä valitsee klikkaamalla oikean paikkakunnan → Ryhti-tiedot haetaan heti kyseisen osoitteen koordinaateilla. Jos ehdotuksia ei löydy, käyttäjä voi jatkaa käsin kuten nyt.
 
-## 1. Tietokanta (migraatio)
+## Miten se toimii käyttäjälle
 
-`huolto_historia`-tauluun kaksi uutta saraketta:
-- `tyon_osuus` numeric, nullable
-- `kotitalousvahennys_tyyppi` text, nullable (sallitut arvot `yritys` / `palkka` / tyhjä)
+1. Käyttäjä kirjoittaa osoitteen (esim. "Kirkkokatu 5").
+2. ~400 ms kirjoittamisen tauon jälkeen kentän alle avautuu 5–7 ehdotusta muodossa: **Kirkkokatu 5** · 90100 Oulu / 33200 Tampere jne.
+3. Klikkaus valitsee rivin: osoite, postinumero ja kaupunki täyttyvät automaattisesti, ja Ryhti-haku käynnistyy samalla klikkauksella (spinner listan tilalla → "✓ Ryhti: rakennusvuosi 1987 · 142 m² …").
+4. Jos haku ei tuota osumia tai palvelu ei vastaa: pieni harmaa teksti "Ei ehdotuksia – täytä tiedot käsin" ja kentät toimivat normaalisti. Nykyinen "Hae talon tiedot Ryhti-rajapinnasta" -painike jää käytettäväksi varmistuksena.
+5. Sama toiminto sekä **Talon tiedot** -sivulla että **Lisää kiinteistö** -dialogissa.
 
-Olemassa olevat käyttöoikeudet ja tietoturvasäännöt riittävät (rivit ovat jo kiinteistön omistajan takana).
+## Tekninen toteutus
 
-## 2. Verovakiot
+**1. `src/lib/ryhti.server.ts`**
+- Uusi `haeOsoite-ehdotukset(teksti)`: Digitransit `/geocoding/v1/autocomplete?text=…&size=7&layers=address&boundary.country=FIN`.
+- Palauttaa normalisoidun listan: `{ id, katuosoite, postinumero, kaupunki, lat, lon, label }` (properties: `name`, `postalcode`, `localadmin`/`locality`, coordinates).
+- Duplikaattien suodatus katuosoite+postinumero -avaimella.
+- Uusi `mappaaRakennusKoordinaateista(lat, lon)`-käyttö: nykyinen `haeRakennukset` + `valitseLahin` + `mappaaRakennus` uudelleenkäytetään sellaisenaan.
 
-Uusi tiedosto `src/lib/kotitalousvahennys.ts`:
-- `VAHENNYS_YRITYS = 0.35`, `VAHENNYS_PALKKA = 0.13`
-- `OMAVASTUU = 150` (€/henkilö/vuosi), `ENIMMAISMAARA = 1600` (€/henkilö/vuosi)
-- `LAHDE = "vero.fi 2025–2026"`
-- Laskentafunktio `laskeVahennys(kirjaukset, henkiloita)`:
-  - yritystyö: `max(0, summa(tyon_osuus) − 150 × henkilöä) × 0,35`
-  - palkkatyö: `summa(tyon_osuus) × 0,13`
-  - yhteissumma katkaistaan katolla `1600 × henkilöä`
-  - palauttaa myös erittelyn (yritys/palkka), katon ja täyttöasteen
-- Yksikkötestit laskennalle.
+**2. `src/lib/ryhti.functions.ts`**
+- `haeOsoiteEhdotukset` (POST, `z.object({ teksti: z.string().trim().min(3) })`) → `{ ok: true, ehdotukset: [...] }` tai `{ ok: false, koodi }`. Timeout-/virhekoodit samalla logiikalla kuin nyt.
+- `haeRyhtiKoordinaateilla` (POST, `{ lat, lon }`) → sama palautusmuoto kuin `haeRyhtiTiedot` (`ok`, `tiedot`, `koodi`), mutta ohittaa geokoodauksen koska koordinaatit tulevat valitusta ehdotuksesta.
+- `haeRyhtiTiedot` jää ennalleen (nappi + taaksepäinyhteensopivuus).
 
-## 3. Huoltokirjauslomake (`src/components/huolto-form.tsx`)
+**3. Uusi komponentti `src/components/osoite-autocomplete.tsx`**
+- Props: `arvo`, `onChangeTeksti`, `onValitse({ katuosoite, postinumero, kaupunki, lat, lon })`, `disabled`.
+- Debounce 400 ms, minimipituus 3 merkkiä, `useQuery` (`queryKey: ["osoite-ehdotukset", teksti]`, `staleTime: 5 min`) + `enabled`-ehto.
+- Lista renderöidään `Input`-kentän alle absoluuttisesti sijoitettuna paneelina (`gold-card`-tyyli, rounded-xl, max-h + scroll). Näppäimistötuki: ↑/↓, Enter valitsee, Esc sulkee; blur sulkee pienellä viiveellä.
+- Ei näytetä listaa, jos käyttäjä on juuri valinnut rivin tai kenttä on tyhjä.
 
-Kustannuskentän viereen:
-- Radiovalinta: Ei vähennykseen / Vähennyskelpoinen (yritykseltä ostettu työ) / Vähennyskelpoinen (palkattu työntekijä)
-- Jos vähennyskelpoinen: "Työn osuus (sis. alv)" €-kenttä + ohjeteksti materiaalien rajaamisesta
-- Kentät mukaan tallennus- ja muokkauslogiikkaan (`addHuolto` / `updateHuolto` skeemat `src/lib/kotivahti.functions.ts`)
+**4. `src/routes/_authenticated/talon-tiedot.tsx`**
+- Osoite-`Input` korvataan `OsoiteAutocomplete`-komponentilla.
+- `onValitse`: `setK({ ...k, osoite, postinumero, kaupunki })` ja käynnistää `ryhtiKoordinaattiHaku`-mutaation, joka täyttää rakennusvuoden, pinta-alan, kerrokset, lämmitysmuodon ja julkisivun sekä asettaa `ryhtiKentat`-merkinnät (sama `onSuccess`-logiikka kuin nykyisessä `ryhtiHaku`ssa → siirretään yhteiseen apufunktioon, ei kopioida).
 
-## 4. Uusi sivu `/kotitalousvahennys`
+**5. `src/components/property-switcher.tsx`**
+- Osoitekenttä samaan `OsoiteAutocomplete`-komponenttiin; valinta täyttää `osoite` + `kaupunki` ja hakee `ryhtiTiedot` koordinaateilla (`lisaaMut` käyttää niitä jo).
 
-Reitti `src/routes/_authenticated/kotitalousvahennys.tsx`, oma head-metadata. Sivupalkkiin Receipt-ikoni ja teksti "Kotitalousvähennys" Kulut-linkin jälkeen.
+## Rajoitteet
 
-Sisältö ylhäältä alas:
-1. Kontrollit: vuosivalitsin (oletus kuluva vuosi) + 1/2 henkilöä -valinta
-2. Verovähennyskortti: "Arvioitu verovähennys", summa isolla, selite henkilömäärän mukaan
-3. Yksi edistymispalkki: X € / 1 600 € (tai 3 200 €), väri teal → oranssi (80 %) → harmaa (100 %)
-4. Avattava "Miten vähennys lasketaan?" -osio esimerkkilaskelmineen
-5. Tapahtumalista "Vähennyskelpoiset toimenpiteet", uusin ensin; tyhjänä ohjeteksti + "Lisää toimenpide" -nappi huoltohistoriaan
-6. Vastuuvapauslauseke alareunassa
-
-Data: uusi palvelinfunktio `getKotitalousvahennys` (vuosi parametrina) hakee valitun kiinteistön huoltokirjaukset, joissa `kotitalousvahennys_tyyppi` on asetettu.
-
-## 5. Dashboard-kortti
-
-Pieni kortti näkyy vain kun kuluvalta vuodelta löytyy vähintään yksi vähennyskelpoinen kirjaus: "💰 Kotitalousvähennys [vuosi]", "Käytetty: X € / 1 600 €", linkki sivulle.
-
-## 6. Huoltohistorialistaus
-
-Rivin perään pieni "ktv"-merkintä kun `kotitalousvahennys_tyyppi` ei ole tyhjä, ja kustannuksen perään työn osuus muodossa `450 € (työ 350 €)`.
-
-## Tekninen huomio
-
-Palkatun työntekijän kohdalla "työnantajan sivukulut" lisätään laskentaan siten, että ne sisällytetään ilmoitettuun työn osuuteen (kenttä ohjeistetaan: palkka + sivukulut). Erillistä sivukulukenttää ei lisätä, ellei toivot sitä.
+- Ehdotukset tulevat Digitransit-geokoodauksesta (kattaa Suomen osoitteet, ei vaadi API-avainta); Ryhti-rakennustiedot haetaan vasta valinnan jälkeen. Jos Ryhti ei tunne rakennusta valitussa pisteessä, näytetään nykyinen viesti "Rakennusta ei löydy tällä osoitteella. Voit täyttää tiedot käsin." eikä kenttiä ylikirjoiteta.
+- Käsin kirjoittaminen ei koskaan esty: lista on pelkkä apu, ei pakollinen vaihe.
