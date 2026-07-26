@@ -45,3 +45,45 @@ export const haeRyhtiTiedot = createServerFn({ method: "POST" })
       return { ok: false as const, koodi: "UPSTREAM_ERROR" as const };
     }
   });
+
+const ehdotusSyote = z.object({ teksti: z.string().trim().min(3) });
+
+export const haeOsoiteEhdotukset = createServerFn({ method: "POST" })
+  .inputValidator((data: unknown) => ehdotusSyote.parse(data))
+  .handler(async ({ data }) => {
+    const { RyhtiError, haeOsoiteEhdotukset: hae } = await import("./ryhti.server");
+    try {
+      return { ok: true as const, ehdotukset: await hae(data.teksti) };
+    } catch (e: any) {
+      if (e instanceof RyhtiError) return { ok: false as const, koodi: e.koodi };
+      return { ok: false as const, koodi: "UPSTREAM_ERROR" as const };
+    }
+  });
+
+const koordinaattiSyote = z.object({
+  lat: z.number().finite(),
+  lon: z.number().finite(),
+});
+
+export const haeRyhtiKoordinaateilla = createServerFn({ method: "POST" })
+  .inputValidator((data: unknown) => koordinaattiSyote.parse(data))
+  .handler(async ({ data }) => {
+    const { RyhtiError, haeRakennukset, valitseLahin, mappaaRakennus } = await import("./ryhti.server");
+    try {
+      const rakennukset = await haeRakennukset(data.lat, data.lon);
+      const rakennus = valitseLahin(rakennukset, data.lat, data.lon);
+      if (!rakennus) return { ok: false as const, koodi: "NO_BUILDING" as const };
+      const tulos = mappaaRakennus(rakennus);
+      const onkoDataa =
+        tulos.rakennusvuosi != null ||
+        tulos.pinta_ala != null ||
+        tulos.kerroksia != null ||
+        tulos.lammitysmuoto != null ||
+        tulos.julkisivumateriaali != null;
+      if (!onkoDataa) return { ok: false as const, koodi: "NO_BUILDING" as const };
+      return { ok: true as const, tiedot: tulos };
+    } catch (e: any) {
+      if (e instanceof RyhtiError) return { ok: false as const, koodi: e.koodi };
+      return { ok: false as const, koodi: "UPSTREAM_ERROR" as const };
+    }
+  });
