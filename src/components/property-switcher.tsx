@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useRouter } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { Check, ChevronDown, Home, Plus, Loader2, Search } from "lucide-react";
+import { Check, ChevronDown, Home, Plus, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { haeRyhtiTiedot, haeRyhtiKoordinaateilla } from "@/lib/ryhti.functions";
 import { OsoiteAutocomplete } from "@/components/osoite-autocomplete";
@@ -53,7 +53,7 @@ export function PropertySwitcher() {
   const [kaupunki, setKaupunki] = useState("");
   const [postinumero, setPostinumero] = useState("");
   const [ryhtiTiedot, setRyhtiTiedot] = useState<any>(null);
-  const [ryhtiInfo, setRyhtiInfo] = useState(false);
+  
   const ryhtiFn = useServerFn(haeRyhtiTiedot);
   const ryhtiKoordFn = useServerFn(haeRyhtiKoordinaateilla);
 
