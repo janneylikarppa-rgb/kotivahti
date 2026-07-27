@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useRouter } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { Check, ChevronDown, Home, Plus, Loader2, Search } from "lucide-react";
+import { Check, ChevronDown, Home, Plus, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { haeRyhtiTiedot, haeRyhtiKoordinaateilla } from "@/lib/ryhti.functions";
 import { OsoiteAutocomplete } from "@/components/osoite-autocomplete";
@@ -53,7 +53,7 @@ export function PropertySwitcher() {
   const [kaupunki, setKaupunki] = useState("");
   const [postinumero, setPostinumero] = useState("");
   const [ryhtiTiedot, setRyhtiTiedot] = useState<any>(null);
-  const [ryhtiInfo, setRyhtiInfo] = useState(false);
+  
   const ryhtiFn = useServerFn(haeRyhtiTiedot);
   const ryhtiKoordFn = useServerFn(haeRyhtiKoordinaateilla);
 
@@ -197,7 +197,7 @@ export function PropertySwitcher() {
       </DropdownMenu>
 
       <Dialog open={openDialog} onOpenChange={setOpenDialog}>
-        <DialogContent>
+        <DialogContent className="max-h-[85vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Lisää kiinteistö</DialogTitle>
             <DialogDescription>
@@ -272,97 +272,16 @@ export function PropertySwitcher() {
               />
             </div>
 
-            <div className="space-y-1.5">
-              <Button
-                type="button"
-                variant="outline"
-                disabled={!osoite.trim() || ryhtiHaku.isPending || ryhtiKoordinaattiHaku.isPending}
-                onClick={() => ryhtiHaku.mutate()}
-                className="w-full justify-center gap-2 border-2 border-dashed border-teal-500/60 bg-teal-500/5 text-teal-600 hover:bg-teal-500/10"
-              >
-                {ryhtiHaku.isPending || ryhtiKoordinaattiHaku.isPending ? (
-                  <><Loader2 className="h-4 w-4 animate-spin" /> Haetaan tietoja...</>
-                ) : (
-                  <><Search className="h-4 w-4" /> Hae talon tiedot Ryhti-rajapinnasta</>
-                )}
-              </Button>
-              <p className="text-xs text-muted-foreground">
-                Kirjoita osoite ja valitse listasta oikea paikkakunta – tai hae napista.{" "}
-                <button
-                  type="button"
-                  onClick={() => setRyhtiInfo((v) => !v)}
-                  className="underline underline-offset-2"
-                >
-                  Mikä Ryhti?
-                </button>
+            {(ryhtiHaku.isPending || ryhtiKoordinaattiHaku.isPending) && (
+              <p className="flex items-center gap-2 text-xs text-muted-foreground">
+                <Loader2 className="h-3.5 w-3.5 animate-spin" /> Haetaan talon tietoja…
               </p>
-              {ryhtiInfo && (
-                <p className="rounded-md border border-border bg-muted/40 p-3 text-xs text-muted-foreground">
-                  Ryhti on ympäristöministeriön rakennetun ympäristön tietojärjestelmä, johon kunnat
-                  toimittavat rakennusten viralliset tiedot. Haemme osoitteesi perusteella lähimmän
-                  asuinrakennuksen perustiedot — voit muokata niitä vapaasti jälkikäteen.
-                </p>
-              )}
-              {ryhtiTiedot && ryhtiYhteenveto && (
-                <p className="text-xs font-medium text-emerald-600">✓ Ryhti: {ryhtiYhteenveto}</p>
-              )}
-            </div>
-
-            <div className="grid grid-cols-2 gap-3">
-              <div className="space-y-1.5">
-                <Label htmlFor="ks-vuosi">Rakennusvuosi</Label>
-                <Input
-                  id="ks-vuosi"
-                  inputMode="numeric"
-                  value={ryhtiTiedot?.rakennusvuosi ?? ""}
-                  onChange={(e) =>
-                    setRyhtiTiedot((p: any) => ({ ...(p ?? {}), rakennusvuosi: e.target.value ? Number(e.target.value) : null }))
-                  }
-                />
-              </div>
-              <div className="space-y-1.5">
-                <Label htmlFor="ks-pinta">Pinta-ala (m²)</Label>
-                <Input
-                  id="ks-pinta"
-                  inputMode="decimal"
-                  value={ryhtiTiedot?.pinta_ala ?? ""}
-                  onChange={(e) =>
-                    setRyhtiTiedot((p: any) => ({ ...(p ?? {}), pinta_ala: e.target.value ? Number(e.target.value) : null }))
-                  }
-                />
-              </div>
-              <div className="space-y-1.5">
-                <Label htmlFor="ks-krs">Kerroksia</Label>
-                <Input
-                  id="ks-krs"
-                  inputMode="numeric"
-                  value={ryhtiTiedot?.kerroksia ?? ""}
-                  onChange={(e) =>
-                    setRyhtiTiedot((p: any) => ({ ...(p ?? {}), kerroksia: e.target.value ? Number(e.target.value) : null }))
-                  }
-                />
-              </div>
-              <div className="space-y-1.5">
-                <Label htmlFor="ks-lammitys">Lämmitysmuoto</Label>
-                <Input
-                  id="ks-lammitys"
-                  value={ryhtiTiedot?.lammitysmuoto ?? ""}
-                  onChange={(e) =>
-                    setRyhtiTiedot((p: any) => ({ ...(p ?? {}), lammitysmuoto: e.target.value || null }))
-                  }
-                />
-              </div>
-              <div className="col-span-2 space-y-1.5">
-                <Label htmlFor="ks-julkisivu">Julkisivumateriaali</Label>
-                <Input
-                  id="ks-julkisivu"
-                  value={ryhtiTiedot?.julkisivumateriaali ?? ""}
-                  onChange={(e) =>
-                    setRyhtiTiedot((p: any) => ({ ...(p ?? {}), julkisivumateriaali: e.target.value || null }))
-                  }
-                />
-              </div>
-            </div>
+            )}
+            {ryhtiTiedot && ryhtiYhteenveto && (
+              <p className="text-xs font-medium text-emerald-600">
+                ✓ Talon tiedot haettu: {ryhtiYhteenveto}. Voit muokata niitä Talon tiedot -sivulla.
+              </p>
+            )}
           </div>
 
           <DialogFooter>
