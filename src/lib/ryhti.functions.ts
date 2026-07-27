@@ -12,15 +12,18 @@ export const haeRyhtiTiedot = createServerFn({ method: "POST" })
     const {
       RyhtiError,
       geokoodaa,
+      haeRakennusAvaimella,
       haeRakennukset,
       valitseLahin,
       mappaaRakennus,
     } = await import("./ryhti.server");
 
     try {
-      const { lat, lon } = await geokoodaa(data.osoite, data.kaupunki ?? null);
-      const rakennukset = await haeRakennukset(lat, lon);
-      const rakennus = valitseLahin(rakennukset, lat, lon);
+      const { lat, lon, rakennusAvain } = await geokoodaa(data.osoite, data.kaupunki ?? null);
+      let rakennus = rakennusAvain ? await haeRakennusAvaimella(rakennusAvain) : null;
+      if (!rakennus) {
+        rakennus = valitseLahin(await haeRakennukset(lat, lon), lat, lon);
+      }
       if (!rakennus) {
         return { ok: false as const, koodi: "NO_BUILDING" as const };
       }
@@ -32,7 +35,6 @@ export const haeRyhtiTiedot = createServerFn({ method: "POST" })
         tulos.lammitysmuoto != null ||
         tulos.julkisivumateriaali != null;
       if (!onkoDataa) {
-        console.warn("[ryhti] tuntematon vastausrakenne:", JSON.stringify(rakennus).slice(0, 800));
         return { ok: false as const, koodi: "NO_BUILDING" as const };
       }
       return { ok: true as const, tiedot: tulos };
@@ -45,6 +47,7 @@ export const haeRyhtiTiedot = createServerFn({ method: "POST" })
       return { ok: false as const, koodi: "UPSTREAM_ERROR" as const };
     }
   });
+
 
 const ehdotusSyote = z.object({ teksti: z.string().trim().min(3) });
 
