@@ -12,15 +12,18 @@ export const haeRyhtiTiedot = createServerFn({ method: "POST" })
     const {
       RyhtiError,
       geokoodaa,
+      haeRakennusAvaimella,
       haeRakennukset,
       valitseLahin,
       mappaaRakennus,
     } = await import("./ryhti.server");
 
     try {
-      const { lat, lon } = await geokoodaa(data.osoite, data.kaupunki ?? null);
-      const rakennukset = await haeRakennukset(lat, lon);
-      const rakennus = valitseLahin(rakennukset, lat, lon);
+      const { lat, lon, rakennusAvain } = await geokoodaa(data.osoite, data.kaupunki ?? null);
+      let rakennus = rakennusAvain ? await haeRakennusAvaimella(rakennusAvain) : null;
+      if (!rakennus) {
+        rakennus = valitseLahin(await haeRakennukset(lat, lon), lat, lon);
+      }
       if (!rakennus) {
         return { ok: false as const, koodi: "NO_BUILDING" as const };
       }
@@ -32,7 +35,6 @@ export const haeRyhtiTiedot = createServerFn({ method: "POST" })
         tulos.lammitysmuoto != null ||
         tulos.julkisivumateriaali != null;
       if (!onkoDataa) {
-        console.warn("[ryhti] tuntematon vastausrakenne:", JSON.stringify(rakennus).slice(0, 800));
         return { ok: false as const, koodi: "NO_BUILDING" as const };
       }
       return { ok: true as const, tiedot: tulos };
@@ -45,6 +47,7 @@ export const haeRyhtiTiedot = createServerFn({ method: "POST" })
       return { ok: false as const, koodi: "UPSTREAM_ERROR" as const };
     }
   });
+
 
 const ehdotusSyote = z.object({ teksti: z.string().trim().min(3) });
 
@@ -63,16 +66,21 @@ export const haeOsoiteEhdotukset = createServerFn({ method: "POST" })
 const koordinaattiSyote = z.object({
   lat: z.number().finite(),
   lon: z.number().finite(),
+  rakennusAvain: z.string().trim().min(1).nullish(),
 });
 
 export const haeRyhtiKoordinaateilla = createServerFn({ method: "POST" })
   .inputValidator((data: unknown) => koordinaattiSyote.parse(data))
   .handler(async ({ data }) => {
-    const { RyhtiError, haeRakennukset, valitseLahin, mappaaRakennus } = await import("./ryhti.server");
+    const { RyhtiError, haeRakennusAvaimella, haeRakennukset, valitseLahin, mappaaRakennus } =
+      await import("./ryhti.server");
     try {
-      const rakennukset = await haeRakennukset(data.lat, data.lon);
-      const rakennus = valitseLahin(rakennukset, data.lat, data.lon);
+      let rakennus = data.rakennusAvain ? await haeRakennusAvaimella(data.rakennusAvain) : null;
+      if (!rakennus) {
+        rakennus = valitseLahin(await haeRakennukset(data.lat, data.lon), data.lat, data.lon);
+      }
       if (!rakennus) return { ok: false as const, koodi: "NO_BUILDING" as const };
+
       const tulos = mappaaRakennus(rakennus);
       const onkoDataa =
         tulos.rakennusvuosi != null ||

@@ -75,7 +75,7 @@ export function PropertySwitcher() {
   });
 
   const ryhtiKoordinaattiHaku = useMutation({
-    mutationFn: (v: { lat: number; lon: number }) => ryhtiKoordFn({ data: v }),
+    mutationFn: (v: { lat: number; lon: number; rakennusAvain?: string | null }) => ryhtiKoordFn({ data: v }),
     onSuccess: (res: any) => {
       if (!res?.ok) {
         toast.info("Osoite valittu. Talon virallisia tietoja ei löytynyt – täytä loput käsin.");
@@ -236,12 +236,13 @@ export function PropertySwitcher() {
                     setOsoite(v);
                     setRyhtiTiedot(null);
                   }}
-                  onValitse={(val: { katuosoite: string; postinumero: string | null; kaupunki: string | null; lat: number; lon: number }) => {
+                  onValitse={(val: { katuosoite: string; postinumero: string | null; kaupunki: string | null; lat: number; lon: number; rakennusAvain?: string | null }) => {
                     setOsoite(val.katuosoite);
                     if (val.kaupunki) setKaupunki(val.kaupunki);
                     setRyhtiTiedot(null);
-                    ryhtiKoordinaattiHaku.mutate({ lat: val.lat, lon: val.lon });
+                    ryhtiKoordinaattiHaku.mutate({ lat: val.lat, lon: val.lon, rakennusAvain: val.rakennusAvain ?? null });
                   }}
+
                 />
               </div>
               <div className="space-y-1.5">

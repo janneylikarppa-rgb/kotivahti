@@ -11,7 +11,9 @@ export type OsoiteValinta = {
   kaupunki: string | null;
   lat: number;
   lon: number;
+  rakennusAvain?: string | null;
 };
+
 
 type Props = {
   arvo: string;
@@ -71,8 +73,10 @@ export function OsoiteAutocomplete({
       kaupunki: e.kaupunki ?? null,
       lat: e.lat,
       lon: e.lon,
+      rakennusAvain: e.rakennusAvain ?? null,
     });
   };
+
 
   return (
     <div className="relative">
