@@ -1278,13 +1278,17 @@ export const addKiinteisto = createServerFn({ method: "POST" })
       .select("id")
       .single();
     if (error) throw error;
-    await supabase.from("talon_tiedot").insert({
-      kiinteisto_id: uusi.id,
-      pinta_ala: data.pinta_ala ?? null,
-      kerroksia: data.kerroksia ?? null,
-      lammitysmuoto: data.lammitysmuoto ?? null,
-      julkisivumateriaali: data.julkisivumateriaali ?? null,
-    });
+    await supabase.from("talon_tiedot").upsert(
+      {
+        kiinteisto_id: uusi.id,
+        pinta_ala: data.pinta_ala ?? null,
+        kerroksia: data.kerroksia ?? null,
+        lammitysmuoto: data.lammitysmuoto ?? null,
+        julkisivumateriaali: data.julkisivumateriaali ?? null,
+      },
+      { onConflict: "kiinteisto_id" },
+    );
+
 
     await supabase.from("kulu_asetukset").insert({ kiinteisto_id: uusi.id });
     await supabase.from("profiles").update({ valittu_kiinteisto_id: uusi.id }).eq("id", userId);
