@@ -11,7 +11,9 @@ export type OsoiteValinta = {
   kaupunki: string | null;
   lat: number;
   lon: number;
+  rakennusAvain?: string | null;
 };
+
 
 type Props = {
   arvo: string;
