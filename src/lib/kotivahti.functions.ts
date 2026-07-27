@@ -1251,6 +1251,7 @@ const lisaaKiinteistoSchema = z.object({
   tyyppi: z.string().min(1).max(50).default("omakotitalo"),
   osoite: z.string().max(200).optional().nullable(),
   kaupunki: z.string().max(120).optional().nullable(),
+  postinumero: z.string().max(10).optional().nullable(),
   rakennusvuosi: z.number().int().min(1700).max(2100).optional().nullable(),
   pinta_ala: z.number().optional().nullable(),
   kerroksia: z.number().int().optional().nullable(),
@@ -1271,6 +1272,7 @@ export const addKiinteisto = createServerFn({ method: "POST" })
         tyyppi: data.tyyppi,
         osoite: data.osoite ?? null,
         kaupunki: data.kaupunki ?? null,
+        postinumero: data.postinumero ?? null,
         rakennusvuosi: data.rakennusvuosi ?? null,
       })
       .select("id")

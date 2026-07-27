@@ -51,6 +51,7 @@ export function PropertySwitcher() {
   const [tyyppi, setTyyppi] = useState("omakotitalo");
   const [osoite, setOsoite] = useState("");
   const [kaupunki, setKaupunki] = useState("");
+  const [postinumero, setPostinumero] = useState("");
   const [ryhtiTiedot, setRyhtiTiedot] = useState<any>(null);
   const [ryhtiInfo, setRyhtiInfo] = useState(false);
   const ryhtiFn = useServerFn(haeRyhtiTiedot);
@@ -122,6 +123,7 @@ export function PropertySwitcher() {
           tyyppi,
           osoite: osoite.trim() || null,
           kaupunki: kaupunki.trim() || null,
+          postinumero: postinumero.trim() || null,
           rakennusvuosi: ryhtiTiedot?.rakennusvuosi ?? null,
           pinta_ala: ryhtiTiedot?.pinta_ala ?? null,
           kerroksia: ryhtiTiedot?.kerroksia ?? null,
@@ -135,6 +137,7 @@ export function PropertySwitcher() {
       setNimi("");
       setOsoite("");
       setKaupunki("");
+      setPostinumero("");
       setRyhtiTiedot(null);
       await qc.invalidateQueries();
       router.invalidate();
@@ -239,6 +242,7 @@ export function PropertySwitcher() {
                   onValitse={(val: { katuosoite: string; postinumero: string | null; kaupunki: string | null; lat: number; lon: number; rakennusAvain?: string | null }) => {
                     setOsoite(val.katuosoite);
                     if (val.kaupunki) setKaupunki(val.kaupunki);
+                    if (val.postinumero) setPostinumero(val.postinumero);
                     setRyhtiTiedot(null);
                     ryhtiKoordinaattiHaku.mutate({ lat: val.lat, lon: val.lon, rakennusAvain: val.rakennusAvain ?? null });
                   }}
@@ -256,6 +260,16 @@ export function PropertySwitcher() {
                   }}
                 />
               </div>
+            </div>
+
+            <div className="space-y-1.5">
+              <Label htmlFor="ks-postinumero">Postinumero</Label>
+              <Input
+                id="ks-postinumero"
+                value={postinumero}
+                onChange={(e) => setPostinumero(e.target.value)}
+                placeholder="00100"
+              />
             </div>
 
             <div className="space-y-1.5">
@@ -292,6 +306,62 @@ export function PropertySwitcher() {
               {ryhtiTiedot && ryhtiYhteenveto && (
                 <p className="text-xs font-medium text-emerald-600">✓ Ryhti: {ryhtiYhteenveto}</p>
               )}
+            </div>
+
+            <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-1.5">
+                <Label htmlFor="ks-vuosi">Rakennusvuosi</Label>
+                <Input
+                  id="ks-vuosi"
+                  inputMode="numeric"
+                  value={ryhtiTiedot?.rakennusvuosi ?? ""}
+                  onChange={(e) =>
+                    setRyhtiTiedot((p: any) => ({ ...(p ?? {}), rakennusvuosi: e.target.value ? Number(e.target.value) : null }))
+                  }
+                />
+              </div>
+              <div className="space-y-1.5">
+                <Label htmlFor="ks-pinta">Pinta-ala (m²)</Label>
+                <Input
+                  id="ks-pinta"
+                  inputMode="decimal"
+                  value={ryhtiTiedot?.pinta_ala ?? ""}
+                  onChange={(e) =>
+                    setRyhtiTiedot((p: any) => ({ ...(p ?? {}), pinta_ala: e.target.value ? Number(e.target.value) : null }))
+                  }
+                />
+              </div>
+              <div className="space-y-1.5">
+                <Label htmlFor="ks-krs">Kerroksia</Label>
+                <Input
+                  id="ks-krs"
+                  inputMode="numeric"
+                  value={ryhtiTiedot?.kerroksia ?? ""}
+                  onChange={(e) =>
+                    setRyhtiTiedot((p: any) => ({ ...(p ?? {}), kerroksia: e.target.value ? Number(e.target.value) : null }))
+                  }
+                />
+              </div>
+              <div className="space-y-1.5">
+                <Label htmlFor="ks-lammitys">Lämmitysmuoto</Label>
+                <Input
+                  id="ks-lammitys"
+                  value={ryhtiTiedot?.lammitysmuoto ?? ""}
+                  onChange={(e) =>
+                    setRyhtiTiedot((p: any) => ({ ...(p ?? {}), lammitysmuoto: e.target.value || null }))
+                  }
+                />
+              </div>
+              <div className="col-span-2 space-y-1.5">
+                <Label htmlFor="ks-julkisivu">Julkisivumateriaali</Label>
+                <Input
+                  id="ks-julkisivu"
+                  value={ryhtiTiedot?.julkisivumateriaali ?? ""}
+                  onChange={(e) =>
+                    setRyhtiTiedot((p: any) => ({ ...(p ?? {}), julkisivumateriaali: e.target.value || null }))
+                  }
+                />
+              </div>
             </div>
           </div>
 
