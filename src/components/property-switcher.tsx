@@ -236,12 +236,13 @@ export function PropertySwitcher() {
                     setOsoite(v);
                     setRyhtiTiedot(null);
                   }}
-                  onValitse={(val: { katuosoite: string; postinumero: string | null; kaupunki: string | null; lat: number; lon: number }) => {
+                  onValitse={(val: { katuosoite: string; postinumero: string | null; kaupunki: string | null; lat: number; lon: number; rakennusAvain?: string | null }) => {
                     setOsoite(val.katuosoite);
                     if (val.kaupunki) setKaupunki(val.kaupunki);
                     setRyhtiTiedot(null);
-                    ryhtiKoordinaattiHaku.mutate({ lat: val.lat, lon: val.lon });
+                    ryhtiKoordinaattiHaku.mutate({ lat: val.lat, lon: val.lon, rakennusAvain: val.rakennusAvain ?? null });
                   }}
+
                 />
               </div>
               <div className="space-y-1.5">
