@@ -214,7 +214,7 @@ function TaloTiedotPage() {
   });
 
   const ryhtiKoordinaattiHaku = useMutation({
-    mutationFn: (v: { lat: number; lon: number }) => ryhtiKoordFn({ data: v }),
+    mutationFn: (v: { lat: number; lon: number; rakennusAvain?: string | null }) => ryhtiKoordFn({ data: v }),
     onSuccess: (res: any) => kasitteleRyhtiTulos(res, true),
     onError: (e: any) => toast.error(e?.message ?? "Haku epäonnistui"),
   });
