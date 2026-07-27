@@ -66,16 +66,21 @@ export const haeOsoiteEhdotukset = createServerFn({ method: "POST" })
 const koordinaattiSyote = z.object({
   lat: z.number().finite(),
   lon: z.number().finite(),
+  rakennusAvain: z.string().trim().min(1).nullish(),
 });
 
 export const haeRyhtiKoordinaateilla = createServerFn({ method: "POST" })
   .inputValidator((data: unknown) => koordinaattiSyote.parse(data))
   .handler(async ({ data }) => {
-    const { RyhtiError, haeRakennukset, valitseLahin, mappaaRakennus } = await import("./ryhti.server");
+    const { RyhtiError, haeRakennusAvaimella, haeRakennukset, valitseLahin, mappaaRakennus } =
+      await import("./ryhti.server");
     try {
-      const rakennukset = await haeRakennukset(data.lat, data.lon);
-      const rakennus = valitseLahin(rakennukset, data.lat, data.lon);
+      let rakennus = data.rakennusAvain ? await haeRakennusAvaimella(data.rakennusAvain) : null;
+      if (!rakennus) {
+        rakennus = valitseLahin(await haeRakennukset(data.lat, data.lon), data.lat, data.lon);
+      }
       if (!rakennus) return { ok: false as const, koodi: "NO_BUILDING" as const };
+
       const tulos = mappaaRakennus(rakennus);
       const onkoDataa =
         tulos.rakennusvuosi != null ||
