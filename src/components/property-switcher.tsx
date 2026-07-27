@@ -75,7 +75,7 @@ export function PropertySwitcher() {
   });
 
   const ryhtiKoordinaattiHaku = useMutation({
-    mutationFn: (v: { lat: number; lon: number }) => ryhtiKoordFn({ data: v }),
+    mutationFn: (v: { lat: number; lon: number; rakennusAvain?: string | null }) => ryhtiKoordFn({ data: v }),
     onSuccess: (res: any) => {
       if (!res?.ok) {
         toast.info("Osoite valittu. Talon virallisia tietoja ei löytynyt – täytä loput käsin.");
