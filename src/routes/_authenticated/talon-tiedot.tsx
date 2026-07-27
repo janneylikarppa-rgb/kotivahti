@@ -385,15 +385,16 @@ function TaloTiedotPage() {
               <OsoiteAutocomplete
                 arvo={k.osoite ?? ""}
                 onChangeTeksti={(v: string) => setK({ ...k, osoite: v })}
-                onValitse={(val: { katuosoite: string; postinumero: string | null; kaupunki: string | null; lat: number; lon: number }) => {
+                onValitse={(val: { katuosoite: string; postinumero: string | null; kaupunki: string | null; lat: number; lon: number; rakennusAvain?: string | null }) => {
                   setK((prev: any) => ({
                     ...prev,
                     osoite: val.katuosoite,
                     postinumero: val.postinumero ?? prev.postinumero,
                     kaupunki: val.kaupunki ?? prev.kaupunki,
                   }));
-                  ryhtiKoordinaattiHaku.mutate({ lat: val.lat, lon: val.lon });
+                  ryhtiKoordinaattiHaku.mutate({ lat: val.lat, lon: val.lon, rakennusAvain: val.rakennusAvain ?? null });
                 }}
+
               />
             </Field>
             <p className="text-xs text-muted-foreground">
