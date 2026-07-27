@@ -73,8 +73,10 @@ export function OsoiteAutocomplete({
       kaupunki: e.kaupunki ?? null,
       lat: e.lat,
       lon: e.lon,
+      rakennusAvain: e.rakennusAvain ?? null,
     });
   };
+
 
   return (
     <div className="relative">
