@@ -1,42 +1,42 @@
-## Tavoite
+## Vastaus kysymykseen: kyllä, sama syy
 
-Osoitekenttään kirjoittaessa haetaan automaattisesti osoite-ehdotuksia ja näytetään lista, jossa jokainen rivi kertoo kaupungin/postinumeron. Käyttäjä valitsee klikkaamalla oikean paikkakunnan → Ryhti-tiedot haetaan heti kyseisen osoitteen koordinaateilla. Jos ehdotuksia ei löydy, käyttäjä voi jatkaa käsin kuten nyt.
+Molemmat oireet — "ei löydä taloja" ja "ei löydä osoitenumeroilla" — johtuvat samasta yhdestä asiasta: **käytössä oleva Ryhti-rajapinnan osoite ei ole olemassa.**
 
-## Miten se toimii käyttäjälle
+Todennettu tässä istunnossa:
 
-1. Käyttäjä kirjoittaa osoitteen (esim. "Kirkkokatu 5").
-2. ~400 ms kirjoittamisen tauon jälkeen kentän alle avautuu 5–7 ehdotusta muodossa: **Kirkkokatu 5** · 90100 Oulu / 33200 Tampere jne.
-3. Klikkaus valitsee rivin: osoite, postinumero ja kaupunki täyttyvät automaattisesti, ja Ryhti-haku käynnistyy samalla klikkauksella (spinner listan tilalla → "✓ Ryhti: rakennusvuosi 1987 · 142 m² …").
-4. Jos haku ei tuota osumia tai palvelu ei vastaa: pieni harmaa teksti "Ei ehdotuksia – täytä tiedot käsin" ja kentät toimivat normaalisti. Nykyinen "Hae talon tiedot Ryhti-rajapinnasta" -painike jää käytettäväksi varmistuksena.
-5. Sama toiminto sekä **Talon tiedot** -sivulla että **Lisää kiinteistö** -dialogissa.
+- `api.ryhti.fi` → `Could not resolve host` (domainia ei ole; ei siis "palvelu alhaalla", vaan väärä osoite). Kaikki rakennushaut epäonnistuvat aina, riippumatta osoitteesta tai numerosta.
+- Osoite-ehdotukset sen sijaan toimivat: haku "Kirkkokatu 5" palauttaa 20 osumaa, joissa talonumero mukana (Helsinki, Lahti, Oulu, Jyväskylä, Kotka, Joensuu, Lappeenranta…). Osoitepuoli ei siis ole vialla.
 
-## Tekninen toteutus
+Eli: osoitteen valinta onnistuu, mutta sen jälkeinen talotietojen haku kaatuu joka kerta → sovellus näyttää pehmeän "täytä loput käsin" -viestin, mikä näyttää käyttäjälle siltä kuin taloja ei löytyisi numeroilla.
 
-**1. `src/lib/ryhti.server.ts`**
-- Uusi `haeOsoite-ehdotukset(teksti)`: Digitransit `/geocoding/v1/autocomplete?text=…&size=7&layers=address&boundary.country=FIN`.
-- Palauttaa normalisoidun listan: `{ id, katuosoite, postinumero, kaupunki, lat, lon, label }` (properties: `name`, `postalcode`, `localadmin`/`locality`, coordinates).
-- Duplikaattien suodatus katuosoite+postinumero -avaimella.
-- Uusi `mappaaRakennusKoordinaateista(lat, lon)`-käyttö: nykyinen `haeRakennukset` + `valitseLahin` + `mappaaRakennus` uudelleenkäytetään sellaisenaan.
+## Löysin oikean, toimivan rajapinnan
 
-**2. `src/lib/ryhti.functions.ts`**
-- `haeOsoiteEhdotukset` (POST, `z.object({ teksti: z.string().trim().min(3) })`) → `{ ok: true, ehdotukset: [...] }` tai `{ ok: false, koodi }`. Timeout-/virhekoodit samalla logiikalla kuin nyt.
-- `haeRyhtiKoordinaateilla` (POST, `{ lat, lon }`) → sama palautusmuoto kuin `haeRyhtiTiedot` (`ok`, `tiedot`, `koodi`), mutta ohittaa geokoodauksen koska koordinaatit tulevat valitusta ehdotuksesta.
-- `haeRyhtiTiedot` jää ennalleen (nappi + taaksepäinyhteensopivuus).
+Ympäristöministeriön avoin Ryhti-rakennustietovaranto (ei API-avainta, todennettu toimivaksi juuri nyt):
 
-**3. Uusi komponentti `src/components/osoite-autocomplete.tsx`**
-- Props: `arvo`, `onChangeTeksti`, `onValitse({ katuosoite, postinumero, kaupunki, lat, lon })`, `disabled`.
-- Debounce 400 ms, minimipituus 3 merkkiä, `useQuery` (`queryKey: ["osoite-ehdotukset", teksti]`, `staleTime: 5 min`) + `enabled`-ehto.
-- Lista renderöidään `Input`-kentän alle absoluuttisesti sijoitettuna paneelina (`gold-card`-tyyli, rounded-xl, max-h + scroll). Näppäimistötuki: ↑/↓, Enter valitsee, Esc sulkee; blur sulkee pienellä viiveellä.
-- Ei näytetä listaa, jos käyttäjä on juuri valinnut rivin tai kenttä on tyhjä.
+- `ryhti_building:open_building` — 3 793 062 rakennusta. Kentät: valmistumispäivä, käyttötarkoitus, julkisivumateriaali, lämmitystapa, lämmitysenergianlähde, kerrosluku, kerrosala, kokonaisala, kantava rakenne.
+- `ryhti_building:open_address` — koko Suomen osoiterekisteri: kadunnimi, talonumero, postinumero, postitoimipaikka ja **suora linkki rakennukseen** (`building_key`).
 
-**4. `src/routes/_authenticated/talon-tiedot.tsx`**
-- Osoite-`Input` korvataan `OsoiteAutocomplete`-komponentilla.
-- `onValitse`: `setK({ ...k, osoite, postinumero, kaupunki })` ja käynnistää `ryhtiKoordinaattiHaku`-mutaation, joka täyttää rakennusvuoden, pinta-alan, kerrokset, lämmitysmuodon ja julkisivun sekä asettaa `ryhtiKentat`-merkinnät (sama `onSuccess`-logiikka kuin nykyisessä `ryhtiHaku`ssa → siirretään yhteiseen apufunktioon, ei kopioida).
+Tämä on selvästi parempi kuin nykyinen "geokoodaa ja arvaa lähin rakennus" -tapa: osoite osoittaa suoraan oikeaan rakennukseen.
 
-**5. `src/components/property-switcher.tsx`**
-- Osoitekenttä samaan `OsoiteAutocomplete`-komponenttiin; valinta täyttää `osoite` + `kaupunki` ja hakee `ryhtiTiedot` koordinaateilla (`lisaaMut` käyttää niitä jo).
+## Mitä korjataan
 
-## Rajoitteet
+**1. `src/lib/ryhti.server.ts` — rakennushaku oikeaan lähteeseen**
+- Poistetaan olematon `api.ryhti.fi`-kutsu.
+- Uusi haku: osoitteen `building_key` → `open_building`-rakennus. Varalle jää lähimmän rakennuksen haku koordinaateilla (koordinaatit muunnetaan EPSG:3067 ↔ WGS84).
+- Koodistoarvot ovat URI-muodossa (esim. `.../lammitystapa/code/03`). Lisätään koodikartat suomenkielisiksi teksteiksi lämmitystavalle, julkisivumateriaalille ja käyttötarkoitukselle, ja kytketään ne olemassa oleviin `mappaaLammitys`/`mappaaJulkisivu`-funktioihin.
+- Kenttäkartta: `completion_date` → rakennusvuosi, `total_area`/`gross_floor_area` → pinta-ala, `number_of_storeys` → kerrokset.
 
-- Ehdotukset tulevat Digitransit-geokoodauksesta (kattaa Suomen osoitteet, ei vaadi API-avainta); Ryhti-rakennustiedot haetaan vasta valinnan jälkeen. Jos Ryhti ei tunne rakennusta valitussa pisteessä, näytetään nykyinen viesti "Rakennusta ei löydy tällä osoitteella. Voit täyttää tiedot käsin." eikä kenttiä ylikirjoiteta.
-- Käsin kirjoittaminen ei koskaan esty: lista on pelkkä apu, ei pakollinen vaihe.
+**2. Osoite-ehdotukset suoraan samasta rekisteristä**
+- `haeOsoiteEhdotukset` hakee jatkossa `open_address`-tasolta (kadunnimi + talonumero + postinumero + postitoimipaikka). Näin ehdotuslistalla näkyvät vain oikeat, rekisterissä olevat osoitteet — ja jokainen valinta tuo mukanaan `building_key`:n, jolloin talotiedot löytyvät varmasti.
+- Nominatim jää varalle, jos rekisteri ei vastaa.
+
+**3. `src/lib/ryhti.functions.ts`**
+- `haeRyhtiKoordinaateilla` laajennetaan ottamaan vastaan myös valitun osoitteen rakennustunnus (`building_key`), jolloin haku on tarkka eikä perustu etäisyysarvaukseen. Palautusmuoto ja virhekoodit pysyvät samoina.
+
+**4. Käyttöliittymä**
+- Ei rakenteellisia muutoksia: `OsoiteAutocomplete`, talon tiedot ja "Lisää kiinteistö" toimivat kuten nyt, mutta valinnan jälkeen kentät täyttyvät oikeasti.
+- Pehmeä "täytä loput käsin" -viesti jää voimaan niitä tapauksia varten, joissa rekisteristä puuttuu tietoja.
+
+## Tarkistus toteutuksen jälkeen
+
+Ajetaan haku muutamalla oikealla osoitteella (mm. sama katuosoite eri paikkakunnilla) ja varmistetaan selaimessa, että rakennusvuosi, pinta-ala, kerrokset, lämmitys ja julkisivu täyttyvät.
