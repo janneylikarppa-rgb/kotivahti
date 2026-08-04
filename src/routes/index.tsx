@@ -177,6 +177,9 @@ html { scroll-behavior: smooth; }
 .ph-title { font-family: 'Playfair Display', serif; color: var(--valkoinen); font-size: 1rem; margin-bottom: 0.2rem; }
 .ph-sub { color: rgba(255,255,255,0.4); font-size: 0.72rem; margin-bottom: 1rem; }
 .ph-chip { display: inline-block; background: rgba(200,151,58,0.2); border: 1px solid rgba(200,151,58,0.4); color: var(--kulta-light); font-size: 0.65rem; letter-spacing: 0.06em; text-transform: uppercase; padding: 0.2rem 0.55rem; border-radius: 5px; margin-bottom: 0.9rem; }
+.ph-chip-group { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 0.9rem; }
+.ph-chip-group .ph-chip { margin-bottom: 0; }
+.ph-chip-active { background: rgba(200,151,58,0.55); border-color: rgba(200,151,58,0.85); color: var(--valkoinen); }
 .ph-rows { display: flex; flex-direction: column; gap: 0.5rem; }
 .ph-row { display: flex; justify-content: space-between; align-items: center; gap: 0.6rem; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.08); border-radius: 9px; padding: 0.55rem 0.7rem; font-size: 0.74rem; }
 .ph-row .k { color: rgba(255,255,255,0.5); }
@@ -242,7 +245,7 @@ const FEATURES = [
 type Mock = {
   title: string;
   sub: string;
-  chip?: string;
+  chip?: ReactNode;
   rows?: [string, string][];
   btn?: string;
   special?: string;
@@ -379,10 +382,14 @@ const SHOWCASE: { icon: ReactNode; title: string; paragraphs: string[]; mock: Mo
     mock: {
       title: "Kotitalousvähennys",
       sub: "Arvio vuodelle 2026",
-      chip: "1 henkilö",
+      chip: (
+        <div className="ph-chip-group">
+          <span className="ph-chip ph-chip-active">1 henkilö</span>
+          <span className="ph-chip">2 henkilöä</span>
+        </div>
+      ),
       special: "kotitalousvahennys",
     },
-    fact: "💡 Yritykseltä ostetusta työstä saa vähentää 35 % työn osuudesta. Maksimivähennys 1 600 € / henkilö. Lähde: vero.fi 2025–2026",
   },
   {
     icon: "📄",
@@ -415,7 +422,13 @@ function PhoneMock({ mock }: { mock: Mock }) {
         <div className="phone-notch" />
         <div className="ph-title">{mock.title}</div>
         <div className="ph-sub">{mock.sub}</div>
-        {mock.chip && <div className="ph-chip">{mock.chip}</div>}
+        {mock.chip && (
+          typeof mock.chip === "string" ? (
+            <div className="ph-chip">{mock.chip}</div>
+          ) : (
+            mock.chip
+          )
+        )}
         {isKtv ? (
           <div className="ph-ktv">
             <div className="ph-ktv-amount">1 480 €</div>
