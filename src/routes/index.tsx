@@ -546,6 +546,40 @@ function LandingPage() {
         </div>
       </section>
 
+      <section className="showcase">
+        <div className="showcase-inner">
+          {SHOWCASE.map((s, i) => (
+            <div key={s.title} className={`sc-row animate-on-scroll${i % 2 === 1 ? " reverse" : ""}`}>
+              <div className="sc-text">
+                <div className="sc-icon">{s.icon}</div>
+                <h3 className="sc-title">{s.title}</h3>
+                {s.paragraphs.map((p) => (
+                  <p className="sc-p" key={p.slice(0, 24)}>{p}</p>
+                ))}
+                <Link to="/rekisteroidy" className="sc-btn">Aloita ilmaiseksi →</Link>
+                <p className="sc-note">Käyttö on maksutonta.<br />Käyttöönotto vie muutaman minuutin.</p>
+              </div>
+              <div className="sc-visual">
+                <PhoneMock mock={s.mock} />
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <section className="sc-final">
+        <div className="sc-final-inner">
+          <h2>Talosi ansaitsee<br />enemmän kuin muistilista.</h2>
+          <p>
+            Liity Kotivahdin käyttäjiin ja pidä talosi tiedot järjestyksessä. Käyttö on maksutonta – käyttöönotto vie muutaman minuutin.
+          </p>
+          <Link to="/rekisteroidy" className="sc-btn">Luo ilmainen tili →</Link>
+          <p className="sc-final-small">Ei luottokorttia. Ei määräaikaa. Vain selkeämpi kuva talostasi.</p>
+        </div>
+      </section>
+
+
+
       <section className="kilpailutus" id="kilpailutus">
         <div className="kilpailutus-inner">
           <div>
