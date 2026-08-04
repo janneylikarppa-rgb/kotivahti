@@ -229,6 +229,181 @@ const FEATURES = [
   { icon: "📄", title: "Myyntiraportti", desc: "Kun taloa myydään, kaikki on valmiina. Yksi nappi tulostaa selkeän raportin välittäjälle – huoltohistoria, rakennusosat, energiankulutus ja dokumenttiliitteet järjestyksessä. Luottamusta herättävä paketti ostajalle." },
 ];
 
+type Mock = {
+  title: string;
+  sub: string;
+  chip?: string;
+  rows: [string, string][];
+  btn?: string;
+};
+
+const SHOWCASE: { icon: string; title: string; paragraphs: string[]; mock: Mock }[] = [
+  {
+    icon: "📋",
+    title: "Kaikki talosi tiedot yhdessä paikassa",
+    paragraphs: [
+      "Omakotitalossa on satoja yksityiskohtia joita pitäisi muistaa – milloin katto on asennettu, mikä maalämpöpumpun malli on, koska putket on viimeksi tarkastettu.",
+      "Talokirja kokoaa kaiken: perustiedot, talotekniikka, materiaalit, laitteet ja asennusvuodet. Tieto syötetään kerran ja se on aina käytettävissä – myös silloin kun ammattilainen kysyy tai talo laitetaan myyntiin.",
+    ],
+    mock: {
+      title: "Talon tiedot",
+      sub: "Koivutie 12 · Kuopio",
+      rows: [
+        ["Rakennusvuosi", "1998"],
+        ["Pinta-ala", "142 m²"],
+        ["Lämmitys", "Maalämpö 2016"],
+        ["Julkisivu", "Puu (lautaverhous)"],
+        ["Katto", "Peltikatto 2012"],
+        ["Ilmanvaihto", "Koneellinen, IV-kone 2005"],
+      ],
+    },
+  },
+  {
+    icon: "📅",
+    title: "Oikea huolto oikeaan aikaan – automaattisesti",
+    paragraphs: [
+      "Omakotitalossa on paljon huollettavaa ja moni asia saattaa unohtua. Keväällä pitäisi tarkastaa katto ja salaojat, syksyllä räystäät ja lämmitysjärjestelmä, talvella lumikuorma ja silikonisaumat.",
+      "Vuosikello listaa kausikohtaiset huoltotehtävät automaattisesti talosi tietojen perusteella. Kuittaat tehdyksi yhdellä painalluksella – ja toimenpide siirtyy suoraan huoltohistoriaan dokumentoituna.",
+    ],
+    mock: {
+      title: "Vuosikello",
+      sub: "Kausi: kevät",
+      chip: "4 tehtävää",
+      rows: [
+        ["Katon ja räystäiden tarkastus", "Tee"],
+        ["Salaojien tarkastus", "Tee"],
+        ["Sadevesikourujen puhdistus", "✓"],
+        ["Julkisivun silmämääräinen tarkastus", "Tee"],
+      ],
+      btn: "Kuittaa tehdyksi",
+    },
+  },
+  {
+    icon: "🤝",
+    title: "Löydä oikea tekijä – ilman etsimistä",
+    paragraphs: [
+      "Milloin olet viimeksi tarvinnut ammattilaista ja miettinyt kenen soitat? Oikean tekijän löytäminen vie aikaa ja lopputulos on epävarma.",
+      "Kotivahdin kautta tilaat kuntoarvion, huollon tai tarjouspyynnön suoraan sovelluksesta. Pyyntö välitetään tarkistetuille paikallisille ammattilaisille omalla alueellasi. Sinä valitset kenen kanssa jatkat.",
+    ],
+    mock: {
+      title: "Tilaa palvelu",
+      sub: "Pyyntö paikallisille ammattilaisille",
+      chip: "Ilmanvaihto ja IV-kone",
+      rows: [
+        ["Palvelu", "Huolto"],
+        ["Kohde", "Koivutie 12"],
+        ["Alue", "Kuopio"],
+        ["Kuvaus", "IV-kanavat puhdistamatta 12 v"],
+      ],
+      btn: "Lähetä pyyntö",
+    },
+  },
+  {
+    icon: "📊",
+    title: "Tiedät jo tänään mitä talossa tapahtuu 10 vuoden päästä",
+    paragraphs: [
+      "Katto kestää 30–40 vuotta. Putket 40–50 vuotta. Maalämpöpumppu 20–25 vuotta. Märkätilat 25 vuotta. Jokaisella rakennusosalla on käyttöikä.",
+      "PTS-suunnitelma laskee talosi rakennusvuoden ja tietojen perusteella milloin kukin osa lähestyy huolto- tai uusimisajankohtaansa. Näet seuraavan 10 vuoden huoltotarpeet selkeänä listana. Ei yllätyksiä – voit varautua ajoissa sekä taloudellisesti että käytännössä.",
+    ],
+    mock: {
+      title: "PTS-suunnitelma",
+      sub: "Seuraavat 10 vuotta",
+      rows: [
+        ["IV-kanavien puhdistus", "2027"],
+        ["Märkätilojen kunnostus", "2029"],
+        ["Julkisivun maalaus", "2031"],
+        ["Peltikaton huoltomaalaus", "2033"],
+        ["Käyttövesiputkisto", "2038"],
+      ],
+    },
+  },
+  {
+    icon: "💰",
+    title: "Näe mihin energia kuluu ja ennakoi tulevat kulut",
+    paragraphs: [
+      "Sähkön ja veden kulutuksen seuranta paljastaa trendit – onko kulutus kasvamassa vai laskenut viime vuodesta. Yksittäinen piikki voi kertoa vuotavasta hanasta tai huonosti toimivasta laitteesta.",
+      "Kirjaa kulutuslukemat kuukausittain ja näet selkeän historian. Riittävän datan kertyessä palvelu tunnistaa automaattisesti sopiiko aurinkosähkö talollesi – ja ehdottaa ammattilaisen kartoitusta.",
+    ],
+    mock: {
+      title: "Kulut",
+      sub: "Sähkönkulutus kuukausittain",
+      rows: [
+        ["Tammikuu", "1 420 kWh"],
+        ["Helmikuu", "1 280 kWh"],
+        ["Maaliskuu", "1 040 kWh"],
+        ["Huhtikuu", "780 kWh"],
+        ["Toukokuu", "560 kWh"],
+        ["Kesäkuu", "410 kWh"],
+      ],
+      btn: "Lisää mittarilukema",
+    },
+  },
+  {
+    icon: "🔧",
+    title: "Dokumentoitu historia on talon arvokkain asiakirja",
+    paragraphs: [
+      "Muistatko milloin kylpyhuone on viimeksi remontoitu? Kuka teki ilmanvaihdon huollon ja minkä yrityksen takuu on vielä voimassa?",
+      "Huoltohistoria tallentaa kaikki tehdyt toimenpiteet – tekijä, päivämäärä, kustannus, kuitit ja takuupaperit. Digitaalisesti tallessa, löydät aina kun tarvitset. Myyntitilanteessa huolella pidetty dokumentaatio on merkittävä luottamuksen rakentaja.",
+    ],
+    mock: {
+      title: "Huoltohistoria",
+      sub: "12 kirjausta",
+      rows: [
+        ["Nuohous · Nuohoja Oy", "3/2026"],
+        ["IV-suodattimet vaihdettu", "1/2026"],
+        ["Maalämpöpumpun huolto", "9/2025"],
+        ["Kylpyhuoneremontti", "5/2024"],
+      ],
+      btn: "Lisää huoltokirjaus",
+    },
+  },
+  {
+    icon: "📄",
+    title: "Myyntitilanteessa kaikki on jo valmiina",
+    paragraphs: [
+      "Kun talo laitetaan myyntiin, välittäjä kysyy rakennustietoja, huoltohistoriaa ja dokumentteja. Useimmiten ne etsitään kiireellä vanhoista papereista ja muistista.",
+      "Kotivahdin myyntiraportti kokoaa kaiken automaattisesti – talon perustiedot, talotekniikka, huoltohistoria kronologisesti, energiankulutus ja dokumenttiliitteet. Yksi nappi, tulostettava PDF välittäjälle. Dokumentoitu talo myy paremmin.",
+    ],
+    mock: {
+      title: "Myyntiraportti",
+      sub: "Esikatselu · Koivutie 12",
+      chip: "Valmis tulostettavaksi",
+      rows: [
+        ["1. Perustiedot", "✓"],
+        ["2. Talotekniikka", "✓"],
+        ["3. Huoltohistoria", "12 kpl"],
+        ["4. Energiankulutus", "✓"],
+        ["5. Dokumenttiliitteet", "6 kpl"],
+      ],
+      btn: "Tulosta PDF",
+    },
+  },
+];
+
+function PhoneMock({ mock }: { mock: Mock }) {
+  return (
+    <div className="phone">
+      <div className="phone-screen">
+        <div className="phone-notch" />
+        <div className="ph-title">{mock.title}</div>
+        <div className="ph-sub">{mock.sub}</div>
+        {mock.chip && <div className="ph-chip">{mock.chip}</div>}
+        <div className="ph-rows">
+          {mock.rows.map(([k, v]) => (
+            <div className="ph-row" key={k}>
+              <span className="k">{k}</span>
+              <span className="v">{v}</span>
+            </div>
+          ))}
+        </div>
+        {mock.btn && <div className="ph-btn">{mock.btn}</div>}
+      </div>
+    </div>
+  );
+}
+
+
+
 const STEPS = [
   { n: 1, title: "Valitse palvelu", desc: "Katto, LVI, sähkö, ilmanvaihto, nuohous – 14 kategoriaa suoraan sovelluksessa." },
   { n: 2, title: "Lähetä pyyntö", desc: "Talon tiedot täyttyvät automaattisesti talokirjastasi. Yksi nappi." },
