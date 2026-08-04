@@ -153,6 +153,41 @@ const STYLES = `
 .kv-footer { background: var(--vihrea-dark); padding: 2rem 3rem; text-align: center; color: rgba(255,255,255,0.3); font-size: 0.8rem; border-top: 1px solid rgba(255,255,255,0.06); }
 .kv-footer span { color: var(--kulta); opacity: 0.7; }
 
+.showcase { padding: 5rem 3rem 2rem; background: var(--kerma); scroll-margin-top: 80px; }
+.showcase-inner { max-width: 1150px; margin: 0 auto; }
+.sc-row { display: grid; grid-template-columns: 1fr 360px; gap: 4rem; align-items: center; padding: 4rem 0; border-top: 1px solid rgba(200,151,58,0.22); }
+.sc-row:first-child { border-top: none; padding-top: 1rem; }
+.sc-row.reverse { grid-template-columns: 360px 1fr; }
+.sc-row.reverse .sc-text { order: 2; }
+.sc-row.reverse .sc-visual { order: 1; }
+.sc-visual { display: flex; justify-content: center; }
+.sc-icon { font-size: 1.6rem; margin-bottom: 0.8rem; }
+.sc-title { font-family: 'Playfair Display', serif; font-size: clamp(1.6rem, 2.6vw, 2.1rem); color: var(--vihrea); line-height: 1.2; margin-bottom: 1.2rem; }
+.sc-p { color: var(--harmaa); font-size: 0.98rem; line-height: 1.75; margin-bottom: 1rem; }
+.sc-btn { display: inline-block; background: var(--kulta); color: #fff; text-decoration: none; font-weight: 600; font-size: 0.92rem; padding: 0.85rem 1.8rem; border-radius: 8px; margin-top: 0.6rem; transition: background 0.2s; }
+.sc-btn:hover { background: #b8842e; }
+.sc-note { color: var(--harmaa); font-size: 0.8rem; line-height: 1.5; margin-top: 0.8rem; opacity: 0.85; }
+
+.phone { width: 320px; max-width: 100%; background: var(--vihrea-dark); border: 1px solid rgba(200,151,58,0.25); border-radius: 34px; padding: 12px; box-shadow: 0 26px 50px -22px rgba(21,42,34,0.55); }
+.phone-screen { background: #16261f; border-radius: 24px; padding: 1.1rem 1rem 1.3rem; min-height: 400px; }
+.phone-notch { width: 84px; height: 5px; background: rgba(255,255,255,0.16); border-radius: 3px; margin: 0 auto 0.9rem; }
+.ph-title { font-family: 'Playfair Display', serif; color: var(--valkoinen); font-size: 1rem; margin-bottom: 0.2rem; }
+.ph-sub { color: rgba(255,255,255,0.4); font-size: 0.72rem; margin-bottom: 1rem; }
+.ph-chip { display: inline-block; background: rgba(200,151,58,0.2); border: 1px solid rgba(200,151,58,0.4); color: var(--kulta-light); font-size: 0.65rem; letter-spacing: 0.06em; text-transform: uppercase; padding: 0.2rem 0.55rem; border-radius: 5px; margin-bottom: 0.9rem; }
+.ph-rows { display: flex; flex-direction: column; gap: 0.5rem; }
+.ph-row { display: flex; justify-content: space-between; align-items: center; gap: 0.6rem; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.08); border-radius: 9px; padding: 0.55rem 0.7rem; font-size: 0.74rem; }
+.ph-row .k { color: rgba(255,255,255,0.5); }
+.ph-row .v { color: var(--valkoinen); font-weight: 600; text-align: right; }
+.ph-btn { margin-top: 1rem; background: rgba(200,151,58,0.9); color: #fff; text-align: center; font-size: 0.76rem; font-weight: 600; padding: 0.6rem; border-radius: 8px; }
+
+.sc-final { padding: 6.5rem 3rem; background: var(--vihrea-dark); text-align: center; position: relative; overflow: hidden; }
+.sc-final::before { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse 60% 80% at 50% 50%, rgba(200,151,58,0.1) 0%, transparent 70%); }
+.sc-final-inner { max-width: 700px; margin: 0 auto; position: relative; }
+.sc-final h2 { font-family: 'Playfair Display', serif; font-size: clamp(2.1rem, 4vw, 3.2rem); color: var(--valkoinen); line-height: 1.15; margin-bottom: 1.2rem; }
+.sc-final p { color: rgba(255,255,255,0.6); font-size: 1rem; line-height: 1.7; margin-bottom: 2.2rem; }
+.sc-final .sc-btn { font-size: 1.05rem; padding: 1.05rem 2.6rem; }
+.sc-final-small { color: rgba(255,255,255,0.4); font-size: 0.82rem; margin-top: 1.2rem; }
+
 @keyframes fadeUp { from { opacity: 0; transform: translateY(24px); } to { opacity: 1; transform: translateY(0); } }
 .animate-on-scroll { opacity: 0; transform: translateY(20px); transition: opacity 0.5s ease, transform 0.5s ease; }
 .animate-on-scroll.visible { opacity: 1; transform: translateY(0); }
