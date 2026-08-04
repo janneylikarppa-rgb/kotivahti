@@ -257,7 +257,7 @@ function LandingPage() {
               <em>koko talon hallinta.</em>
             </h1>
             <p className="hero-sub">
-              Talokirja, vuosikello, kulujenseuranta, PTS-suunnitelma ja palveluiden kilpailutus – kaikki samassa paikassa.
+              Sähköinen talokirja, vuosikello, kulujenseuranta, PTS-suunnitelma ja palveluiden kilpailutus – kaikki samassa paikassa.
             </p>
             <div className="hero-actions">
               <Link to="/rekisteroidy" className="btn-primary">
