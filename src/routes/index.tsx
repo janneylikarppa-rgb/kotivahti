@@ -177,13 +177,13 @@ const STYLES = `
 `;
 
 const FEATURES = [
-  { icon: "📋", title: "Talokirja", desc: "Talon perustiedot, laitteet, materiaalit ja vuosiluvut yhdessä paikassa. Päivitä kerran, käytä aina." },
-  { icon: "📅", title: "Vuosikello", desc: "Kausihuollot listattuna. Kuittaa tehdyksi – menee automaattisesti huoltohistoriaan." },
-  { icon: "🤝", title: "Palveluiden kilpailutus", desc: "Tilaa kuntoarvio, huolto tai tarjouspyyntö suoraan sovelluksesta. Välitetään tarkastettuille paikallisille tekijöille – sinä valitset parhaan.", highlight: true, tag: "⭐ Suosittu" },
-  { icon: "📊", title: "PTS-suunnitelma", desc: "Ennakoi milloin rakennusosat tarvitsevat toimenpiteitä. Ei yllätyksiä." },
-  { icon: "💰", title: "Kulujenseuranta", desc: "Sähkö ja vesi kulutuspohjaisesti. Ennakointilaskelma tuleville vuosille." },
-  { icon: "🔧", title: "Huoltohistoria", desc: "Kaikki dokumentoitu. Kuitit, kuvat, tekijät – löydät aina kun tarvitset." },
-  { icon: "📄", title: "Myyntiraportti", desc: "Tulostettava raportti välittäjälle. Yksi nappi, kaikki tallessa." },
+  { icon: "📋", title: "Talokirja", desc: "Sähköinen talokirja kokoaa kotisi tiedot yhteen paikkaan – perustiedot, talotekniikka, materiaalit, laitteet ja vuosiluvut. Tieto on aina ajantasaista ja löytyy hetkessä. Myyntitilanteessa dokumentoitu huoltohistoria on arvokas – se kertoo ostajalle, että talosta on pidetty huolta." },
+  { icon: "📅", title: "Vuosikello", desc: "Oikea huolto oikeaan aikaan – kausikohtaiset huoltomuistutukset talosi tietojen perusteella. Kuittaa tehdyksi, niin toimenpide siirtyy automaattisesti huoltohistoriaan." },
+  { icon: "🤝", title: "Palveluiden kilpailutus", desc: "Tarvitsetko kuntoarvion, huollon tai tarjouksen? Lähetä pyyntö suoraan sovelluksesta – välitetään tarkistetuille paikallisille ammattilaisille. Sinä päätät kenen valitset.", highlight: true, tag: "⭐ Suosittu" },
+  { icon: "📊", title: "PTS-suunnitelma", desc: "Pitkän tähtäimen suunnitelma laskee talosi tietojen perusteella milloin rakennusosat – katto, putket, lämmitysjärjestelmä, märkätilat – tarvitsevat huoltoa tai uusimista. Näet seuraavan 10 vuoden huoltotarpeet yhdellä silmäyksellä. Ei yllätyksiä, ei kiirehuoltoja – vain ennakointi." },
+  { icon: "💰", title: "Kulujenseuranta", desc: "Seuraa sähkön ja veden kulutusta vuositasolla. Näet miten kulutus kehittyy vuodesta toiseen – ja saat ennakoivan arvion tulevista kustannuksista." },
+  { icon: "🔧", title: "Huoltohistoria", desc: "Kaikki tehdyt huollot, remontit ja tarkastukset dokumentoituna – tekijä, päivämäärä, kustannus ja liitteet. Kuitit ja takuut tallessa digitaalisesti. Löydät aina mitä tarvitset ja milloin." },
+  { icon: "📄", title: "Myyntiraportti", desc: "Kun taloa myydään, kaikki on valmiina. Yksi nappi tulostaa selkeän raportin välittäjälle – huoltohistoria, rakennusosat, energiankulutus ja dokumenttiliitteet järjestyksessä. Luottamusta herättävä paketti ostajalle." },
 ];
 
 const STEPS = [
