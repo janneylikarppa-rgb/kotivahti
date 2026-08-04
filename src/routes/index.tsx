@@ -438,7 +438,7 @@ function PhoneMock({ mock }: { mock: Mock }) {
         ) : (
           <>
             <div className="ph-rows">
-              {mock.rows.map(([k, v]) => (
+              {(mock.rows ?? []).map(([k, v]) => (
                 <div className="ph-row" key={k}>
                   <span className="k">{k}</span>
                   <span className="v">{v}</span>
