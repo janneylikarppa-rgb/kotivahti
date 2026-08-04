@@ -239,7 +239,7 @@ type Mock = {
   btn?: string;
 };
 
-const SHOWCASE: { icon: string; title: string; paragraphs: string[]; mock: Mock }[] = [
+const SHOWCASE: { icon: ReactNode; title: string; paragraphs: string[]; mock: Mock; fact?: string }[] = [
   {
     icon: "📋",
     title: "Kaikki talosi tiedot yhdessä paikassa",
@@ -360,6 +360,22 @@ const SHOWCASE: { icon: string; title: string; paragraphs: string[]; mock: Mock 
     },
   },
   {
+    icon: <Calculator size={28} color="var(--kulta)" strokeWidth={1.5} />,
+    title: "Kotitalousvähennys – seuraa hyöty euroina",
+    paragraphs: [
+      "Kotitalousvähennys on yksi suomalaisten käytetyimmistä verotuksen eduista – mutta moni jättää sen hakematta tai käyttää vain osan.",
+      "Kun kirjaat huollon tai remontin Kotivahdin huoltohistoriaan, merkitset samalla työn osuuden. Kotivahti laskee automaattisesti kuinka paljon verovähennystä on kertynyt ja paljonko on vielä käytettävissä – reaaliajassa, koko vuoden ajan.",
+      "Ei enää arvaile veroilmoituksessa. Kaikki kirjattu, kaikki laskettuna.",
+    ],
+    mock: {
+      title: "Kotitalousvähennys",
+      sub: "Arvio vuodelle 2026",
+      chip: "1 henkilö",
+      special: "kotitalousvahennys",
+    },
+    fact: "💡 Yritykseltä ostetusta työstä saa vähentää 35 % työn osuudesta. Maksimivähennys 1 600 € / henkilö. Lähde: vero.fi 2025–2026",
+  },
+  {
     icon: "📄",
     title: "Myyntitilanteessa kaikki on jo valmiina",
     paragraphs: [
@@ -383,6 +399,7 @@ const SHOWCASE: { icon: string; title: string; paragraphs: string[]; mock: Mock 
 ];
 
 function PhoneMock({ mock }: { mock: Mock }) {
+  const isKtv = mock.special === "kotitalousvahennys";
   return (
     <div className="phone">
       <div className="phone-screen">
@@ -390,15 +407,38 @@ function PhoneMock({ mock }: { mock: Mock }) {
         <div className="ph-title">{mock.title}</div>
         <div className="ph-sub">{mock.sub}</div>
         {mock.chip && <div className="ph-chip">{mock.chip}</div>}
-        <div className="ph-rows">
-          {mock.rows.map(([k, v]) => (
-            <div className="ph-row" key={k}>
-              <span className="k">{k}</span>
-              <span className="v">{v}</span>
+        {isKtv ? (
+          <div className="ph-ktv">
+            <div className="ph-ktv-amount">1 480 €</div>
+            <div className="ph-ktv-label">Arvioitu verovähennys</div>
+            <div className="ph-ktv-bar">
+              <div className="ph-ktv-fill" style={{ width: "92.5%" }} />
             </div>
-          ))}
-        </div>
-        {mock.btn && <div className="ph-btn">{mock.btn}</div>}
+            <div className="ph-ktv-meta">Jäljellä 120 € / 1 600 €</div>
+            <div className="ph-rows">
+              <div className="ph-row">
+                <span className="k">Yritystyöt</span>
+                <span className="v">4 120 €</span>
+              </div>
+              <div className="ph-row">
+                <span className="k">Palkkatyöt</span>
+                <span className="v">0 €</span>
+              </div>
+            </div>
+          </div>
+        ) : (
+          <>
+            <div className="ph-rows">
+              {mock.rows.map(([k, v]) => (
+                <div className="ph-row" key={k}>
+                  <span className="k">{k}</span>
+                  <span className="v">{v}</span>
+                </div>
+              ))}
+            </div>
+            {mock.btn && <div className="ph-btn">{mock.btn}</div>}
+          </>
+        )}
       </div>
     </div>
   );
@@ -563,6 +603,7 @@ function LandingPage() {
               </div>
               <div className="sc-visual">
                 <PhoneMock mock={s.mock} />
+                {s.fact && <div className="sc-fact">{s.fact}</div>}
               </div>
             </div>
           ))}
