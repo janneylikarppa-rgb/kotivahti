@@ -1,5 +1,6 @@
 import { createFileRoute, Link, redirect } from "@tanstack/react-router";
-import { useEffect } from "react";
+import { useEffect, type ReactNode } from "react";
+import { Calculator } from "lucide-react";
 import { getReadySession } from "@/lib/auth-session";
 
 export const Route = createFileRoute("/")({
@@ -168,6 +169,7 @@ html { scroll-behavior: smooth; }
 .sc-btn { display: inline-block; background: var(--kulta); color: #fff; text-decoration: none; font-weight: 600; font-size: 0.92rem; padding: 0.85rem 1.8rem; border-radius: 8px; margin-top: 0.6rem; transition: background 0.2s; }
 .sc-btn:hover { background: #b8842e; }
 .sc-note { color: var(--harmaa); font-size: 0.8rem; line-height: 1.5; margin-top: 0.8rem; opacity: 0.85; }
+.sc-fact { max-width: 320px; margin-top: 1.2rem; padding: 1rem; background: rgba(30,58,47,0.06); border: 1px solid rgba(200,151,58,0.22); border-radius: 10px; color: var(--harmaa); font-size: 0.82rem; line-height: 1.55; }
 
 .phone { width: 320px; max-width: 100%; background: var(--vihrea-dark); border: 1px solid rgba(200,151,58,0.25); border-radius: 34px; padding: 12px; box-shadow: 0 26px 50px -22px rgba(21,42,34,0.55); }
 .phone-screen { background: #16261f; border-radius: 24px; padding: 1.1rem 1rem 1.3rem; min-height: 400px; }
@@ -180,6 +182,12 @@ html { scroll-behavior: smooth; }
 .ph-row .k { color: rgba(255,255,255,0.5); }
 .ph-row .v { color: var(--valkoinen); font-weight: 600; text-align: right; }
 .ph-btn { margin-top: 1rem; background: rgba(200,151,58,0.9); color: #fff; text-align: center; font-size: 0.76rem; font-weight: 600; padding: 0.6rem; border-radius: 8px; }
+.ph-ktv { display: flex; flex-direction: column; align-items: center; text-align: center; padding: 0.5rem 0 1rem; }
+.ph-ktv-amount { font-family: 'Playfair Display', serif; font-size: 2.2rem; color: var(--kulta-light); line-height: 1; margin-bottom: 0.3rem; }
+.ph-ktv-label { color: rgba(255,255,255,0.5); font-size: 0.75rem; margin-bottom: 1rem; }
+.ph-ktv-bar { width: 100%; height: 10px; background: rgba(255,255,255,0.08); border-radius: 5px; overflow: hidden; margin-bottom: 0.6rem; }
+.ph-ktv-fill { height: 100%; background: linear-gradient(90deg, var(--kulta), var(--kulta-light)); border-radius: 5px; }
+.ph-ktv-meta { color: rgba(255,255,255,0.4); font-size: 0.7rem; margin-bottom: 1rem; }
 
 .sc-final { padding: 6.5rem 3rem; background: var(--vihrea-dark); text-align: center; position: relative; overflow: hidden; }
 .sc-final::before { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse 60% 80% at 50% 50%, rgba(200,151,58,0.1) 0%, transparent 70%); }
@@ -227,6 +235,7 @@ const FEATURES = [
   { icon: "📊", title: "PTS-suunnitelma", desc: "Pitkän tähtäimen suunnitelma laskee talosi tietojen perusteella milloin rakennusosat – katto, putket, lämmitysjärjestelmä, märkätilat – tarvitsevat huoltoa tai uusimista. Näet seuraavan 10 vuoden huoltotarpeet yhdellä silmäyksellä. Ei yllätyksiä, ei kiirehuoltoja – vain ennakointi." },
   { icon: "💰", title: "Kulujenseuranta", desc: "Seuraa sähkön ja veden kulutusta vuositasolla. Näet miten kulutus kehittyy vuodesta toiseen – ja saat ennakoivan arvion tulevista kustannuksista." },
   { icon: "🔧", title: "Huoltohistoria", desc: "Kaikki tehdyt huollot, remontit ja tarkastukset dokumentoituna – tekijä, päivämäärä, kustannus ja liitteet. Kuitit ja takuut tallessa digitaalisesti. Löydät aina mitä tarvitset ja milloin." },
+  { icon: "🧮", title: "Kotitalousvähennys", desc: "Seuraa kotitalousvähennyksen kertymää huolto- ja remonttikirjauksista. Kotivahti laskee automaattisesti, paljonko verovähennystä on kertynyt ja paljonko on vielä käytettävissä." },
   { icon: "📄", title: "Myyntiraportti", desc: "Kun taloa myydään, kaikki on valmiina. Yksi nappi tulostaa selkeän raportin välittäjälle – huoltohistoria, rakennusosat, energiankulutus ja dokumenttiliitteet järjestyksessä. Luottamusta herättävä paketti ostajalle." },
 ];
 
@@ -234,11 +243,12 @@ type Mock = {
   title: string;
   sub: string;
   chip?: string;
-  rows: [string, string][];
+  rows?: [string, string][];
   btn?: string;
+  special?: string;
 };
 
-const SHOWCASE: { icon: string; title: string; paragraphs: string[]; mock: Mock }[] = [
+const SHOWCASE: { icon: ReactNode; title: string; paragraphs: string[]; mock: Mock; fact?: string }[] = [
   {
     icon: "📋",
     title: "Kaikki talosi tiedot yhdessä paikassa",
@@ -359,6 +369,22 @@ const SHOWCASE: { icon: string; title: string; paragraphs: string[]; mock: Mock 
     },
   },
   {
+    icon: <Calculator size={28} color="var(--kulta)" strokeWidth={1.5} />,
+    title: "Kotitalousvähennys – seuraa hyöty euroina",
+    paragraphs: [
+      "Kotitalousvähennys on yksi suomalaisten käytetyimmistä verotuksen eduista – mutta moni jättää sen hakematta tai käyttää vain osan.",
+      "Kun kirjaat huollon tai remontin Kotivahdin huoltohistoriaan, merkitset samalla työn osuuden. Kotivahti laskee automaattisesti kuinka paljon verovähennystä on kertynyt ja paljonko on vielä käytettävissä – reaaliajassa, koko vuoden ajan.",
+      "Ei enää arvaile veroilmoituksessa. Kaikki kirjattu, kaikki laskettuna.",
+    ],
+    mock: {
+      title: "Kotitalousvähennys",
+      sub: "Arvio vuodelle 2026",
+      chip: "1 henkilö",
+      special: "kotitalousvahennys",
+    },
+    fact: "💡 Yritykseltä ostetusta työstä saa vähentää 35 % työn osuudesta. Maksimivähennys 1 600 € / henkilö. Lähde: vero.fi 2025–2026",
+  },
+  {
     icon: "📄",
     title: "Myyntitilanteessa kaikki on jo valmiina",
     paragraphs: [
@@ -382,6 +408,7 @@ const SHOWCASE: { icon: string; title: string; paragraphs: string[]; mock: Mock 
 ];
 
 function PhoneMock({ mock }: { mock: Mock }) {
+  const isKtv = mock.special === "kotitalousvahennys";
   return (
     <div className="phone">
       <div className="phone-screen">
@@ -389,15 +416,38 @@ function PhoneMock({ mock }: { mock: Mock }) {
         <div className="ph-title">{mock.title}</div>
         <div className="ph-sub">{mock.sub}</div>
         {mock.chip && <div className="ph-chip">{mock.chip}</div>}
-        <div className="ph-rows">
-          {mock.rows.map(([k, v]) => (
-            <div className="ph-row" key={k}>
-              <span className="k">{k}</span>
-              <span className="v">{v}</span>
+        {isKtv ? (
+          <div className="ph-ktv">
+            <div className="ph-ktv-amount">1 480 €</div>
+            <div className="ph-ktv-label">Arvioitu verovähennys</div>
+            <div className="ph-ktv-bar">
+              <div className="ph-ktv-fill" style={{ width: "92.5%" }} />
             </div>
-          ))}
-        </div>
-        {mock.btn && <div className="ph-btn">{mock.btn}</div>}
+            <div className="ph-ktv-meta">Jäljellä 120 € / 1 600 €</div>
+            <div className="ph-rows">
+              <div className="ph-row">
+                <span className="k">Yritystyöt</span>
+                <span className="v">4 120 €</span>
+              </div>
+              <div className="ph-row">
+                <span className="k">Palkkatyöt</span>
+                <span className="v">0 €</span>
+              </div>
+            </div>
+          </div>
+        ) : (
+          <>
+            <div className="ph-rows">
+              {(mock.rows ?? []).map(([k, v]) => (
+                <div className="ph-row" key={k}>
+                  <span className="k">{k}</span>
+                  <span className="v">{v}</span>
+                </div>
+              ))}
+            </div>
+            {mock.btn && <div className="ph-btn">{mock.btn}</div>}
+          </>
+        )}
       </div>
     </div>
   );
@@ -532,7 +582,7 @@ function LandingPage() {
           <div className="features-head animate-on-scroll">
             <div className="section-label">Ominaisuudet</div>
             <h2 className="section-h2">Kaikki mitä talo tarvitsee<br /><em>– yhdessä.</em></h2>
-            <p className="section-lead">Seitsemän toimintoa jotka tekevät talostasi hyvin hoidetun – automaattisesti ja ilman vaivaa.</p>
+            <p className="section-lead">Kahdeksan toimintoa jotka tekevät talostasi hyvin hoidetun – automaattisesti ja ilman vaivaa.</p>
           </div>
           <div className="features-grid">
             {FEATURES.map((f) => (
@@ -562,6 +612,7 @@ function LandingPage() {
               </div>
               <div className="sc-visual">
                 <PhoneMock mock={s.mock} />
+                {s.fact && <div className="sc-fact">{s.fact}</div>}
               </div>
             </div>
           ))}
