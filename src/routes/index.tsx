@@ -23,6 +23,7 @@ const STYLES = `
   --harmaa: #6b6b6b;
   --valkoinen: #ffffff;
 }
+html { scroll-behavior: smooth; }
 .kv-page * { margin: 0; padding: 0; box-sizing: border-box; }
 .kv-page { font-family: 'DM Sans', sans-serif; background: var(--kerma); color: var(--teksti); overflow-x: hidden; min-height: 100vh; }
 
