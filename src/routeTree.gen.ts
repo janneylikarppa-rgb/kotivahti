@@ -9,75 +9,44 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as VaihdaSalasanaRouteImport } from './routes/vaihda-salasana'
-import { Route as UnohtunutSalasanaRouteImport } from './routes/unohtunut-salasana'
-import { Route as UkkRouteImport } from './routes/ukk'
-import { Route as TietosuojaRouteImport } from './routes/tietosuoja'
-import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
-import { Route as RekisteroidyRouteImport } from './routes/rekisteroidy'
-import { Route as PalauteRouteImport } from './routes/palaute'
-import { Route as LoginRouteImport } from './routes/login'
-import { Route as KayttoehdotRouteImport } from './routes/kayttoehdot'
-import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as OpasIndexRouteImport } from './routes/opas/index'
-import { Route as OpasNuohousHintaRouteImport } from './routes/opas/nuohous-hinta'
-import { Route as OpasKatonTarkastusRouteImport } from './routes/opas/katon-tarkastus'
-import { Route as OpasIvPuhdistusRouteImport } from './routes/opas/iv-puhdistus'
-import { Route as AuthenticatedVuosikelloRouteImport } from './routes/_authenticated/vuosikello'
-import { Route as AuthenticatedTalonTiedotRouteImport } from './routes/_authenticated/talon-tiedot'
-import { Route as AuthenticatedPyynnotRouteImport } from './routes/_authenticated/pyynnot'
-import { Route as AuthenticatedPtsRouteImport } from './routes/_authenticated/pts'
-import { Route as AuthenticatedMyyntiraporttiRouteImport } from './routes/_authenticated/myyntiraportti'
-import { Route as AuthenticatedKulutRouteImport } from './routes/_authenticated/kulut'
-import { Route as AuthenticatedKotitalousvahennysRouteImport } from './routes/_authenticated/kotitalousvahennys'
-import { Route as AuthenticatedHuoltohistoriaRouteImport } from './routes/_authenticated/huoltohistoria'
-import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
+import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
+import { Route as KayttoehdotRouteImport } from './routes/kayttoehdot'
+import { Route as LoginRouteImport } from './routes/login'
+import { Route as PalauteRouteImport } from './routes/palaute'
+import { Route as RekisteroidyRouteImport } from './routes/rekisteroidy'
+import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
+import { Route as TietosuojaRouteImport } from './routes/tietosuoja'
+import { Route as UkkRouteImport } from './routes/ukk'
+import { Route as UnohtunutSalasanaRouteImport } from './routes/unohtunut-salasana'
+import { Route as VaihdaSalasanaRouteImport } from './routes/vaihda-salasana'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
+import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
+import { Route as AuthenticatedHuoltohistoriaRouteImport } from './routes/_authenticated/huoltohistoria'
+import { Route as AuthenticatedKotitalousvahennysRouteImport } from './routes/_authenticated/kotitalousvahennys'
+import { Route as AuthenticatedKulutRouteImport } from './routes/_authenticated/kulut'
+import { Route as AuthenticatedMyyntiraporttiRouteImport } from './routes/_authenticated/myyntiraportti'
+import { Route as AuthenticatedPtsRouteImport } from './routes/_authenticated/pts'
+import { Route as AuthenticatedPyynnotRouteImport } from './routes/_authenticated/pyynnot'
+import { Route as AuthenticatedTalonTiedotRouteImport } from './routes/_authenticated/talon-tiedot'
+import { Route as AuthenticatedVuosikelloRouteImport } from './routes/_authenticated/vuosikello'
+import { Route as OpasIndexRouteImport } from './routes/opas/index'
+import { Route as OpasIvPuhdistusRouteImport } from './routes/opas/iv-puhdistus'
+import { Route as OpasKatonTarkastusRouteImport } from './routes/opas/katon-tarkastus'
+import { Route as OpasNuohousHintaRouteImport } from './routes/opas/nuohous-hinta'
 import { Route as ApiPublicPalauteRouteImport } from './routes/api/public/palaute'
-import { Route as ApiPublicHooksYdinprosessiEskalointiRouteImport } from './routes/api/public/hooks/ydinprosessi-eskalointi'
-import { Route as ApiPublicHooksNuohousMuistutusRouteImport } from './routes/api/public/hooks/nuohous-muistutus'
-import { Route as ApiPublicHooksLahetaKausikirjeRouteImport } from './routes/api/public/hooks/laheta-kausikirje'
 import { Route as ApiPublicHooksKausikirjeFollowupRouteImport } from './routes/api/public/hooks/kausikirje-followup'
+import { Route as ApiPublicHooksLahetaKausikirjeRouteImport } from './routes/api/public/hooks/laheta-kausikirje'
+import { Route as ApiPublicHooksNuohousMuistutusRouteImport } from './routes/api/public/hooks/nuohous-muistutus'
+import { Route as ApiPublicHooksYdinprosessiEskalointiRouteImport } from './routes/api/public/hooks/ydinprosessi-eskalointi'
 
-const VaihdaSalasanaRoute = VaihdaSalasanaRouteImport.update({
-  id: '/vaihda-salasana',
-  path: '/vaihda-salasana',
+const IndexRoute = IndexRouteImport.update({
+  id: '/',
+  path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const UnohtunutSalasanaRoute = UnohtunutSalasanaRouteImport.update({
-  id: '/unohtunut-salasana',
-  path: '/unohtunut-salasana',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const UkkRoute = UkkRouteImport.update({
-  id: '/ukk',
-  path: '/ukk',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const TietosuojaRoute = TietosuojaRouteImport.update({
-  id: '/tietosuoja',
-  path: '/tietosuoja',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
-  id: '/sitemap.xml',
-  path: '/sitemap.xml',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const RekisteroidyRoute = RekisteroidyRouteImport.update({
-  id: '/rekisteroidy',
-  path: '/rekisteroidy',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const PalauteRoute = PalauteRouteImport.update({
-  id: '/palaute',
-  path: '/palaute',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const LoginRoute = LoginRouteImport.update({
-  id: '/login',
-  path: '/login',
+const AuthenticatedRoute = AuthenticatedRouteImport.update({
+  id: '/_authenticated',
   getParentRoute: () => rootRouteImport,
 } as any)
 const KayttoehdotRoute = KayttoehdotRouteImport.update({
@@ -85,54 +54,71 @@ const KayttoehdotRoute = KayttoehdotRouteImport.update({
   path: '/kayttoehdot',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AuthenticatedRoute = AuthenticatedRouteImport.update({
-  id: '/_authenticated',
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
   getParentRoute: () => rootRouteImport,
 } as any)
-const IndexRoute = IndexRouteImport.update({
-  id: '/',
-  path: '/',
+const PalauteRoute = PalauteRouteImport.update({
+  id: '/palaute',
+  path: '/palaute',
   getParentRoute: () => rootRouteImport,
 } as any)
-const OpasIndexRoute = OpasIndexRouteImport.update({
-  id: '/opas/',
-  path: '/opas/',
+const RekisteroidyRoute = RekisteroidyRouteImport.update({
+  id: '/rekisteroidy',
+  path: '/rekisteroidy',
   getParentRoute: () => rootRouteImport,
 } as any)
-const OpasNuohousHintaRoute = OpasNuohousHintaRouteImport.update({
-  id: '/opas/nuohous-hinta',
-  path: '/opas/nuohous-hinta',
+const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
+  id: '/sitemap.xml',
+  path: '/sitemap.xml',
   getParentRoute: () => rootRouteImport,
 } as any)
-const OpasKatonTarkastusRoute = OpasKatonTarkastusRouteImport.update({
-  id: '/opas/katon-tarkastus',
-  path: '/opas/katon-tarkastus',
+const TietosuojaRoute = TietosuojaRouteImport.update({
+  id: '/tietosuoja',
+  path: '/tietosuoja',
   getParentRoute: () => rootRouteImport,
 } as any)
-const OpasIvPuhdistusRoute = OpasIvPuhdistusRouteImport.update({
-  id: '/opas/iv-puhdistus',
-  path: '/opas/iv-puhdistus',
+const UkkRoute = UkkRouteImport.update({
+  id: '/ukk',
+  path: '/ukk',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AuthenticatedVuosikelloRoute = AuthenticatedVuosikelloRouteImport.update({
-  id: '/vuosikello',
-  path: '/vuosikello',
+const UnohtunutSalasanaRoute = UnohtunutSalasanaRouteImport.update({
+  id: '/unohtunut-salasana',
+  path: '/unohtunut-salasana',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const VaihdaSalasanaRoute = VaihdaSalasanaRouteImport.update({
+  id: '/vaihda-salasana',
+  path: '/vaihda-salasana',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
-const AuthenticatedTalonTiedotRoute =
-  AuthenticatedTalonTiedotRouteImport.update({
-    id: '/talon-tiedot',
-    path: '/talon-tiedot',
+const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedHuoltohistoriaRoute =
+  AuthenticatedHuoltohistoriaRouteImport.update({
+    id: '/huoltohistoria',
+    path: '/huoltohistoria',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
-const AuthenticatedPyynnotRoute = AuthenticatedPyynnotRouteImport.update({
-  id: '/pyynnot',
-  path: '/pyynnot',
-  getParentRoute: () => AuthenticatedRoute,
-} as any)
-const AuthenticatedPtsRoute = AuthenticatedPtsRouteImport.update({
-  id: '/pts',
-  path: '/pts',
+const AuthenticatedKotitalousvahennysRoute =
+  AuthenticatedKotitalousvahennysRouteImport.update({
+    id: '/kotitalousvahennys',
+    path: '/kotitalousvahennys',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedKulutRoute = AuthenticatedKulutRouteImport.update({
+  id: '/kulut',
+  path: '/kulut',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
 const AuthenticatedMyyntiraporttiRoute =
@@ -141,48 +127,56 @@ const AuthenticatedMyyntiraporttiRoute =
     path: '/myyntiraportti',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
-const AuthenticatedKulutRoute = AuthenticatedKulutRouteImport.update({
-  id: '/kulut',
-  path: '/kulut',
+const AuthenticatedPtsRoute = AuthenticatedPtsRouteImport.update({
+  id: '/pts',
+  path: '/pts',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
-const AuthenticatedKotitalousvahennysRoute =
-  AuthenticatedKotitalousvahennysRouteImport.update({
-    id: '/kotitalousvahennys',
-    path: '/kotitalousvahennys',
-    getParentRoute: () => AuthenticatedRoute,
-  } as any)
-const AuthenticatedHuoltohistoriaRoute =
-  AuthenticatedHuoltohistoriaRouteImport.update({
-    id: '/huoltohistoria',
-    path: '/huoltohistoria',
-    getParentRoute: () => AuthenticatedRoute,
-  } as any)
-const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
-  id: '/dashboard',
-  path: '/dashboard',
+const AuthenticatedPyynnotRoute = AuthenticatedPyynnotRouteImport.update({
+  id: '/pyynnot',
+  path: '/pyynnot',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
-const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
-  id: '/admin',
-  path: '/admin',
+const AuthenticatedTalonTiedotRoute =
+  AuthenticatedTalonTiedotRouteImport.update({
+    id: '/talon-tiedot',
+    path: '/talon-tiedot',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedVuosikelloRoute = AuthenticatedVuosikelloRouteImport.update({
+  id: '/vuosikello',
+  path: '/vuosikello',
   getParentRoute: () => AuthenticatedRoute,
+} as any)
+const OpasIndexRoute = OpasIndexRouteImport.update({
+  id: '/opas/',
+  path: '/opas/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const OpasIvPuhdistusRoute = OpasIvPuhdistusRouteImport.update({
+  id: '/opas/iv-puhdistus',
+  path: '/opas/iv-puhdistus',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const OpasKatonTarkastusRoute = OpasKatonTarkastusRouteImport.update({
+  id: '/opas/katon-tarkastus',
+  path: '/opas/katon-tarkastus',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const OpasNuohousHintaRoute = OpasNuohousHintaRouteImport.update({
+  id: '/opas/nuohous-hinta',
+  path: '/opas/nuohous-hinta',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const ApiPublicPalauteRoute = ApiPublicPalauteRouteImport.update({
   id: '/api/public/palaute',
   path: '/api/public/palaute',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ApiPublicHooksYdinprosessiEskalointiRoute =
-  ApiPublicHooksYdinprosessiEskalointiRouteImport.update({
-    id: '/api/public/hooks/ydinprosessi-eskalointi',
-    path: '/api/public/hooks/ydinprosessi-eskalointi',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ApiPublicHooksNuohousMuistutusRoute =
-  ApiPublicHooksNuohousMuistutusRouteImport.update({
-    id: '/api/public/hooks/nuohous-muistutus',
-    path: '/api/public/hooks/nuohous-muistutus',
+const ApiPublicHooksKausikirjeFollowupRoute =
+  ApiPublicHooksKausikirjeFollowupRouteImport.update({
+    id: '/api/public/hooks/kausikirje-followup',
+    path: '/api/public/hooks/kausikirje-followup',
     getParentRoute: () => rootRouteImport,
   } as any)
 const ApiPublicHooksLahetaKausikirjeRoute =
@@ -191,10 +185,16 @@ const ApiPublicHooksLahetaKausikirjeRoute =
     path: '/api/public/hooks/laheta-kausikirje',
     getParentRoute: () => rootRouteImport,
   } as any)
-const ApiPublicHooksKausikirjeFollowupRoute =
-  ApiPublicHooksKausikirjeFollowupRouteImport.update({
-    id: '/api/public/hooks/kausikirje-followup',
-    path: '/api/public/hooks/kausikirje-followup',
+const ApiPublicHooksNuohousMuistutusRoute =
+  ApiPublicHooksNuohousMuistutusRouteImport.update({
+    id: '/api/public/hooks/nuohous-muistutus',
+    path: '/api/public/hooks/nuohous-muistutus',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiPublicHooksYdinprosessiEskalointiRoute =
+  ApiPublicHooksYdinprosessiEskalointiRouteImport.update({
+    id: '/api/public/hooks/ydinprosessi-eskalointi',
+    path: '/api/public/hooks/ydinprosessi-eskalointi',
     getParentRoute: () => rootRouteImport,
   } as any)
 
@@ -415,67 +415,11 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/vaihda-salasana': {
-      id: '/vaihda-salasana'
-      path: '/vaihda-salasana'
-      fullPath: '/vaihda-salasana'
-      preLoaderRoute: typeof VaihdaSalasanaRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/unohtunut-salasana': {
-      id: '/unohtunut-salasana'
-      path: '/unohtunut-salasana'
-      fullPath: '/unohtunut-salasana'
-      preLoaderRoute: typeof UnohtunutSalasanaRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/ukk': {
-      id: '/ukk'
-      path: '/ukk'
-      fullPath: '/ukk'
-      preLoaderRoute: typeof UkkRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/tietosuoja': {
-      id: '/tietosuoja'
-      path: '/tietosuoja'
-      fullPath: '/tietosuoja'
-      preLoaderRoute: typeof TietosuojaRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/sitemap.xml': {
-      id: '/sitemap.xml'
-      path: '/sitemap.xml'
-      fullPath: '/sitemap.xml'
-      preLoaderRoute: typeof SitemapDotxmlRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/rekisteroidy': {
-      id: '/rekisteroidy'
-      path: '/rekisteroidy'
-      fullPath: '/rekisteroidy'
-      preLoaderRoute: typeof RekisteroidyRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/palaute': {
-      id: '/palaute'
-      path: '/palaute'
-      fullPath: '/palaute'
-      preLoaderRoute: typeof PalauteRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/login': {
-      id: '/login'
-      path: '/login'
-      fullPath: '/login'
-      preLoaderRoute: typeof LoginRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/kayttoehdot': {
-      id: '/kayttoehdot'
-      path: '/kayttoehdot'
-      fullPath: '/kayttoehdot'
-      preLoaderRoute: typeof KayttoehdotRouteImport
+    '/': {
+      id: '/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated': {
@@ -485,95 +429,74 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/': {
-      id: '/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
+    '/kayttoehdot': {
+      id: '/kayttoehdot'
+      path: '/kayttoehdot'
+      fullPath: '/kayttoehdot'
+      preLoaderRoute: typeof KayttoehdotRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/opas/': {
-      id: '/opas/'
-      path: '/opas'
-      fullPath: '/opas/'
-      preLoaderRoute: typeof OpasIndexRouteImport
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/opas/nuohous-hinta': {
-      id: '/opas/nuohous-hinta'
-      path: '/opas/nuohous-hinta'
-      fullPath: '/opas/nuohous-hinta'
-      preLoaderRoute: typeof OpasNuohousHintaRouteImport
+    '/palaute': {
+      id: '/palaute'
+      path: '/palaute'
+      fullPath: '/palaute'
+      preLoaderRoute: typeof PalauteRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/opas/katon-tarkastus': {
-      id: '/opas/katon-tarkastus'
-      path: '/opas/katon-tarkastus'
-      fullPath: '/opas/katon-tarkastus'
-      preLoaderRoute: typeof OpasKatonTarkastusRouteImport
+    '/rekisteroidy': {
+      id: '/rekisteroidy'
+      path: '/rekisteroidy'
+      fullPath: '/rekisteroidy'
+      preLoaderRoute: typeof RekisteroidyRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/opas/iv-puhdistus': {
-      id: '/opas/iv-puhdistus'
-      path: '/opas/iv-puhdistus'
-      fullPath: '/opas/iv-puhdistus'
-      preLoaderRoute: typeof OpasIvPuhdistusRouteImport
+    '/sitemap.xml': {
+      id: '/sitemap.xml'
+      path: '/sitemap.xml'
+      fullPath: '/sitemap.xml'
+      preLoaderRoute: typeof SitemapDotxmlRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/_authenticated/vuosikello': {
-      id: '/_authenticated/vuosikello'
-      path: '/vuosikello'
-      fullPath: '/vuosikello'
-      preLoaderRoute: typeof AuthenticatedVuosikelloRouteImport
-      parentRoute: typeof AuthenticatedRoute
+    '/tietosuoja': {
+      id: '/tietosuoja'
+      path: '/tietosuoja'
+      fullPath: '/tietosuoja'
+      preLoaderRoute: typeof TietosuojaRouteImport
+      parentRoute: typeof rootRouteImport
     }
-    '/_authenticated/talon-tiedot': {
-      id: '/_authenticated/talon-tiedot'
-      path: '/talon-tiedot'
-      fullPath: '/talon-tiedot'
-      preLoaderRoute: typeof AuthenticatedTalonTiedotRouteImport
-      parentRoute: typeof AuthenticatedRoute
+    '/ukk': {
+      id: '/ukk'
+      path: '/ukk'
+      fullPath: '/ukk'
+      preLoaderRoute: typeof UkkRouteImport
+      parentRoute: typeof rootRouteImport
     }
-    '/_authenticated/pyynnot': {
-      id: '/_authenticated/pyynnot'
-      path: '/pyynnot'
-      fullPath: '/pyynnot'
-      preLoaderRoute: typeof AuthenticatedPyynnotRouteImport
-      parentRoute: typeof AuthenticatedRoute
+    '/unohtunut-salasana': {
+      id: '/unohtunut-salasana'
+      path: '/unohtunut-salasana'
+      fullPath: '/unohtunut-salasana'
+      preLoaderRoute: typeof UnohtunutSalasanaRouteImport
+      parentRoute: typeof rootRouteImport
     }
-    '/_authenticated/pts': {
-      id: '/_authenticated/pts'
-      path: '/pts'
-      fullPath: '/pts'
-      preLoaderRoute: typeof AuthenticatedPtsRouteImport
-      parentRoute: typeof AuthenticatedRoute
+    '/vaihda-salasana': {
+      id: '/vaihda-salasana'
+      path: '/vaihda-salasana'
+      fullPath: '/vaihda-salasana'
+      preLoaderRoute: typeof VaihdaSalasanaRouteImport
+      parentRoute: typeof rootRouteImport
     }
-    '/_authenticated/myyntiraportti': {
-      id: '/_authenticated/myyntiraportti'
-      path: '/myyntiraportti'
-      fullPath: '/myyntiraportti'
-      preLoaderRoute: typeof AuthenticatedMyyntiraporttiRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
-    '/_authenticated/kulut': {
-      id: '/_authenticated/kulut'
-      path: '/kulut'
-      fullPath: '/kulut'
-      preLoaderRoute: typeof AuthenticatedKulutRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
-    '/_authenticated/kotitalousvahennys': {
-      id: '/_authenticated/kotitalousvahennys'
-      path: '/kotitalousvahennys'
-      fullPath: '/kotitalousvahennys'
-      preLoaderRoute: typeof AuthenticatedKotitalousvahennysRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
-    '/_authenticated/huoltohistoria': {
-      id: '/_authenticated/huoltohistoria'
-      path: '/huoltohistoria'
-      fullPath: '/huoltohistoria'
-      preLoaderRoute: typeof AuthenticatedHuoltohistoriaRouteImport
+    '/_authenticated/admin': {
+      id: '/_authenticated/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AuthenticatedAdminRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/dashboard': {
@@ -583,12 +506,89 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
-    '/_authenticated/admin': {
-      id: '/_authenticated/admin'
-      path: '/admin'
-      fullPath: '/admin'
-      preLoaderRoute: typeof AuthenticatedAdminRouteImport
+    '/_authenticated/huoltohistoria': {
+      id: '/_authenticated/huoltohistoria'
+      path: '/huoltohistoria'
+      fullPath: '/huoltohistoria'
+      preLoaderRoute: typeof AuthenticatedHuoltohistoriaRouteImport
       parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/kotitalousvahennys': {
+      id: '/_authenticated/kotitalousvahennys'
+      path: '/kotitalousvahennys'
+      fullPath: '/kotitalousvahennys'
+      preLoaderRoute: typeof AuthenticatedKotitalousvahennysRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/kulut': {
+      id: '/_authenticated/kulut'
+      path: '/kulut'
+      fullPath: '/kulut'
+      preLoaderRoute: typeof AuthenticatedKulutRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/myyntiraportti': {
+      id: '/_authenticated/myyntiraportti'
+      path: '/myyntiraportti'
+      fullPath: '/myyntiraportti'
+      preLoaderRoute: typeof AuthenticatedMyyntiraporttiRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/pts': {
+      id: '/_authenticated/pts'
+      path: '/pts'
+      fullPath: '/pts'
+      preLoaderRoute: typeof AuthenticatedPtsRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/pyynnot': {
+      id: '/_authenticated/pyynnot'
+      path: '/pyynnot'
+      fullPath: '/pyynnot'
+      preLoaderRoute: typeof AuthenticatedPyynnotRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/talon-tiedot': {
+      id: '/_authenticated/talon-tiedot'
+      path: '/talon-tiedot'
+      fullPath: '/talon-tiedot'
+      preLoaderRoute: typeof AuthenticatedTalonTiedotRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/vuosikello': {
+      id: '/_authenticated/vuosikello'
+      path: '/vuosikello'
+      fullPath: '/vuosikello'
+      preLoaderRoute: typeof AuthenticatedVuosikelloRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/opas/': {
+      id: '/opas/'
+      path: '/opas'
+      fullPath: '/opas/'
+      preLoaderRoute: typeof OpasIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/opas/iv-puhdistus': {
+      id: '/opas/iv-puhdistus'
+      path: '/opas/iv-puhdistus'
+      fullPath: '/opas/iv-puhdistus'
+      preLoaderRoute: typeof OpasIvPuhdistusRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/opas/katon-tarkastus': {
+      id: '/opas/katon-tarkastus'
+      path: '/opas/katon-tarkastus'
+      fullPath: '/opas/katon-tarkastus'
+      preLoaderRoute: typeof OpasKatonTarkastusRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/opas/nuohous-hinta': {
+      id: '/opas/nuohous-hinta'
+      path: '/opas/nuohous-hinta'
+      fullPath: '/opas/nuohous-hinta'
+      preLoaderRoute: typeof OpasNuohousHintaRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/api/public/palaute': {
       id: '/api/public/palaute'
@@ -597,18 +597,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicPalauteRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/public/hooks/ydinprosessi-eskalointi': {
-      id: '/api/public/hooks/ydinprosessi-eskalointi'
-      path: '/api/public/hooks/ydinprosessi-eskalointi'
-      fullPath: '/api/public/hooks/ydinprosessi-eskalointi'
-      preLoaderRoute: typeof ApiPublicHooksYdinprosessiEskalointiRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/public/hooks/nuohous-muistutus': {
-      id: '/api/public/hooks/nuohous-muistutus'
-      path: '/api/public/hooks/nuohous-muistutus'
-      fullPath: '/api/public/hooks/nuohous-muistutus'
-      preLoaderRoute: typeof ApiPublicHooksNuohousMuistutusRouteImport
+    '/api/public/hooks/kausikirje-followup': {
+      id: '/api/public/hooks/kausikirje-followup'
+      path: '/api/public/hooks/kausikirje-followup'
+      fullPath: '/api/public/hooks/kausikirje-followup'
+      preLoaderRoute: typeof ApiPublicHooksKausikirjeFollowupRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/public/hooks/laheta-kausikirje': {
@@ -618,11 +611,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicHooksLahetaKausikirjeRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/public/hooks/kausikirje-followup': {
-      id: '/api/public/hooks/kausikirje-followup'
-      path: '/api/public/hooks/kausikirje-followup'
-      fullPath: '/api/public/hooks/kausikirje-followup'
-      preLoaderRoute: typeof ApiPublicHooksKausikirjeFollowupRouteImport
+    '/api/public/hooks/nuohous-muistutus': {
+      id: '/api/public/hooks/nuohous-muistutus'
+      path: '/api/public/hooks/nuohous-muistutus'
+      fullPath: '/api/public/hooks/nuohous-muistutus'
+      preLoaderRoute: typeof ApiPublicHooksNuohousMuistutusRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/hooks/ydinprosessi-eskalointi': {
+      id: '/api/public/hooks/ydinprosessi-eskalointi'
+      path: '/api/public/hooks/ydinprosessi-eskalointi'
+      fullPath: '/api/public/hooks/ydinprosessi-eskalointi'
+      preLoaderRoute: typeof ApiPublicHooksYdinprosessiEskalointiRouteImport
       parentRoute: typeof rootRouteImport
     }
   }
