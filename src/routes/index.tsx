@@ -263,8 +263,6 @@ function LandingPage() {
               <Link to="/rekisteroidy" className="btn-primary">
                 Avaa talokirja ilmaiseksi →
               </Link>
-              <div className="hero-trust">
-              </div>
             </div>
           </div>
 
