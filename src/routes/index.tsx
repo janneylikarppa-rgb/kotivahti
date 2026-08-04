@@ -264,9 +264,7 @@ function LandingPage() {
                 Avaa talokirja ilmaiseksi →
               </Link>
               <div className="hero-trust">
-                <div className="trust-item"><span>✓</span> Tarkastetut ammattilaiset</div>
                 <div className="trust-item"><span>🔒</span> Tietosi suojattu</div>
-                
               </div>
             </div>
           </div>
