@@ -382,10 +382,14 @@ const SHOWCASE: { icon: ReactNode; title: string; paragraphs: string[]; mock: Mo
     mock: {
       title: "Kotitalousvähennys",
       sub: "Arvio vuodelle 2026",
-      chip: "1 henkilö",
+      chip: (
+        <div className="ph-chip-group">
+          <span className="ph-chip ph-chip-active">1 henkilö</span>
+          <span className="ph-chip">2 henkilöä</span>
+        </div>
+      ),
       special: "kotitalousvahennys",
     },
-    fact: "💡 Yritykseltä ostetusta työstä saa vähentää 35 % työn osuudesta. Maksimivähennys 1 600 € / henkilö. Lähde: vero.fi 2025–2026",
   },
   {
     icon: "📄",
