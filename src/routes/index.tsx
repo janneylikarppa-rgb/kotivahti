@@ -1,5 +1,6 @@
 import { createFileRoute, Link, redirect } from "@tanstack/react-router";
-import { useEffect } from "react";
+import { useEffect, type ReactNode } from "react";
+import { Calculator } from "lucide-react";
 import { getReadySession } from "@/lib/auth-session";
 
 export const Route = createFileRoute("/")({
@@ -532,7 +533,7 @@ function LandingPage() {
           <div className="features-head animate-on-scroll">
             <div className="section-label">Ominaisuudet</div>
             <h2 className="section-h2">Kaikki mitä talo tarvitsee<br /><em>– yhdessä.</em></h2>
-            <p className="section-lead">Seitsemän toimintoa jotka tekevät talostasi hyvin hoidetun – automaattisesti ja ilman vaivaa.</p>
+            <p className="section-lead">Kahdeksan toimintoa jotka tekevät talostasi hyvin hoidetun – automaattisesti ja ilman vaivaa.</p>
           </div>
           <div className="features-grid">
             {FEATURES.map((f) => (
