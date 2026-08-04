@@ -266,7 +266,7 @@ function LandingPage() {
               <div className="hero-trust">
                 <div className="trust-item"><span>✓</span> Tarkastetut ammattilaiset</div>
                 <div className="trust-item"><span>🔒</span> Tietosi suojattu</div>
-                <div className="trust-item"><span>✦</span> Ei luottokorttia</div>
+                
               </div>
             </div>
           </div>
