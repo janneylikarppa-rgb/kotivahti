@@ -422,7 +422,13 @@ function PhoneMock({ mock }: { mock: Mock }) {
         <div className="phone-notch" />
         <div className="ph-title">{mock.title}</div>
         <div className="ph-sub">{mock.sub}</div>
-        {mock.chip && <div className="ph-chip">{mock.chip}</div>}
+        {mock.chip && (
+          typeof mock.chip === "string" ? (
+            <div className="ph-chip">{mock.chip}</div>
+          ) : (
+            mock.chip
+          )
+        )}
         {isKtv ? (
           <div className="ph-ktv">
             <div className="ph-ktv-amount">1 480 €</div>
