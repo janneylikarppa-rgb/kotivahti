@@ -242,7 +242,7 @@ const FEATURES = [
 type Mock = {
   title: string;
   sub: string;
-  chip?: string;
+  chip?: ReactNode;
   rows?: [string, string][];
   btn?: string;
   special?: string;
