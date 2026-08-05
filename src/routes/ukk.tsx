@@ -59,6 +59,9 @@ export const Route = createFileRoute("/ukk")({
 function UkkPage() {
   return (
     <main className="mx-auto max-w-3xl px-4 py-12 md:py-20">
+      <Link to="/" className="mb-6 inline-block text-sm text-cream/60 transition hover:text-[color:var(--kulta)]">
+        ← Takaisin etusivulle
+      </Link>
       <p className="eyebrow mb-3">Usein kysytyt kysymykset</p>
       <h1 className="font-serif text-4xl text-cream md:text-5xl">UKK — Kotivahti</h1>
       <p className="mt-4 text-cream/70">
