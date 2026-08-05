@@ -97,6 +97,11 @@ export function OpasLayout({ o }: { o: OpasSisalto }) {
           Aloita maksutta
         </a>
       </aside>
+
+      <div className="mt-12 flex gap-6 border-t border-cream/10 pt-6 text-sm">
+        <a href="/" className="text-cream/60 transition hover:text-[color:var(--kulta)]">← Takaisin etusivulle</a>
+        <a href="/opas" className="text-cream/60 transition hover:text-[color:var(--kulta)]">Kaikki oppaat</a>
+      </div>
     </main>
   );
 }
