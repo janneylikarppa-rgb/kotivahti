@@ -59,6 +59,9 @@ export const Route = createFileRoute("/ukk")({
 function UkkPage() {
   return (
     <main className="mx-auto max-w-3xl px-4 py-12 md:py-20">
+      <Link to="/" className="mb-6 inline-block text-sm text-cream/60 transition hover:text-[color:var(--kulta)]">
+        ← Takaisin etusivulle
+      </Link>
       <p className="eyebrow mb-3">Usein kysytyt kysymykset</p>
       <h1 className="font-serif text-4xl text-cream md:text-5xl">UKK — Kotivahti</h1>
       <p className="mt-4 text-cream/70">
@@ -78,6 +81,11 @@ function UkkPage() {
         <p className="text-cream">Aloita Kotivahdin käyttö maksutta — talokirja, PTS ja kausimuistutukset.</p>
         <Link to="/rekisteroidy" className="mt-4 inline-block rounded-md bg-[color:var(--kulta)] px-6 py-2.5 font-semibold text-[#0D1F14]">
           Rekisteröidy
+        </Link>
+      </div>
+      <div className="mt-12 border-t border-cream/10 pt-6">
+        <Link to="/" className="text-sm text-cream/60 transition hover:text-[color:var(--kulta)]">
+          ← Takaisin etusivulle
         </Link>
       </div>
     </main>

@@ -62,6 +62,8 @@ export function OpasLayout({ o }: { o: OpasSisalto }) {
   return (
     <main className="mx-auto max-w-3xl px-4 py-12 md:py-20">
       <p className="eyebrow mb-3">
+        <a href="/" className="text-cream/60 hover:text-cream">Etusivu</a>
+        <span className="mx-2 text-cream/30">›</span>
         <a href="/opas" className="text-cream/60 hover:text-cream">Oppaat</a>
       </p>
       <h1 className="font-serif text-4xl text-cream md:text-5xl">{o.title}</h1>
@@ -95,6 +97,11 @@ export function OpasLayout({ o }: { o: OpasSisalto }) {
           Aloita maksutta
         </a>
       </aside>
+
+      <div className="mt-12 flex gap-6 border-t border-cream/10 pt-6 text-sm">
+        <a href="/" className="text-cream/60 transition hover:text-[color:var(--kulta)]">← Takaisin etusivulle</a>
+        <a href="/opas" className="text-cream/60 transition hover:text-[color:var(--kulta)]">Kaikki oppaat</a>
+      </div>
     </main>
   );
 }

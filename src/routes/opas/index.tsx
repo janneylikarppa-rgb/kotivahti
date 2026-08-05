@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 
 const SITE = "https://kotivahti.fi";
 
@@ -38,6 +38,9 @@ export const Route = createFileRoute("/opas/")({
 function OpasIndex() {
   return (
     <main className="mx-auto max-w-4xl px-4 py-12 md:py-20">
+      <Link to="/" className="mb-6 inline-block text-sm text-cream/60 transition hover:text-[color:var(--kulta)]">
+        ← Takaisin etusivulle
+      </Link>
       <p className="eyebrow mb-3">Oppaat</p>
       <h1 className="font-serif text-4xl text-cream md:text-5xl">Talon huolto-oppaat</h1>
       <p className="mt-4 max-w-2xl text-cream/70">
@@ -55,6 +58,11 @@ function OpasIndex() {
             <span className="mt-3 inline-block text-sm text-[color:var(--kulta)]">Lue opas →</span>
           </a>
         ))}
+      </div>
+      <div className="mt-12 border-t border-cream/10 pt-6">
+        <Link to="/" className="text-sm text-cream/60 transition hover:text-[color:var(--kulta)]">
+          ← Takaisin etusivulle
+        </Link>
       </div>
     </main>
   );
