@@ -1,12 +1,12 @@
-# Paluulinkit UKK- ja opassivuille + arvio kielivalinnasta
+# Paluulinkit UKK- ja opassivuille
 
-## Osa 1 — Paluu etusivulle (tehdään nyt)
+## Toteutus (osa 1)
 
 Lisätään yhtenäinen "← Takaisin etusivulle" -linkki kolmeen paikkaan:
 
 - `src/routes/ukk.tsx` — linkki heti sivun alkuun (otsikon yläpuolelle) ja toinen sisällön loppuun.
 - `src/routes/opas/index.tsx` — sama linkki oppaiden listasivun alkuun ja loppuun.
-- `src/components/opas-layout.tsx` — yksittäisille opassivuille: yläreunaan nykyisen "Oppaat"-murupolun rinnalle (Etusivu › Oppaat) ja alalaitaan CTA-laatikon jälkeen paluulinkki.
+- `src/components/opas-layout.tsx` — yksittäisille opassivuille: yläreunaan murupolku (Etusivu › Oppaat) ja alalaitaan CTA-laatikon jälkeen paluulinkki.
 
 Tyyli: sama hillitty kerma/kulta-linkki kuin lakisivujen alalaidassa (`legal-layout.tsx`), TanStack `<Link to="/">` eikä `<a>`. Ei muita sisältömuutoksia.
 
