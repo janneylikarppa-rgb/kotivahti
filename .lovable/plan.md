@@ -10,7 +10,7 @@ Lisätään yhtenäinen "← Takaisin etusivulle" -linkki kolmeen paikkaan:
 
 Tyyli: sama hillitty kerma/kulta-linkki kuin lakisivujen alalaidassa (`legal-layout.tsx`), TanStack `<Link to="/">` eikä `<a>`. Ei muita sisältömuutoksia.
 
-## Osa 2 — Kielivalinta (arvio, ei toteuteta vielä)
+## Kielivalinta (myöhemmin, ei tässä)
 
 Kysyit onko iso työ. Lyhyt vastaus: **keskisuuri–iso**, koska sovelluksessa on satoja suomenkielisiä tekstejä hajallaan komponenteissa sekä sisältödataa (PTS-kohteet, vuosikello, huolto-infot, oppaat, sähköpostipohjat).
 
