@@ -83,6 +83,11 @@ function UkkPage() {
           Rekisteröidy
         </Link>
       </div>
+      <div className="mt-12 border-t border-cream/10 pt-6">
+        <Link to="/" className="text-sm text-cream/60 transition hover:text-[color:var(--kulta)]">
+          ← Takaisin etusivulle
+        </Link>
+      </div>
     </main>
   );
 }
