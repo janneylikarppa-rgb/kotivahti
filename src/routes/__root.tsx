@@ -12,6 +12,8 @@ import {
 import appCss from "../styles.css?url";
 import { getCachedSession, subscribeToSession } from "@/lib/auth-session";
 import { Toaster } from "@/components/ui/sonner";
+import { AsennaBanner } from "@/components/asenna-banner";
+import { registerServiceWorker } from "@/lib/pwa";
 
 function NotFoundComponent() {
   return (
