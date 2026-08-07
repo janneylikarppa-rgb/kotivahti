@@ -186,11 +186,17 @@ function ChunkReloadGuard() {
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
+
+  useEffect(() => {
+    registerServiceWorker();
+  }, []);
+
   return (
     <QueryClientProvider client={queryClient}>
       <ChunkReloadGuard />
       <AuthSync />
       <Outlet />
+      <AsennaBanner />
       <Toaster />
     </QueryClientProvider>
   );
