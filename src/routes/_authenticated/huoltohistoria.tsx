@@ -146,7 +146,7 @@ function HuoltoPage() {
           {editing && (
             <HuoltoForm
               initial={editing}
-              onSubmit={(v) => updM.mutate({ id: editing.id, ...v })}
+              onSubmit={(v) => updM.mutateAsync({ id: editing.id, ...v })}
               loading={updM.isPending}
               submitLabel="Tallenna muutokset"
               invalidate={invalidate}
