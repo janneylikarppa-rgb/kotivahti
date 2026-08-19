@@ -35,6 +35,7 @@ function VuosikelloPage() {
   const fetchFn = useServerFn(getKuitatut);
   const fetchPts = useServerFn(getPts);
   const kuittaaFn = useServerFn(kuittaaHuolto);
+  const metriikkaFn = useServerFn(paivitaMetriikka);
   const qc = useQueryClient();
   const { data } = useQuery({ queryKey: ["kuitatut"], queryFn: () => fetchFn() });
   const { data: ptsData } = useQuery({ queryKey: ["pts"], queryFn: () => fetchPts(), staleTime: 30_000 });
