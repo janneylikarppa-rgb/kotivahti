@@ -33,7 +33,7 @@ export function HuoltoForm({
 }: {
   initial?: any;
   lockKohde?: boolean;
-  onSubmit: (v: any) => void;
+  onSubmit: (v: any) => void | Promise<void>;
   loading: boolean;
   submitLabel?: string;
   invalidate: () => void;
