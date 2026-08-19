@@ -121,7 +121,7 @@ export function HuoltoForm({
 
   return (
     <form
-      onSubmit={(e) => {
+      onSubmit={async (e) => {
         e.preventDefault();
         const laite_paivitys = paivitaTalo && voiPaivittaa
           ? {
@@ -134,7 +134,7 @@ export function HuoltoForm({
         const ktv = form.kotitalousvahennys_tyyppi === "yritys" || form.kotitalousvahennys_tyyppi === "palkka"
           ? form.kotitalousvahennys_tyyppi
           : null;
-        onSubmit({
+        await onSubmit({
           ...form,
           kustannus: Number(form.kustannus || 0),
           kotitalousvahennys_tyyppi: ktv,
@@ -144,6 +144,10 @@ export function HuoltoForm({
           liitteet: uudet,
           laite_paivitys,
         });
+        // Metriikka: uusi huolto kirjattu (ei päivityksissä)
+        if (!initial?.id) {
+          metriikkaFn({ data: { kentta: "huoltoja_kirjattu", maara: 1 } }).catch(() => {});
+        }
       }}
       className="space-y-4"
     >
