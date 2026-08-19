@@ -667,12 +667,6 @@ export const kuittaaHuolto = createServerFn({ method: "POST" })
     }, { onConflict: "kiinteisto_id,kausi_key,huolto_nimi,vuosi" });
     if (error) throw error;
 
-    // Metriikka: vuosikellon kuittaus
-    try {
-      const { inkrementoiMetriikka } = await import("@/lib/palaute.functions");
-      await inkrementoiMetriikka(userId, "vuosikelloa_kuitattu", 1);
-    } catch {}
-
     return { ok: true };
   });
 
