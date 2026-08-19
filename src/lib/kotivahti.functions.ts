@@ -347,11 +347,6 @@ export const saveTaloTiedot = createServerFn({ method: "POST" })
     const { data: kRow } = await supabase.from("kiinteistot").select("rakennusvuosi").eq("id", k.id).maybeSingle();
     const talo = taloRaw ? { ...taloRaw, rakennusvuosi: (kRow as any)?.rakennusvuosi } : null;
     await synkronoiPts(supabase, k.id, talo);
-    // Metriikka: talon tiedot täytetty
-    try {
-      const { inkrementoiMetriikka } = await import("@/lib/palaute.functions");
-      await inkrementoiMetriikka(userId, "talon_tiedot_taytetty", 1);
-    } catch {}
     return { ok: true };
   });
 
