@@ -302,6 +302,8 @@ function TaloTiedotPage() {
       qc.invalidateQueries({ queryKey: ["talo"], refetchType: "inactive" });
       qc.invalidateQueries({ queryKey: ["dashboard"] });
       qc.invalidateQueries({ queryKey: ["pts"] });
+      // Metriikka: talon tiedot täytetty (boolean, idempotentti tietokantafunktiossa)
+      metriikkaFn({ data: { kentta: "talon_tiedot_taytetty", maara: 1 } }).catch(() => {});
       if (opts?.silent) {
         setAutoStatus("saved");
         setTimeout(() => setAutoStatus("idle"), 1500);
