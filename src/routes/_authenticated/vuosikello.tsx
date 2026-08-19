@@ -56,6 +56,8 @@ function VuosikelloPage() {
       qc.invalidateQueries({ queryKey: ["kulut"] });
       qc.invalidateQueries({ queryKey: ["dashboard"] });
       qc.invalidateQueries({ queryKey: ["huollot"] });
+      // Metriikka: vuosikellon kuittaus
+      metriikkaFn({ data: { kentta: "vuosikelloa_kuitattu", maara: 1 } }).catch(() => {});
       setValittu(null);
     },
     onError: (e: any) => toast.error(e.message),
