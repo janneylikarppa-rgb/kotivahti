@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { deleteHuoltoLiite, getDokumenttiUrl } from "@/lib/kotivahti.functions";
+import { paivitaMetriikka } from "@/lib/palaute.functions";
 import { HUOLTO_KOHDE_RYHMAT, HUOLTO_TYYPIT } from "@/lib/huolto-kohteet";
 import { materiaalivaihtoehdot, tukeeLaitePaivitysta, tukeeMerkkiMalli } from "@/lib/laite-paivitys";
 import { supabase } from "@/integrations/supabase/client";
@@ -32,7 +33,7 @@ export function HuoltoForm({
 }: {
   initial?: any;
   lockKohde?: boolean;
-  onSubmit: (v: any) => void;
+  onSubmit: (v: any) => unknown;
   loading: boolean;
   submitLabel?: string;
   invalidate: () => void;
@@ -61,6 +62,7 @@ export function HuoltoForm({
 
   const urlFn = useServerFn(getDokumenttiUrl);
   const delLiiteFn = useServerFn(deleteHuoltoLiite);
+  const metriikkaFn = useServerFn(paivitaMetriikka);
 
   const handleChange = (k: string, v: any) => setForm({ ...form, [k]: v });
 
@@ -119,7 +121,7 @@ export function HuoltoForm({
 
   return (
     <form
-      onSubmit={(e) => {
+      onSubmit={async (e) => {
         e.preventDefault();
         const laite_paivitys = paivitaTalo && voiPaivittaa
           ? {
@@ -132,7 +134,7 @@ export function HuoltoForm({
         const ktv = form.kotitalousvahennys_tyyppi === "yritys" || form.kotitalousvahennys_tyyppi === "palkka"
           ? form.kotitalousvahennys_tyyppi
           : null;
-        onSubmit({
+        await onSubmit({
           ...form,
           kustannus: Number(form.kustannus || 0),
           kotitalousvahennys_tyyppi: ktv,
@@ -142,6 +144,10 @@ export function HuoltoForm({
           liitteet: uudet,
           laite_paivitys,
         });
+        // Metriikka: uusi huolto kirjattu (ei päivityksissä)
+        if (!initial?.id) {
+          metriikkaFn({ data: { kentta: "huoltoja_kirjattu", maara: 1 } }).catch(() => {});
+        }
       }}
       className="space-y-4"
     >

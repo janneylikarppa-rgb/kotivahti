@@ -3,6 +3,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useRef, useState } from "react";
 import { getTaloTiedot, saveTaloTiedot, addDokumentti, deleteDokumentti, getDokumenttiUrl } from "@/lib/kotivahti.functions";
+import { paivitaMetriikka } from "@/lib/palaute.functions";
 import { haeRyhtiTiedot, haeRyhtiKoordinaateilla } from "@/lib/ryhti.functions";
 import { OsoiteAutocomplete } from "@/components/osoite-autocomplete";
 import { supabase } from "@/integrations/supabase/client";
@@ -129,6 +130,7 @@ function boolOrNull(v: any) { return v === "" || v == null ? null : Boolean(v); 
 function TaloTiedotPage() {
   const fetchFn = useServerFn(getTaloTiedot);
   const saveFn = useServerFn(saveTaloTiedot);
+  const metriikkaFn = useServerFn(paivitaMetriikka);
   const qc = useQueryClient();
   const { data, isLoading } = useQuery({ queryKey: ["talo"], queryFn: () => fetchFn(), staleTime: 30_000 });
   const [active, setActive] = useState(0);
@@ -300,6 +302,8 @@ function TaloTiedotPage() {
       qc.invalidateQueries({ queryKey: ["talo"], refetchType: "inactive" });
       qc.invalidateQueries({ queryKey: ["dashboard"] });
       qc.invalidateQueries({ queryKey: ["pts"] });
+      // Metriikka: talon tiedot täytetty (boolean, idempotentti tietokantafunktiossa)
+      metriikkaFn({ data: { kentta: "talon_tiedot_taytetty", maara: 1 } }).catch(() => {});
       if (opts?.silent) {
         setAutoStatus("saved");
         setTimeout(() => setAutoStatus("idle"), 1500);

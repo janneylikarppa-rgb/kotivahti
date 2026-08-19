@@ -3,6 +3,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
 import { getKuitatut, getPts, kuittaaHuolto } from "@/lib/kotivahti.functions";
+import { paivitaMetriikka } from "@/lib/palaute.functions";
 import { KAUDET, kaikkiHuollot, PERUSHUOLLOT, dynamicHuollot, type Kausi, type HuoltoRivi } from "@/lib/vuosikello-data";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -34,6 +35,7 @@ function VuosikelloPage() {
   const fetchFn = useServerFn(getKuitatut);
   const fetchPts = useServerFn(getPts);
   const kuittaaFn = useServerFn(kuittaaHuolto);
+  const metriikkaFn = useServerFn(paivitaMetriikka);
   const qc = useQueryClient();
   const { data } = useQuery({ queryKey: ["kuitatut"], queryFn: () => fetchFn() });
   const { data: ptsData } = useQuery({ queryKey: ["pts"], queryFn: () => fetchPts(), staleTime: 30_000 });
@@ -54,6 +56,8 @@ function VuosikelloPage() {
       qc.invalidateQueries({ queryKey: ["kulut"] });
       qc.invalidateQueries({ queryKey: ["dashboard"] });
       qc.invalidateQueries({ queryKey: ["huollot"] });
+      // Metriikka: vuosikellon kuittaus
+      metriikkaFn({ data: { kentta: "vuosikelloa_kuitattu", maara: 1 } }).catch(() => {});
       setValittu(null);
     },
     onError: (e: any) => toast.error(e.message),

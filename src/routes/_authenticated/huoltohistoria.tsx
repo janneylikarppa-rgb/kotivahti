@@ -83,7 +83,7 @@ function HuoltoPage() {
           </DialogTrigger>
           <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
             <DialogHeader><DialogTitle className="font-serif text-2xl">Lisää huoltomerkintä</DialogTitle></DialogHeader>
-            <HuoltoForm onSubmit={(v) => addM.mutate(v)} loading={addM.isPending} invalidate={invalidate} />
+            <HuoltoForm onSubmit={(v) => addM.mutateAsync(v)} loading={addM.isPending} invalidate={invalidate} />
           </DialogContent>
         </Dialog>
       </header>
@@ -146,7 +146,7 @@ function HuoltoPage() {
           {editing && (
             <HuoltoForm
               initial={editing}
-              onSubmit={(v) => updM.mutate({ id: editing.id, ...v })}
+              onSubmit={(v) => updM.mutateAsync({ id: editing.id, ...v })}
               loading={updM.isPending}
               submitLabel="Tallenna muutokset"
               invalidate={invalidate}

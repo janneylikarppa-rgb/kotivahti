@@ -279,8 +279,15 @@ export const paivitaKirjautuminen = createServerFn({ method: "POST" })
 export const merkitsePtsAvattu = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
-    const a = await admin();
-    await a.rpc("inkrementoi_metriikka", { _user_id: context.userId, _kentta: "pts_avattu", _maara: 1 });
+    await inkrementoiMetriikka(context.userId, "pts_avattu", 1);
+    return { ok: true };
+  });
+
+export const paivitaMetriikka = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((i: unknown) => z.object({ kentta: z.string(), maara: z.number().default(1) }).parse(i))
+  .handler(async ({ data, context }) => {
+    await inkrementoiMetriikka(context.userId, data.kentta, data.maara);
     return { ok: true };
   });
 

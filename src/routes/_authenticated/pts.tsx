@@ -316,7 +316,7 @@ function PtsPage() {
               loading={kuittausM.isPending}
               submitLabel="Kuittaa tehdyksi"
               invalidate={invalidate}
-              onSubmit={(values) => kuittausM.mutate({ rivi: kuittaa, values })}
+              onSubmit={(values) => kuittausM.mutateAsync({ rivi: kuittaa, values })}
             />
           </DialogContent>
         )}
