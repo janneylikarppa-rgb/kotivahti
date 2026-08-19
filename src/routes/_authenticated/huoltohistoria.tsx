@@ -83,7 +83,7 @@ function HuoltoPage() {
           </DialogTrigger>
           <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
             <DialogHeader><DialogTitle className="font-serif text-2xl">Lisää huoltomerkintä</DialogTitle></DialogHeader>
-            <HuoltoForm onSubmit={(v) => addM.mutate(v)} loading={addM.isPending} invalidate={invalidate} />
+            <HuoltoForm onSubmit={(v) => addM.mutateAsync(v)} loading={addM.isPending} invalidate={invalidate} />
           </DialogContent>
         </Dialog>
       </header>
