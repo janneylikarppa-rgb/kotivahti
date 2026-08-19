@@ -130,6 +130,7 @@ function boolOrNull(v: any) { return v === "" || v == null ? null : Boolean(v); 
 function TaloTiedotPage() {
   const fetchFn = useServerFn(getTaloTiedot);
   const saveFn = useServerFn(saveTaloTiedot);
+  const metriikkaFn = useServerFn(paivitaMetriikka);
   const qc = useQueryClient();
   const { data, isLoading } = useQuery({ queryKey: ["talo"], queryFn: () => fetchFn(), staleTime: 30_000 });
   const [active, setActive] = useState(0);
