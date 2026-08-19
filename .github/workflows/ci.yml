@@ -1,0 +1,32 @@
+name: CI – Tarkista koodi
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  typecheck:
+    name: TypeScript-tarkistus
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Hae koodi
+        uses: actions/checkout@v4
+
+      - name: Asenna Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Asenna riippuvuudet
+        run: npm ci
+
+      - name: TypeScript-tarkistus
+        run: npx tsc --noEmit
+
+      - name: Ilmoitus onnistumisesta
+        if: success()
+        run: echo "✓ Koodi on kunnossa"
