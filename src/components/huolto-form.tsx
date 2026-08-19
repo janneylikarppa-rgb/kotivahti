@@ -62,6 +62,7 @@ export function HuoltoForm({
 
   const urlFn = useServerFn(getDokumenttiUrl);
   const delLiiteFn = useServerFn(deleteHuoltoLiite);
+  const metriikkaFn = useServerFn(paivitaMetriikka);
 
   const handleChange = (k: string, v: any) => setForm({ ...form, [k]: v });
 
