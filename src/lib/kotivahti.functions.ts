@@ -530,12 +530,6 @@ export const addHuolto = createServerFn({ method: "POST" })
     const vuosi = new Date(data.pvm).getFullYear();
     await paivitaPts(supabase, k.id, kohdeAvain, data.tyyppi, vuosi, data.pts_siirto ?? 0);
 
-    // Metriikka: huolto kirjattu
-    try {
-      const { inkrementoiMetriikka } = await import("@/lib/palaute.functions");
-      await inkrementoiMetriikka(userId, "huoltoja_kirjattu", 1);
-    } catch {}
-
     return { ok: true };
   });
 
