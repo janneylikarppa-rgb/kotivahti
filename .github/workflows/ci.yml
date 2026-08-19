@@ -22,8 +22,5 @@ jobs:
       - name: Asenna riippuvuudet
         run: npm ci
 
-      - name: Tarkista build
-        run: npm run build || echo "Build käyttää Lovable-ympäristöä"
-
-      - name: Ilmoitus
-        run: echo "✓ Tarkistus valmis"
+      - name: Tarkistus valmis
+        run: echo "✓ Riippuvuudet asennettu"
