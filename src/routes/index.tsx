@@ -261,7 +261,7 @@ const SHOWCASE: { icon: ReactNode; title: string; paragraphs: string[]; mock: Mo
     ],
     mock: {
       title: "Talon tiedot",
-      sub: "Koivutie 12 · Kuopio",
+      sub: "Koivutie 12",
       rows: [
         ["Rakennusvuosi", "1998"],
         ["Pinta-ala", "142 m²"],
@@ -306,7 +306,7 @@ const SHOWCASE: { icon: ReactNode; title: string; paragraphs: string[]; mock: Mo
       rows: [
         ["Palvelu", "Huolto"],
         ["Kohde", "Koivutie 12"],
-        ["Alue", "Kuopio"],
+        ["Alue", "Oma alueesi"],
         ["Kuvaus", "IV-kanavat puhdistamatta 12 v"],
       ],
       btn: "Lähetä pyyntö",
@@ -553,7 +553,7 @@ function LandingPage() {
               <div className="mock-header">
                 <div>
                   <div className="mock-title">Kotiluotsi</div>
-                  <div className="mock-address">Koivutie 12 · Kuopio</div>
+                  <div className="mock-address">Koivutie 12</div>
                 </div>
               </div>
               <div className="mock-tasks">
@@ -676,7 +676,7 @@ function LandingPage() {
             </div>
             <hr className="kil-divider" />
             <div className="kil-result">
-              <div className="kil-result-label">Paikalliset tarjoukset – Kuopio</div>
+              <div className="kil-result-label">Paikalliset tarjoukset</div>
               <div className="kil-offers">
                 {OFFERS.map((o) => (
                   <div className="kil-offer" key={o.name}>
@@ -731,7 +731,7 @@ function LandingPage() {
           <a href="/kayttoehdot" style={{ color: "rgba(255,255,255,0.55)", textDecoration: "none", marginRight: "1.2rem" }}>Käyttöehdot</a>
           <a href="/tietosuoja" style={{ color: "rgba(255,255,255,0.55)", textDecoration: "none" }}>Tietosuoja</a>
         </p>
-        <p>© 2026 <span>Kotiluotsi</span> · Talosi oma avustaja · Kuopio, Suomi</p>
+        <p>© 2026 <span>Kotiluotsi</span> · Talosi oma avustaja · Suomi</p>
       </footer>
     </div>
   );
