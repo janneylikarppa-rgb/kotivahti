@@ -10,7 +10,7 @@ import {
   getPts,
   lykkaaPtsRivi,
   peruLykkays,
-} from "@/lib/kotivahti.functions";
+} from "@/lib/kotiluotsi.functions";
 import { HuoltoForm } from "@/components/huolto-form";
 import { getSisaltoteksti, getYlitetytTeksti } from "@/lib/pts-sisaltotekstit";
 import { HUOLTO_KOHDE_RYHMAT } from "@/lib/huolto-kohteet";
@@ -54,8 +54,8 @@ export const Route = createFileRoute("/_authenticated/pts")({
 });
 
 const AURINKO_ID = "aurinko-suositus";
-const AURINKO_DISMISS_KEY = "kotivahti_aurinko_kuitattu";
-const AURINKO_LYKKAYS_KEY = "kotivahti_aurinko_lykatty_asti";
+const AURINKO_DISMISS_KEY = "kotiluotsi_aurinko_kuitattu";
+const AURINKO_LYKKAYS_KEY = "kotiluotsi_aurinko_lykatty_asti";
 
 type PtsRivi = {
   id: string;

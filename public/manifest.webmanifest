@@ -1,6 +1,6 @@
 {
-  "name": "Kotivahti",
-  "short_name": "Kotivahti",
+  "name": "Kotiluotsi",
+  "short_name": "Kotiluotsi",
   "description": "Sähköinen talokirja, vuosikello ja kulujenseuranta omakotitaloasujille.",
   "start_url": "/",
   "scope": "/",

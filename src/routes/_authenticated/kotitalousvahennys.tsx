@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
-import { getKotitalousvahennys } from "@/lib/kotivahti.functions";
+import { getKotitalousvahennys } from "@/lib/kotiluotsi.functions";
 import {
   laskeVahennys, vahennysVari, euro,
   ENIMMAISMAARA, OMAVASTUU, LAHDE,
@@ -15,9 +15,9 @@ import { ChevronDown, Plus } from "lucide-react";
 export const Route = createFileRoute("/_authenticated/kotitalousvahennys")({
   head: () => ({
     meta: [
-      { title: "Kotitalousvähennys – Kotivahti" },
+      { title: "Kotitalousvähennys – Kotiluotsi" },
       { name: "description", content: "Seuraa kotitalousvähennyksen kertymää kirjatuista huoltotöistä ja arvioi verovähennyksesi." },
-      { property: "og:title", content: "Kotitalousvähennys – Kotivahti" },
+      { property: "og:title", content: "Kotitalousvähennys – Kotiluotsi" },
       { property: "og:description", content: "Seuraa kotitalousvähennyksen kertymää kirjatuista huoltotöistä ja arvioi verovähennyksesi." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },

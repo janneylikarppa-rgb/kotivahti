@@ -21,7 +21,7 @@ export const Route = createFileRoute("/api/public/hooks/laheta-kausikirje")({
         ]);
 
         const tyyppi = KAUSI_TYYPPI[body.kausi];
-        const baseUrl = process.env.PUBLIC_APP_URL ?? "https://kotivahti.fi";
+        const baseUrl = process.env.PUBLIC_APP_URL ?? "https://kotiluotsi.fi";
 
         // Hae kohderyhmä
         const { data: metriikat } = await supabaseAdmin

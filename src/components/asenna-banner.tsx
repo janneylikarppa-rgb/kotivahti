@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Download, Share, X } from "lucide-react";
 
-const DISMISS_KEY = "kotivahti_install_banner_dismissed";
+const DISMISS_KEY = "kotiluotsi_install_banner_dismissed";
 
 type InstallPromptEvent = Event & {
   prompt: () => Promise<void>;
@@ -75,14 +75,14 @@ export function AsennaBanner() {
       <div className="mx-auto flex max-w-md items-start gap-3 rounded-xl border border-border bg-card p-4 shadow-lg">
         <img
           src="/icons/icon-192.png"
-          alt="Kotivahti-sovelluksen kuvake"
+          alt="Kotiluotsi-sovelluksen kuvake"
           width={40}
           height={40}
           loading="lazy"
           className="h-10 w-10 shrink-0 rounded-lg"
         />
         <div className="min-w-0 flex-1">
-          <p className="text-sm font-semibold text-foreground">Lisää Kotivahti kotinäytölle</p>
+          <p className="text-sm font-semibold text-foreground">Lisää Kotiluotsi kotinäytölle</p>
           {promptEvent ? (
             <p className="mt-0.5 text-xs text-muted-foreground">
               Avaa talokirjasi yhdellä napautuksella kuin sovelluksena.

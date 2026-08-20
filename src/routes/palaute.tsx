@@ -49,7 +49,7 @@ function PalauteSivu() {
             <h1 className="text-3xl font-serif text-cream">Vastauksesi on tallennettu</h1>
             <p className="text-sm text-muted-foreground">Pidämme sinut tulevana kautena ajan tasalla.</p>
             <Link to="/" className="inline-flex items-center justify-center rounded-md bg-primary px-5 py-2.5 text-sm font-semibold uppercase tracking-wider text-primary-foreground hover:bg-[color:var(--gold-2)] mt-4">
-              Avaa Kotivahti
+              Avaa Kotiluotsi
             </Link>
           </>
         )}
@@ -59,7 +59,7 @@ function PalauteSivu() {
             <h1 className="text-3xl font-serif text-cream">Tämä palautekutsu on vanhentunut</h1>
             <p className="text-sm text-muted-foreground">Kiitos kuitenkin kiinnostuksestasi — voit antaa palautetta sovelluksessa milloin tahansa.</p>
             <Link to="/" className="inline-flex items-center justify-center rounded-md bg-primary px-5 py-2.5 text-sm font-semibold uppercase tracking-wider text-primary-foreground hover:bg-[color:var(--gold-2)] mt-4">
-              Avaa Kotivahti
+              Avaa Kotiluotsi
             </Link>
           </>
         )}
@@ -69,7 +69,7 @@ function PalauteSivu() {
             <h1 className="text-3xl font-serif text-cream">Vastausta ei voitu tallentaa</h1>
             <p className="text-sm text-muted-foreground">{virhe}</p>
             <Link to="/" className="inline-flex items-center justify-center rounded-md bg-primary px-5 py-2.5 text-sm font-semibold uppercase tracking-wider text-primary-foreground hover:bg-[color:var(--gold-2)] mt-4">
-              Avaa Kotivahti
+              Avaa Kotiluotsi
             </Link>
           </>
         )}

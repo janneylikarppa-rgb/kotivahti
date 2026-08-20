@@ -40,7 +40,7 @@ export async function fetchJson(url: string): Promise<any> {
       signal: controller.signal,
       headers: {
         Accept: "application/json",
-        "User-Agent": "Kotivahti/1.0 (kiinteistonhuoltopalvelu)",
+        "User-Agent": "Kotiluotsi/1.0 (kiinteistonhuoltopalvelu)",
       },
     });
     if (!res.ok) {

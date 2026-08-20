@@ -14,7 +14,7 @@ export function useRealtimeSync(kiinteistoId: string | null | undefined) {
     if (!kiinteistoId) return;
     const filter = `kiinteisto_id=eq.${kiinteistoId}`;
     const channel = supabase
-      .channel(`kotivahti-${kiinteistoId}`)
+      .channel(`kotiluotsi-${kiinteistoId}`)
       .on("postgres_changes", { event: "*", schema: "public", table: "huolto_historia", filter }, () => {
         qc.invalidateQueries({ queryKey: ["huollot"] });
         qc.invalidateQueries({ queryKey: ["pts"] });

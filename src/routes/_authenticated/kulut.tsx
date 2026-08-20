@@ -6,7 +6,7 @@ import {
   addKulu, deleteKulu, getKulut, saveAsetukset,
   addToistuvaKulu, updateToistuvaKulu, deleteToistuvaKulu,
   tallennaKuukaudenMittari,
-} from "@/lib/kotivahti.functions";
+} from "@/lib/kotiluotsi.functions";
 import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";

@@ -2,7 +2,7 @@
 // RESEND_API_KEY luetaan ajonaikaisesti process.env-muuttujasta.
 
 const RESEND_URL = "https://api.resend.com/emails";
-const FROM = "Kotivahti <onboarding@resend.dev>";
+const FROM = "Kotiluotsi <onboarding@resend.dev>";
 
 export async function lahetaEmail(input: {
   to: string;
@@ -72,7 +72,7 @@ export function omistajanIlmoitus(liidi: LiidiData, opts?: { adminUrl?: string }
     html: `
 <div style="font-family: -apple-system, Segoe UI, sans-serif; max-width: 640px; margin: 0 auto; padding: 24px; color: #1a1a1a; background: #ffffff;">
   <div style="background: #0D1F14; color: #C9A84C; padding: 16px 20px; border-radius: 8px 8px 0 0;">
-    <h2 style="margin: 0; font-family: Georgia, serif; font-size: 20px;">UUSI LIIDI – KOTIVAHTI</h2>
+    <h2 style="margin: 0; font-family: Georgia, serif; font-size: 20px;">UUSI LIIDI – KOTILUOTSI</h2>
   </div>
   <div style="border: 1px solid #e5e5e5; border-top: none; padding: 20px; border-radius: 0 0 8px 8px;">
     <p style="margin: 0 0 16px; color: #666; font-size: 13px;">Vastaanotettu: <strong style="color: #1a1a1a;">${esc(nyt)}</strong></p>

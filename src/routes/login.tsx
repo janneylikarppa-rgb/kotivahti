@@ -126,7 +126,7 @@ function LoginPage() {
         <nav className="auth-nav">
           <Link to="/" className="auth-logo">
             <span className="auth-logo-mark">K</span>
-            <span className="auth-logo-name">Kotivahti<span className="dot">.</span></span>
+            <span className="auth-logo-name">Kotiluotsi<span className="dot">.</span></span>
           </Link>
         </nav>
         <main className="auth-main">

@@ -554,7 +554,7 @@ export const lahetaTestiKausikirje = createServerFn({ method: "POST" })
       import("@/lib/email.server"),
       import("@/lib/kausikirje.server"),
     ]);
-    const baseUrl = process.env.PUBLIC_APP_URL ?? "https://kotivahti.fi";
+    const baseUrl = process.env.PUBLIC_APP_URL ?? "https://kotiluotsi.fi";
     const etunimi = (prof.nimi ?? prof.email).split(" ")[0];
 
     const { data: kysely, error } = await a.from("palaute_kyselyt")

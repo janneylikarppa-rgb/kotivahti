@@ -4,8 +4,8 @@ import { LegalLayout } from "@/components/legal-layout";
 export const Route = createFileRoute("/tietosuoja")({
   head: () => ({
     meta: [
-      { title: "Tietosuojaseloste – Kotivahti" },
-      { name: "description", content: "Kotivahti-palvelun tietosuojaseloste (GDPR)." },
+      { title: "Tietosuojaseloste – Kotiluotsi" },
+      { name: "description", content: "Kotiluotsi-palvelun tietosuojaseloste (GDPR)." },
     ],
   }),
   component: TietosuojaPage,
@@ -15,7 +15,7 @@ function TietosuojaPage() {
   return (
     <LegalLayout title="Tietosuojaseloste" updated="Toukokuu 2026">
       <p>
-        Tässä tietosuojaselosteessa kerromme, miten käsittelemme Kotivahti-palvelun käyttäjien
+        Tässä tietosuojaselosteessa kerromme, miten käsittelemme Kotiluotsi-palvelun käyttäjien
         henkilötietoja EU:n yleisen tietosuoja-asetuksen (GDPR) mukaisesti.
       </p>
 

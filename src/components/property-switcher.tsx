@@ -37,7 +37,7 @@ import {
   addKiinteisto,
   listKiinteistot,
   setValittuKiinteisto,
-} from "@/lib/kotivahti.functions";
+} from "@/lib/kotiluotsi.functions";
 
 export function PropertySwitcher() {
   const router = useRouter();

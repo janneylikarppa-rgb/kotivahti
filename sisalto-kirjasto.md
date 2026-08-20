@@ -1,4 +1,4 @@
-# KOTIVAHTI – SISÄLTÖKIRJASTO
+# KOTILUOTSI – SISÄLTÖKIRJASTO
 
 Päivitetty: 2026-06-21
 
@@ -526,7 +526,7 @@ Pohja täyttää kategoriaan sopivat talon tiedot kuvaukseen, esim:
 
 ### 4.1 Omistajan ilmoitus uudesta liidistä
 **Aihe:** `🔔 Uusi liidi – {kategoria} – {kaupunki}`
-**Sisältö (HTML):** Otsikko "UUSI LIIDI – KOTIVAHTI", vastaanottoaika, sekä taulukot:
+**Sisältö (HTML):** Otsikko "UUSI LIIDI – KOTILUOTSI", vastaanottoaika, sekä taulukot:
 - *Pyyntö:* Palvelu (Kuntoarvio / Huolto / Tarjouspyyntö), Kategoria
 - *Asiakas:* Nimi, Puhelin (tel-linkki), Sähköposti (mailto)
 - *Kiinteistö:* Osoite, Kaupunki, Rakennusvuosi, Lämmitys (jos annettu)
@@ -535,7 +535,7 @@ Pohja täyttää kategoriaan sopivat talon tiedot kuvaukseen, esim:
 - CTA-nappi: "Hallinnoi pyyntöä admin-paneelissa →"
 
 ### 4.2 Kausikirje – Kevät 🌱
-**Aihe:** `🌱 Kotivahti – kevään huoltomuistutus`
+**Aihe:** `🌱 Kotiluotsi – kevään huoltomuistutus`
 **Otsikko:** "Kevään huoltomuistutus"
 **Avaus:** "Hei {etunimi}, tässä kevään tärkeimmät huoltotoimenpiteet omakotitaloasi varten."
 **Kauden tärkeimmät huollot:**
@@ -546,22 +546,22 @@ Pohja täyttää kategoriaan sopivat talon tiedot kuvaukseen, esim:
 - **Salaojat** – Tarkista kevätsulannan jälkeen toimivuus ja kaivot.
 **Kysymys:** "Oletko tehnyt kauden huoltoja?"
 **Napit:** "✓ Kyllä, tehty" · "⏳ Vielä kesken" · "✗ En vielä – tilaan apua"
-**CTA:** "Avaa Kotivahti →"
+**CTA:** "Avaa Kotiluotsi →"
 **Alaviite:** "Et halua kausimuistutuksia? Peruuta tilaus →"
 
 ### 4.3 Kausikirje – Kesä ☀️
-**Aihe:** `☀️ Kotivahti – kesän huoltomuistutus`
+**Aihe:** `☀️ Kotiluotsi – kesän huoltomuistutus`
 **Otsikko:** "Kesän huoltomuistutus"
 **Kauden tärkeimmät huollot:**
 - **Julkisivun kuntokierros** – Halkeamat, maalikalvon kunto, lahot puuosat.
 - **Terassin hoito ja tarkastus** – Puhdista, käsittele öljyllä tai kuultolla.
 - **Nuohous** – Paras aika kesällä – varaa nuohooja ajoissa.
 - **Lattiakaivot** – Kesäpuhdistus – nosta kaivon kansi ja huuhtele.
-**Kysymys:** "Miten Kotivahti on palvellut tähän mennessä?"
+**Kysymys:** "Miten Kotiluotsi on palvellut tähän mennessä?"
 **Napit:** ⭐ / ⭐⭐ / ⭐⭐⭐ / ⭐⭐⭐⭐ / ⭐⭐⭐⭐⭐
 
 ### 4.4 Kausikirje – Syksy 🍂
-**Aihe:** `🍂 Kotivahti – syksyn huoltomuistutus`
+**Aihe:** `🍂 Kotiluotsi – syksyn huoltomuistutus`
 **Otsikko:** "Syksyn huoltomuistutus"
 **Kauden tärkeimmät huollot:**
 - **Lämmityksen käynnistys ja patterit** – Ilmaa patterit ja tarkista toiminta.
@@ -573,7 +573,7 @@ Pohja täyttää kategoriaan sopivat talon tiedot kuvaukseen, esim:
 **Napit:** "✓ Kyllä, tehty" · "⏳ Vielä kesken" · "✗ En vielä – tilaan apua"
 
 ### 4.5 Kausikirje – Talvi ❄️
-**Aihe:** `❄️ Kotivahti – talven huoltomuistutus`
+**Aihe:** `❄️ Kotiluotsi – talven huoltomuistutus`
 **Otsikko:** "Talven huoltomuistutus"
 **Kauden tärkeimmät huollot:**
 - **Lumikuorma katolla** – Seuraa kertymää ja pudota tarvittaessa.
@@ -588,7 +588,7 @@ Pohja täyttää kategoriaan sopivat talon tiedot kuvaukseen, esim:
 
 ### 4.7 Follow-up – kesken-vastauksen jälkeen
 **Aihe:** "Kauden huollot vielä kesken? Me autamme"
-**Sisältö:** "Hei {etunimi}, Viikko sitten kerroit että {kauden} huollot ovat vielä tekemättä. Kotivahdin tarkastetut ammattilaiset hoitavat – pyydä tarjous suoraan palvelusta."
+**Sisältö:** "Hei {etunimi}, Viikko sitten kerroit että {kauden} huollot ovat vielä tekemättä. Kotiluotsin tarkastetut ammattilaiset hoitavat – pyydä tarjous suoraan palvelusta."
 **CTA:** "Tilaa ammattilainen →"
 
 ### 4.8 Omistajan hälytys – ammattilainen ei reagoinut
@@ -1302,7 +1302,7 @@ Pohja täyttää kategoriaan sopivat talon tiedot kuvaukseen, esim:
 - "Milloin ilmanvaihtokanavat pitää puhdistaa, kuinka usein suodattimet vaihdetaan ja mikä on hinta-arvio."
 - "Katon tarkastus — mitä, miten ja milloin"
 - "Säännöllinen katon tarkastus säästää tuhansia. Mitä ammattilainen tarkistaa ja kuinka usein."
-- "Talon huolto-oppaat — Kotivahti"
+- "Talon huolto-oppaat — Kotiluotsi"
 - "Konkreettisia oppaita omakotitalon vuosihuoltoihin: nuohous, ilmanvaihto, katon tarkastus ja paljon muuta."
 - "Konkreettisia oppaita omakotitalon vuosihuoltoihin."
 - "eyebrow mb-3"
@@ -1419,7 +1419,7 @@ Pohja täyttää kategoriaan sopivat talon tiedot kuvaukseen, esim:
 - "Pyynnöt"
 - "Admin"
 - "Kirjaudu ulos"
-- "Kotivahti"
+- "Kotiluotsi"
 - "Navigaatio"
 - "0; return ("
 
@@ -1471,7 +1471,7 @@ Pohja täyttää kategoriaan sopivat talon tiedot kuvaukseen, esim:
 ### Lakisivujen pohja (LegalLayout)
 **[src/components/legal-layout.tsx]**
 - "eyebrow mb-3"
-- "Kotivahti"
+- "Kotiluotsi"
 - "Käyttöehdot"
 - "Tietosuoja"
 - "Kirjaudu"
@@ -1482,22 +1482,22 @@ Pohja täyttää kategoriaan sopivat talon tiedot kuvaukseen, esim:
 **[src/components/opas-layout.tsx]**
 - "Article"
 - "Organization"
-- "Kotivahti"
+- "Kotiluotsi"
 - "FAQPage"
 - "Question"
 - "Answer"
 - "eyebrow mb-3"
-- "${o.title} — Kotivahti"
+- "${o.title} — Kotiluotsi"
 - "Oppaat"
 - "Usein kysytyt kysymykset"
-- "Kotivahti pitää talosi huoltohistorian, kulut ja PTS-suunnitelman yhdessä paikassa — ja muistuttaa oikealla hetkellä."
+- "Kotiluotsi pitää talosi huoltohistorian, kulut ja PTS-suunnitelman yhdessä paikassa — ja muistuttaa oikealla hetkellä."
 - "Aloita maksutta"
 
 ### Palautekortti
 **[src/components/palaute-kortti.tsx]**
 - "Kiitos palautteestasi!"
 - "Sulje"
-- "Mikä Kotivahdissa toimi parhaiten?"
+- "Mikä Kotiluotsissa toimi parhaiten?"
 - "Sain talosta yleiskuvan"
 - "Huoltomuistutukset"
 - "Tilasin kuntoarvion"
@@ -1526,7 +1526,7 @@ Pohja täyttää kategoriaan sopivat talon tiedot kuvaukseen, esim:
 - "; case "tyonlaatu": return"
 - "(null); const [kommentti, setKommentti] = useState(""); return ("
 - "(null); return ("
-- "Suosittelisitko Kotivahtia tutullesi?"
+- "Suosittelisitko Kotiluotsia tutullesi?"
 - "0 = en lainkaan, 10 = ehdottomasti"
 - "Miten ammattilaisen työ sujui?"
 
@@ -1588,26 +1588,26 @@ Pohja täyttää kategoriaan sopivat talon tiedot kuvaukseen, esim:
 
 ### Palaute-vastaussivu (palaute.tsx)
 - Latausvaihe: "Käsitellään vastausta…" / "Hetki"
-- Onnistuminen: "Kiitos!" / "Vastauksesi on tallennettu" / "Pidämme sinut tulevana kautena ajan tasalla." / nappi "Avaa Kotivahti"
-- Virhe: "Hups" / "Vastausta ei voitu tallentaa" / "Linkki on puutteellinen." / nappi "Avaa Kotivahti"
+- Onnistuminen: "Kiitos!" / "Vastauksesi on tallennettu" / "Pidämme sinut tulevana kautena ajan tasalla." / nappi "Avaa Kotiluotsi"
+- Virhe: "Hups" / "Vastausta ei voitu tallentaa" / "Linkki on puutteellinen." / nappi "Avaa Kotiluotsi"
 
 ### UKK-sivu (ukk.tsx)
-- Otsikko: "UKK — Kotivahti"
-- Johdanto: "Tältä sivulta löydät vastaukset Kotivahti-palvelua koskeviin yleisimpiin kysymyksiin. Talon huoltoon ja vuosihuoltojen ajoitukseen liittyvät oppaat löydät Oppaat-osiosta."
+- Otsikko: "UKK — Kotiluotsi"
+- Johdanto: "Tältä sivulta löydät vastaukset Kotiluotsi-palvelua koskeviin yleisimpiin kysymyksiin. Talon huoltoon ja vuosihuoltojen ajoitukseen liittyvät oppaat löydät Oppaat-osiosta."
 - **Kysymykset & vastaukset:**
-  - **Q:** Mikä Kotivahti on ja onko se ilmainen?
-    **A:** Kotivahti on omakotitaloasujille tarkoitettu talokirja: tallennat talon tiedot, huoltohistorian, kulut ja saat automaattisen PTS-suunnitelman (pitkän tähtäimen huoltosuunnitelma). Peruskäyttö on maksutonta — tarjoamme lisäksi kilpailutusta ammattilaisten huoltotöistä, mikä on käyttäjälle veloituksetonta.
+  - **Q:** Mikä Kotiluotsi on ja onko se ilmainen?
+    **A:** Kotiluotsi on omakotitaloasujille tarkoitettu talokirja: tallennat talon tiedot, huoltohistorian, kulut ja saat automaattisen PTS-suunnitelman (pitkän tähtäimen huoltosuunnitelma). Peruskäyttö on maksutonta — tarjoamme lisäksi kilpailutusta ammattilaisten huoltotöistä, mikä on käyttäjälle veloituksetonta.
   - **Q:** Miten talokirja toimii?
-    **A:** Kun täytät talon perustiedot (rakennusvuosi, lämmitysmuoto, kattomateriaali, ikkunoiden uusimisvuosi yms.), Kotivahti laskee RT-kortiston käyttöikien ja huoltovälien perusteella mitä toimenpiteitä on luvassa lähivuosina. Kirjaat tehdyt huollot ja kulut samaan paikkaan, ja saat kausimuistutuksia (kevät/kesä/syksy/talvi).
+    **A:** Kun täytät talon perustiedot (rakennusvuosi, lämmitysmuoto, kattomateriaali, ikkunoiden uusimisvuosi yms.), Kotiluotsi laskee RT-kortiston käyttöikien ja huoltovälien perusteella mitä toimenpiteitä on luvassa lähivuosina. Kirjaat tehdyt huollot ja kulut samaan paikkaan, ja saat kausimuistutuksia (kevät/kesä/syksy/talvi).
   - **Q:** Miten ammattilaisten kilpailutus toimii?
-    **A:** Kun tarvitset esimerkiksi nuohouksen, IV-puhdistuksen tai katon tarkastuksen, voit pyytää Kotivahdin kautta kuntoarvion tai tarjouksen. Pyyntö välitetään alueesi tarkastetuille ammattilaisille, jotka ottavat yhteyttä suoraan sinuun. Sinulla ei ole velvollisuutta hyväksyä mitään tarjousta.
+    **A:** Kun tarvitset esimerkiksi nuohouksen, IV-puhdistuksen tai katon tarkastuksen, voit pyytää Kotiluotsin kautta kuntoarvion tai tarjouksen. Pyyntö välitetään alueesi tarkastetuille ammattilaisille, jotka ottavat yhteyttä suoraan sinuun. Sinulla ei ole velvollisuutta hyväksyä mitään tarjousta.
   - **Q:** Onko pyyntö sitova? Pitääkö antaa luottokortti?
-    **A:** Pyyntö ei ole sitova. Et anna maksutietoja Kotivahdille — sovit hinnasta ja työstä suoraan valitsemasi ammattilaisen kanssa.
-  - **Q:** Onko Kotivahdin listaamat ammattilaiset tarkastettu?
+    **A:** Pyyntö ei ole sitova. Et anna maksutietoja Kotiluotsille — sovit hinnasta ja työstä suoraan valitsemasi ammattilaisen kanssa.
+  - **Q:** Onko Kotiluotsin listaamat ammattilaiset tarkastettu?
     **A:** Kyllä. Tarkistamme verkostoomme liittyvät ammattilaiset: Y-tunnus, ennakkoperintärekisteri ja toimialakohtaiset luvat (esim. sähkö- ja LVI-pätevyydet). Käyttäjäpalaute vaikuttaa siihen, ketkä pysyvät verkostossa.
   - **Q:** Miten tietoturva on hoidettu?
     **A:** Talon tiedot, huoltohistoria ja kulut tallennetaan EU-alueen palvelimille. Vain sinä näet oman talosi tiedot — emme myy tai luovuta tietoja ulkopuolisille. Voit poistaa tilisi ja kaikki tietosi milloin tahansa.
-- Alalaatikko: "Aloita Kotivahdin käyttö maksutta — talokirja, PTS ja kausimuistutukset." + nappi "Rekisteröidy"
+- Alalaatikko: "Aloita Kotiluotsin käyttö maksutta — talokirja, PTS ja kausimuistutukset." + nappi "Rekisteröidy"
 
 ### Tietosuojaseloste & Käyttöehdot
 **Lähde:** `src/routes/tietosuoja.tsx`, `src/routes/kayttoehdot.tsx`
@@ -1622,7 +1622,7 @@ Sisältävät vakio-osiot: rekisterinpitäjä, käsiteltävät tiedot, käyttöt
 
 
 ### Kirjautuminen (`src/routes/login.tsx`)
-- Logo-linkki: "Kotivahti."
+- Logo-linkki: "Kotiluotsi."
 - Takaisin-linkki: "← Etusivulle"
 - Eyebrow: "Kirjaudu"
 - Otsikko: "Tervetuloa *takaisin*"

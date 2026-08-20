@@ -4,8 +4,8 @@ import { LegalLayout } from "@/components/legal-layout";
 export const Route = createFileRoute("/kayttoehdot")({
   head: () => ({
     meta: [
-      { title: "Käyttöehdot – Kotivahti" },
-      { name: "description", content: "Kotivahti-palvelun käyttöehdot." },
+      { title: "Käyttöehdot – Kotiluotsi" },
+      { name: "description", content: "Kotiluotsi-palvelun käyttöehdot." },
     ],
   }),
   component: KayttoehdotPage,
@@ -15,7 +15,7 @@ function KayttoehdotPage() {
   return (
     <LegalLayout title="Käyttöehdot" updated="Toukokuu 2026">
       <p>
-        Nämä käyttöehdot ("Ehdot") koskevat Kotivahti-palvelua ja siihen liittyvää digitaalista
+        Nämä käyttöehdot ("Ehdot") koskevat Kotiluotsi-palvelua ja siihen liittyvää digitaalista
         talokirjaa ("Palvelu"). Palvelun tarjoaa <strong>[Yrityksen nimi]</strong> (
         <strong>[Y-tunnus]</strong>), kotipaikka <strong>[Paikkakunta]</strong>, Suomi.
       </p>
@@ -25,7 +25,7 @@ function KayttoehdotPage() {
 
       <h2>1. Palvelun kuvaus</h2>
       <p>
-        Kotivahti on digitaalinen talokirja omakotitalojen omistajille. Palvelu auttaa
+        Kotiluotsi on digitaalinen talokirja omakotitalojen omistajille. Palvelu auttaa
         suunnittelemaan, dokumentoimaan ja seuraamaan kiinteistön huoltoa, kuluja ja kuntoa
         (mm. vuosikello, PTS-ehdotukset, huoltohistoria, kulujen seuranta, liidilomake
         ammattilaisten tilaamiseen).
@@ -70,7 +70,7 @@ function KayttoehdotPage() {
 
       <h2>5. Liidilomake ja yhteydet palveluntarjoajiin</h2>
       <p>
-        Palvelun kautta voi lähettää tarjous- ja palvelupyyntöjä ("liidi") Kotivahtiin
+        Palvelun kautta voi lähettää tarjous- ja palvelupyyntöjä ("liidi") Kotiluotsiin
         liitetyille ammattilaisille (esim. nuohoojat, kattoasentajat, putkimiehet). Kun
         käyttäjä lähettää pyynnön:
       </p>
@@ -80,19 +80,19 @@ function KayttoehdotPage() {
           välitetään valitulle ulkopuoliselle palveluntarjoajalle.
         </li>
         <li>
-          Kotivahti toimii ainoastaan välittäjänä – sopimus mahdollisesta työn suorittamisesta
+          Kotiluotsi toimii ainoastaan välittäjänä – sopimus mahdollisesta työn suorittamisesta
           syntyy käyttäjän ja ammattilaisen välille.
         </li>
         <li>
-          Kotivahti ei vastaa ammattilaisen suorituksesta, hinnoittelusta tai työn laadusta.
+          Kotiluotsi ei vastaa ammattilaisen suorituksesta, hinnoittelusta tai työn laadusta.
         </li>
       </ul>
 
       <h2>6. Immateriaalioikeudet</h2>
       <p>
-        Kaikki Palveluun liittyvät immateriaalioikeudet kuuluvat Kotivahdille tai sen
+        Kaikki Palveluun liittyvät immateriaalioikeudet kuuluvat Kotiluotsille tai sen
         lisenssinantajille. Käyttäjän syöttämä sisältö pysyy käyttäjän omaisuutena, mutta
-        Kotivahdilla on oikeus käsitellä sitä Palvelun tarjoamiseksi.
+        Kotiluotsilla on oikeus käsitellä sitä Palvelun tarjoamiseksi.
       </p>
 
       <h2>7. Palvelun saatavuus ja päättäminen</h2>

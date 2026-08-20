@@ -38,7 +38,7 @@ export const KAUSI_INFO: Record<Kausi, {
       { otsikko: "Nuohous", teksti: "Paras aika kesällä – varaa nuohooja ajoissa." },
       { otsikko: "Lattiakaivot", teksti: "Kesäpuhdistus – nosta kaivon kansi ja huuhtele." },
     ],
-    kysymys: "Miten Kotivahti on palvellut tähän mennessä?",
+    kysymys: "Miten Kotiluotsi on palvellut tähän mennessä?",
     napit: [
       { teksti: "⭐", vastaus: "1" },
       { teksti: "⭐⭐", vastaus: "2" },
@@ -105,7 +105,7 @@ export type KausikirjeData = {
 
 export function rakennaKausikirje(d: KausikirjeData): { subject: string; html: string } {
   const info = KAUSI_INFO[d.kausi];
-  const subject = `${info.ikoni} Kotivahti – ${info.nimi.toLowerCase()} huoltomuistutus`;
+  const subject = `${info.ikoni} Kotiluotsi – ${info.nimi.toLowerCase()} huoltomuistutus`;
   const base = d.baseUrl.replace(/\/$/, "");
   const palauteUrl = (vastaus: string) =>
     `${base}/palaute?token=${encodeURIComponent(d.token)}&vastaus=${encodeURIComponent(vastaus)}&kausi=${d.kausi}`;
@@ -146,7 +146,7 @@ export function rakennaKausikirje(d: KausikirjeData): { subject: string; html: s
     <div style="text-align: center;">${napit}</div>
 
     <div style="margin-top: 28px; padding-top: 20px; border-top: 1px solid #e5e5e5; text-align: center;">
-      <a href="${esc(ctaUrl)}" style="display: inline-block; padding: 12px 28px; background: #C9A84C; color: #0D1F14; text-decoration: none; border-radius: 6px; font-weight: 700; letter-spacing: 0.5px;">Avaa Kotivahti →</a>
+      <a href="${esc(ctaUrl)}" style="display: inline-block; padding: 12px 28px; background: #C9A84C; color: #0D1F14; text-decoration: none; border-radius: 6px; font-weight: 700; letter-spacing: 0.5px;">Avaa Kotiluotsi →</a>
     </div>
 
     <p style="margin: 28px 0 0; padding-top: 16px; border-top: 1px solid #e5e5e5; font-size: 12px; color: #888; text-align: center;">
@@ -171,7 +171,7 @@ export function rakennaFollowUpKesken(etunimi: string, kausi: Kausi, baseUrl: st
   <div style="border:1px solid #e5e5e5; border-top:none; padding:24px; border-radius:0 0 8px 8px;">
     <p>Hei ${esc(etunimi)},</p>
     <p>Viikko sitten kerroit että ${esc(info.nimi.toLowerCase())} huollot ovat vielä tekemättä.</p>
-    <p>Kotivahdin tarkastetut ammattilaiset hoitavat – pyydä tarjous suoraan palvelusta.</p>
+    <p>Kotiluotsin tarkastetut ammattilaiset hoitavat – pyydä tarjous suoraan palvelusta.</p>
     <div style="text-align:center; margin-top: 24px;">
       <a href="${esc(base)}/pts" style="display:inline-block; padding:12px 28px; background:#C9A84C; color:#0D1F14; text-decoration:none; border-radius:6px; font-weight:700;">Tilaa ammattilainen →</a>
     </div>

@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
-import { getKuitatut, getPts, kuittaaHuolto } from "@/lib/kotivahti.functions";
+import { getKuitatut, getPts, kuittaaHuolto } from "@/lib/kotiluotsi.functions";
 import { paivitaMetriikka } from "@/lib/palaute.functions";
 import { KAUDET, kaikkiHuollot, PERUSHUOLLOT, dynamicHuollot, type Kausi, type HuoltoRivi } from "@/lib/vuosikello-data";
 import { Card, CardContent } from "@/components/ui/card";

@@ -13,7 +13,7 @@ export const Route = createFileRoute("/api/public/hooks/kausikirje-followup")({
           import("@/lib/email.server"),
         ]);
 
-        const baseUrl = process.env.PUBLIC_APP_URL ?? "https://kotivahti.fi";
+        const baseUrl = process.env.PUBLIC_APP_URL ?? "https://kotiluotsi.fi";
         const seitsemanPv = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
         // Yli 21 päivää vanhoja ei enää muistuteta
         const kolmeViikkoa = new Date(Date.now() - 21 * 24 * 60 * 60 * 1000).toISOString();

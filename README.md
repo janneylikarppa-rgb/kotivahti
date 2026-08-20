@@ -2,7 +2,7 @@
 
 Vinkki Lovablelle
 
-Liitä prototyyppitiedosto (kotivahti.html) Lovablen visuaaliseksi referenssiksi. Se näyttää tarkalleen miltä jokainen sivu näyttää, mitä kenttiä lomakkeissa on ja miten navigaatio toimii. Pyydä Lovablea rakentamaan sama toiminnallisuus Supabase-backendillä.
+Liitä prototyyppitiedosto (kotiluotsi.html) Lovablen visuaaliseksi referenssiksi. Se näyttää tarkalleen miltä jokainen sivu näyttää, mitä kenttiä lomakkeissa on ja miten navigaatio toimii. Pyydä Lovablea rakentamaan sama toiminnallisuus Supabase-backendillä.
 
 Tärkeä Lovable-prompti
 

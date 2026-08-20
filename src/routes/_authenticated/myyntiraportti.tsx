@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect, useMemo, useState } from "react";
-import { getMyyntiraportti } from "@/lib/kotivahti.functions";
+import { getMyyntiraportti } from "@/lib/kotiluotsi.functions";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
@@ -285,7 +285,7 @@ function MyyntiraporttiPage() {
           </div>
           {k.rakennusvuosi && <div className="text-lg opacity-70">Rakennusvuosi: {k.rakennusvuosi}</div>}
           <div className="my-6 mx-auto h-px w-32" style={{ background: "var(--gold)" }} />
-          <p className="text-sm opacity-70">Dokumentoitu Kotivahti-palvelussa</p>
+          <p className="text-sm opacity-70">Dokumentoitu Kotiluotsi-palvelussa</p>
           <p className="text-sm opacity-70">Päivätty {new Date().toLocaleDateString("fi-FI")}</p>
           <div className="text-sm mt-8 flex justify-center gap-4 flex-wrap opacity-80">
             <span>{huollot.length} huoltoa kirjattu</span>
