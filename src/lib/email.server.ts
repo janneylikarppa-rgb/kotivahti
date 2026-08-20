@@ -2,7 +2,7 @@
 // RESEND_API_KEY luetaan ajonaikaisesti process.env-muuttujasta.
 
 const RESEND_URL = "https://api.resend.com/emails";
-const FROM = "Kotiluotsi <onboarding@resend.dev>";
+const FROM = "Kotiluotsi <noreply@kotiluotsi.fi>";
 
 export async function lahetaEmail(input: {
   to: string;
