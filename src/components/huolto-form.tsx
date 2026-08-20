@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
-import { deleteHuoltoLiite, getDokumenttiUrl } from "@/lib/kotivahti.functions";
+import { deleteHuoltoLiite, getDokumenttiUrl } from "@/lib/kotiluotsi.functions";
 import { paivitaMetriikka } from "@/lib/palaute.functions";
 import { HUOLTO_KOHDE_RYHMAT, HUOLTO_TYYPIT } from "@/lib/huolto-kohteet";
 import { materiaalivaihtoehdot, tukeeLaitePaivitysta, tukeeMerkkiMalli } from "@/lib/laite-paivitys";

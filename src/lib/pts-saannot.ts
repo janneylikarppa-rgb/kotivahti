@@ -1,5 +1,5 @@
 // Säilytetty yhteensopivuuden vuoksi. Uusi PTS-malli on src/lib/pts-kohteet.ts
-// ja src/lib/kotivahti.functions.ts (pts_suunnitelma-taulu).
+// ja src/lib/kotiluotsi.functions.ts (pts_suunnitelma-taulu).
 // Tämä tiedosto tarjoaa vain tyypit ja apurit joita pts-sisaltotekstit.ts käyttää.
 
 export type PtsTila = "kiireellinen" | "lahivuosina" | "seurannassa";

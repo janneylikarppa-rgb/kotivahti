@@ -27,7 +27,7 @@ export const Route = createFileRoute("/api/public/hooks/nuohous-muistutus")({
           import("@/lib/email.server"),
         ]);
 
-        const baseUrl = process.env.PUBLIC_APP_URL ?? "https://kotivahti.fi";
+        const baseUrl = process.env.PUBLIC_APP_URL ?? "https://kotiluotsi.fi";
         const vuosi = new Date().getFullYear();
 
         // Hae käyttäjät joilla on tulisija / hormi
@@ -154,7 +154,7 @@ function wrap(
       <a href="${esc(ctaUrl)}" style="display:inline-block; padding:12px 26px; background:#C9A84C; color:#0D1F14; text-decoration:none; border-radius:6px; font-weight:700; letter-spacing:0.3px;">${esc(info.cta)} →</a>
     </div>
     <p style="margin:24px 0 0; padding-top:16px; border-top:1px solid #e5e5e5; font-size:11px; color:#999; text-align:center;">
-      Kotivahti – talokirja ja huoltomuistutukset omakotitaloasujille
+      Kotiluotsi – talokirja ja huoltomuistutukset omakotitaloasujille
     </p>
   </div>
 </div>`.trim();

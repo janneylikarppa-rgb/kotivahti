@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 
-const SITE = "https://kotivahti.fi";
+const SITE = "https://kotiluotsi.fi";
 
 const POLUT = [
   "/",

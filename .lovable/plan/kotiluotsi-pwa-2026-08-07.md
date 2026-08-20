@@ -1,11 +1,11 @@
-# Kotivahti PWA
+# Kotiluotsi PWA
 
 Tehdään sovelluksesta asennettava ja perustoiminnoiltaan offline-kelpoinen.
 
 ## 1. Sovelluskuvake
 
 Projektissa ei ole vielä logotiedostoa (ei `public/`-kansiota lainkaan). Luodaan
-Kotivahti-brändin mukainen neliömäinen tunnus (tumma metsänvihreä tausta
+Kotiluotsi-brändin mukainen neliömäinen tunnus (tumma metsänvihreä tausta
 `#0D1F14`, kultainen talo/kilpi-symboli) ja tallennetaan:
 
 - `public/icons/icon-192.png`
@@ -18,8 +18,8 @@ Kotivahti-brändin mukainen neliömäinen tunnus (tumma metsänvihreä tausta
 `public/manifest.webmanifest`:
 
 ```text
-name: Kotivahti
-short_name: Kotivahti
+name: Kotiluotsi
+short_name: Kotiluotsi
 display: standalone
 start_url: /
 background_color: #0D1F14
@@ -33,7 +33,7 @@ icons: 192 + 512 (any + maskable)
 - `meta name="theme-color" content="#0D1F14"`
 - `meta name="apple-mobile-web-app-capable" content="yes"`
 - `meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"`
-- `meta name="apple-mobile-web-app-title" content="Kotivahti"`
+- `meta name="apple-mobile-web-app-title" content="Kotiluotsi"`
 - `link rel="apple-touch-icon"`
 
 ## 4. Offline-tuki (service worker)
@@ -60,7 +60,7 @@ esikatselussa.
 Uusi komponentti `src/components/asenna-banner.tsx`, renderöidään juuressa:
 
 - Kuuntelee `beforeinstallprompt`-tapahtumaa (Chrome/Edge/Android) ja näyttää
-  alalaidan bannerin: "Lisää Kotivahti kotinäytölle" + Asenna / Ei nyt.
+  alalaidan bannerin: "Lisää Kotiluotsi kotinäytölle" + Asenna / Ei nyt.
 - iOS/Safari: ei `beforeinstallprompt`-tukea, joten näytetään ohjebanner
   ("Jaa → Lisää Koti-valikkoon") vain, jos selain on iOS-Safari eikä sovellus jo
   ole standalone-tilassa.

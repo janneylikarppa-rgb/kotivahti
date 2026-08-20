@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery } from "@tanstack/react-query";
-import { getDashboard, getKotitalousvahennys } from "@/lib/kotivahti.functions";
+import { getDashboard, getKotitalousvahennys } from "@/lib/kotiluotsi.functions";
 import { laskeVahennys, euro } from "@/lib/kotitalousvahennys";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";

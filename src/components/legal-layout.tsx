@@ -8,7 +8,7 @@ export function LegalLayout({ title, updated, children }: { title: string; updat
         <div className="mx-auto max-w-3xl px-6 py-4 flex items-center justify-between">
           <Link to="/" className="inline-flex items-center gap-2">
             <div className="grid h-8 w-8 place-items-center rounded-md bg-primary text-primary-foreground font-serif">K</div>
-            <span className="font-serif text-lg text-cream">Kotivahti<span className="text-primary">.</span></span>
+            <span className="font-serif text-lg text-cream">Kotiluotsi<span className="text-primary">.</span></span>
           </Link>
           <nav className="flex gap-4 text-xs uppercase tracking-wider text-muted-foreground">
             <Link to="/kayttoehdot" className="hover:text-primary">Käyttöehdot</Link>

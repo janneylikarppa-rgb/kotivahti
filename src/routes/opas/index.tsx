@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 
-const SITE = "https://kotivahti.fi";
+const SITE = "https://kotiluotsi.fi";
 
 const OPPAAT = [
   {
@@ -24,9 +24,9 @@ export const Route = createFileRoute("/opas/")({
   component: OpasIndex,
   head: () => ({
     meta: [
-      { title: "Talon huolto-oppaat — Kotivahti" },
+      { title: "Talon huolto-oppaat — Kotiluotsi" },
       { name: "description", content: "Konkreettisia oppaita omakotitalon vuosihuoltoihin: nuohous, ilmanvaihto, katon tarkastus ja paljon muuta." },
-      { property: "og:title", content: "Talon huolto-oppaat — Kotivahti" },
+      { property: "og:title", content: "Talon huolto-oppaat — Kotiluotsi" },
       { property: "og:description", content: "Konkreettisia oppaita omakotitalon vuosihuoltoihin." },
       { property: "og:type", content: "website" },
       { property: "og:url", content: `${SITE}/opas` },

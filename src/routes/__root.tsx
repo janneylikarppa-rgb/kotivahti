@@ -47,7 +47,7 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
   const chunkError = isChunkLoadError(error);
 
   if (chunkError && typeof window !== "undefined") {
-    const key = "__kotivahti_chunk_reload";
+    const key = "__kotiluotsi_chunk_reload";
     if (!sessionStorage.getItem(key)) {
       sessionStorage.setItem(key, "1");
       // Aseta reload heti — ei flash-virhenäkymää
@@ -87,20 +87,20 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1, viewport-fit=cover" },
-      { title: "Kotivahti – Huoltokirja omakotitaloasujille" },
+      { title: "Kotiluotsi – Huoltokirja omakotitaloasujille" },
       {
         name: "description",
         content: "Pidä talosi huoltohistoria, kulut ja vuosikello järjestyksessä yhdessä paikassa.",
       },
-      { property: "og:title", content: "Kotivahti" },
+      { property: "og:title", content: "Kotiluotsi" },
       { property: "og:description", content: "Huoltokirja omakotitaloasujille." },
       { property: "og:type", content: "website" },
       { name: "theme-color", content: "#0D1F14" },
       { name: "mobile-web-app-capable", content: "yes" },
       { name: "apple-mobile-web-app-capable", content: "yes" },
       { name: "apple-mobile-web-app-status-bar-style", content: "black-translucent" },
-      { name: "apple-mobile-web-app-title", content: "Kotivahti" },
-      { name: "application-name", content: "Kotivahti" },
+      { name: "apple-mobile-web-app-title", content: "Kotiluotsi" },
+      { name: "application-name", content: "Kotiluotsi" },
     ],
     links: [
       { rel: "stylesheet", href: appCss },
@@ -167,7 +167,7 @@ function AuthSync() {
 function ChunkReloadGuard() {
   useEffect(() => {
     if (typeof window === "undefined") return;
-    const key = "__kotivahti_chunk_reload";
+    const key = "__kotiluotsi_chunk_reload";
     // Clear stale reload flag after successful load
     const t = setTimeout(() => sessionStorage.removeItem(key), 3000);
     const onPreloadError = (e: Event) => {

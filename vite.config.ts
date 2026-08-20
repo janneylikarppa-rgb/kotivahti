@@ -34,7 +34,7 @@ export default defineConfig({
               urlPattern: ({ request }) => request.mode === "navigate",
               handler: "NetworkFirst",
               options: {
-                cacheName: "kotivahti-pages",
+                cacheName: "kotiluotsi-pages",
                 networkTimeoutSeconds: 5,
                 expiration: { maxEntries: 30, maxAgeSeconds: 60 * 60 * 24 * 7 },
               },
@@ -44,7 +44,7 @@ export default defineConfig({
                 sameOrigin && ["style", "script", "worker", "font", "image"].includes(request.destination),
               handler: "CacheFirst",
               options: {
-                cacheName: "kotivahti-assets",
+                cacheName: "kotiluotsi-assets",
                 expiration: { maxEntries: 120, maxAgeSeconds: 60 * 60 * 24 * 30 },
               },
             },

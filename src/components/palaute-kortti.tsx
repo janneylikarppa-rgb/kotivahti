@@ -7,7 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import { haeAktiivinenKysely, vastaaKyselyyn, type AktiivinenKysely } from "@/lib/palaute.functions";
 
-const OHITETUT_AVAIN = "kotivahti_palaute_ohitettu";
+const OHITETUT_AVAIN = "kotiluotsi_palaute_ohitettu";
 
 // localStorage säilyy yli session — sama suljettu kysely-id ei nouse uudelleen.
 function ohitetut(): Set<string> {
@@ -193,7 +193,7 @@ function OnboardingKysely({ onVastaa, loading }: { onVastaa: (v: Record<string, 
         </div>
       </div>
       <div>
-        <p className="text-xs text-muted-foreground mb-1.5">Mitä toivoisit Kotivahdilta lisää?</p>
+        <p className="text-xs text-muted-foreground mb-1.5">Mitä toivoisit Kotiluotsilta lisää?</p>
         <Textarea rows={2} placeholder="Vapaa sana (valinnainen)" value={toive} onChange={(e) => setToive(e.target.value)} />
       </div>
       <Button disabled={!helppous || !ensivaikutelma || loading} className="w-full uppercase tracking-wider font-semibold"
@@ -209,7 +209,7 @@ function NpsKysely({ onVastaa, loading }: { onVastaa: (v: Record<string, any>) =
   const [miksi, setMiksi] = useState("");
   return (
     <div className="space-y-3 pr-6">
-      <h3 className="font-serif text-base text-cream">Suosittelisitko Kotivahtia tutullesi?</h3>
+      <h3 className="font-serif text-base text-cream">Suosittelisitko Kotiluotsia tutullesi?</h3>
       <p className="text-xs text-muted-foreground">0 = en lainkaan, 10 = ehdottomasti</p>
       <div className="grid grid-cols-11 gap-1">
         {Array.from({ length: 11 }).map((_, i) => (

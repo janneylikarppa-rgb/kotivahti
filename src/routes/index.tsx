@@ -238,7 +238,7 @@ const FEATURES = [
   { icon: "📊", title: "PTS-suunnitelma", desc: "Pitkän tähtäimen suunnitelma laskee talosi tietojen perusteella milloin rakennusosat – katto, putket, lämmitysjärjestelmä, märkätilat – tarvitsevat huoltoa tai uusimista. Näet seuraavan 10 vuoden huoltotarpeet yhdellä silmäyksellä. Ei yllätyksiä, ei kiirehuoltoja – vain ennakointi." },
   { icon: "💰", title: "Kulujenseuranta", desc: "Seuraa sähkön ja veden kulutusta vuositasolla. Näet miten kulutus kehittyy vuodesta toiseen – ja saat ennakoivan arvion tulevista kustannuksista." },
   { icon: "🔧", title: "Huoltohistoria", desc: "Kaikki tehdyt huollot, remontit ja tarkastukset dokumentoituna – tekijä, päivämäärä, kustannus ja liitteet. Kuitit ja takuut tallessa digitaalisesti. Löydät aina mitä tarvitset ja milloin." },
-  { icon: "🧮", title: "Kotitalousvähennys", desc: "Seuraa kotitalousvähennyksen kertymää huolto- ja remonttikirjauksista. Kotivahti laskee automaattisesti, paljonko verovähennystä on kertynyt ja paljonko on vielä käytettävissä." },
+  { icon: "🧮", title: "Kotitalousvähennys", desc: "Seuraa kotitalousvähennyksen kertymää huolto- ja remonttikirjauksista. Kotiluotsi laskee automaattisesti, paljonko verovähennystä on kertynyt ja paljonko on vielä käytettävissä." },
   { icon: "📄", title: "Myyntiraportti", desc: "Kun taloa myydään, kaikki on valmiina. Yksi nappi tulostaa selkeän raportin välittäjälle – huoltohistoria, rakennusosat, energiankulutus ja dokumenttiliitteet järjestyksessä. Luottamusta herättävä paketti ostajalle." },
 ];
 
@@ -297,7 +297,7 @@ const SHOWCASE: { icon: ReactNode; title: string; paragraphs: string[]; mock: Mo
     title: "Löydä oikea tekijä – ilman etsimistä",
     paragraphs: [
       "Milloin olet viimeksi tarvinnut ammattilaista ja miettinyt kenen soitat? Oikean tekijän löytäminen vie aikaa ja lopputulos on epävarma.",
-      "Kotivahdin kautta tilaat kuntoarvion, huollon tai tarjouspyynnön suoraan sovelluksesta. Pyyntö välitetään tarkistetuille paikallisille ammattilaisille omalla alueellasi. Sinä valitset kenen kanssa jatkat.",
+      "Kotiluotsin kautta tilaat kuntoarvion, huollon tai tarjouspyynnön suoraan sovelluksesta. Pyyntö välitetään tarkistetuille paikallisille ammattilaisille omalla alueellasi. Sinä valitset kenen kanssa jatkat.",
     ],
     mock: {
       title: "Tilaa palvelu",
@@ -376,7 +376,7 @@ const SHOWCASE: { icon: ReactNode; title: string; paragraphs: string[]; mock: Mo
     title: "Kotitalousvähennys – seuraa hyöty euroina",
     paragraphs: [
       "Kotitalousvähennys on yksi suomalaisten käytetyimmistä verotuksen eduista – mutta moni jättää sen hakematta tai käyttää vain osan.",
-      "Kun kirjaat huollon tai remontin Kotivahdin huoltohistoriaan, merkitset samalla työn osuuden. Kotivahti laskee automaattisesti kuinka paljon verovähennystä on kertynyt ja paljonko on vielä käytettävissä – reaaliajassa, koko vuoden ajan.",
+      "Kun kirjaat huollon tai remontin Kotiluotsin huoltohistoriaan, merkitset samalla työn osuuden. Kotiluotsi laskee automaattisesti kuinka paljon verovähennystä on kertynyt ja paljonko on vielä käytettävissä – reaaliajassa, koko vuoden ajan.",
       "Ei enää arvaile veroilmoituksessa. Kaikki kirjattu, kaikki laskettuna.",
     ],
     mock: {
@@ -396,7 +396,7 @@ const SHOWCASE: { icon: ReactNode; title: string; paragraphs: string[]; mock: Mo
     title: "Myyntitilanteessa kaikki on jo valmiina",
     paragraphs: [
       "Kun talo laitetaan myyntiin, välittäjä kysyy rakennustietoja, huoltohistoriaa ja dokumentteja. Useimmiten ne etsitään kiireellä vanhoista papereista ja muistista.",
-      "Kotivahdin myyntiraportti kokoaa kaiken automaattisesti – talon perustiedot, talotekniikka, huoltohistoria kronologisesti, energiankulutus ja dokumenttiliitteet. Yksi nappi, tulostettava PDF välittäjälle. Dokumentoitu talo myy paremmin.",
+      "Kotiluotsin myyntiraportti kokoaa kaiken automaattisesti – talon perustiedot, talotekniikka, huoltohistoria kronologisesti, energiankulutus ja dokumenttiliitteet. Yksi nappi, tulostettava PDF välittäjälle. Dokumentoitu talo myy paremmin.",
     ],
     mock: {
       title: "Myyntiraportti",
@@ -522,7 +522,7 @@ function LandingPage() {
       <style>{STYLES}</style>
 
       <nav className="kv-nav">
-        <div className="nav-logo">Koti<span>vahti</span></div>
+        <div className="nav-logo">Koti<span>luotsi</span></div>
         <div className="nav-links">
           <a href="#ominaisuudet">Ominaisuudet</a>
           <a href="#kilpailutus">Kilpailutus</a>
@@ -552,7 +552,7 @@ function LandingPage() {
             <div className="mock-card">
               <div className="mock-header">
                 <div>
-                  <div className="mock-title">Kotivahti</div>
+                  <div className="mock-title">Kotiluotsi</div>
                   <div className="mock-address">Koivutie 12 · Kuopio</div>
                 </div>
               </div>
@@ -636,7 +636,7 @@ function LandingPage() {
         <div className="sc-final-inner">
           <h2>Talosi ansaitsee<br />enemmän kuin muistilista.</h2>
           <p>
-            Liity Kotivahdin käyttäjiin ja pidä talosi tiedot järjestyksessä. Käyttö on maksutonta – käyttöönotto vie muutaman minuutin.
+            Liity Kotiluotsin käyttäjiin ja pidä talosi tiedot järjestyksessä. Käyttö on maksutonta – käyttöönotto vie muutaman minuutin.
           </p>
           <Link to="/rekisteroidy" className="sc-btn">Luo ilmainen tili →</Link>
           <p className="sc-final-small">Ei luottokorttia. Ei määräaikaa. Vain selkeämpi kuva talostasi.</p>
@@ -652,7 +652,7 @@ function LandingPage() {
               Palveluiden kilpailutus
             </div>
             <h2 className="section-h2">Ammattilainen paikalle –<br /><em>helposti ja nopeasti.</em></h2>
-            <p className="section-lead">Tilaa suoraan sovelluksesta. Kotivahti välittää pyyntösi tarkastettuihin paikallisiin yrityksiin ja sinä valitset parhaan tarjouksen.</p>
+            <p className="section-lead">Tilaa suoraan sovelluksesta. Kotiluotsi välittää pyyntösi tarkastettuihin paikallisiin yrityksiin ja sinä valitset parhaan tarjouksen.</p>
             <div className="kil-steps">
               {STEPS.map((s) => (
                 <div className="kil-step" key={s.n}>
@@ -696,7 +696,7 @@ function LandingPage() {
       <section className="proof">
         <div className="proof-inner">
           <div className="proof-head animate-on-scroll">
-            <div className="section-label">Miksi Kotivahti</div>
+            <div className="section-label">Miksi Kotiluotsi</div>
             <h2 className="section-h2">Talosi tiedot vihdoin<br /><em>järjestyksessä.</em></h2>
           </div>
           <div className="stats-row">
@@ -731,7 +731,7 @@ function LandingPage() {
           <a href="/kayttoehdot" style={{ color: "rgba(255,255,255,0.55)", textDecoration: "none", marginRight: "1.2rem" }}>Käyttöehdot</a>
           <a href="/tietosuoja" style={{ color: "rgba(255,255,255,0.55)", textDecoration: "none" }}>Tietosuoja</a>
         </p>
-        <p>© 2026 <span>Kotivahti</span> · Talosi oma avustaja · Kuopio, Suomi</p>
+        <p>© 2026 <span>Kotiluotsi</span> · Talosi oma avustaja · Kuopio, Suomi</p>
       </footer>
     </div>
   );

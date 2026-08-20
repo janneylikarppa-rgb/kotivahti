@@ -14,13 +14,13 @@ export type OpasSisalto = {
   faq: FaqItem[];
 };
 
-export const OPAS_SITE = "https://kotivahti.fi";
+export const OPAS_SITE = "https://kotiluotsi.fi";
 
 export function opasHead(o: OpasSisalto) {
   const url = `${OPAS_SITE}/opas/${o.slug}`;
   return {
     meta: [
-      { title: `${o.title} — Kotivahti` },
+      { title: `${o.title} — Kotiluotsi` },
       { name: "description", content: o.description },
       { property: "og:title", content: o.title },
       { property: "og:description", content: o.description },
@@ -37,8 +37,8 @@ export function opasHead(o: OpasSisalto) {
           headline: o.title,
           description: o.description,
           datePublished: o.julkaistu,
-          author: { "@type": "Organization", name: "Kotivahti" },
-          publisher: { "@type": "Organization", name: "Kotivahti" },
+          author: { "@type": "Organization", name: "Kotiluotsi" },
+          publisher: { "@type": "Organization", name: "Kotiluotsi" },
           mainEntityOfPage: url,
         }),
       },
@@ -91,7 +91,7 @@ export function OpasLayout({ o }: { o: OpasSisalto }) {
 
       <aside className="mt-12 rounded-lg border border-[color:var(--kulta)]/30 bg-[color:var(--kulta)]/5 p-6 text-center">
         <p className="text-cream">
-          Kotivahti pitää talosi huoltohistorian, kulut ja PTS-suunnitelman yhdessä paikassa — ja muistuttaa oikealla hetkellä.
+          Kotiluotsi pitää talosi huoltohistorian, kulut ja PTS-suunnitelman yhdessä paikassa — ja muistuttaa oikealla hetkellä.
         </p>
         <a href="/rekisteroidy" className="mt-4 inline-block rounded-md bg-[color:var(--kulta)] px-6 py-2.5 font-semibold text-[#0D1F14]">
           Aloita maksutta
