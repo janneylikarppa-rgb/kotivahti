@@ -47,6 +47,15 @@ export function AppSidebar() {
   });
   const uusiaCount = uudet?.admin ? (uudet.count ?? 0) : 0;
 
+  const adminFn = useServerFn(onkoAdmin);
+  const { data: adminCheck } = useQuery({
+    queryKey: ["onko-admin"],
+    queryFn: () => adminFn(),
+    staleTime: 5 * 60_000,
+  });
+  const isAdmin = adminCheck?.admin === true;
+  const naytettavat = items.filter((item) => item.url !== "/admin" || isAdmin);
+
   useEffect(() => {
     if (isMobile) setOpenMobile(false);
   }, [path, isMobile, setOpenMobile]);
