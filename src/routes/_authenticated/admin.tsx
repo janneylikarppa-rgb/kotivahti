@@ -1,7 +1,7 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -45,19 +45,17 @@ export const Route = createFileRoute("/_authenticated/admin")({
 
 function AdminPage() {
   const adminFn = useServerFn(onkoAdmin);
+  const navigate = useNavigate();
   const { data: adminCheck, isLoading } = useQuery({ queryKey: ["onko-admin"], queryFn: () => adminFn() });
+  const eiOikeuksia = !isLoading && !adminCheck?.admin;
 
-  if (isLoading) return <p className="text-muted-foreground">Tarkistetaan oikeuksia...</p>;
-  if (!adminCheck?.admin) {
-    return (
-      <Card className="gold-card">
-        <CardContent className="py-12 text-center">
-          <p className="text-cream font-serif text-xl">Ei käyttöoikeuksia</p>
-          <p className="mt-2 text-sm text-muted-foreground">Vain ylläpitäjät pääsevät tälle sivulle.</p>
-        </CardContent>
-      </Card>
-    );
-  }
+  useEffect(() => {
+    if (!eiOikeuksia) return;
+    toast.error("Ei käyttöoikeuksia", { description: "Vain ylläpitäjät pääsevät tälle sivulle." });
+    navigate({ to: "/dashboard", replace: true });
+  }, [eiOikeuksia, navigate]);
+
+  if (isLoading || eiOikeuksia) return <p className="text-muted-foreground">Tarkistetaan oikeuksia...</p>;
 
   return (
     <div className="mx-auto max-w-6xl space-y-8">
