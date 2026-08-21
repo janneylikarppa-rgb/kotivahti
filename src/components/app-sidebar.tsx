@@ -17,7 +17,7 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar";
 import { supabase } from "@/integrations/supabase/client";
-import { getUusienLiidienMaara } from "@/lib/liidit.functions";
+import { getUusienLiidienMaara, onkoAdmin } from "@/lib/liidit.functions";
 
 const items = [
   { title: "Yleiskuva", url: "/dashboard", icon: LayoutDashboard },
