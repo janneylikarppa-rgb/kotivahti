@@ -17,7 +17,7 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar";
 import { supabase } from "@/integrations/supabase/client";
-import { getUusienLiidienMaara } from "@/lib/liidit.functions";
+import { getUusienLiidienMaara, onkoAdmin } from "@/lib/liidit.functions";
 
 const items = [
   { title: "Yleiskuva", url: "/dashboard", icon: LayoutDashboard },
@@ -46,6 +46,15 @@ export function AppSidebar() {
     refetchInterval: 60_000,
   });
   const uusiaCount = uudet?.admin ? (uudet.count ?? 0) : 0;
+
+  const adminFn = useServerFn(onkoAdmin);
+  const { data: adminCheck } = useQuery({
+    queryKey: ["onko-admin"],
+    queryFn: () => adminFn(),
+    staleTime: 5 * 60_000,
+  });
+  const isAdmin = adminCheck?.admin === true;
+  const naytettavat = items.filter((item) => item.url !== "/admin" || isAdmin);
 
   useEffect(() => {
     if (isMobile) setOpenMobile(false);
@@ -77,7 +86,7 @@ export function AppSidebar() {
           <SidebarGroupLabel className="eyebrow">Navigaatio</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
-              {items.map((item) => {
+              {naytettavat.map((item) => {
                 const showBadge = item.url === "/admin" && uusiaCount > 0;
                 return (
                   <SidebarMenuItem key={item.url}>
