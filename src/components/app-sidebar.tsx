@@ -86,7 +86,7 @@ export function AppSidebar() {
           <SidebarGroupLabel className="eyebrow">Navigaatio</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
-              {items.map((item) => {
+              {naytettavat.map((item) => {
                 const showBadge = item.url === "/admin" && uusiaCount > 0;
                 return (
                   <SidebarMenuItem key={item.url}>
