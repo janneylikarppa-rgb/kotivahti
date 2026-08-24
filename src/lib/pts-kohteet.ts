@@ -59,8 +59,8 @@ export const PTS_KOHTEET: PtsKohde[] = [
     lahdeVuosi: (t) => i(lisa(t).sahkopatteri_asennettu_vuosi) ?? lammV(t),
     koskee: (t) => onLamm(t, "sähköpatter", "sahkopatter", "suora sähkö", "suora sahko", "sahkolammitys", "sähkölämmitys") },
   { avain: "lvv_suora", nimi: "Lämminvesivaraaja", kategoria: "Lämmitys", kayttoika: 25, huoltovali: 5,
-    lahdeVuosi: (t) => i(lisa(t).lvv_asennettu_vuosi),
-    koskee: (t) => onLamm(t, "sahkolammitys", "sähkölämmitys", "suora sähkö") && i(lisa(t).lvv_asennettu_vuosi) != null },
+    lahdeVuosi: (t) => i(lisa(t).lvv_asennettu_vuosi) ?? lammV(t),
+    koskee: (t) => onLamm(t, "sahkolammitys", "sähkölämmitys", "suora sähkö") },
   // Keskuslämmitys – kattilatyypit
   { avain: "keskus_kattila_puu", nimi: "Keskuslämmityskattila (puu)", kategoria: "Lämmitys", kayttoika: 30, huoltovali: 1,
     lahdeVuosi: kattilaV, koskee: (t) => onLamm(t, "keskus") && onKattila(t, "puu") },
