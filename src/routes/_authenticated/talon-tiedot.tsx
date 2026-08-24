@@ -82,6 +82,11 @@ const MERKIT: Record<string, { tyyppi: string; merkit: string[] }> = {
   kaukolampo: { tyyppi: "Lämmönjakokeskus", merkit: ["Alfa Laval", "Danfoss", "Gebwell", "Högfors", "Cetetherm", "Muu"] },
   sahkolammitys: { tyyppi: "Lämminvesivaraaja", merkit: ["Jäspi", "Kaukora", "Nibe", "Haato", "Muu"] },
 };
+const LVV_MALLIT: Record<string, string[]> = {
+  "Jäspi": ["VLM 100", "VLM 150", "VLM 200", "VLM 300", "VLS 200", "VLS 300", "VLK 15", "VLK 35", "VLK 100", "VLK 300", "Ovali 300", "Basic 200", "Solar 300"],
+  "Nibe": ["Compact 100", "Compact 150", "Compact 200", "Compact 300", "Eminent 35", "Eminent 55", "Eminent 100", "Mega W-E 300", "VPB 200", "VPB 300"],
+  "Haato": ["HK 15", "HK 30", "HK 55", "HK 80", "HK 100", "HM 150", "HM 200", "HM 300", "HVS 300"],
+};
 const KATTILA_TYYPIT = [
   { key: "puu", nimi: "Puukattila" },
   { key: "sahko", nimi: "Sähkökattila" },
