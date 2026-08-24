@@ -36,6 +36,9 @@ html { scroll-behavior: smooth; }
 .nav-links a:hover { color: var(--vihrea); }
 .nav-cta { background: var(--kulta); color: var(--valkoinen) !important; padding: 0.55rem 1.4rem; border-radius: 6px; font-weight: 600 !important; font-size: 0.88rem !important; letter-spacing: 0.02em; transition: background 0.2s !important; }
 .nav-cta:hover { background: #b8842e !important; color: #fff !important; }
+.nav-toggle { display: none; align-items: center; justify-content: center; width: 44px; height: 44px; margin-left: 0.5rem; border: 1px solid rgba(200,151,58,0.3); border-radius: 8px; background: transparent; color: var(--vihrea); cursor: pointer; }
+.nav-mobile { display: none; }
+
 
 .hero { min-height: 100vh; background: var(--vihrea-dark); display: flex; align-items: center; position: relative; overflow: hidden; padding: 7rem 3rem 5rem; }
 .hero::before { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse 70% 60% at 60% 40%, rgba(200,151,58,0.08) 0%, transparent 70%); }
