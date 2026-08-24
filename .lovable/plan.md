@@ -9,11 +9,12 @@ Lämminvesivaraajan "Mallimerkintä" on nyt vapaa tekstikenttä. Muutetaan se va
 - Muilla merkeillä (esim. Kaukora tai oma merkki) kenttä toimii kuten nyt: vapaa teksti.
 - Aiemmin tallennettu vapaa teksti säilyy ja näkyy oikein.
 
-## Mallilistat
+## Mallilistat (malli + kokoluokka litroina)
 
-- **Jäspi**: VLM, VLS, VLK, Ovali, Basic, Solar, Duplex, Muu / oma
-- **Nibe**: Compact CU, Eminent, Mega W-E, VPB, Elk, Muu / oma
-- **Haato**: HK, HM, HKS, HVS, Muu / oma
+- **Jäspi**: VLM 100, VLM 150, VLM 200, VLM 300, VLS 200, VLS 300, VLK 15, VLK 35, VLK 100, VLK 300, Ovali 300, Basic 200, Solar 300, Muu / oma
+- **Nibe**: Compact 100, Compact 150, Compact 200, Compact 300, Eminent 35, Eminent 55, Eminent 100, Mega W-E 300, VPB 200, VPB 300, Muu / oma
+- **Haato**: HK 15, HK 30, HK 55, HK 80, HK 100, HM 150, HM 200, HM 300, HVS 300, Muu / oma
+
 
 ## Tekniset yksityiskohdat
 
