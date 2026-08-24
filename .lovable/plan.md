@@ -1,20 +1,19 @@
-# Oppaat-osion piilotus
+# Oppaat-osion poisto
 
-Piilotetaan opassivut näkyvistä ilman että sisältöä poistetaan — sivut jäävät koodiin, mutta niihin ei enää ohjata kävijöitä eikä hakukoneita.
+Poistetaan opassivut kokonaan sovelluksesta. Osio rakennetaan myöhemmin uudelleen tyhjältä pöydältä.
 
 ## Muutokset
 
-1. **Etusivun alatunniste** — poistetaan "Oppaat"-linkki.
-2. **UKK-sivu** — poistetaan viittaus Oppaat-osioon (jätetään lause ilman linkkiä).
-3. **Sivukartta (sitemap.xml)** — poistetaan `/opas` ja kaikki kolme opassivua, jotta Google ei enää indeksoi niitä.
-4. **Opassivut itse** — lisätään `noindex, nofollow` -metatieto, jotta jo indeksoidut sivut poistuvat hakutuloksista. Sivut säilyvät toimivina suoralla osoitteella, joten sisältö on helppo palauttaa myöhemmin.
+1. **Opassivut poistetaan** — kaikki neljä sivua (oppaiden etusivu, nuohouksen hinta, IV-puhdistus, katon tarkastus) sekä niiden yhteinen layout-komponentti.
+2. **Etusivun alatunniste** — "Oppaat"-linkki poistetaan.
+3. **UKK-sivu** — poistetaan viittaus Oppaat-osioon; lause muotoillaan niin, ettei siinä ole rikkinäistä linkkiä.
+4. **Sivukartta (sitemap.xml)** — poistetaan `/opas` ja kaikki opassivut, jotta hakukoneet lopettavat niiden indeksoinnin.
+
+Poiston jälkeen osoitteet `/opas/...` palauttavat normaalin "sivua ei löydy" -näkymän.
 
 ## Tekniset yksityiskohdat
 
-- `src/routes/index.tsx` (footer-linkki), `src/routes/ukk.tsx`, `src/routes/sitemap[.]xml.ts`
-- `src/components/opas-layout.tsx`: `opasHead`-funktioon `{ name: "robots", content: "noindex, nofollow" }`; sisäiset "Oppaat"-murupolkulinkit voidaan jättää, koska ne näkyvät vain opassivuilla.
-- Reittitiedostoja ei poisteta, joten `routeTree.gen.ts` pysyy ennallaan.
-
-## Vaihtoehto
-
-Jos haluat oppaat kokonaan pois (404), poistetaan `src/routes/opas/`-kansio ja `opas-layout.tsx`. Kerro, jos tämä on toivottu lopputulos.
+- Poistetaan `src/routes/opas/` (index, iv-puhdistus, katon-tarkastus, nuohous-hinta) ja `src/components/opas-layout.tsx`.
+- Muokataan `src/routes/index.tsx` (footer-linkki), `src/routes/ukk.tsx` ja `src/routes/sitemap[.]xml.ts`.
+- `src/routeTree.gen.ts` regeneroituu automaattisesti.
+- Lopuksi varmistetaan onnistunut build, ei TypeScript-virheitä eikä konsolivirheitä.
