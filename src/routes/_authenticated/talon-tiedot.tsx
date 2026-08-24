@@ -222,7 +222,8 @@ function TaloTiedotPage() {
   });
 
 
-  const laite = t.lammitysmuoto ? MERKIT[t.lammitysmuoto] : undefined;
+  // Suoralla sähkölämmityksellä varaajan tiedot syötetään omassa lohkossaan
+  const laite = t.lammitysmuoto && t.lammitysmuoto !== "sahkolammitys" ? MERKIT[t.lammitysmuoto] : undefined;
 
   const lammitysLisa = (t.lammitys_lisatieto && typeof t.lammitys_lisatieto === "object") ? t.lammitys_lisatieto : {};
   const setLisa = (patch: Record<string, any>) => setT({ ...t, lammitys_lisatieto: { ...lammitysLisa, ...patch } });
@@ -619,20 +620,24 @@ function TaloTiedotPage() {
               </div>
             )}
 
-            {/* Suora sähkölämmitys: patterit + LVV */}
-            {t.lammitysmuoto === "sahkolammitys" && (
+            {/* Suora sähkölämmitys: patterit ja lämminvesivaraaja erikseen */}
+            {t.lammitysmuoto === "sahkolammitys" && (<>
               <div className="rounded-md border border-border bg-card/40 p-4 space-y-4">
-                <p className="eyebrow text-primary">Sähköpatterit ja lämminvesivaraaja</p>
+                <p className="eyebrow text-primary">Sähköpatterit</p>
                 <Field label="Sähköpattereiden asennusvuosi"><Input type="number" value={lammitysLisa.sahkopatteri_asennettu_vuosi ?? ""} onChange={(e) => setLisa({ sahkopatteri_asennettu_vuosi: e.target.value })} /></Field>
-                <Row>
-                  <Field label="Lämminvesivaraajan merkki">
-                    <SelectOrOther value={lammitysLisa.lvv_merkki} options={MERKIT.sahkolammitys.merkit} onChange={(v) => setLisa({ lvv_merkki: v })} />
-                  </Field>
-                  <Field label="LVV:n mallimerkintä"><Input value={lammitysLisa.lvv_malli ?? ""} onChange={(e) => setLisa({ lvv_malli: e.target.value })} /></Field>
-                </Row>
-                <Field label="LVV:n asennusvuosi"><Input type="number" value={lammitysLisa.lvv_asennettu_vuosi ?? ""} onChange={(e) => setLisa({ lvv_asennettu_vuosi: e.target.value })} /></Field>
               </div>
-            )}
+
+              <div className="rounded-md border border-border bg-card/40 p-4 space-y-4">
+                <p className="eyebrow text-primary">Lämminvesivaraaja</p>
+                <Row>
+                  <Field label="Merkki">
+                    <SelectOrOther value={lammitysLisa.lvv_merkki ?? lammitysLisa.merkki} options={MERKIT.sahkolammitys.merkit} onChange={(v) => setLisa({ lvv_merkki: v })} />
+                  </Field>
+                  <Field label="Mallimerkintä"><Input value={lammitysLisa.lvv_malli ?? lammitysLisa.malli ?? ""} onChange={(e) => setLisa({ lvv_malli: e.target.value })} /></Field>
+                </Row>
+                <Field label="Asennusvuosi"><Input type="number" value={lammitysLisa.lvv_asennettu_vuosi ?? ""} onChange={(e) => setLisa({ lvv_asennettu_vuosi: e.target.value })} placeholder="Jätä tyhjäksi jos alkuperäinen" /></Field>
+              </div>
+            </>)}
 
             <p className="eyebrow text-primary pt-2">Ilmalämpöpumppu (lisälaite)</p>
             <Row>
