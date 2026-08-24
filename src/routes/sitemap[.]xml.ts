@@ -9,6 +9,7 @@ const POLUT = [
   "/opas/nuohous-hinta",
   "/opas/iv-puhdistus",
   "/opas/katon-tarkastus",
+  "/blogi/sahkoinen-talokirja",
   "/kayttoehdot",
   "/tietosuoja",
   "/login",
