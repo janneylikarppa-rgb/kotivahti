@@ -1,6 +1,6 @@
 import { createFileRoute, Link, redirect } from "@tanstack/react-router";
-import { useEffect, type ReactNode } from "react";
-import { Calculator } from "lucide-react";
+import { useEffect, useState, type ReactNode } from "react";
+import { Calculator, Menu, X } from "lucide-react";
 import { getReadySession } from "@/lib/auth-session";
 
 export const Route = createFileRoute("/")({
@@ -36,6 +36,9 @@ html { scroll-behavior: smooth; }
 .nav-links a:hover { color: var(--vihrea); }
 .nav-cta { background: var(--kulta); color: var(--valkoinen) !important; padding: 0.55rem 1.4rem; border-radius: 6px; font-weight: 600 !important; font-size: 0.88rem !important; letter-spacing: 0.02em; transition: background 0.2s !important; }
 .nav-cta:hover { background: #b8842e !important; color: #fff !important; }
+.nav-toggle { display: none; align-items: center; justify-content: center; width: 44px; height: 44px; margin-left: 0.5rem; border: 1px solid rgba(200,151,58,0.3); border-radius: 8px; background: transparent; color: var(--vihrea); cursor: pointer; }
+.nav-mobile { display: none; }
+
 
 .hero { min-height: 100vh; background: var(--vihrea-dark); display: flex; align-items: center; position: relative; overflow: hidden; padding: 7rem 3rem 5rem; }
 .hero::before { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse 70% 60% at 60% 40%, rgba(200,151,58,0.08) 0%, transparent 70%); }
@@ -220,7 +223,14 @@ html { scroll-behavior: smooth; }
   .features-grid { grid-template-columns: 1fr; }
   .kil-cats { grid-template-columns: 1fr; }
   .nav-links a:not(.nav-cta) { display: none; }
+  .nav-links { gap: 0.6rem; }
+  .nav-toggle { display: inline-flex; }
+  .nav-mobile { display: block; position: fixed; top: 68px; left: 0; right: 0; z-index: 99; background: rgba(245,240,232,0.98); backdrop-filter: blur(12px); border-bottom: 1px solid rgba(200,151,58,0.25); box-shadow: 0 10px 30px rgba(30,58,47,0.12); padding: 0.5rem 1.5rem 1rem; }
+  .nav-mobile a { display: block; padding: 0.85rem 0; text-decoration: none; color: var(--vihrea); font-size: 1rem; font-weight: 500; border-bottom: 1px solid rgba(200,151,58,0.15); }
+  .nav-mobile a:last-child { border-bottom: none; }
+  .nav-backdrop { position: fixed; inset: 0; z-index: 98; background: rgba(21,42,34,0.25); border: 0; }
 }
+
 @media (max-width: 900px) {
   .showcase { padding: 3.5rem 1.5rem 1rem; }
   .sc-row, .sc-row.reverse { grid-template-columns: 1fr; gap: 2.2rem; padding: 2.8rem 0; }
@@ -491,6 +501,8 @@ const OFFERS = [
 ];
 
 function LandingPage() {
+  const [valikkoAuki, setValikkoAuki] = useState(false);
+
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
@@ -517,6 +529,17 @@ function LandingPage() {
     };
   }, []);
 
+  useEffect(() => {
+    if (!valikkoAuki) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setValikkoAuki(false);
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [valikkoAuki]);
+
+  const sulje = () => setValikkoAuki(false);
+
   return (
     <div className="kv-page">
       <style>{STYLES}</style>
@@ -528,8 +551,31 @@ function LandingPage() {
           <a href="#kilpailutus">Kilpailutus</a>
           <Link to="/blogi/sahkoinen-talokirja">Blogi</Link>
           <Link to="/rekisteroidy" className="nav-cta">Aloita ilmaiseksi</Link>
+          <button
+            type="button"
+            className="nav-toggle"
+            aria-label={valikkoAuki ? "Sulje valikko" : "Avaa valikko"}
+            aria-expanded={valikkoAuki}
+            onClick={() => setValikkoAuki((v) => !v)}
+          >
+            {valikkoAuki ? <X size={22} /> : <Menu size={22} />}
+          </button>
         </div>
       </nav>
+
+      {valikkoAuki && (
+        <>
+          <button type="button" className="nav-backdrop" aria-label="Sulje valikko" onClick={sulje} />
+          <div className="nav-mobile">
+            <a href="#ominaisuudet" onClick={sulje}>Ominaisuudet</a>
+            <a href="#kilpailutus" onClick={sulje}>Kilpailutus</a>
+            <Link to="/blogi/sahkoinen-talokirja" onClick={sulje}>Blogi</Link>
+            <Link to="/ukk" onClick={sulje}>Usein kysyttyä</Link>
+            <Link to="/login" onClick={sulje}>Kirjaudu</Link>
+          </div>
+        </>
+      )}
+
 
       <section className="hero">
         <div className="hero-inner">
