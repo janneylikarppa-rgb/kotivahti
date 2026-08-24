@@ -638,7 +638,18 @@ function TaloTiedotPage() {
                   <Field label="Merkki">
                     <SelectOrOther value={lammitysLisa.lvv_merkki ?? lammitysLisa.merkki} options={MERKIT.sahkolammitys.merkit} onChange={(v) => setLisa({ lvv_merkki: v })} />
                   </Field>
-                  <Field label="Mallimerkintä"><Input value={lammitysLisa.lvv_malli ?? lammitysLisa.malli ?? ""} onChange={(e) => setLisa({ lvv_malli: e.target.value })} /></Field>
+                  <Field label="Mallimerkintä">
+                    {LVV_MALLIT[lammitysLisa.lvv_merkki ?? lammitysLisa.merkki ?? ""] ? (
+                      <SelectOrOther
+                        key={lammitysLisa.lvv_merkki ?? lammitysLisa.merkki}
+                        value={lammitysLisa.lvv_malli ?? lammitysLisa.malli}
+                        options={LVV_MALLIT[lammitysLisa.lvv_merkki ?? lammitysLisa.merkki ?? ""]}
+                        onChange={(v) => setLisa({ lvv_malli: v })}
+                      />
+                    ) : (
+                      <Input value={lammitysLisa.lvv_malli ?? lammitysLisa.malli ?? ""} onChange={(e) => setLisa({ lvv_malli: e.target.value })} />
+                    )}
+                  </Field>
                 </Row>
                 <Field label="Asennusvuosi"><Input type="number" value={lammitysLisa.lvv_asennettu_vuosi ?? ""} onChange={(e) => setLisa({ lvv_asennettu_vuosi: e.target.value })} placeholder="Jätä tyhjäksi jos alkuperäinen" /></Field>
               </div>
