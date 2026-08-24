@@ -670,7 +670,18 @@ function TaloTiedotPage() {
               <Field label="Merkki">
                 <SelectOrOther value={t.ilp_merkki} options={ILP_MERKIT} onChange={(v) => setT({ ...t, ilp_merkki: v })} />
               </Field>
-              <Field label="Mallimerkintä"><Input value={t.ilp_malli ?? ""} onChange={(e) => setT({ ...t, ilp_malli: e.target.value })} placeholder="Esim. MSZ-LN35VG" /></Field>
+              <Field label="Mallimerkintä">
+                {ILP_MALLIT[t.ilp_merkki ?? ""] ? (
+                  <SelectOrOther
+                    key={t.ilp_merkki}
+                    value={t.ilp_malli}
+                    options={ILP_MALLIT[t.ilp_merkki ?? ""]}
+                    onChange={(v) => setT({ ...t, ilp_malli: v })}
+                  />
+                ) : (
+                  <Input value={t.ilp_malli ?? ""} onChange={(e) => setT({ ...t, ilp_malli: e.target.value })} placeholder="Esim. MSZ-LN35VG" />
+                )}
+              </Field>
             </Row>
             <Field label="LP:n asennusvuosi"><Input type="number" value={t.ilp_asennettu_vuosi ?? ""} onChange={(e) => setT({ ...t, ilp_asennettu_vuosi: e.target.value })} /></Field>
 
