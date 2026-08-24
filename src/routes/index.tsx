@@ -501,6 +501,8 @@ const OFFERS = [
 ];
 
 function LandingPage() {
+  const [valikkoAuki, setValikkoAuki] = useState(false);
+
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
@@ -527,6 +529,17 @@ function LandingPage() {
     };
   }, []);
 
+  useEffect(() => {
+    if (!valikkoAuki) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setValikkoAuki(false);
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [valikkoAuki]);
+
+  const sulje = () => setValikkoAuki(false);
+
   return (
     <div className="kv-page">
       <style>{STYLES}</style>
@@ -538,8 +551,31 @@ function LandingPage() {
           <a href="#kilpailutus">Kilpailutus</a>
           <Link to="/blogi/sahkoinen-talokirja">Blogi</Link>
           <Link to="/rekisteroidy" className="nav-cta">Aloita ilmaiseksi</Link>
+          <button
+            type="button"
+            className="nav-toggle"
+            aria-label={valikkoAuki ? "Sulje valikko" : "Avaa valikko"}
+            aria-expanded={valikkoAuki}
+            onClick={() => setValikkoAuki((v) => !v)}
+          >
+            {valikkoAuki ? <X size={22} /> : <Menu size={22} />}
+          </button>
         </div>
       </nav>
+
+      {valikkoAuki && (
+        <>
+          <button type="button" className="nav-backdrop" aria-label="Sulje valikko" onClick={sulje} />
+          <div className="nav-mobile">
+            <a href="#ominaisuudet" onClick={sulje}>Ominaisuudet</a>
+            <a href="#kilpailutus" onClick={sulje}>Kilpailutus</a>
+            <Link to="/blogi/sahkoinen-talokirja" onClick={sulje}>Blogi</Link>
+            <Link to="/ukk" onClick={sulje}>Usein kysyttyä</Link>
+            <Link to="/login" onClick={sulje}>Kirjaudu</Link>
+          </div>
+        </>
+      )}
+
 
       <section className="hero">
         <div className="hero-inner">
