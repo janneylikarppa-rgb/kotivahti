@@ -87,6 +87,16 @@ const LVV_MALLIT: Record<string, string[]> = {
   "Nibe": ["Compact 100", "Compact 150", "Compact 200", "Compact 300", "Eminent 35", "Eminent 55", "Eminent 100", "Mega W-E 300", "VPB 200", "VPB 300"],
   "Haato": ["HK 15", "HK 30", "HK 55", "HK 80", "HK 100", "HM 150", "HM 200", "HM 300", "HVS 300"],
 };
+const ILP_MALLIT: Record<string, string[]> = {
+  "Mitsubishi": ["MSZ-LN25VG", "MSZ-LN35VG", "MSZ-LN50VG", "MSZ-FT25VG", "MSZ-FT35VG", "MSZ-FT50VG", "MSZ-AP25VG", "MSZ-AP35VG", "MSZ-HR25VF", "MSZ-HR35VF", "Kirigamine Zen"],
+  "Daikin": ["Perfera FTXM20R", "Perfera FTXM25R", "Perfera FTXM35R", "Perfera FTXM42R", "Ururu Sarara", "Comfora FTXP25", "Comfora FTXP35", "Emura", "Stylish"],
+  "Panasonic": ["Etherea Z25", "Etherea Z35", "Etherea Z50", "HZ25", "HZ35", "Nordic NZ25", "Nordic NZ35", "TZ25", "TZ35"],
+  "Toshiba": ["Daiseikai 9", "Daiseikai 10", "Shorai Edge 25", "Shorai Edge 35", "Haori", "Polar"],
+  "Fujitsu": ["LU25", "LU35", "LM25", "LM35", "Nocria X", "ASYG09", "ASYG12"],
+  "LG": ["Artcool", "Standard Plus", "ThermaV", "H09", "H12"],
+  "Samsung": ["Wind-Free Nordic 25", "Wind-Free Nordic 35", "AR35", "Cebu"],
+  "Sharp": ["AY-XP09", "AY-XP12", "Plasmacluster"],
+};
 const KATTILA_TYYPIT = [
   { key: "puu", nimi: "Puukattila" },
   { key: "sahko", nimi: "Sähkökattila" },
