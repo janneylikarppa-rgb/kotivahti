@@ -232,7 +232,7 @@ function BlogiPage() {
         <p style={{ marginBottom: "0.6rem" }}>
           <a href="/blogi">Blogi</a>
           <a href="/ukk">UKK</a>
-          <a href="/opas">Oppaat</a>
+          
           <a href="/kayttoehdot">Käyttöehdot</a>
           <a href="/tietosuoja">Tietosuoja</a>
         </p>

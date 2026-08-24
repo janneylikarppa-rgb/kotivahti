@@ -66,9 +66,8 @@ function UkkPage() {
       <h1 className="font-serif text-4xl text-cream md:text-5xl">UKK — Kotiluotsi</h1>
       <p className="mt-4 text-cream/70">
         Tältä sivulta löydät vastaukset Kotiluotsi-palvelua koskeviin yleisimpiin kysymyksiin.
-        Talon huoltoon ja vuosihuoltojen ajoitukseen liittyvät oppaat löydät{" "}
-        <Link to="/opas" className="text-[color:var(--kulta)] underline">Oppaat-osiosta</Link>.
       </p>
+
       <div className="mt-10 space-y-6">
         {KYSYMYKSET.map((k) => (
           <article key={k.q} className="rounded-lg border border-cream/10 bg-cream/5 p-5">
