@@ -223,7 +223,14 @@ html { scroll-behavior: smooth; }
   .features-grid { grid-template-columns: 1fr; }
   .kil-cats { grid-template-columns: 1fr; }
   .nav-links a:not(.nav-cta) { display: none; }
+  .nav-links { gap: 0.6rem; }
+  .nav-toggle { display: inline-flex; }
+  .nav-mobile { display: block; position: fixed; top: 68px; left: 0; right: 0; z-index: 99; background: rgba(245,240,232,0.98); backdrop-filter: blur(12px); border-bottom: 1px solid rgba(200,151,58,0.25); box-shadow: 0 10px 30px rgba(30,58,47,0.12); padding: 0.5rem 1.5rem 1rem; }
+  .nav-mobile a { display: block; padding: 0.85rem 0; text-decoration: none; color: var(--vihrea); font-size: 1rem; font-weight: 500; border-bottom: 1px solid rgba(200,151,58,0.15); }
+  .nav-mobile a:last-child { border-bottom: none; }
+  .nav-backdrop { position: fixed; inset: 0; z-index: 98; background: rgba(21,42,34,0.25); border: 0; }
 }
+
 @media (max-width: 900px) {
   .showcase { padding: 3.5rem 1.5rem 1rem; }
   .sc-row, .sc-row.reverse { grid-template-columns: 1fr; gap: 2.2rem; padding: 2.8rem 0; }
