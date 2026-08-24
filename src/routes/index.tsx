@@ -526,6 +526,7 @@ function LandingPage() {
         <div className="nav-links">
           <a href="#ominaisuudet">Ominaisuudet</a>
           <a href="#kilpailutus">Kilpailutus</a>
+          <Link to="/blogi/sahkoinen-talokirja">Blogi</Link>
           <Link to="/rekisteroidy" className="nav-cta">Aloita ilmaiseksi</Link>
         </div>
       </nav>
