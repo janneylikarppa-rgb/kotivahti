@@ -222,7 +222,8 @@ function TaloTiedotPage() {
   });
 
 
-  const laite = t.lammitysmuoto ? MERKIT[t.lammitysmuoto] : undefined;
+  // Suoralla sähkölämmityksellä varaajan tiedot syötetään omassa lohkossaan
+  const laite = t.lammitysmuoto && t.lammitysmuoto !== "sahkolammitys" ? MERKIT[t.lammitysmuoto] : undefined;
 
   const lammitysLisa = (t.lammitys_lisatieto && typeof t.lammitys_lisatieto === "object") ? t.lammitys_lisatieto : {};
   const setLisa = (patch: Record<string, any>) => setT({ ...t, lammitys_lisatieto: { ...lammitysLisa, ...patch } });
