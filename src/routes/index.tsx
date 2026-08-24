@@ -1,6 +1,6 @@
 import { createFileRoute, Link, redirect } from "@tanstack/react-router";
-import { useEffect, type ReactNode } from "react";
-import { Calculator } from "lucide-react";
+import { useEffect, useState, type ReactNode } from "react";
+import { Calculator, Menu, X } from "lucide-react";
 import { getReadySession } from "@/lib/auth-session";
 
 export const Route = createFileRoute("/")({
