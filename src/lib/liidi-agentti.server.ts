@@ -129,7 +129,10 @@ export async function analysoiLiidi(liidi: LiidiInput): Promise<AgentinEhdotus |
     }
     const body = await res.json();
     const teksti = body?.content?.map((c: any) => c?.text ?? "").join("") ?? "";
-    return puraJson(teksti);
+    console.log("[liidi-agentti] Clauden raakavastaus:", teksti.slice(0, 4000));
+    const purettu = puraJson(teksti);
+    if (!purettu) console.error("[liidi-agentti] JSON-parsinta epäonnistui raakavastauksesta");
+    return purettu;
   } catch (e) {
     console.error("Liidi-agentti virhe", e);
     return null;
