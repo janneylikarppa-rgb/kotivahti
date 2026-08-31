@@ -194,19 +194,19 @@ export async function kasitteleLiidiAgentilla(supabase: any, liidi: LiidiInput):
   try {
     const ehdotus = await analysoiLiidi(liidi);
     const tunti = helsinkiTunti();
-    const paivaika = tunti >= 8 && tunti < 18;
+    const onPaiva = tunti >= 8 && tunti < 18;
 
-    console.log(`[liidi-agentti] Liidi ${liidi.id} käsitelty. Helsinki-aika: ${helsinkiAika()}, tunti: ${tunti}, päiväaika: ${paivaika}`);
+    console.log(`[liidi-agentti] Liidi ${liidi.id} käsitelty. Helsinki-aika: ${helsinkiAika()}, tunti: ${tunti}, onPaiva: ${onPaiva}`);
 
     const paivitys: Record<string, unknown> = {
       kasitelty_at: new Date().toISOString(),
     };
     if (ehdotus) paivitys.agentin_ehdotus = ehdotus;
-    if (!paivaika) paivitys.lahetus_jonossa = true;
+    if (!onPaiva) paivitys.lahetus_jonossa = true;
 
     await supabase.from("liidit").update(paivitys).eq("id", liidi.id);
 
-    if (paivaika && ehdotus) {
+    if (onPaiva && ehdotus) {
       const vastaanottaja = process.env.OWNER_EMAIL ?? OMISTAJA_OLETUS;
       const msg = agentinIlmoitusEmail(liidi, ehdotus);
       const r = await lahetaEmail({ to: vastaanottaja, subject: msg.subject, html: msg.html });
