@@ -34,6 +34,7 @@ import { Route as BlogiSahkoinenTalokirjaRouteImport } from './routes/blogi/sahk
 import { Route as ApiPublicPalauteRouteImport } from './routes/api/public/palaute'
 import { Route as ApiPublicHooksKausikirjeFollowupRouteImport } from './routes/api/public/hooks/kausikirje-followup'
 import { Route as ApiPublicHooksLahetaKausikirjeRouteImport } from './routes/api/public/hooks/laheta-kausikirje'
+import { Route as ApiPublicHooksLiidiAamukoontiRouteImport } from './routes/api/public/hooks/liidi-aamukoonti'
 import { Route as ApiPublicHooksNuohousMuistutusRouteImport } from './routes/api/public/hooks/nuohous-muistutus'
 import { Route as ApiPublicHooksYdinprosessiEskalointiRouteImport } from './routes/api/public/hooks/ydinprosessi-eskalointi'
 import { Route as LovableEmailAuthPreviewRouteImport } from './routes/lovable/email/auth/preview'
@@ -169,6 +170,12 @@ const ApiPublicHooksLahetaKausikirjeRoute =
     path: '/api/public/hooks/laheta-kausikirje',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiPublicHooksLiidiAamukoontiRoute =
+  ApiPublicHooksLiidiAamukoontiRouteImport.update({
+    id: '/api/public/hooks/liidi-aamukoonti',
+    path: '/api/public/hooks/liidi-aamukoonti',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiPublicHooksNuohousMuistutusRoute =
   ApiPublicHooksNuohousMuistutusRouteImport.update({
     id: '/api/public/hooks/nuohous-muistutus',
@@ -217,6 +224,7 @@ export interface FileRoutesByFullPath {
   '/api/public/palaute': typeof ApiPublicPalauteRoute
   '/api/public/hooks/kausikirje-followup': typeof ApiPublicHooksKausikirjeFollowupRoute
   '/api/public/hooks/laheta-kausikirje': typeof ApiPublicHooksLahetaKausikirjeRoute
+  '/api/public/hooks/liidi-aamukoonti': typeof ApiPublicHooksLiidiAamukoontiRoute
   '/api/public/hooks/nuohous-muistutus': typeof ApiPublicHooksNuohousMuistutusRoute
   '/api/public/hooks/ydinprosessi-eskalointi': typeof ApiPublicHooksYdinprosessiEskalointiRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
@@ -247,6 +255,7 @@ export interface FileRoutesByTo {
   '/api/public/palaute': typeof ApiPublicPalauteRoute
   '/api/public/hooks/kausikirje-followup': typeof ApiPublicHooksKausikirjeFollowupRoute
   '/api/public/hooks/laheta-kausikirje': typeof ApiPublicHooksLahetaKausikirjeRoute
+  '/api/public/hooks/liidi-aamukoonti': typeof ApiPublicHooksLiidiAamukoontiRoute
   '/api/public/hooks/nuohous-muistutus': typeof ApiPublicHooksNuohousMuistutusRoute
   '/api/public/hooks/ydinprosessi-eskalointi': typeof ApiPublicHooksYdinprosessiEskalointiRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
@@ -279,6 +288,7 @@ export interface FileRoutesById {
   '/api/public/palaute': typeof ApiPublicPalauteRoute
   '/api/public/hooks/kausikirje-followup': typeof ApiPublicHooksKausikirjeFollowupRoute
   '/api/public/hooks/laheta-kausikirje': typeof ApiPublicHooksLahetaKausikirjeRoute
+  '/api/public/hooks/liidi-aamukoonti': typeof ApiPublicHooksLiidiAamukoontiRoute
   '/api/public/hooks/nuohous-muistutus': typeof ApiPublicHooksNuohousMuistutusRoute
   '/api/public/hooks/ydinprosessi-eskalointi': typeof ApiPublicHooksYdinprosessiEskalointiRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
@@ -311,6 +321,7 @@ export interface FileRouteTypes {
     | '/api/public/palaute'
     | '/api/public/hooks/kausikirje-followup'
     | '/api/public/hooks/laheta-kausikirje'
+    | '/api/public/hooks/liidi-aamukoonti'
     | '/api/public/hooks/nuohous-muistutus'
     | '/api/public/hooks/ydinprosessi-eskalointi'
     | '/lovable/email/auth/preview'
@@ -341,6 +352,7 @@ export interface FileRouteTypes {
     | '/api/public/palaute'
     | '/api/public/hooks/kausikirje-followup'
     | '/api/public/hooks/laheta-kausikirje'
+    | '/api/public/hooks/liidi-aamukoonti'
     | '/api/public/hooks/nuohous-muistutus'
     | '/api/public/hooks/ydinprosessi-eskalointi'
     | '/lovable/email/auth/preview'
@@ -372,6 +384,7 @@ export interface FileRouteTypes {
     | '/api/public/palaute'
     | '/api/public/hooks/kausikirje-followup'
     | '/api/public/hooks/laheta-kausikirje'
+    | '/api/public/hooks/liidi-aamukoonti'
     | '/api/public/hooks/nuohous-muistutus'
     | '/api/public/hooks/ydinprosessi-eskalointi'
     | '/lovable/email/auth/preview'
@@ -394,6 +407,7 @@ export interface RootRouteChildren {
   ApiPublicPalauteRoute: typeof ApiPublicPalauteRoute
   ApiPublicHooksKausikirjeFollowupRoute: typeof ApiPublicHooksKausikirjeFollowupRoute
   ApiPublicHooksLahetaKausikirjeRoute: typeof ApiPublicHooksLahetaKausikirjeRoute
+  ApiPublicHooksLiidiAamukoontiRoute: typeof ApiPublicHooksLiidiAamukoontiRoute
   ApiPublicHooksNuohousMuistutusRoute: typeof ApiPublicHooksNuohousMuistutusRoute
   ApiPublicHooksYdinprosessiEskalointiRoute: typeof ApiPublicHooksYdinprosessiEskalointiRoute
   LovableEmailAuthPreviewRoute: typeof LovableEmailAuthPreviewRoute
@@ -577,6 +591,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicHooksLahetaKausikirjeRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/hooks/liidi-aamukoonti': {
+      id: '/api/public/hooks/liidi-aamukoonti'
+      path: '/api/public/hooks/liidi-aamukoonti'
+      fullPath: '/api/public/hooks/liidi-aamukoonti'
+      preLoaderRoute: typeof ApiPublicHooksLiidiAamukoontiRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/hooks/nuohous-muistutus': {
       id: '/api/public/hooks/nuohous-muistutus'
       path: '/api/public/hooks/nuohous-muistutus'
@@ -654,6 +675,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiPublicPalauteRoute: ApiPublicPalauteRoute,
   ApiPublicHooksKausikirjeFollowupRoute: ApiPublicHooksKausikirjeFollowupRoute,
   ApiPublicHooksLahetaKausikirjeRoute: ApiPublicHooksLahetaKausikirjeRoute,
+  ApiPublicHooksLiidiAamukoontiRoute: ApiPublicHooksLiidiAamukoontiRoute,
   ApiPublicHooksNuohousMuistutusRoute: ApiPublicHooksNuohousMuistutusRoute,
   ApiPublicHooksYdinprosessiEskalointiRoute:
     ApiPublicHooksYdinprosessiEskalointiRoute,
