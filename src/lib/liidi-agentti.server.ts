@@ -30,14 +30,13 @@ type LiidiInput = {
   nimi: string;
 };
 
-function helsinkiTunti(d = new Date()): number {
-  const osat = new Intl.DateTimeFormat("fi-FI", {
+function helsinkiTunti(): number {
+  const nytHelsinki = new Date().toLocaleString("fi-FI", {
     timeZone: "Europe/Helsinki",
     hour: "2-digit",
     hour12: false,
-  }).formatToParts(d);
-  const tunti = osat.find((o) => o.type === "hour")?.value ?? "0";
-  return parseInt(tunti, 10);
+  });
+  return parseInt(nytHelsinki, 10);
 }
 
 function esc(s: unknown): string {
