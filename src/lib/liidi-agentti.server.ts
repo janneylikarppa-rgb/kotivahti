@@ -108,12 +108,14 @@ export async function analysoiLiidi(liidi: LiidiInput): Promise<AgentinEhdotus |
     return null;
   }
   try {
+    const workspaceId = process.env.ANTHROPIC_WORKSPACE_ID;
     const res = await fetch(ANTHROPIC_URL, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
         "x-api-key": apiKey,
         "anthropic-version": "2023-06-01",
+        ...(workspaceId ? { "anthropic-workspace-id": workspaceId } : {}),
       },
       body: JSON.stringify({
         model: MODEL,
