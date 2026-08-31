@@ -247,6 +247,47 @@ function LiiditTab() {
                   </section>
                 )}
 
+                {avoin.agentin_ehdotus && (
+                  <section className="space-y-2 rounded border border-primary/40 bg-primary/5 p-3">
+                    <h3 className="text-[11px] uppercase tracking-wider text-primary">🤖 Agentin suositus</h3>
+                    <p className="text-sm">
+                      <span className="text-muted-foreground">Kiireellisyys:</span>{" "}
+                      <span className="text-cream font-medium">{avoin.agentin_ehdotus.kiireellisyys}</span>
+                    </p>
+                    {Array.isArray(avoin.agentin_ehdotus.ammattilaiset) && avoin.agentin_ehdotus.ammattilaiset.length > 0 && (
+                      <ol className="space-y-1 text-sm">
+                        {avoin.agentin_ehdotus.ammattilaiset.map((a: any, i: number) => (
+                          <li key={i} className="text-cream">
+                            <span className="font-medium">{i + 1}. {a.nimi}</span>
+                            <span className="text-muted-foreground"> – {a.arvosana}⭐ ({a.arvostelut} arv.){a.puhelin ? ` – ${a.puhelin}` : ""}</span>
+                            {a.perustelu && <div className="text-xs text-muted-foreground">{a.perustelu}</div>}
+                          </li>
+                        ))}
+                      </ol>
+                    )}
+                    {avoin.agentin_ehdotus.valmis_viesti && (
+                      <div className="space-y-1">
+                        <p className="whitespace-pre-wrap text-sm text-cream">"{avoin.agentin_ehdotus.valmis_viesti}"</p>
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          onClick={async () => {
+                            try {
+                              await navigator.clipboard.writeText(avoin.agentin_ehdotus.valmis_viesti);
+                              toast.success("Kopioitu leikepöydälle");
+                            } catch {
+                              toast.error("Kopiointi epäonnistui");
+                            }
+                          }}
+                        >
+                          Kopioi viesti
+                        </Button>
+                      </div>
+                    )}
+                  </section>
+                )}
+
                 <section className="flex items-center gap-3 pt-2 border-t border-border/40">
                   <Label className="text-xs uppercase tracking-wider">Tila</Label>
                   <Select value={avoin.status} onValueChange={(v) => mut.mutate({ id: avoin.id, status: v })}>

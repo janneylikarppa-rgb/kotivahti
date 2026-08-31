@@ -142,6 +142,20 @@ export const luoLiidi = createServerFn({ method: "POST" })
       .single();
     if (insErr) throw insErr;
 
+    // Liidikäsittelyagentti: analysoi liidin ja hoitaa omistajailmoituksen.
+    // Virheet lokistuvat moduulissa eivätkä kaada liidin luontia.
+    {
+      const { kasitteleLiidiAgentilla } = await import("@/lib/liidi-agentti.server");
+      await kasitteleLiidiAgentilla(supabase, {
+        id: inserted.id,
+        kategoria: inserted.kategoria,
+        kaupunki: inserted.kaupunki,
+        palvelu: inserted.palvelu,
+        kuvaus: inserted.kuvaus,
+        nimi: inserted.nimi,
+      });
+    }
+
     // Etsi sopivat ammattilaiset (sama kategoria, aktiivinen, maakunta täsmää tai toimialueet tyhjä)
     const { data: ammLista } = await supabase
       .from("ammattilaiset")

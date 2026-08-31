@@ -361,14 +361,17 @@ export type Database = {
       }
       liidit: {
         Row: {
+          agentin_ehdotus: Json | null
           ammattilainen_id: string | null
           created_at: string
           id: string
+          kasitelty_at: string | null
           kategoria: string
           kaupunki: string | null
           kiinteisto_id: string
           kuvaus: string | null
           lahetetty_at: string | null
+          lahetus_jonossa: boolean
           lammitys: string | null
           lisatieto: string | null
           maakunta: string | null
@@ -384,14 +387,17 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          agentin_ehdotus?: Json | null
           ammattilainen_id?: string | null
           created_at?: string
           id?: string
+          kasitelty_at?: string | null
           kategoria: string
           kaupunki?: string | null
           kiinteisto_id: string
           kuvaus?: string | null
           lahetetty_at?: string | null
+          lahetus_jonossa?: boolean
           lammitys?: string | null
           lisatieto?: string | null
           maakunta?: string | null
@@ -407,14 +413,17 @@ export type Database = {
           user_id: string
         }
         Update: {
+          agentin_ehdotus?: Json | null
           ammattilainen_id?: string | null
           created_at?: string
           id?: string
+          kasitelty_at?: string | null
           kategoria?: string
           kaupunki?: string | null
           kiinteisto_id?: string
           kuvaus?: string | null
           lahetetty_at?: string | null
+          lahetus_jonossa?: boolean
           lammitys?: string | null
           lisatieto?: string | null
           maakunta?: string | null
