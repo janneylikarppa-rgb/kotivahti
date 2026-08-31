@@ -33,7 +33,7 @@ Uusi reitti `src/routes/api/public/hooks/liidi-aamukoonti.ts`:
 - Hakee liidit joilla `lahetus_jonossa = true`.
 - Lähettää koonnin aiheella `☀️ [X] uutta liidiä yön aikana`, rivit `• kategoria – kaupunki – klo aika`, linkki adminiin.
 - Nollaa `lahetus_jonossa = false`.
-- pg_cron-ajastus joka päivä klo 08:00 Europe/Helsinki (05:00 UTC talvella; ajastetaan Helsinki-ajassa cron-lausekkeessa).
+- Aikavyöhykkeen käsittely: pg_cron ajaa aina UTC:ssa eikä tunne kesäaikaa, joten yksi kiinteä ajankohta ajelisi tunnin pieleen puolet vuodesta (08:00 Helsinki = 05:00 UTC kesällä, 06:00 UTC talvella). Ratkaisu: pg_cron ajaa **molempina** aikoina (`0 5 * * *` ja `0 6 * * *`), ja reitti tarkistaa Europe/Helsinki-kellon (`Intl.DateTimeFormat` aikavyöhykkeellä) ja lähettää koonnin vain kun Helsinki-aika on 08:xx. Toinen ajosta ohitetaan no-op:na. Näin koonti lähtee aina tasan klo 08:00 Suomen aikaa ympäri vuoden.
 
 ## 5. Admin-paneeli
 `src/routes/_authenticated/admin.tsx`: liidin avatussa näkymässä uusi kortti "🤖 Agentin suositus" – kolme ammattilaista (nimi, arvosana ⭐, puhelin, perustelu), valmis viesti ja "📋 Kopioi viesti" -painike (leikepöydälle + vahvistusilmoitus). Näytetään vain jos `agentin_ehdotus` on olemassa.
