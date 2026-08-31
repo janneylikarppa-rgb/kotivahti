@@ -103,9 +103,10 @@ function puraJson(teksti: string): AgentinEhdotus | null {
 export async function analysoiLiidi(liidi: LiidiInput): Promise<AgentinEhdotus | null> {
   const apiKey = process.env.ANTHROPIC_API_KEY;
   if (!apiKey) {
-    console.error("ANTHROPIC_API_KEY puuttuu – agenttia ei ajeta");
+    console.error("[agentti] VIRHE: ANTHROPIC_API_KEY puuttuu – agenttia ei ajeta");
     return null;
   }
+  console.log("[agentti] Aloitetaan Claude-kutsu");
   try {
     const workspaceId = process.env.ANTHROPIC_WORKSPACE_ID;
     const res = await fetch(ANTHROPIC_URL, {
@@ -123,17 +124,17 @@ export async function analysoiLiidi(liidi: LiidiInput): Promise<AgentinEhdotus |
       }),
     });
     if (!res.ok) {
-      console.error("Anthropic epäonnistui", res.status, await res.text().catch(() => ""));
+      console.error("[agentti] VIRHE: Anthropic epäonnistui", res.status, await res.text().catch(() => ""));
       return null;
     }
     const body = await res.json();
+    console.log("[agentti] Vastaus:", JSON.stringify(body).slice(0, 4000));
     const teksti = body?.content?.map((c: any) => c?.text ?? "").join("") ?? "";
-    console.log("[liidi-agentti] Clauden raakavastaus:", teksti.slice(0, 4000));
     const purettu = puraJson(teksti);
-    if (!purettu) console.error("[liidi-agentti] JSON-parsinta epäonnistui raakavastauksesta");
+    if (!purettu) console.error("[agentti] VIRHE: JSON-parsinta epäonnistui raakavastauksesta");
     return purettu;
-  } catch (e) {
-    console.error("Liidi-agentti virhe", e);
+  } catch (error) {
+    console.error("[agentti] VIRHE:", error);
     return null;
   }
 }
