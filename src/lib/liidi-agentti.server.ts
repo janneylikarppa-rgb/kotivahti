@@ -173,11 +173,26 @@ function agentinIlmoitusEmail(liidi: LiidiInput, ehdotus: AgentinEhdotus) {
  * analysoi, tallentaa ehdotuksen, ja joko lähettää heti (08–18) tai jonottaa aamukoontiin.
  * Ei koskaan heitä virhettä – liidin luonti ei saa kaatua agenttiin.
  */
+function helsinkiAika(d = new Date()): string {
+  return new Intl.DateTimeFormat("fi-FI", {
+    timeZone: "Europe/Helsinki",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+    hour12: false,
+  }).format(d);
+}
+
 export async function kasitteleLiidiAgentilla(supabase: any, liidi: LiidiInput): Promise<void> {
   try {
     const ehdotus = await analysoiLiidi(liidi);
     const tunti = helsinkiTunti();
     const paivaika = tunti >= 8 && tunti < 18;
+
+    console.log(`[liidi-agentti] Liidi ${liidi.id} käsitelty. Helsinki-aika: ${helsinkiAika()}, tunti: ${tunti}, päiväaika: ${paivaika}`);
 
     const paivitys: Record<string, unknown> = {
       kasitelty_at: new Date().toISOString(),
