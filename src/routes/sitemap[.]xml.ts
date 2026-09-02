@@ -9,7 +9,6 @@ const POLUT = [
   "/kayttoehdot",
 
   "/tietosuoja",
-  "/login",
   "/rekisteroidy",
 ];
 
