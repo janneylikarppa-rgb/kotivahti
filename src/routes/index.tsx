@@ -102,6 +102,7 @@ html { scroll-behavior: smooth; }
 .feat-icon { font-size: 1.8rem; margin-bottom: 1rem; }
 .feat-title { font-size: 1.05rem; font-weight: 600; color: var(--vihrea); margin-bottom: 0.5rem; }
 .feat-desc { font-size: 0.875rem; color: var(--harmaa); line-height: 1.6; }
+.feat-note { font-size: 0.75rem; color: var(--harmaa); font-style: italic; margin-top: 0.75rem; line-height: 1.5; opacity: 0.85; }
 .feat-card.highlight { background: var(--vihrea); border-color: var(--vihrea); }
 .feat-card.highlight::before { opacity: 1; }
 .feat-card.highlight .feat-title { color: var(--valkoinen); }
