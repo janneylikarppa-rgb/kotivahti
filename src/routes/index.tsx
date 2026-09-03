@@ -799,8 +799,8 @@ function LandingPage() {
       <section className="blog-preview" id="ajankohtaista">
         <div className="blog-preview-inner">
           <div className="blog-preview-head animate-on-scroll">
-            <div className="section-label">Ajankohtaista</div>
-            <h2 className="section-h2">Asumisen <em>ajankohtaista</em></h2>
+            <div className="section-label">Blogi</div>
+            <h2 className="section-h2">Ajankohtaista</h2>
           </div>
           <div className="blog-grid">
             {BLOG_POSTS.map((post) => (
