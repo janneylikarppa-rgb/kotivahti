@@ -796,6 +796,25 @@ function LandingPage() {
         </div>
       </section>
 
+      <section className="blog-preview" id="ajankohtaista">
+        <div className="blog-preview-inner">
+          <div className="blog-preview-head animate-on-scroll">
+            <div className="section-label">Ajankohtaista</div>
+            <h2 className="section-h2">Asumisen <em>ajankohtaista</em></h2>
+          </div>
+          <div className="blog-grid">
+            {BLOG_POSTS.map((post) => (
+              <Link key={post.href} to={post.href} className="blog-card animate-on-scroll">
+                <span className="blog-tag">{post.tag}</span>
+                <h3 className="blog-title">{post.title}</h3>
+                <p className="blog-excerpt">{post.excerpt}</p>
+                <span className="blog-link">Lue artikkeli →</span>
+              </Link>
+            ))}
+          </div>
+        </div>
+      </section>
+
       <footer className="kv-footer">
         <p style={{ marginBottom: "0.6rem" }}>
           <a href="/ukk" style={{ color: "rgba(255,255,255,0.55)", textDecoration: "none", marginRight: "1.2rem" }}>UKK</a>
