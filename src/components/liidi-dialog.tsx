@@ -9,6 +9,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Info } from "lucide-react";
 import { getOmatKiinteistot, luoLiidi } from "@/lib/liidit.functions";
 import {
   LIIDI_KATEGORIAT,
@@ -112,7 +113,7 @@ export function LiidiDialog({ open, onOpenChange, esitaytetty }: LiidiDialogProp
                 Pyyntösi on vastaanotettu.
               </div>
               <div className="text-sm" style={{ color: "#E8D89A" }}>
-                Olemme sinuun yhteydessä 1–3 arkipäivän sisällä.
+                Pyyntösi vastaanotetaan ja välitetään ammattilaiselle. Vastausaika vaihtelee kategorian ja paikkakunnan mukaan.
               </div>
             </div>
           </div>
@@ -156,6 +157,13 @@ export function LiidiDialog({ open, onOpenChange, esitaytetty }: LiidiDialogProp
             Välitämme pyynnön tarkastetuille oman paikkakuntasi ammattilaiselle. Palvelu on maksuton, ja sen käyttämisestä voit itse päättää.
           </DialogDescription>
         </DialogHeader>
+
+        <div className="flex items-start gap-3 rounded-md border border-amber-400/40 bg-amber-50/10 p-3 text-sm text-amber-100/90">
+          <Info className="mt-0.5 h-4 w-4 shrink-0 text-amber-400" />
+          <p>
+            Kumppaniverkostoamme rakennetaan parhaillaan. Palvelupyyntösi vastaanotetaan ja välitetään – vastausaika voi vaihdella kategorian ja paikkakunnan mukaan.
+          </p>
+        </div>
 
         <form onSubmit={submit} className="space-y-4">
           <div className="space-y-2">
