@@ -325,10 +325,9 @@ const SHOWCASE: { icon: ReactNode; title: string; paragraphs: string[]; mock: Mo
   },
   {
     icon: "📊",
-    title: "Tiedät jo tänään mitä talossa tapahtuu 10 vuoden päästä",
+    title: "Kotiluotsi tuntee talosi tilanteen",
     paragraphs: [
-      "Katto kestää 30–40 vuotta. Putket 40–50 vuotta. Maalämpöpumppu 20–25 vuotta. Märkätilat 25 vuotta. Jokaisella rakennusosalla on käyttöikä.",
-      "PTS-suunnitelma laskee talosi rakennusvuoden ja tietojen perusteella milloin kukin osa lähestyy huolto- tai uusimisajankohtaansa. Näet seuraavan 10 vuoden huoltotarpeet selkeänä listana. Ei yllätyksiä – voit varautua ajoissa sekä taloudellisesti että käytännössä.",
+      "Kotiluotsi ottaa huomioon juuri sinun talosi tiedot ja muodostaa niiden perusteella yksilöllisen pitkän tähtäimen suunnitelman. Se kertoo, milloin talotekniikkaa ja muita talon osia kannattaa huoltaa, korjata tai uusia. Näin tiedät ajoissa, mitä omassa talossasi on tulossa – ja voit välttää turhat kulut ja yllätykset.",
     ],
     mock: {
       title: "PTS-suunnitelma",
