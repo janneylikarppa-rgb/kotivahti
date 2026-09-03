@@ -204,6 +204,19 @@ html { scroll-behavior: smooth; }
 .sc-final .sc-btn { font-size: 1.05rem; padding: 1.05rem 2.6rem; }
 .sc-final-small { color: rgba(255,255,255,0.4); font-size: 0.82rem; margin-top: 1.2rem; }
 
+.blog-preview { padding: 5rem 3rem; background: var(--kerma); }
+.blog-preview-inner { max-width: 1200px; margin: 0 auto; }
+.blog-preview-head { text-align: center; margin-bottom: 3rem; }
+.blog-preview-head .section-label { justify-content: center; }
+.blog-grid { display: grid; grid-template-columns: 1fr; gap: 1.5rem; max-width: 720px; margin: 0 auto; }
+.blog-card { display: block; background: var(--valkoinen); border: 1px solid rgba(0,0,0,0.06); border-radius: 14px; padding: 2rem; transition: all 0.25s; text-decoration: none; color: inherit; }
+.blog-card:hover { transform: translateY(-4px); box-shadow: 0 12px 40px rgba(0,0,0,0.1); }
+.blog-card .blog-tag { display: inline-block; color: var(--harmaa); font-size: 0.72rem; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 0.8rem; }
+.blog-card .blog-title { font-family: 'Playfair Display', serif; font-size: clamp(1.3rem, 2.2vw, 1.6rem); color: var(--vihrea); line-height: 1.25; margin-bottom: 0.9rem; }
+.blog-card .blog-excerpt { font-size: 0.95rem; color: var(--harmaa); line-height: 1.65; margin-bottom: 1.4rem; }
+.blog-card .blog-link { display: inline-flex; align-items: center; gap: 0.4rem; color: var(--kulta); font-weight: 600; font-size: 0.92rem; transition: gap 0.2s; }
+.blog-card:hover .blog-link { gap: 0.7rem; }
+
 @keyframes fadeUp { from { opacity: 0; transform: translateY(24px); } to { opacity: 1; transform: translateY(0); } }
 .animate-on-scroll { opacity: 0; transform: translateY(20px); transition: opacity 0.5s ease, transform 0.5s ease; }
 .animate-on-scroll.visible { opacity: 1; transform: translateY(0); }
@@ -422,6 +435,16 @@ const SHOWCASE: { icon: ReactNode | null; title: string; paragraphs: string[]; m
       ],
       btn: "Tulosta PDF",
     },
+  },
+];
+
+type BlogPost = { tag: string; title: string; excerpt: string; href: string };
+const BLOG_POSTS: BlogPost[] = [
+  {
+    tag: "Artikkeli",
+    title: "Sähköinen talokirja – mitä, milloin ja kuka?",
+    excerpt: "Onko sinullakin talon tiedot hajallaan – osa muistitikulla, osa paperisessa mapissa ja osa vain muistissa? Et ole yksin – tämä on omakotitaloasujien arkipäivää ympäri Suomen.",
+    href: "/blogi/sahkoinen-talokirja",
   },
 ];
 
@@ -770,6 +793,25 @@ function LandingPage() {
           <Link to="/rekisteroidy" className="btn-primary" style={{ margin: "0 auto", fontSize: "1.1rem", padding: "1.1rem 2.8rem" }}>
             Aloita nyt – ilmaiseksi →
           </Link>
+        </div>
+      </section>
+
+      <section className="blog-preview" id="ajankohtaista">
+        <div className="blog-preview-inner">
+          <div className="blog-preview-head animate-on-scroll">
+            <div className="section-label">Blogi</div>
+            <h2 className="section-h2">Ajankohtaista</h2>
+          </div>
+          <div className="blog-grid">
+            {BLOG_POSTS.map((post) => (
+              <Link key={post.href} to={post.href} className="blog-card animate-on-scroll">
+                <span className="blog-tag">{post.tag}</span>
+                <h3 className="blog-title">{post.title}</h3>
+                <p className="blog-excerpt">{post.excerpt}</p>
+                <span className="blog-link">Lue artikkeli →</span>
+              </Link>
+            ))}
+          </div>
         </div>
       </section>
 
