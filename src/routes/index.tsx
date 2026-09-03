@@ -265,7 +265,7 @@ type Mock = {
 
 const SHOWCASE: { icon: ReactNode | null; title: string; paragraphs: string[]; mock: Mock; fact?: string }[] = [
   {
-    icon: "📋",
+    icon: null,
     title: "Kaikki talosi tiedot yhdessä paikassa",
     paragraphs: [
       "Omakotitalossa on satoja yksityiskohtia joita pitäisi muistaa – milloin katto on asennettu, mikä maalämpöpumpun malli on, koska putket on viimeksi tarkastettu.",
@@ -285,7 +285,7 @@ const SHOWCASE: { icon: ReactNode | null; title: string; paragraphs: string[]; m
     },
   },
   {
-    icon: "📅",
+    icon: null,
     title: "Oikea huolto oikeaan aikaan – automaattisesti",
     paragraphs: [
       "Omakotitalossa on paljon huollettavaa ja moni asia saattaa unohtua. Keväällä pitäisi tarkastaa katto ja salaojat, syksyllä räystäät ja lämmitysjärjestelmä, talvella lumikuorma ja silikonisaumat.",
@@ -305,7 +305,7 @@ const SHOWCASE: { icon: ReactNode | null; title: string; paragraphs: string[]; m
     },
   },
   {
-    icon: "🤝",
+    icon: null,
     title: "Löydä oikea tekijä – ilman etsimistä",
     paragraphs: [
       "Milloin olet viimeksi tarvinnut ammattilaista ja miettinyt kenen soitat? Oikean tekijän löytäminen vie aikaa ja lopputulos on epävarma.",
@@ -325,7 +325,7 @@ const SHOWCASE: { icon: ReactNode | null; title: string; paragraphs: string[]; m
     },
   },
   {
-    icon: "📊",
+    icon: null,
     title: "Kotiluotsi tuntee talosi tilanteen",
     paragraphs: [
       "Kotiluotsi ottaa huomioon juuri sinun talosi tiedot ja muodostaa niiden perusteella yksilöllisen pitkän tähtäimen suunnitelman. Se kertoo, milloin talotekniikkaa ja muita talon osia kannattaa huoltaa, korjata tai uusia. Näin tiedät ajoissa, mitä omassa talossasi on tulossa – ja voit välttää turhat kulut ja yllätykset.",
@@ -343,7 +343,7 @@ const SHOWCASE: { icon: ReactNode | null; title: string; paragraphs: string[]; m
     },
   },
   {
-    icon: "💰",
+    icon: null,
     title: "Näe mihin energia kuluu ja ennakoi tulevat kulut",
     paragraphs: [
       "Sähkön ja veden kulutuksen seuranta paljastaa trendit – onko kulutus kasvamassa vai laskenut viime vuodesta. Yksittäinen piikki voi kertoa vuotavasta hanasta tai huonosti toimivasta laitteesta.",
@@ -364,7 +364,7 @@ const SHOWCASE: { icon: ReactNode | null; title: string; paragraphs: string[]; m
     },
   },
   {
-    icon: "🔧",
+    icon: null,
     title: "Dokumentoitu historia on talon arvokkain asiakirja",
     paragraphs: [
       "Muistatko milloin kylpyhuone on viimeksi remontoitu? Kuka teki ilmanvaihdon huollon ja minkä yrityksen takuu on vielä voimassa?",
@@ -403,7 +403,7 @@ const SHOWCASE: { icon: ReactNode | null; title: string; paragraphs: string[]; m
     },
   },
   {
-    icon: "📄",
+    icon: null,
     title: "Myyntitilanteessa kaikki on jo valmiina",
     paragraphs: [
       "Kun talo laitetaan myyntiin, välittäjä kysyy rakennustietoja, huoltohistoriaa ja dokumentteja. Useimmiten ne etsitään kiireellä vanhoista papereista ja muistista.",
