@@ -243,14 +243,14 @@ html { scroll-behavior: smooth; }
 
 
 const FEATURES = [
-  { icon: "📋", title: "Talokirja", desc: "Sähköinen talokirja kokoaa kotisi tiedot yhteen paikkaan – perustiedot, talotekniikka, materiaalit, laitteet ja vuosiluvut. Tieto on aina ajantasaista ja löytyy hetkessä. Myyntitilanteessa dokumentoitu huoltohistoria on arvokas – se kertoo ostajalle, että talosta on pidetty huolta." },
-  { icon: "📅", title: "Vuosikello", desc: "Oikea huolto oikeaan aikaan – kausikohtaiset huoltomuistutukset talosi tietojen perusteella. Kuittaa tehdyksi, niin toimenpide siirtyy automaattisesti huoltohistoriaan." },
-  { icon: "🤝", title: "Palveluiden kilpailutus", desc: "Tarvitsetko kuntoarvion, huollon tai tarjouksen? Lähetä pyyntö suoraan sovelluksesta – välitetään tarkistetuille paikallisille ammattilaisille. Sinä päätät kenen valitset.", highlight: true, tag: "⭐ Suosittu", note: "Kumppaniverkosto rakenteilla – palvelu laajenee alueittain." },
-  { icon: "📊", title: "PTS-suunnitelma", desc: "Hyvin hoidettu talo on järkevämpi omistaa ja sen arvo säilyy paremmin. PTS auttaa pitämään kodin kunnossa suunnitelmallisesti ja ennakoimaan tulevia tarpeita ennen kuin niistä syntyy ongelmia tai turhia kustannuksia." },
-  { icon: "💰", title: "Kulujenseuranta", desc: "Seuraa sähkön ja veden kulutusta vuositasolla. Näet miten kulutus kehittyy vuodesta toiseen – ja saat ennakoivan arvion tulevista kustannuksista." },
-  { icon: "🔧", title: "Huoltohistoria", desc: "Kaikki tehdyt huollot, remontit ja tarkastukset dokumentoituna – tekijä, päivämäärä, kustannus ja liitteet. Kuitit ja takuut tallessa digitaalisesti. Löydät aina mitä tarvitset ja milloin." },
-  { icon: "🧮", title: "Kotitalousvähennys", desc: "Seuraa kotitalousvähennyksen kertymää huolto- ja remonttikirjauksista. Kotiluotsi laskee automaattisesti, paljonko verovähennystä on kertynyt ja paljonko on vielä käytettävissä." },
-  { icon: "📄", title: "Myyntiraportti", desc: "Kun taloa myydään, kaikki on valmiina. Yksi nappi tulostaa selkeän raportin välittäjälle – huoltohistoria, rakennusosat, energiankulutus ja dokumenttiliitteet järjestyksessä. Luottamusta herättävä paketti ostajalle." },
+  { title: "Talokirja", desc: "Sähköinen talokirja kokoaa kotisi tiedot yhteen paikkaan – perustiedot, talotekniikka, materiaalit, laitteet ja vuosiluvut. Tieto on aina ajantasaista ja löytyy hetkessä. Myyntitilanteessa dokumentoitu huoltohistoria on arvokas – se kertoo ostajalle, että talosta on pidetty huolta." },
+  { title: "Vuosikello", desc: "Oikea huolto oikeaan aikaan – kausikohtaiset huoltomuistutukset talosi tietojen perusteella. Kuittaa tehdyksi, niin toimenpide siirtyy automaattisesti huoltohistoriaan." },
+  { title: "Palveluiden kilpailutus", desc: "Tarvitsetko kuntoarvion, huollon tai tarjouksen? Lähetä pyyntö suoraan sovelluksesta – välitetään tarkistetuille paikallisille ammattilaisille. Sinä päätät kenen valitset.", highlight: true, tag: "⭐ Suosittu", note: "Kumppaniverkosto rakenteilla – palvelu laajenee alueittain." },
+  { title: "PTS-suunnitelma", desc: "Hyvin hoidettu talo on järkevämpi omistaa ja sen arvo säilyy paremmin. PTS auttaa pitämään kodin kunnossa suunnitelmallisesti ja ennakoimaan tulevia tarpeita ennen kuin niistä syntyy ongelmia tai turhia kustannuksia." },
+  { title: "Kulujenseuranta", desc: "Seuraa sähkön ja veden kulutusta vuositasolla. Näet miten kulutus kehittyy vuodesta toiseen – ja saat ennakoivan arvion tulevista kustannuksista." },
+  { title: "Huoltohistoria", desc: "Kaikki tehdyt huollot, remontit ja tarkastukset dokumentoituna – tekijä, päivämäärä, kustannus ja liitteet. Kuitit ja takuut tallessa digitaalisesti. Löydät aina mitä tarvitset ja milloin." },
+  { title: "Kotitalousvähennys", desc: "Seuraa kotitalousvähennyksen kertymää huolto- ja remonttikirjauksista. Kotiluotsi laskee automaattisesti, paljonko verovähennystä on kertynyt ja paljonko on vielä käytettävissä." },
+  { title: "Myyntiraportti", desc: "Kun taloa myydään, kaikki on valmiina. Yksi nappi tulostaa selkeän raportin välittäjälle – huoltohistoria, rakennusosat, energiankulutus ja dokumenttiliitteet järjestyksessä. Luottamusta herättävä paketti ostajalle." },
 ];
 
 type Mock = {
@@ -262,7 +262,7 @@ type Mock = {
   special?: string;
 };
 
-const SHOWCASE: { icon: ReactNode; title: string; paragraphs: string[]; mock: Mock; fact?: string }[] = [
+const SHOWCASE: { icon: ReactNode | null; title: string; paragraphs: string[]; mock: Mock; fact?: string }[] = [
   {
     icon: "📋",
     title: "Kaikki talosi tiedot yhdessä paikassa",
