@@ -242,15 +242,16 @@ html { scroll-behavior: smooth; }
 `;
 
 
-const FEATURES = [
-  { icon: "📋", title: "Talokirja", desc: "Sähköinen talokirja kokoaa kotisi tiedot yhteen paikkaan – perustiedot, talotekniikka, materiaalit, laitteet ja vuosiluvut. Tieto on aina ajantasaista ja löytyy hetkessä. Myyntitilanteessa dokumentoitu huoltohistoria on arvokas – se kertoo ostajalle, että talosta on pidetty huolta." },
-  { icon: "📅", title: "Vuosikello", desc: "Oikea huolto oikeaan aikaan – kausikohtaiset huoltomuistutukset talosi tietojen perusteella. Kuittaa tehdyksi, niin toimenpide siirtyy automaattisesti huoltohistoriaan." },
-  { icon: "🤝", title: "Palveluiden kilpailutus", desc: "Tarvitsetko kuntoarvion, huollon tai tarjouksen? Lähetä pyyntö suoraan sovelluksesta – välitetään tarkistetuille paikallisille ammattilaisille. Sinä päätät kenen valitset.", highlight: true, tag: "⭐ Suosittu", note: "Kumppaniverkosto rakenteilla – palvelu laajenee alueittain." },
-  { icon: "📊", title: "PTS-suunnitelma", desc: "Hyvin hoidettu talo on järkevämpi omistaa ja sen arvo säilyy paremmin. PTS auttaa pitämään kodin kunnossa suunnitelmallisesti ja ennakoimaan tulevia tarpeita ennen kuin niistä syntyy ongelmia tai turhia kustannuksia." },
-  { icon: "💰", title: "Kulujenseuranta", desc: "Seuraa sähkön ja veden kulutusta vuositasolla. Näet miten kulutus kehittyy vuodesta toiseen – ja saat ennakoivan arvion tulevista kustannuksista." },
-  { icon: "🔧", title: "Huoltohistoria", desc: "Kaikki tehdyt huollot, remontit ja tarkastukset dokumentoituna – tekijä, päivämäärä, kustannus ja liitteet. Kuitit ja takuut tallessa digitaalisesti. Löydät aina mitä tarvitset ja milloin." },
-  { icon: "🧮", title: "Kotitalousvähennys", desc: "Seuraa kotitalousvähennyksen kertymää huolto- ja remonttikirjauksista. Kotiluotsi laskee automaattisesti, paljonko verovähennystä on kertynyt ja paljonko on vielä käytettävissä." },
-  { icon: "📄", title: "Myyntiraportti", desc: "Kun taloa myydään, kaikki on valmiina. Yksi nappi tulostaa selkeän raportin välittäjälle – huoltohistoria, rakennusosat, energiankulutus ja dokumenttiliitteet järjestyksessä. Luottamusta herättävä paketti ostajalle." },
+type Feature = { icon?: ReactNode; title: string; desc: string; highlight?: boolean; tag?: string; note?: string };
+const FEATURES: Feature[] = [
+  { title: "Talokirja", desc: "Sähköinen talokirja kokoaa kotisi tiedot yhteen paikkaan – perustiedot, talotekniikka, materiaalit, laitteet ja vuosiluvut. Tieto on aina ajantasaista ja löytyy hetkessä. Myyntitilanteessa dokumentoitu huoltohistoria on arvokas – se kertoo ostajalle, että talosta on pidetty huolta." },
+  { title: "Vuosikello", desc: "Oikea huolto oikeaan aikaan – kausikohtaiset huoltomuistutukset talosi tietojen perusteella. Kuittaa tehdyksi, niin toimenpide siirtyy automaattisesti huoltohistoriaan." },
+  { title: "Palveluiden kilpailutus", desc: "Tarvitsetko kuntoarvion, huollon tai tarjouksen? Lähetä pyyntö suoraan sovelluksesta – välitetään tarkistetuille paikallisille ammattilaisille. Sinä päätät kenen valitset.", highlight: true, tag: "⭐ Suosittu", note: "Kumppaniverkosto rakenteilla – palvelu laajenee alueittain." },
+  { title: "PTS-suunnitelma", desc: "Hyvin hoidettu talo on järkevämpi omistaa ja sen arvo säilyy paremmin. PTS auttaa pitämään kodin kunnossa suunnitelmallisesti ja ennakoimaan tulevia tarpeita ennen kuin niistä syntyy ongelmia tai turhia kustannuksia." },
+  { title: "Kulujenseuranta", desc: "Seuraa sähkön ja veden kulutusta vuositasolla. Näet miten kulutus kehittyy vuodesta toiseen – ja saat ennakoivan arvion tulevista kustannuksista." },
+  { title: "Huoltohistoria", desc: "Kaikki tehdyt huollot, remontit ja tarkastukset dokumentoituna – tekijä, päivämäärä, kustannus ja liitteet. Kuitit ja takuut tallessa digitaalisesti. Löydät aina mitä tarvitset ja milloin." },
+  { title: "Kotitalousvähennys", desc: "Seuraa kotitalousvähennyksen kertymää huolto- ja remonttikirjauksista. Kotiluotsi laskee automaattisesti, paljonko verovähennystä on kertynyt ja paljonko on vielä käytettävissä." },
+  { title: "Myyntiraportti", desc: "Kun taloa myydään, kaikki on valmiina. Yksi nappi tulostaa selkeän raportin välittäjälle – huoltohistoria, rakennusosat, energiankulutus ja dokumenttiliitteet järjestyksessä. Luottamusta herättävä paketti ostajalle." },
 ];
 
 type Mock = {
@@ -262,9 +263,9 @@ type Mock = {
   special?: string;
 };
 
-const SHOWCASE: { icon: ReactNode; title: string; paragraphs: string[]; mock: Mock; fact?: string }[] = [
+const SHOWCASE: { icon: ReactNode | null; title: string; paragraphs: string[]; mock: Mock; fact?: string }[] = [
   {
-    icon: "📋",
+    icon: null,
     title: "Kaikki talosi tiedot yhdessä paikassa",
     paragraphs: [
       "Omakotitalossa on satoja yksityiskohtia joita pitäisi muistaa – milloin katto on asennettu, mikä maalämpöpumpun malli on, koska putket on viimeksi tarkastettu.",
@@ -284,7 +285,7 @@ const SHOWCASE: { icon: ReactNode; title: string; paragraphs: string[]; mock: Mo
     },
   },
   {
-    icon: "📅",
+    icon: null,
     title: "Oikea huolto oikeaan aikaan – automaattisesti",
     paragraphs: [
       "Omakotitalossa on paljon huollettavaa ja moni asia saattaa unohtua. Keväällä pitäisi tarkastaa katto ja salaojat, syksyllä räystäät ja lämmitysjärjestelmä, talvella lumikuorma ja silikonisaumat.",
@@ -304,7 +305,7 @@ const SHOWCASE: { icon: ReactNode; title: string; paragraphs: string[]; mock: Mo
     },
   },
   {
-    icon: "🤝",
+    icon: null,
     title: "Löydä oikea tekijä – ilman etsimistä",
     paragraphs: [
       "Milloin olet viimeksi tarvinnut ammattilaista ja miettinyt kenen soitat? Oikean tekijän löytäminen vie aikaa ja lopputulos on epävarma.",
@@ -324,7 +325,7 @@ const SHOWCASE: { icon: ReactNode; title: string; paragraphs: string[]; mock: Mo
     },
   },
   {
-    icon: "📊",
+    icon: null,
     title: "Kotiluotsi tuntee talosi tilanteen",
     paragraphs: [
       "Kotiluotsi ottaa huomioon juuri sinun talosi tiedot ja muodostaa niiden perusteella yksilöllisen pitkän tähtäimen suunnitelman. Se kertoo, milloin talotekniikkaa ja muita talon osia kannattaa huoltaa, korjata tai uusia. Näin tiedät ajoissa, mitä omassa talossasi on tulossa – ja voit välttää turhat kulut ja yllätykset.",
@@ -342,7 +343,7 @@ const SHOWCASE: { icon: ReactNode; title: string; paragraphs: string[]; mock: Mo
     },
   },
   {
-    icon: "💰",
+    icon: null,
     title: "Näe mihin energia kuluu ja ennakoi tulevat kulut",
     paragraphs: [
       "Sähkön ja veden kulutuksen seuranta paljastaa trendit – onko kulutus kasvamassa vai laskenut viime vuodesta. Yksittäinen piikki voi kertoa vuotavasta hanasta tai huonosti toimivasta laitteesta.",
@@ -363,7 +364,7 @@ const SHOWCASE: { icon: ReactNode; title: string; paragraphs: string[]; mock: Mo
     },
   },
   {
-    icon: "🔧",
+    icon: null,
     title: "Dokumentoitu historia on talon arvokkain asiakirja",
     paragraphs: [
       "Muistatko milloin kylpyhuone on viimeksi remontoitu? Kuka teki ilmanvaihdon huollon ja minkä yrityksen takuu on vielä voimassa?",
@@ -402,7 +403,7 @@ const SHOWCASE: { icon: ReactNode; title: string; paragraphs: string[]; mock: Mo
     },
   },
   {
-    icon: "📄",
+    icon: null,
     title: "Myyntitilanteessa kaikki on jo valmiina",
     paragraphs: [
       "Kun talo laitetaan myyntiin, välittäjä kysyy rakennustietoja, huoltohistoriaa ja dokumentteja. Useimmiten ne etsitään kiireellä vanhoista papereista ja muistista.",
@@ -648,7 +649,7 @@ function LandingPage() {
             {FEATURES.map((f) => (
               <div key={f.title} className={`feat-card animate-on-scroll${f.highlight ? " highlight" : ""}`}>
                 {f.tag && <div className="feat-tag">{f.tag}</div>}
-                <div className="feat-icon">{f.icon}</div>
+                {f.icon && <div className="feat-icon">{f.icon}</div>}
                 <div className="feat-title">{f.title}</div>
                 <div className="feat-desc">{f.desc}</div>
                 {f.note && <div className="feat-note">{f.note}</div>}
@@ -663,7 +664,7 @@ function LandingPage() {
           {SHOWCASE.map((s, i) => (
             <div key={s.title} className={`sc-row animate-on-scroll${i % 2 === 1 ? " reverse" : ""}`}>
               <div className="sc-text">
-                <div className="sc-icon">{s.icon}</div>
+                {s.icon && <div className="sc-icon">{s.icon}</div>}
                 <h3 className="sc-title">{s.title}</h3>
                 {s.paragraphs.map((p) => (
                   <p className="sc-p" key={p.slice(0, 24)}>{p}</p>
