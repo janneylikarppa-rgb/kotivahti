@@ -242,7 +242,8 @@ html { scroll-behavior: smooth; }
 `;
 
 
-const FEATURES = [
+type Feature = { icon?: ReactNode; title: string; desc: string; highlight?: boolean; tag?: string; note?: string };
+const FEATURES: Feature[] = [
   { title: "Talokirja", desc: "Sähköinen talokirja kokoaa kotisi tiedot yhteen paikkaan – perustiedot, talotekniikka, materiaalit, laitteet ja vuosiluvut. Tieto on aina ajantasaista ja löytyy hetkessä. Myyntitilanteessa dokumentoitu huoltohistoria on arvokas – se kertoo ostajalle, että talosta on pidetty huolta." },
   { title: "Vuosikello", desc: "Oikea huolto oikeaan aikaan – kausikohtaiset huoltomuistutukset talosi tietojen perusteella. Kuittaa tehdyksi, niin toimenpide siirtyy automaattisesti huoltohistoriaan." },
   { title: "Palveluiden kilpailutus", desc: "Tarvitsetko kuntoarvion, huollon tai tarjouksen? Lähetä pyyntö suoraan sovelluksesta – välitetään tarkistetuille paikallisille ammattilaisille. Sinä päätät kenen valitset.", highlight: true, tag: "⭐ Suosittu", note: "Kumppaniverkosto rakenteilla – palvelu laajenee alueittain." },
@@ -648,7 +649,7 @@ function LandingPage() {
             {FEATURES.map((f) => (
               <div key={f.title} className={`feat-card animate-on-scroll${f.highlight ? " highlight" : ""}`}>
                 {f.tag && <div className="feat-tag">{f.tag}</div>}
-                <div className="feat-icon">{f.icon}</div>
+                {f.icon && <div className="feat-icon">{f.icon}</div>}
                 <div className="feat-title">{f.title}</div>
                 <div className="feat-desc">{f.desc}</div>
                 {f.note && <div className="feat-note">{f.note}</div>}
@@ -663,7 +664,7 @@ function LandingPage() {
           {SHOWCASE.map((s, i) => (
             <div key={s.title} className={`sc-row animate-on-scroll${i % 2 === 1 ? " reverse" : ""}`}>
               <div className="sc-text">
-                <div className="sc-icon">{s.icon}</div>
+                {s.icon && <div className="sc-icon">{s.icon}</div>}
                 <h3 className="sc-title">{s.title}</h3>
                 {s.paragraphs.map((p) => (
                   <p className="sc-p" key={p.slice(0, 24)}>{p}</p>
