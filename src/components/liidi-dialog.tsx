@@ -158,8 +158,8 @@ export function LiidiDialog({ open, onOpenChange, esitaytetty }: LiidiDialogProp
           </DialogDescription>
         </DialogHeader>
 
-        <div className="flex items-start gap-3 rounded-md border border-amber-400/40 bg-amber-50/10 p-3 text-sm text-amber-100/90">
-          <Info className="mt-0.5 h-4 w-4 shrink-0 text-amber-400" />
+        <div className="flex items-start gap-3 rounded-md border border-amber-400/60 bg-amber-50 p-3 text-sm text-amber-900">
+          <Info className="mt-0.5 h-4 w-4 shrink-0 text-amber-600" />
           <p>
             Kumppaniverkostoamme rakennetaan parhaillaan. Palvelupyyntösi vastaanotetaan ja välitetään – vastausaika voi vaihdella kategorian ja paikkakunnan mukaan.
           </p>
