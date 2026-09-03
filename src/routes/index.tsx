@@ -244,7 +244,7 @@ html { scroll-behavior: smooth; }
 const FEATURES = [
   { icon: "📋", title: "Talokirja", desc: "Sähköinen talokirja kokoaa kotisi tiedot yhteen paikkaan – perustiedot, talotekniikka, materiaalit, laitteet ja vuosiluvut. Tieto on aina ajantasaista ja löytyy hetkessä. Myyntitilanteessa dokumentoitu huoltohistoria on arvokas – se kertoo ostajalle, että talosta on pidetty huolta." },
   { icon: "📅", title: "Vuosikello", desc: "Oikea huolto oikeaan aikaan – kausikohtaiset huoltomuistutukset talosi tietojen perusteella. Kuittaa tehdyksi, niin toimenpide siirtyy automaattisesti huoltohistoriaan." },
-  { icon: "🤝", title: "Palveluiden kilpailutus", desc: "Tarvitsetko kuntoarvion, huollon tai tarjouksen? Lähetä pyyntö suoraan sovelluksesta – välitetään tarkistetuille paikallisille ammattilaisille. Sinä päätät kenen valitset.", highlight: true, tag: "⭐ Suosittu" },
+  { icon: "🤝", title: "Palveluiden kilpailutus", desc: "Tarvitsetko kuntoarvion, huollon tai tarjouksen? Lähetä pyyntö suoraan sovelluksesta – välitetään tarkistetuille paikallisille ammattilaisille. Sinä päätät kenen valitset.", highlight: true, tag: "⭐ Suosittu", note: "Kumppaniverkosto rakenteilla – palvelu laajenee alueittain." },
   { icon: "📊", title: "PTS-suunnitelma", desc: "Pitkän tähtäimen suunnitelma laskee talosi tietojen perusteella milloin rakennusosat – katto, putket, lämmitysjärjestelmä, märkätilat – tarvitsevat huoltoa tai uusimista. Näet seuraavan 10 vuoden huoltotarpeet yhdellä silmäyksellä. Ei yllätyksiä, ei kiirehuoltoja – vain ennakointi." },
   { icon: "💰", title: "Kulujenseuranta", desc: "Seuraa sähkön ja veden kulutusta vuositasolla. Näet miten kulutus kehittyy vuodesta toiseen – ja saat ennakoivan arvion tulevista kustannuksista." },
   { icon: "🔧", title: "Huoltohistoria", desc: "Kaikki tehdyt huollot, remontit ja tarkastukset dokumentoituna – tekijä, päivämäärä, kustannus ja liitteet. Kuitit ja takuut tallessa digitaalisesti. Löydät aina mitä tarvitset ja milloin." },
@@ -651,6 +651,7 @@ function LandingPage() {
                 <div className="feat-icon">{f.icon}</div>
                 <div className="feat-title">{f.title}</div>
                 <div className="feat-desc">{f.desc}</div>
+                {f.note && <div className="feat-note">{f.note}</div>}
               </div>
             ))}
           </div>
