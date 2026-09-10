@@ -243,7 +243,7 @@ html { scroll-behavior: smooth; }
   .sc-row, .sc-row.reverse { grid-template-columns: 1fr; gap: 2.2rem; padding: 2.8rem 0; }
   .sc-row.reverse .sc-text { order: 1; }
   .sc-row.reverse .sc-visual { order: 2; }
-  .sc-final { padding: 4.5rem 1.5rem; }
+  
 }
 `;
 
