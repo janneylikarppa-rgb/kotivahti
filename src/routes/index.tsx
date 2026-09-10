@@ -704,16 +704,25 @@ function LandingPage() {
         </div>
       </section>
 
-      <section className="sc-final">
-        <div className="sc-final-inner">
-          <h2>Talosi ansaitsee<br />enemmän kuin muistilista.</h2>
-          <p>
-            Liity Kotiluotsin käyttäjiin ja pidä talosi tiedot järjestyksessä. Käyttö on maksutonta – käyttöönotto vie muutaman minuutin.
-          </p>
-          <Link to="/rekisteroidy" className="sc-btn">Luo ilmainen tili →</Link>
-          <p className="sc-final-small">Ei luottokorttia. Ei määräaikaa. Vain selkeämpi kuva talostasi.</p>
+      <section className="blog-preview" id="ajankohtaista">
+        <div className="blog-preview-inner">
+          <div className="blog-preview-head animate-on-scroll">
+            <div className="section-label">Blogi</div>
+            <h2 className="section-h2">Ajankohtaista</h2>
+          </div>
+          <div className="blog-grid">
+            {BLOG_POSTS.map((post) => (
+              <Link key={post.href} to={post.href} className="blog-card animate-on-scroll">
+                <span className="blog-tag">{post.tag}</span>
+                <h3 className="blog-title">{post.title}</h3>
+                <p className="blog-excerpt">{post.excerpt}</p>
+                <span className="blog-link">Lue artikkeli →</span>
+              </Link>
+            ))}
+          </div>
         </div>
       </section>
+
 
 
 
