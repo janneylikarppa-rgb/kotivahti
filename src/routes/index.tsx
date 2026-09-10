@@ -196,13 +196,6 @@ html { scroll-behavior: smooth; }
 .ph-ktv-fill { height: 100%; background: linear-gradient(90deg, var(--kulta), var(--kulta-light)); border-radius: 5px; }
 .ph-ktv-meta { color: rgba(255,255,255,0.4); font-size: 0.7rem; margin-bottom: 1rem; }
 
-.sc-final { padding: 6.5rem 3rem; background: var(--vihrea-dark); text-align: center; position: relative; overflow: hidden; }
-.sc-final::before { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse 60% 80% at 50% 50%, rgba(200,151,58,0.1) 0%, transparent 70%); }
-.sc-final-inner { max-width: 700px; margin: 0 auto; position: relative; }
-.sc-final h2 { font-family: 'Playfair Display', serif; font-size: clamp(2.1rem, 4vw, 3.2rem); color: var(--valkoinen); line-height: 1.15; margin-bottom: 1.2rem; }
-.sc-final p { color: rgba(255,255,255,0.6); font-size: 1rem; line-height: 1.7; margin-bottom: 2.2rem; }
-.sc-final .sc-btn { font-size: 1.05rem; padding: 1.05rem 2.6rem; }
-.sc-final-small { color: rgba(255,255,255,0.4); font-size: 0.82rem; margin-top: 1.2rem; }
 
 .blog-preview { padding: 5rem 3rem; background: var(--kerma); }
 .blog-preview-inner { max-width: 1200px; margin: 0 auto; }
@@ -805,24 +798,8 @@ function LandingPage() {
         </div>
       </section>
 
-      <section className="blog-preview" id="ajankohtaista">
-        <div className="blog-preview-inner">
-          <div className="blog-preview-head animate-on-scroll">
-            <div className="section-label">Blogi</div>
-            <h2 className="section-h2">Ajankohtaista</h2>
-          </div>
-          <div className="blog-grid">
-            {BLOG_POSTS.map((post) => (
-              <Link key={post.href} to={post.href} className="blog-card animate-on-scroll">
-                <span className="blog-tag">{post.tag}</span>
-                <h3 className="blog-title">{post.title}</h3>
-                <p className="blog-excerpt">{post.excerpt}</p>
-                <span className="blog-link">Lue artikkeli →</span>
-              </Link>
-            ))}
-          </div>
-        </div>
-      </section>
+
+
 
       <footer className="kv-footer">
         <p style={{ marginBottom: "0.6rem" }}>
