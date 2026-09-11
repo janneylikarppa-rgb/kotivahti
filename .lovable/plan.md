@@ -1,67 +1,50 @@
-# Capacitor-valmistelu mobiilisovellusta varten
+# PTS-artikkelin lisääminen blogiin
 
-Tehdään sovellukseen kaikki se, mikä on mahdollista tehdä täällä: asetukset,
-komennot, kuvakkeet ja mobiiliapurit. Varsinaiset iOS- ja Android-projektit
-luodaan myöhemmin omalla koneella Xcodella ja Android Studiolla.
+## Tavoite
+Lisätään Kotiluotsin blogiin uusi julkinen artikkeli "Pitkän tähtäimen suunnitelma – miksi omakotitalon ennakoiva huolto kannattaa" omalle reitilleen, päivitetään etusivun Ajankohtaista-osio ja sivukerta.
 
-## 1. Capacitor-paketit
+## Mitä rakennetaan
 
-Asennetaan: `@capacitor/core`, `@capacitor/cli`, `@capacitor/ios`,
-`@capacitor/android`, `@capacitor/app`, `@capacitor/haptics`,
-`@capacitor/keyboard`, `@capacitor/status-bar` ja kehityspakettina
-`@capacitor/assets`.
+### 1. Uusi blogisivu
+- Tiedosto: `src/routes/blogi/pts-suunnitelma.tsx`
+- URL: `/blogi/pts-suunnitelma`
+- Julkinen sivu, ei vaadi kirjautumista.
+- Sama rakenne kuin `src/routes/blogi/sahkoinen-talokirja.tsx`:
+  - Vaalea tausta, Playfair Display -otsikot, Outfit/DM Sans -leipäteksti.
+  - Navigaatio, breadcrumb, artikkelisisältö, CTA, "Lue myös" -osio ja footer.
+  - SEO-meta, canonical, JSON-LD (Article + BreadcrumbList).
 
-## 2. capacitor.config.ts projektin juureen
+### 2. Artikkelin sisältö
+- Breadcrumb: Kotiluotsi → Blogi → PTS-suunnitelma
+- Meta: "Artikkeli · Syyskuu 2026 · Lukuaika ~5 min"
+- H1: "Pitkän tähtäimen suunnitelma – miksi omakotitalon ennakoiva huolto kannattaa"
+- Johdanto ja H2-osiot käyttäjän antamalla tekstillä.
+- CTA: "Katso, miltä oman talosi seuraavat vuodet näyttävät →" → `/rekisteroidy`
+- "Lue myös:" -linkki sähköiseen talokirjaan (`/blogi/sahkoinen-talokirja`).
 
-- appId: `fi.kotiluotsi.app`
-- appName: `Kotiluotsi`
-- webDir: `dist`
-- StatusBar tumma, taustaväri `#0D1F14`
-- Keyboard: `resize: body`, tumma tyyli
+### 3. Etusivun blogi-osio
+- Lisätään `BLOG_POSTS`-taulukkoon `src/routes/index.tsx` toinen artikkeli:
+  - tag: "Artikkeli"
+  - title: "Pitkän tähtäimen suunnitelma – miksi omakotitalon ennakoiva huolto kannattaa"
+  - excerpt: "Omakotitalossa on yllättävän paljon asioita, jotka pitäisi muistaa. PTS-suunnitelma auttaa ennakoimaan tulevat huollot ajoissa."
+  - href: `/blogi/pts-suunnitelma`
+- Säilytetään olemassa oleva korttityyli ja hover-efekti.
+- Tarvittaessa päivitetään `.blog-grid` tukemaan kahden kortin rinnakkaista asettelua desktopilla (esim. `repeat(auto-fit, minmax(320px, 1fr))`), jotta kaksi korttia ei pakota päällekkäisyyttä.
 
-Lisäksi kommentoitu `server.url`-lohko valmiina: Kotiluotsi tarvitsee
-palvelimen (kirjautuminen, tietokanta), joten sovellus ei voi toimia pelkällä
-`dist`-kansiolla. Kun kauppajulkaisu on ajankohtainen, `server.url` osoitetaan
-osoitteeseen `https://kotiluotsi.fi`. Tämä valinta tehdään myöhemmin.
+### 4. Sivukerta
+- Lisätään `/blogi/pts-suunnitelma` `src/routes/sitemap[.]xml.ts` -tiedoston `POLUT`-listaan.
 
-## 3. Komennot package.json:iin
+## Tekninen toteutus
+1. Luodaan `src/routes/blogi/pts-suunnitelma.tsx` olemassa olevan blogisivun pohjalta.
+2. Päivitetään `src/routes/index.tsx`:
+   - Lisätään uusi artikkeli `BLOG_POSTS`-taulukkoon.
+   - Säädetään `.blog-grid` responsiiviseksi kahdelle kortille.
+3. Päivitetään `src/routes/sitemap[.]xml.ts` uudella polulla.
+4. Ei muita muutoksia sovellukseen.
 
-`cap:build`, `cap:sync`, `cap:ios`, `cap:android` pyynnön mukaisesti.
-
-## 4. Kuvake ja aloitusruutu
-
-Luodaan `assets/icon.png` (1024x1024) ja `assets/splash.png` (2732x2732):
-tumma metsänvihreä tausta `#0D1F14`, kultainen `#C9A84C` K-kirjain ja
-Kotiluotsin ilme. Kuvakkeiden generointi (`npx capacitor-assets generate`)
-ajetaan vasta kun natiiviprojektit on luotu.
-
-## 5. Mobiiliapurit
-
-Uusi `src/hooks/useMobile.ts`:
-
-- `isNative` ja `platform` Capacitorin kautta
-- turvallinen web-fallback, jotta nykyinen selainversio ja palvelinrenderöinti
-  toimivat entiseen tapaan
-
-Lisäksi iOS:n lovilaitteita varten turva-alueen täyte (`safe-area-inset`)
-sovelluksen ylä- ja alareunaan vain kun sovellus ajetaan natiivina. Selainversion
-ulkoasu ei muutu.
-
-## 6. Ohje jatkoa varten
-
-`README.md`:ään lyhyt osio: miten projekti siirretään omalle koneelle, miten
-`npx cap add ios` ja `npx cap add android` ajetaan siellä, mitkä tiedot
-Info.plistiin ja AndroidManifestiin lisätään (näyttönimi, tunniste, kamera- ja
-kuvakirjastoluvat, internet-oikeus) sekä miten kuvakkeet generoidaan.
-
-## Tekniset huomiot
-
-- Projekti on TanStack Start -SSR-sovellus (Cloudflare Worker). `vite build` ei
-  tuota staattista `dist`-kansiota, jonka Capacitor voisi paketoida sellaisenaan.
-  Siksi `webDir: dist` jää paikoilleen konfiguraatiossa, mutta toimiva
-  julkaisumalli on natiivikuori, joka lataa julkaistun osoitteen.
-- `npx cap add ios/android`, `npx cap sync` ja kauppakäännökset vaativat
-  Xcoden/Android Studion; niitä ei ajeta tässä ympäristössä.
-- Tarkistukset ennen valmiiksi ilmoittamista: `bun run build` onnistuu,
-  ei tyyppivirheitä, ei konsolivirheitä, PWA ja nykyinen selainversio
-  toimivat ennallaan.
+## Tarkistus
+- `bun run build` onnistuu.
+- `tsgo` ei paljasta TypeScript-virheitä.
+- Uusi sivu avautuu osoitteessa `/blogi/pts-suunnitelma`.
+- Etusivun Ajankohtaista-osiossa on kaksi korttia ja linkit toimivat.
+- Sivukerta sisältää uuden polun.
