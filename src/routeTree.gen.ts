@@ -30,6 +30,7 @@ import { Route as AuthenticatedPtsRouteImport } from './routes/_authenticated/pt
 import { Route as AuthenticatedPyynnotRouteImport } from './routes/_authenticated/pyynnot'
 import { Route as AuthenticatedTalonTiedotRouteImport } from './routes/_authenticated/talon-tiedot'
 import { Route as AuthenticatedVuosikelloRouteImport } from './routes/_authenticated/vuosikello'
+import { Route as BlogiPtsSuunnitelmaRouteImport } from './routes/blogi/pts-suunnitelma'
 import { Route as BlogiSahkoinenTalokirjaRouteImport } from './routes/blogi/sahkoinen-talokirja'
 import { Route as ApiPublicPalauteRouteImport } from './routes/api/public/palaute'
 import { Route as ApiPublicHooksKausikirjeFollowupRouteImport } from './routes/api/public/hooks/kausikirje-followup'
@@ -148,6 +149,11 @@ const AuthenticatedVuosikelloRoute = AuthenticatedVuosikelloRouteImport.update({
   path: '/vuosikello',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
+const BlogiPtsSuunnitelmaRoute = BlogiPtsSuunnitelmaRouteImport.update({
+  id: '/blogi/pts-suunnitelma',
+  path: '/blogi/pts-suunnitelma',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const BlogiSahkoinenTalokirjaRoute = BlogiSahkoinenTalokirjaRouteImport.update({
   id: '/blogi/sahkoinen-talokirja',
   path: '/blogi/sahkoinen-talokirja',
@@ -220,6 +226,7 @@ export interface FileRoutesByFullPath {
   '/pyynnot': typeof AuthenticatedPyynnotRoute
   '/talon-tiedot': typeof AuthenticatedTalonTiedotRoute
   '/vuosikello': typeof AuthenticatedVuosikelloRoute
+  '/blogi/pts-suunnitelma': typeof BlogiPtsSuunnitelmaRoute
   '/blogi/sahkoinen-talokirja': typeof BlogiSahkoinenTalokirjaRoute
   '/api/public/palaute': typeof ApiPublicPalauteRoute
   '/api/public/hooks/kausikirje-followup': typeof ApiPublicHooksKausikirjeFollowupRoute
@@ -251,6 +258,7 @@ export interface FileRoutesByTo {
   '/pyynnot': typeof AuthenticatedPyynnotRoute
   '/talon-tiedot': typeof AuthenticatedTalonTiedotRoute
   '/vuosikello': typeof AuthenticatedVuosikelloRoute
+  '/blogi/pts-suunnitelma': typeof BlogiPtsSuunnitelmaRoute
   '/blogi/sahkoinen-talokirja': typeof BlogiSahkoinenTalokirjaRoute
   '/api/public/palaute': typeof ApiPublicPalauteRoute
   '/api/public/hooks/kausikirje-followup': typeof ApiPublicHooksKausikirjeFollowupRoute
@@ -284,6 +292,7 @@ export interface FileRoutesById {
   '/_authenticated/pyynnot': typeof AuthenticatedPyynnotRoute
   '/_authenticated/talon-tiedot': typeof AuthenticatedTalonTiedotRoute
   '/_authenticated/vuosikello': typeof AuthenticatedVuosikelloRoute
+  '/blogi/pts-suunnitelma': typeof BlogiPtsSuunnitelmaRoute
   '/blogi/sahkoinen-talokirja': typeof BlogiSahkoinenTalokirjaRoute
   '/api/public/palaute': typeof ApiPublicPalauteRoute
   '/api/public/hooks/kausikirje-followup': typeof ApiPublicHooksKausikirjeFollowupRoute
@@ -317,6 +326,7 @@ export interface FileRouteTypes {
     | '/pyynnot'
     | '/talon-tiedot'
     | '/vuosikello'
+    | '/blogi/pts-suunnitelma'
     | '/blogi/sahkoinen-talokirja'
     | '/api/public/palaute'
     | '/api/public/hooks/kausikirje-followup'
@@ -348,6 +358,7 @@ export interface FileRouteTypes {
     | '/pyynnot'
     | '/talon-tiedot'
     | '/vuosikello'
+    | '/blogi/pts-suunnitelma'
     | '/blogi/sahkoinen-talokirja'
     | '/api/public/palaute'
     | '/api/public/hooks/kausikirje-followup'
@@ -380,6 +391,7 @@ export interface FileRouteTypes {
     | '/_authenticated/pyynnot'
     | '/_authenticated/talon-tiedot'
     | '/_authenticated/vuosikello'
+    | '/blogi/pts-suunnitelma'
     | '/blogi/sahkoinen-talokirja'
     | '/api/public/palaute'
     | '/api/public/hooks/kausikirje-followup'
@@ -403,6 +415,7 @@ export interface RootRouteChildren {
   UkkRoute: typeof UkkRoute
   UnohtunutSalasanaRoute: typeof UnohtunutSalasanaRoute
   VaihdaSalasanaRoute: typeof VaihdaSalasanaRoute
+  BlogiPtsSuunnitelmaRoute: typeof BlogiPtsSuunnitelmaRoute
   BlogiSahkoinenTalokirjaRoute: typeof BlogiSahkoinenTalokirjaRoute
   ApiPublicPalauteRoute: typeof ApiPublicPalauteRoute
   ApiPublicHooksKausikirjeFollowupRoute: typeof ApiPublicHooksKausikirjeFollowupRoute
@@ -563,6 +576,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedVuosikelloRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/blogi/pts-suunnitelma': {
+      id: '/blogi/pts-suunnitelma'
+      path: '/blogi/pts-suunnitelma'
+      fullPath: '/blogi/pts-suunnitelma'
+      preLoaderRoute: typeof BlogiPtsSuunnitelmaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/blogi/sahkoinen-talokirja': {
       id: '/blogi/sahkoinen-talokirja'
       path: '/blogi/sahkoinen-talokirja'
@@ -671,6 +691,7 @@ const rootRouteChildren: RootRouteChildren = {
   UkkRoute: UkkRoute,
   UnohtunutSalasanaRoute: UnohtunutSalasanaRoute,
   VaihdaSalasanaRoute: VaihdaSalasanaRoute,
+  BlogiPtsSuunnitelmaRoute: BlogiPtsSuunnitelmaRoute,
   BlogiSahkoinenTalokirjaRoute: BlogiSahkoinenTalokirjaRoute,
   ApiPublicPalauteRoute: ApiPublicPalauteRoute,
   ApiPublicHooksKausikirjeFollowupRoute: ApiPublicHooksKausikirjeFollowupRoute,
