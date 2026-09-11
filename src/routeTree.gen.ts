@@ -30,6 +30,7 @@ import { Route as AuthenticatedPtsRouteImport } from './routes/_authenticated/pt
 import { Route as AuthenticatedPyynnotRouteImport } from './routes/_authenticated/pyynnot'
 import { Route as AuthenticatedTalonTiedotRouteImport } from './routes/_authenticated/talon-tiedot'
 import { Route as AuthenticatedVuosikelloRouteImport } from './routes/_authenticated/vuosikello'
+import { Route as BlogiIndexRouteImport } from './routes/blogi.index'
 import { Route as BlogiPtsSuunnitelmaRouteImport } from './routes/blogi/pts-suunnitelma'
 import { Route as BlogiSahkoinenTalokirjaRouteImport } from './routes/blogi/sahkoinen-talokirja'
 import { Route as ApiPublicPalauteRouteImport } from './routes/api/public/palaute'
@@ -149,6 +150,11 @@ const AuthenticatedVuosikelloRoute = AuthenticatedVuosikelloRouteImport.update({
   path: '/vuosikello',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
+const BlogiIndexRoute = BlogiIndexRouteImport.update({
+  id: '/blogi/',
+  path: '/blogi/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const BlogiPtsSuunnitelmaRoute = BlogiPtsSuunnitelmaRouteImport.update({
   id: '/blogi/pts-suunnitelma',
   path: '/blogi/pts-suunnitelma',
@@ -228,6 +234,7 @@ export interface FileRoutesByFullPath {
   '/vuosikello': typeof AuthenticatedVuosikelloRoute
   '/blogi/pts-suunnitelma': typeof BlogiPtsSuunnitelmaRoute
   '/blogi/sahkoinen-talokirja': typeof BlogiSahkoinenTalokirjaRoute
+  '/blogi/': typeof BlogiIndexRoute
   '/api/public/palaute': typeof ApiPublicPalauteRoute
   '/api/public/hooks/kausikirje-followup': typeof ApiPublicHooksKausikirjeFollowupRoute
   '/api/public/hooks/laheta-kausikirje': typeof ApiPublicHooksLahetaKausikirjeRoute
@@ -260,6 +267,7 @@ export interface FileRoutesByTo {
   '/vuosikello': typeof AuthenticatedVuosikelloRoute
   '/blogi/pts-suunnitelma': typeof BlogiPtsSuunnitelmaRoute
   '/blogi/sahkoinen-talokirja': typeof BlogiSahkoinenTalokirjaRoute
+  '/blogi': typeof BlogiIndexRoute
   '/api/public/palaute': typeof ApiPublicPalauteRoute
   '/api/public/hooks/kausikirje-followup': typeof ApiPublicHooksKausikirjeFollowupRoute
   '/api/public/hooks/laheta-kausikirje': typeof ApiPublicHooksLahetaKausikirjeRoute
@@ -294,6 +302,7 @@ export interface FileRoutesById {
   '/_authenticated/vuosikello': typeof AuthenticatedVuosikelloRoute
   '/blogi/pts-suunnitelma': typeof BlogiPtsSuunnitelmaRoute
   '/blogi/sahkoinen-talokirja': typeof BlogiSahkoinenTalokirjaRoute
+  '/blogi/': typeof BlogiIndexRoute
   '/api/public/palaute': typeof ApiPublicPalauteRoute
   '/api/public/hooks/kausikirje-followup': typeof ApiPublicHooksKausikirjeFollowupRoute
   '/api/public/hooks/laheta-kausikirje': typeof ApiPublicHooksLahetaKausikirjeRoute
@@ -328,6 +337,7 @@ export interface FileRouteTypes {
     | '/vuosikello'
     | '/blogi/pts-suunnitelma'
     | '/blogi/sahkoinen-talokirja'
+    | '/blogi/'
     | '/api/public/palaute'
     | '/api/public/hooks/kausikirje-followup'
     | '/api/public/hooks/laheta-kausikirje'
@@ -360,6 +370,7 @@ export interface FileRouteTypes {
     | '/vuosikello'
     | '/blogi/pts-suunnitelma'
     | '/blogi/sahkoinen-talokirja'
+    | '/blogi'
     | '/api/public/palaute'
     | '/api/public/hooks/kausikirje-followup'
     | '/api/public/hooks/laheta-kausikirje'
@@ -393,6 +404,7 @@ export interface FileRouteTypes {
     | '/_authenticated/vuosikello'
     | '/blogi/pts-suunnitelma'
     | '/blogi/sahkoinen-talokirja'
+    | '/blogi/'
     | '/api/public/palaute'
     | '/api/public/hooks/kausikirje-followup'
     | '/api/public/hooks/laheta-kausikirje'
@@ -417,6 +429,7 @@ export interface RootRouteChildren {
   VaihdaSalasanaRoute: typeof VaihdaSalasanaRoute
   BlogiPtsSuunnitelmaRoute: typeof BlogiPtsSuunnitelmaRoute
   BlogiSahkoinenTalokirjaRoute: typeof BlogiSahkoinenTalokirjaRoute
+  BlogiIndexRoute: typeof BlogiIndexRoute
   ApiPublicPalauteRoute: typeof ApiPublicPalauteRoute
   ApiPublicHooksKausikirjeFollowupRoute: typeof ApiPublicHooksKausikirjeFollowupRoute
   ApiPublicHooksLahetaKausikirjeRoute: typeof ApiPublicHooksLahetaKausikirjeRoute
@@ -576,6 +589,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedVuosikelloRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/blogi/': {
+      id: '/blogi/'
+      path: '/blogi'
+      fullPath: '/blogi/'
+      preLoaderRoute: typeof BlogiIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/blogi/pts-suunnitelma': {
       id: '/blogi/pts-suunnitelma'
       path: '/blogi/pts-suunnitelma'
@@ -693,6 +713,7 @@ const rootRouteChildren: RootRouteChildren = {
   VaihdaSalasanaRoute: VaihdaSalasanaRoute,
   BlogiPtsSuunnitelmaRoute: BlogiPtsSuunnitelmaRoute,
   BlogiSahkoinenTalokirjaRoute: BlogiSahkoinenTalokirjaRoute,
+  BlogiIndexRoute: BlogiIndexRoute,
   ApiPublicPalauteRoute: ApiPublicPalauteRoute,
   ApiPublicHooksKausikirjeFollowupRoute: ApiPublicHooksKausikirjeFollowupRoute,
   ApiPublicHooksLahetaKausikirjeRoute: ApiPublicHooksLahetaKausikirjeRoute,
