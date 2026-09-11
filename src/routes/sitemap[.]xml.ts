@@ -5,6 +5,7 @@ const SITE = "https://kotiluotsi.fi";
 const POLUT = [
   "/",
   "/ukk",
+  "/blogi",
   "/blogi/sahkoinen-talokirja",
   "/blogi/pts-suunnitelma",
   "/kayttoehdot",
