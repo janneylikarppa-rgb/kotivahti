@@ -6,6 +6,7 @@ const POLUT = [
   "/",
   "/ukk",
   "/blogi/sahkoinen-talokirja",
+  "/blogi/pts-suunnitelma",
   "/kayttoehdot",
 
   "/tietosuoja",

@@ -201,7 +201,7 @@ html { scroll-behavior: smooth; }
 .blog-preview-inner { max-width: 1200px; margin: 0 auto; }
 .blog-preview-head { text-align: center; margin-bottom: 3rem; }
 .blog-preview-head .section-label { justify-content: center; }
-.blog-grid { display: grid; grid-template-columns: 1fr; gap: 1.5rem; max-width: 720px; margin: 0 auto; }
+.blog-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1.5rem; max-width: 1000px; margin: 0 auto; }
 .blog-card { display: block; background: var(--valkoinen); border: 1px solid rgba(0,0,0,0.06); border-radius: 14px; padding: 2rem; transition: all 0.25s; text-decoration: none; color: inherit; }
 .blog-card:hover { transform: translateY(-4px); box-shadow: 0 12px 40px rgba(0,0,0,0.1); }
 .blog-card .blog-tag { display: inline-block; color: var(--harmaa); font-size: 0.72rem; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 0.8rem; }
@@ -438,6 +438,12 @@ const BLOG_POSTS: BlogPost[] = [
     title: "Sähköinen talokirja – mitä, milloin ja kuka?",
     excerpt: "Onko sinullakin talon tiedot hajallaan – osa muistitikulla, osa paperisessa mapissa ja osa vain muistissa? Et ole yksin – tämä on omakotitaloasujien arkipäivää ympäri Suomen.",
     href: "/blogi/sahkoinen-talokirja",
+  },
+  {
+    tag: "Artikkeli",
+    title: "Pitkän tähtäimen suunnitelma – miksi omakotitalon ennakoiva huolto kannattaa",
+    excerpt: "Omakotitalossa on yllättävän paljon asioita, jotka pitäisi muistaa. PTS-suunnitelma auttaa ennakoimaan tulevat huollot ajoissa.",
+    href: "/blogi/pts-suunnitelma",
   },
 ];
 
