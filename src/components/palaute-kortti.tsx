@@ -60,16 +60,16 @@ export function PalauteKortti() {
   const sulje = () => { ohitaSessio(kysely.id); setAuki(false); };
 
   return (
-    <div className="fixed bottom-4 right-4 z-50 max-w-[340px] w-[calc(100vw-2rem)] rounded-xl border border-primary/50 bg-[#142A1A] p-4 shadow-2xl animate-in slide-in-from-bottom-4 fade-in duration-300">
+    <div className="fixed bottom-4 right-4 z-50 max-w-[340px] w-[calc(100vw-2rem)] rounded-xl border border-gold/30 bg-card p-4 shadow-2xl text-card-foreground animate-in slide-in-from-bottom-4 fade-in duration-300">
       {!kiitos && (
-        <button onClick={sulje} aria-label="Sulje" className="absolute right-2 top-2 text-muted-foreground hover:text-cream">
+        <button onClick={sulje} aria-label="Sulje" className="absolute right-2 top-2 text-muted-foreground hover:text-foreground">
           <X className="h-4 w-4" />
         </button>
       )}
       {kiitos ? (
         <div className="py-6 text-center">
           <div className="text-3xl mb-2">🙏</div>
-          <p className="font-serif text-base text-cream">Kiitos palautteesta!</p>
+          <p className="font-serif text-base text-card-foreground">Kiitos palautteesta!</p>
         </div>
       ) : (
         <KyselySisalto kysely={kysely} onVastaa={(v) => mut.mutate(v)} loading={mut.isPending} />
@@ -140,12 +140,12 @@ function ChoiceKysely({ otsikko, kentta, vaihtoehdot, onVastaa, loading, salliKo
   const [kommentti, setKommentti] = useState("");
   return (
     <div className="space-y-3 pr-6">
-      <h3 className="font-serif text-base text-cream">{otsikko}</h3>
+      <h3 className="font-serif text-base text-card-foreground">{otsikko}</h3>
       <div className="flex flex-col gap-1.5">
         {vaihtoehdot.map((v) => (
           <button key={v.v} onClick={() => setValinta(v.v)}
             className={`text-left rounded-md border px-3 py-2 text-sm transition ${
-              valinta === v.v ? "border-primary bg-primary/15 text-cream" : "border-border/60 text-muted-foreground hover:border-primary/50 hover:text-cream"
+              valinta === v.v ? "border-primary bg-primary/15 text-foreground" : "border-border/60 text-muted-foreground hover:border-primary/50 hover:text-foreground"
             }`}>{v.n}</button>
         ))}
       </div>
@@ -171,14 +171,14 @@ function OnboardingKysely({ onVastaa, loading }: { onVastaa: (v: Record<string, 
   ];
   return (
     <div className="space-y-3 pr-6">
-      <h3 className="font-serif text-base text-cream">Miten kokemuksesi alkoi?</h3>
+      <h3 className="font-serif text-base text-card-foreground">Miten kokemuksesi alkoi?</h3>
       <div>
         <p className="text-xs text-muted-foreground mb-1.5">Oliko aloittaminen helppoa?</p>
         <div className="flex flex-col gap-1.5">
           {helppoudet.map((v) => (
             <button key={v.v} onClick={() => setHelppous(v.v)}
               className={`text-left rounded-md border px-3 py-1.5 text-sm transition ${
-                helppous === v.v ? "border-primary bg-primary/15 text-cream" : "border-border/60 text-muted-foreground hover:border-primary/50 hover:text-cream"
+                helppous === v.v ? "border-primary bg-primary/15 text-foreground" : "border-border/60 text-muted-foreground hover:border-primary/50 hover:text-foreground"
               }`}>{v.n}</button>
           ))}
         </div>
@@ -209,13 +209,13 @@ function NpsKysely({ onVastaa, loading }: { onVastaa: (v: Record<string, any>) =
   const [miksi, setMiksi] = useState("");
   return (
     <div className="space-y-3 pr-6">
-      <h3 className="font-serif text-base text-cream">Suosittelisitko Kotiluotsia tutullesi?</h3>
+      <h3 className="font-serif text-base text-card-foreground">Suosittelisitko Kotiluotsia tutullesi?</h3>
       <p className="text-xs text-muted-foreground">0 = en lainkaan, 10 = ehdottomasti</p>
       <div className="grid grid-cols-11 gap-1">
         {Array.from({ length: 11 }).map((_, i) => (
           <button key={i} onClick={() => setPisteet(i)}
             className={`h-8 rounded text-xs font-mono transition ${
-              pisteet === i ? "bg-primary text-primary-foreground" : "bg-background/40 text-muted-foreground hover:bg-primary/20 hover:text-cream"
+              pisteet === i ? "bg-primary text-primary-foreground" : "bg-background/40 text-muted-foreground hover:bg-primary/20 hover:text-foreground"
             }`}>{i}</button>
         ))}
       </div>
@@ -243,13 +243,13 @@ function ChurnKysely({ onVastaa, loading }: { onVastaa: (v: Record<string, any>)
   const toggle = (v: string) => setValitut((p) => p.includes(v) ? p.filter((x) => x !== v) : [...p, v]);
   return (
     <div className="space-y-3 pr-6">
-      <h3 className="font-serif text-base text-cream">Et ole käynyt vähään aikaan – mitä jäit kaipaamaan?</h3>
+      <h3 className="font-serif text-base text-card-foreground">Et ole käynyt vähään aikaan – mitä jäit kaipaamaan?</h3>
       <p className="text-xs text-muted-foreground">Voit valita useamman</p>
       <div className="flex flex-col gap-1.5">
         {syyt.map((v) => (
           <button key={v.v} onClick={() => toggle(v.v)}
             className={`text-left rounded-md border px-3 py-1.5 text-sm transition ${
-              valitut.includes(v.v) ? "border-primary bg-primary/15 text-cream" : "border-border/60 text-muted-foreground hover:border-primary/50 hover:text-cream"
+              valitut.includes(v.v) ? "border-primary bg-primary/15 text-foreground" : "border-border/60 text-muted-foreground hover:border-primary/50 hover:text-foreground"
             }`}>{v.n}</button>
         ))}
       </div>
@@ -274,15 +274,15 @@ function VaiheKaksiKysely({ onVastaa, loading }: { onVastaa: (v: Record<string, 
   ];
   return (
     <div className="space-y-3 pr-6">
-      <h3 className="font-serif text-base text-cream">Miten käynti meni?</h3>
+      <h3 className="font-serif text-base text-card-foreground">Miten käynti meni?</h3>
       <div>
         <p className="text-xs text-muted-foreground mb-1.5">Käviköhän ammattilainen sovitusti?</p>
         <div className="flex flex-col gap-1.5">
           {k1.map((v) => (
             <button key={v.v} onClick={() => setKavi(v.v)}
-              className={`text-left rounded-md border px-3 py-1.5 text-sm transition ${
-                kavi === v.v ? "border-primary bg-primary/15 text-cream" : "border-border/60 text-muted-foreground hover:border-primary/50 hover:text-cream"
-              }`}>{v.n}</button>
+            className={`text-left rounded-md border px-3 py-1.5 text-sm transition ${
+              kavi === v.v ? "border-primary bg-primary/15 text-foreground" : "border-border/60 text-muted-foreground hover:border-primary/50 hover:text-foreground"
+            }`}>{v.n}</button>
           ))}
         </div>
       </div>
@@ -326,7 +326,7 @@ function VaiheKolmeKysely({ onVastaa, loading }: { onVastaa: (v: Record<string, 
       {opts.map((o) => (
         <button key={o.v} onClick={() => set(o.v)}
           className={`text-left rounded-md border px-3 py-1.5 text-xs transition ${
-            val === o.v ? "border-primary bg-primary/15 text-cream" : "border-border/60 text-muted-foreground hover:border-primary/50 hover:text-cream"
+            val === o.v ? "border-primary bg-primary/15 text-foreground" : "border-border/60 text-muted-foreground hover:border-primary/50 hover:text-foreground"
           }`}>{o.n}</button>
       ))}
     </div>
@@ -336,7 +336,7 @@ function VaiheKolmeKysely({ onVastaa, loading }: { onVastaa: (v: Record<string, 
 
   return (
     <div className="space-y-3 pr-6 max-h-[70vh] overflow-y-auto">
-      <h3 className="font-serif text-base text-cream">Kokonaiskokemus työstä</h3>
+      <h3 className="font-serif text-base text-card-foreground">Kokonaiskokemus työstä</h3>
 
       <div>
         <p className="text-xs text-muted-foreground mb-1.5">Työn lopputulos (1=ei hyväksyttävä, 5=ylitti odotukset)</p>
@@ -404,7 +404,7 @@ function TahdetKysely({ onVastaa, loading }: { onVastaa: (v: Record<string, any>
   const [kommentti, setKommentti] = useState("");
   return (
     <div className="space-y-3 pr-6">
-      <h3 className="font-serif text-base text-cream">Miten ammattilaisen työ sujui?</h3>
+      <h3 className="font-serif text-base text-card-foreground">Miten ammattilaisen työ sujui?</h3>
       <div className="flex gap-1">
         {[1, 2, 3, 4, 5].map((n) => (
           <button key={n} onClick={() => setLaatu(n)}
