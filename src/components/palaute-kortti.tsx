@@ -62,14 +62,14 @@ export function PalauteKortti() {
   return (
     <div className="fixed bottom-4 right-4 z-50 max-w-[340px] w-[calc(100vw-2rem)] rounded-xl border border-gold/30 bg-card p-4 shadow-2xl text-card-foreground animate-in slide-in-from-bottom-4 fade-in duration-300">
       {!kiitos && (
-        <button onClick={sulje} aria-label="Sulje" className="absolute right-2 top-2 text-muted-foreground hover:text-cream">
+        <button onClick={sulje} aria-label="Sulje" className="absolute right-2 top-2 text-muted-foreground hover:text-foreground">
           <X className="h-4 w-4" />
         </button>
       )}
       {kiitos ? (
         <div className="py-6 text-center">
           <div className="text-3xl mb-2">🙏</div>
-          <p className="font-serif text-base text-cream">Kiitos palautteesta!</p>
+          <p className="font-serif text-base text-card-foreground">Kiitos palautteesta!</p>
         </div>
       ) : (
         <KyselySisalto kysely={kysely} onVastaa={(v) => mut.mutate(v)} loading={mut.isPending} />
