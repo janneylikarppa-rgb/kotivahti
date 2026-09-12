@@ -140,7 +140,7 @@ function ChoiceKysely({ otsikko, kentta, vaihtoehdot, onVastaa, loading, salliKo
   const [kommentti, setKommentti] = useState("");
   return (
     <div className="space-y-3 pr-6">
-      <h3 className="font-serif text-base text-cream">{otsikko}</h3>
+      <h3 className="font-serif text-base text-card-foreground">{otsikko}</h3>
       <div className="flex flex-col gap-1.5">
         {vaihtoehdot.map((v) => (
           <button key={v.v} onClick={() => setValinta(v.v)}
@@ -171,7 +171,7 @@ function OnboardingKysely({ onVastaa, loading }: { onVastaa: (v: Record<string, 
   ];
   return (
     <div className="space-y-3 pr-6">
-      <h3 className="font-serif text-base text-cream">Miten kokemuksesi alkoi?</h3>
+      <h3 className="font-serif text-base text-card-foreground">Miten kokemuksesi alkoi?</h3>
       <div>
         <p className="text-xs text-muted-foreground mb-1.5">Oliko aloittaminen helppoa?</p>
         <div className="flex flex-col gap-1.5">
@@ -209,7 +209,7 @@ function NpsKysely({ onVastaa, loading }: { onVastaa: (v: Record<string, any>) =
   const [miksi, setMiksi] = useState("");
   return (
     <div className="space-y-3 pr-6">
-      <h3 className="font-serif text-base text-cream">Suosittelisitko Kotiluotsia tutullesi?</h3>
+      <h3 className="font-serif text-base text-card-foreground">Suosittelisitko Kotiluotsia tutullesi?</h3>
       <p className="text-xs text-muted-foreground">0 = en lainkaan, 10 = ehdottomasti</p>
       <div className="grid grid-cols-11 gap-1">
         {Array.from({ length: 11 }).map((_, i) => (
@@ -243,7 +243,7 @@ function ChurnKysely({ onVastaa, loading }: { onVastaa: (v: Record<string, any>)
   const toggle = (v: string) => setValitut((p) => p.includes(v) ? p.filter((x) => x !== v) : [...p, v]);
   return (
     <div className="space-y-3 pr-6">
-      <h3 className="font-serif text-base text-cream">Et ole käynyt vähään aikaan – mitä jäit kaipaamaan?</h3>
+      <h3 className="font-serif text-base text-card-foreground">Et ole käynyt vähään aikaan – mitä jäit kaipaamaan?</h3>
       <p className="text-xs text-muted-foreground">Voit valita useamman</p>
       <div className="flex flex-col gap-1.5">
         {syyt.map((v) => (
@@ -274,7 +274,7 @@ function VaiheKaksiKysely({ onVastaa, loading }: { onVastaa: (v: Record<string, 
   ];
   return (
     <div className="space-y-3 pr-6">
-      <h3 className="font-serif text-base text-cream">Miten käynti meni?</h3>
+      <h3 className="font-serif text-base text-card-foreground">Miten käynti meni?</h3>
       <div>
         <p className="text-xs text-muted-foreground mb-1.5">Käviköhän ammattilainen sovitusti?</p>
         <div className="flex flex-col gap-1.5">
@@ -336,7 +336,7 @@ function VaiheKolmeKysely({ onVastaa, loading }: { onVastaa: (v: Record<string, 
 
   return (
     <div className="space-y-3 pr-6 max-h-[70vh] overflow-y-auto">
-      <h3 className="font-serif text-base text-cream">Kokonaiskokemus työstä</h3>
+      <h3 className="font-serif text-base text-card-foreground">Kokonaiskokemus työstä</h3>
 
       <div>
         <p className="text-xs text-muted-foreground mb-1.5">Työn lopputulos (1=ei hyväksyttävä, 5=ylitti odotukset)</p>
@@ -404,7 +404,7 @@ function TahdetKysely({ onVastaa, loading }: { onVastaa: (v: Record<string, any>
   const [kommentti, setKommentti] = useState("");
   return (
     <div className="space-y-3 pr-6">
-      <h3 className="font-serif text-base text-cream">Miten ammattilaisen työ sujui?</h3>
+      <h3 className="font-serif text-base text-card-foreground">Miten ammattilaisen työ sujui?</h3>
       <div className="flex gap-1">
         {[1, 2, 3, 4, 5].map((n) => (
           <button key={n} onClick={() => setLaatu(n)}
