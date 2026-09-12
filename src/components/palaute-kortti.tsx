@@ -145,7 +145,7 @@ function ChoiceKysely({ otsikko, kentta, vaihtoehdot, onVastaa, loading, salliKo
         {vaihtoehdot.map((v) => (
           <button key={v.v} onClick={() => setValinta(v.v)}
             className={`text-left rounded-md border px-3 py-2 text-sm transition ${
-              valinta === v.v ? "border-primary bg-primary/15 text-cream" : "border-border/60 text-muted-foreground hover:border-primary/50 hover:text-cream"
+              valinta === v.v ? "border-primary bg-primary/15 text-foreground" : "border-border/60 text-muted-foreground hover:border-primary/50 hover:text-foreground"
             }`}>{v.n}</button>
         ))}
       </div>
@@ -178,7 +178,7 @@ function OnboardingKysely({ onVastaa, loading }: { onVastaa: (v: Record<string, 
           {helppoudet.map((v) => (
             <button key={v.v} onClick={() => setHelppous(v.v)}
               className={`text-left rounded-md border px-3 py-1.5 text-sm transition ${
-                helppous === v.v ? "border-primary bg-primary/15 text-cream" : "border-border/60 text-muted-foreground hover:border-primary/50 hover:text-cream"
+                helppous === v.v ? "border-primary bg-primary/15 text-foreground" : "border-border/60 text-muted-foreground hover:border-primary/50 hover:text-foreground"
               }`}>{v.n}</button>
           ))}
         </div>
@@ -215,7 +215,7 @@ function NpsKysely({ onVastaa, loading }: { onVastaa: (v: Record<string, any>) =
         {Array.from({ length: 11 }).map((_, i) => (
           <button key={i} onClick={() => setPisteet(i)}
             className={`h-8 rounded text-xs font-mono transition ${
-              pisteet === i ? "bg-primary text-primary-foreground" : "bg-background/40 text-muted-foreground hover:bg-primary/20 hover:text-cream"
+              pisteet === i ? "bg-primary text-primary-foreground" : "bg-background/40 text-muted-foreground hover:bg-primary/20 hover:text-foreground"
             }`}>{i}</button>
         ))}
       </div>
@@ -249,7 +249,7 @@ function ChurnKysely({ onVastaa, loading }: { onVastaa: (v: Record<string, any>)
         {syyt.map((v) => (
           <button key={v.v} onClick={() => toggle(v.v)}
             className={`text-left rounded-md border px-3 py-1.5 text-sm transition ${
-              valitut.includes(v.v) ? "border-primary bg-primary/15 text-cream" : "border-border/60 text-muted-foreground hover:border-primary/50 hover:text-cream"
+              valitut.includes(v.v) ? "border-primary bg-primary/15 text-foreground" : "border-border/60 text-muted-foreground hover:border-primary/50 hover:text-foreground"
             }`}>{v.n}</button>
         ))}
       </div>
@@ -280,9 +280,9 @@ function VaiheKaksiKysely({ onVastaa, loading }: { onVastaa: (v: Record<string, 
         <div className="flex flex-col gap-1.5">
           {k1.map((v) => (
             <button key={v.v} onClick={() => setKavi(v.v)}
-              className={`text-left rounded-md border px-3 py-1.5 text-sm transition ${
-                kavi === v.v ? "border-primary bg-primary/15 text-cream" : "border-border/60 text-muted-foreground hover:border-primary/50 hover:text-cream"
-              }`}>{v.n}</button>
+            className={`text-left rounded-md border px-3 py-1.5 text-sm transition ${
+              kavi === v.v ? "border-primary bg-primary/15 text-foreground" : "border-border/60 text-muted-foreground hover:border-primary/50 hover:text-foreground"
+            }`}>{v.n}</button>
           ))}
         </div>
       </div>
@@ -326,7 +326,7 @@ function VaiheKolmeKysely({ onVastaa, loading }: { onVastaa: (v: Record<string, 
       {opts.map((o) => (
         <button key={o.v} onClick={() => set(o.v)}
           className={`text-left rounded-md border px-3 py-1.5 text-xs transition ${
-            val === o.v ? "border-primary bg-primary/15 text-cream" : "border-border/60 text-muted-foreground hover:border-primary/50 hover:text-cream"
+            val === o.v ? "border-primary bg-primary/15 text-foreground" : "border-border/60 text-muted-foreground hover:border-primary/50 hover:text-foreground"
           }`}>{o.n}</button>
       ))}
     </div>
