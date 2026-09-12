@@ -60,7 +60,7 @@ export function PalauteKortti() {
   const sulje = () => { ohitaSessio(kysely.id); setAuki(false); };
 
   return (
-    <div className="fixed bottom-4 right-4 z-50 max-w-[340px] w-[calc(100vw-2rem)] rounded-xl border border-primary/50 bg-[#142A1A] p-4 shadow-2xl animate-in slide-in-from-bottom-4 fade-in duration-300">
+    <div className="fixed bottom-4 right-4 z-50 max-w-[340px] w-[calc(100vw-2rem)] rounded-xl border border-gold/30 bg-card p-4 shadow-2xl text-card-foreground animate-in slide-in-from-bottom-4 fade-in duration-300">
       {!kiitos && (
         <button onClick={sulje} aria-label="Sulje" className="absolute right-2 top-2 text-muted-foreground hover:text-cream">
           <X className="h-4 w-4" />
