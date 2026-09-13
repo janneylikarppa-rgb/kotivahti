@@ -14,7 +14,8 @@ Ei oletusvalintaa; lähetys estetään kunnes valinta on tehty. Kartta-vaihtoeht
 Uusi komponentti `src/components/kartta-valinta.tsx`:
 - Mapbox GL JS, tyyli `dark-v11`, zoom maakuntatasolle
 - Kodin marker (valkoinen koti-ikoni, tooltip "Kotisi")
-- Ammattilaisten markerit + popup: yrityksen nimi, ⭐ arvosana/5, arviomäärä
+- Ammattilaisten markerit + popup: yrityksen nimi lihavoituna valkoisella, kultainen "✓ Tarkistettu" ja kaupunki hillityllä tekstillä
+- Jos ammattilaiselle on vähintään kolme Kotiluotsissa annettua työlaatuarviota, popup näyttää lisäksi "★ X.X ([lkm] arv.)"; alle kolmella arviolla arvosanariviä ei näytetä
 - Valinta: klikkaus korostaa kultaisella (#C9A84C), yläpalkki "+1 valittu (X/3)", uudelleenklikkaus poistaa, 3:n jälkeen muut harmaantuvat ("Maksimimäärä valittu")
 - Alareuna: "Valittu: X/3" · [Peruuta] · [Valmis, palaa lomakkeelle →] (disabloitu kun 0)
 
@@ -36,7 +37,8 @@ Ammattilaislomakkeeseen osoitekentät (katuosoite, postinumero, kaupunki). Talle
 - Mapbox-avain: käytetään Lovablen Mapbox-liitäntää (connector), joka tuo julkisen tokenin selaimeen (`VITE_LOVABLE_CONNECTOR_MAPBOX_PUBLIC_TOKEN`) ja salaisen tokenin palvelinpuolen geokoodaukseen gatewayn kautta. Tämä on turvallisempi kuin tokenin käsinlisäys; pyydän liitännän yhdistämistä työn alussa.
 - Geokoodaus (osoite → lat/lng) tehdään palvelinfunktiossa `src/lib/liidit.functions.ts`, ei selaimessa.
 - Kartta ladataan vain selaimessa (`ClientOnly` + dynaaminen import), koska sovellus renderöi palvelimella.
-- Uusi julkinen-kirjautuneille palvelinfunktio: hae ammattilaiset kategorian + maakunnan mukaan (vain nimi, arvosana, arviomäärä, koordinaatit — ei sähköpostia tai puhelinta).
+- Uusi kirjautuneille tarkoitettu palvelinfunktio hakee ammattilaiset kategorian + maakunnan mukaan (vain nimi, kaupunki, koordinaatit ja tarvittaessa arvioyhteenveto — ei sähköpostia tai puhelinta).
+- Arvosana ja arvioiden määrä johdetaan automaattisesti ammattilaiseen liitettyjen liidien `palaute_kyselyt`-taulun `tyon_laatu`-vastauksista. Arvioyhteenveto palautetaan vain, kun hyväksyttyjä arvioita on vähintään kolme.
 - `luoLiidi`-validointi laajenee: `valinta_tapa` ja `valitut_ammattilaiset` (max 3).
 
 ## Varmistus
