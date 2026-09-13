@@ -1,0 +1,5 @@
+- [ ] Lisää palveluntarjoajan valinta liidilomakkeeseen
+- [ ] Lisää Mapbox-karttamodaali ja yritysvalinta
+- [ ] Lisää osoite- ja valintakentät tietokantaan
+- [ ] Laajenna ammattilaisen admin-lomake ja geokoodaus
+- [ ] Varmista build, TypeScript, selain ja konsoli
